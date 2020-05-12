@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="User Details Report" progressMode="Percentage" resultAction="Rename" subType="Identity and User Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="User Details Report">
+            <DataSource defaultSort="name" objectType="Identity" type="Filter">
+              <QueryParameters>
+                <Parameter argument="lastRefresh" property="lastRefresh" valueClass="daterange"/>
+                <Parameter argument="lastLogin" property="lastLogin" valueClass="daterange"/>
+                <Parameter argument="identityApplications" property="links.application.id"/>
+                <Parameter argument="capabilities" property="capabilities.id"/>
+                <Parameter argument="identityRoles">
+                  <QueryScript>
+                    <Source>
+                            import sailpoint.object.*;
+                            import java.lang.*;
+                            List roleFilters = new ArrayList();
+                            if (value != null){
+                              for(String role : value){
+                                roleFilters.add(Filter.eq("bundles.id", role));
+                                roleFilters.add(Filter.eq("assignedRoles.id", role));
+                              }
+
+                              if (!roleFilters.isEmpty())
+                                queryOptions.addFilter(Filter.subquery("id", Identity.class, "id", Filter.or(roleFilters)));
+                            }
+                            return queryOptions;
+                          </Source>
+                  </QueryScript>
+                </Parameter>
+                <Parameter argument="groupDefinitions">
+                  <QueryScript>
+                    <Source>
+                            import sailpoint.object.*;
+                            import sailpoint.reporting.*;
+                            Filter f = ReportingLibrary.getGroupDefinitionFilter(context, value, false);
+                            if(f!=null) {
+                                queryOptions.addFilter(f);
+                            }
+                            return queryOptions;
+                          </Source>
+                  </QueryScript>
+                </Parameter>
+              </QueryParameters>
+            </DataSource>
+            <ReportForm>
+              <Reference class="sailpoint.object.Form" name="Base Identity Report Form"/>
+            </ReportForm>
+            <Columns>
+              <ReportColumnConfig field="identity" header="rept_user_details_col_identity" property="name" sortable="true" width="110"/>
+              <ReportColumnConfig field="lastName" header="rept_user_details_col_lastname" property="lastname" sortable="true" width="110"/>
+              <ReportColumnConfig field="firstName" header="rept_user_details_col_firstname" property="firstname" sortable="true" width="110"/>
+              <ReportColumnConfig field="manager" header="rept_user_details_col_manager" property="manager.displayName" sortable="true" width="110"/>
+              <ReportColumnConfig field="roles" header="rept_user_details_col_roles" property="id" width="110">
+                <RenderScript>
+                  <Source>
+                          import sailpoint.object.*;
+                          import java.util.*;
+
+                          List nameFilter = new ArrayList();
+                          nameFilter.add(Filter.eq("name", "assignedRoles"));
+                          nameFilter.add(Filter.eq("name", "detectedRoles"));
+
+                          QueryOptions ops = new QueryOptions();
+                          ops.addFilter(Filter.eq("identity.id", value));
+                          ops.addFilter(Filter.or(nameFilter));
+
+                          List names = new ArrayList();
+                          List properties = new ArrayList();
+                          properties.add("value");
+                          Iterator iter = context.search(IdentityEntitlement.class, ops, properties);
+                          while(iter.hasNext()){
+                            names.add(iter.next()[0]);
+                          }
+                          return names;
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="applications" header="rept_user_details_col_applications" property="links.application.name" subQueryKey="id" width="110"/>
+            </Columns>
+            <InitializationRule>
+              <Reference class="sailpoint.object.Rule" name="Identity Report Form Customizer"/>
+            </InitializationRule>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>A detailed view of users currently detected by IdentityIQ.</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessUserReport"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument multi="true" name="groupDefinitions" type="string">
+        <Description>rept_input_user_report_group_definition</Description>
+      </Argument>
+      <Argument name="capabilities" type="string">
+        <Description>rept_input_user_report_capabilities</Description>
+      </Argument>
+      <Argument name="lastLogin" type="date">
+        <Description>rept_input_user_report_last_login</Description>
+      </Argument>
+      <Argument name="lastRefresh" type="date">
+        <Description>rept_input_user_report_last_refresh</Description>
+      </Argument>
+      <Argument multi="true" name="identityRoles" type="Bundle">
+        <Description>rept_input_user_report_biz_roles</Description>
+      </Argument>
+      <Argument multi="true" name="identityApplications" type="Application">
+        <Description>rept_input_user_report_apps</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

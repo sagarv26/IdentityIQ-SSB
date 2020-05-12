@@ -1,0 +1,171 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true"  name="SP SAMPLE WF" type="LCMProvisioning">
+	<Description>
+	
+	This is a sample workflow showing use of the provision processor framework.
+	
+	It also utilizes the role assignment framework and send emails framework.  
+	
+	The provision processor itself uses the approval framework.  
+	</Description>
+	
+<!-- **************************************************************************
+	STANDARD INPUT VARIABLES
+ **************************************************************************-->  
+  <Variable input="true" name="trigger">
+    <Description>The IdentityTrigger</Description>
+  </Variable>
+  <Variable input="true" name="event">
+    <Description>The IdentityChangeEvent</Description>
+  </Variable>
+  <Variable initializer="string:true" name="trace">
+    <Description>
+      Used for debugging this workflow and when set to true trace
+      will be sent to stdout.
+    </Description>
+  </Variable>
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity.</Description>
+  </Variable>
+  <Variable name="flow" initializer="string:AccessRequest">
+    <Description>The name of the identity.</Description>
+  </Variable>
+  <Variable name="source" initializer="string:LCM">
+    <Description>The name of the identity.</Description>
+  </Variable>
+  <Variable initializer="script:resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>
+      The displayName of the identity being updated.
+      Query for this using a projection query and fall back to the name.
+    </Description>
+  </Variable>
+  
+<!-- **************************************************************************
+	EMAIL SETUP VARIABLES
+ **************************************************************************-->
+  <Variable name="successTo" initializer="sampleuser@sailpoint.com" />
+  <Variable name="failureTo" initializer="sampleuser@sailpoint.com" />
+  <Variable name="successTemplate" initializer="string:SP Post Prov Result Email" />
+  <Variable name="failureTemplate" initializer="string:SP Post Prov Result Email" />
+  <Variable name="approvedTo" initializer="sampleuser@sailpoint.com" />
+  <Variable name="rejectedTo" initializer="sampleuser@sailpoint.com" />
+  <Variable name="approvedTemplate" initializer="string:SP Approval Result Email" />
+  <Variable name="rejectedTemplate" initializer="string:SP Approval Result Email" />	
+  <Variable name="updateStandardPostProvEmails" initializer="false" />	
+  <Variable name="updateStandardPostApproveEmails" initializer="false" />
+  
+<!-- **************************************************************************
+	VARIABLES USED DURING PROCESSING
+ **************************************************************************-->
+  <Variable editable="true" name="requestType">
+    <Description>The Decider determining the Use Case</Description>
+  </Variable>
+  <Variable name="plan" />
+  <Variable name="project" />
+  
+  <Variable name="emailArgList">
+  	<Description>
+  		List of hash maps of all necessary emails that need to be sent out. 
+  	</Description>
+  </Variable>
+  <Variable name="spExtAttrs" />
+  
+<!-- **************************************************************************-->
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule"  name="SP Provisioning Rules Library"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="2" posY="135">
+    <Transition to="Get Request Type"/>
+  </Step>
+  <Step name="Get Request Type" resultVariable="requestType">
+    <Script>
+      <Source>
+      	import sailpoint.object.*;
+      	
+      	/* Sample code to add an extended attribute to be passed down into approvals */
+      	Attributes attrs = new Attributes();
+      	attrs.put("secAdmin", "blah");
+      	
+      	workflow.put("spExtAttrs", spExtAttrs);
+      	
+      	/* this would then be retrieved via the following:
+      		Attributes attrs = workflow.get("spExtAttrs");
+      		String secAdmin = attrs.get("secAdmin");
+      	
+      	*/
+      
+      	return "SAMPLE JOINER";
+      </Source>
+    </Script>
+     <Transition to="Build Plan" />
+  </Step>
+  <Step name="Build Plan" resultVariable="plan">
+  	<Script>
+  		<Source>
+  			import sailpoint.object.*;
+  			import java.util.*;
+  			ProvisioningPlan plan = getDynamicRolesPlan(context, identityName);
+  			return plan;
+  		</Source>
+  	</Script>
+  	<Transition to="No Request Failure" when="plan == null || plan.getAccountRequests() == null || plan.getAccountRequests().size() &lt; 1"/>
+  	<Transition to="Process Plan"/>
+  </Step>
+  <Step icon="Task" name="Process Plan">
+    <Arg name="fallbackApprover" value="spadmin"/>
+    <Arg name="flow" value="ref:flow"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="emailArgList" value="ref:emailArgList"/>
+    <Arg name="requestType" value="ref:requestType" />
+    <Arg name="requestor" value="ref:requestor" />
+    <Arg name="successTo" value="ref:successTo" />
+    <Arg name="failureTo" value="ref:failureTo" />
+    <Arg name="successTemplate" value="ref:successTemplate" />
+    <Arg name="failureTemplate" value="ref:failureTemplate" />
+    <Arg name="approvedTo" value="ref:successTo" />
+    <Arg name="rejectedTo" value="ref:failureTo" />
+    <Arg name="approvedTemplate" value="ref:approvedTemplate" />
+    <Arg name="rejectedTemplate" value="ref:rejectedTemplate" />
+    <Arg name="updateStandardPostProvEmails" value="ref:updateStandardPostProvEmails" />
+    <Arg name="updateStandardPostApproveEmails" value="ref:updateStandardPostApproveEmails" />
+    <Arg name="spExtAttrs" value="ref:spExtAttrs" />
+    <Return name="emailArgList" to="emailArgList"/>
+    <Return name="approvalSet" to="approvalSet"/>
+    <Return name="project" to="project"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="SP Provision Processor Sub"/>
+    </WorkflowRef>
+    <Transition to="Send Emails" />
+  </Step>
+  
+  <Step name="No Request Failure">
+  	<Script>
+  		<Source>
+  			System.out.println("In No Request Failure Step");
+  			//TODO:  CAN ADD LOGIC TO APPEND EMAILS.  
+  			// SHOULD BE IN RULE LIBRARY.  ADDING HERE FOR DISPLAY PURPOSES
+  		
+  		</Source>
+  	</Script>
+  	<Transition to="Send Emails" />
+  </Step>
+  
+  <Step name="Send Emails">
+  	<Arg name="emailArgList" value="ref:emailArgList"/>
+    <Description>
+      Call the standard subprocess that will handle the built-in
+      owner, manager and security officer approval schemes.
+    </Description>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="SP Dynamic Send Emails Sub"/>
+    </WorkflowRef>
+    <Transition to="Stop"/>
+  </Step>
+  
+  <Step icon="Stop" name="Stop" posX="960" posY="17"/>
+</Workflow>

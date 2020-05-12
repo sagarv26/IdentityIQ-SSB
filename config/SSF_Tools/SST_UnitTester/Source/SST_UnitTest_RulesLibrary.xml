@@ -1,0 +1,523 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="SST Unit Test Rules Library" language="beanshell">
+	<Source>
+	<![CDATA[
+	import sailpoint.object.*;
+	import sailpoint.api.SailPointContext;
+	import java.util.*;
+	import java.text.*;
+	import sailpoint.tools.GeneralException;
+	import sailpoint.tools.Util;
+	import sailpoint.tools.xml.XMLObjectFactory;
+   	import sailpoint.object.ProvisioningPlan;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+	import sailpoint.tools.Util;
+    import sailpoint.tools.Message;
+    import sailpoint.dec.monitoring.Monitor;
+    import java.io.*;
+    import sailpoint.tools.xml.*;
+    import org.apache.velocity.VelocityContext;
+	import org.apache.velocity.app.Velocity;
+	import org.apache.velocity.exception.MethodInvocationException;
+	import org.apache.velocity.exception.ParseErrorException;
+	import org.apache.velocity.exception.ResourceNotFoundException;  
+    
+    import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	private static Log utlogger = LogFactory.getLog("rule.SST.UnitTest.RulesLibrary");
+	
+	private static String redBG = "#FF9900";
+	private static String greenBG = "#73B873";
+	private static String qt = "'";
+	private static String td = "<td>";
+	
+	public static boolean isSuccess(Object actualResult, Object expectedResult){
+		utlogger.trace("Enter isSuccess");
+		boolean success = false;
+		
+		
+		utlogger.trace("ActualResult: " + actualResult);
+		utlogger.trace("ExpectedResult: " + expectedResult);
+		
+		if (actualResult == null){
+			if (expectedResult == null){
+				success = true;
+			}
+		} else {
+			if (actualResult.equals(expectedResult)){
+				success = true;
+			} else {
+			
+				if (actualResult instanceof AbstractXmlObject && expectedResult instanceof AbstractXmlObject){
+				
+					success = isSuccessXml(actualResult, expectedResult);
+				} else if (actualResult instanceof ProvisioningPlan && expectedResult instanceof ProvisioningPlan){
+				
+					success = isSuccessProvPlan(actualResult, expectedResult);
+				}
+			}
+		}
+		
+		utlogger.trace("Exit isSuccess: " + success);
+		return success;
+	}
+	
+	public static boolean isSuccessXml(AbstractXmlObject actualResult, AbstractXmlObject expectedResult){
+		utlogger.trace("Enter isSuccessXml");
+		boolean success = false;
+		
+		String aAsXml = "";
+		if (actualResult != null){
+			aAsXml = actualResult.toXml();
+		}
+		
+		String eAsXml = "";
+		if (expectedResult != null){
+			eAsXml = expectedResult.toXml();
+		}
+		
+		utlogger.trace("Comparing xml of actual: " + aAsXml);
+		utlogger.trace("To xml of expected: " + eAsXml);
+		if (aAsXml.equals(eAsXml)){
+			success = true;
+		}
+		
+		utlogger.trace("Exit isSuccessXml: " + success);
+		return success;
+	}
+	
+	public static boolean isSuccessProvPlan(ProvisioningPlan actualResult, ProvisioningPlan expectedResult){
+		utlogger.trace("Enter isSuccessProvPlan");
+		boolean success = false;
+		
+		String aAsXml = "";
+		if (actualResult != null){
+			aAsXml = actualResult.toXml();
+		}
+		
+		String eAsXml = "";
+		if (expectedResult != null){
+			eAsXml = expectedResult.toXml();
+		}
+		
+		utlogger.trace("Comparing xml of actual: " + aAsXml);
+		utlogger.trace("To xml of expected: " + eAsXml);
+		if (aAsXml.equals(eAsXml)){
+			success = true;
+		}
+		
+		utlogger.trace("Exit isSuccessProvPlan: " + success);
+		return success;
+	}
+	
+	public Form getUTReportForm(){
+		utlogger.trace("Enter getUTReportForm");
+		Form f = context.getObjectByName(Form.class, "SST UT Report Form");
+		
+		if (f == null){
+			throw new Exception("Unable to find the form SST UT Report Form.  SST Unit Tester not fully deployed");
+		}
+		
+		Form form = f.deepCopy(context);
+		
+		File folder = new File("%%SST_UT_OUTPUT_PATH%%");
+		File[] listOfFiles = folder.listFiles();
+		
+		Form.Section section = new Form.Section("Reports");
+		section.setType("datatable");
+		section.setLabel("Reports");
+		
+		//List fileNames = new ArrayList();
+		utlogger.trace("Have file names: " + listOfFiles);
+		if (listOfFiles != null){
+		
+			utlogger.trace("Loop the files");
+			
+			int count  = listOfFiles.length;
+			utlogger.trace("Have # of files: " + count);
+			
+			if (count == 0){
+				Field f = new Field();
+		        f.setValue("<p>No reports have been run yet.</p>");
+		        f.setType("html");
+		        f.setFormat("html");
+		        f.setDisplayType("html");
+		        
+		        section.add(f);
+			}
+			
+			for (File file : listOfFiles) {
+				count = count - 1;
+				
+				if (count > 15){
+					utlogger.trace("Skip older file");
+					continue;
+				}
+				
+			    if (file.isFile()) {
+			    	String fileName = file.getName();
+			    	String absName = file.getAbsolutePath();
+			    	
+			    	if (fileName.indexOf("UT") < 0) {
+			    		continue;
+			    	}
+			    	
+			    	String[] split = fileName.split("-");
+			    	
+			    	utlogger.trace("Have split: " + split);
+			    	String dtString = split[1];
+			    	String target = split[2];
+			    	
+			    	target = target.substring(0, target.length() -5);
+			    	
+			    	utlogger.trace("Have date string: " + dtString);
+			    	utlogger.trace("Have target: " + target);
+			    	
+			    	String pattern = "yyyyMMdd_HHmmss";
+    				SimpleDateFormat format = new SimpleDateFormat(pattern);
+    				
+    				Date dt = format.parse(dtString);
+    				
+    				String newPattern = "MMM dd, yyyy 'at' HH:mm:ss";
+    				format = new SimpleDateFormat(newPattern);
+    				
+    				String printDate = format.format(dt);
+			    	utlogger.trace("Print date: " + printDate);
+			    	
+			    	String html = "<a href='/%%SST_IIQ_INSTANCE_NAME%%/UTReports/" + fileName + "' target='_blank'>" + printDate + " on " + target + "</a>";
+			    	//	String html = "&lt;a href='" + absName + "' target='_blank'&gt;" + fileName + "&lt;/a&gt;";
+			        utlogger.trace("Have file: " + file.getName());
+			        
+			        Field f = new Field();
+			        f.setValue(html);
+			        f.setType("html");
+			        f.setFormat("html");
+			        f.setDisplayType("html");
+			        
+			        section.add(f);
+			        
+			    }
+			}
+		} else {
+			Field f = new Field();
+	        f.setValue("<p>No reports have been run yet.</p>");
+	        f.setType("html");
+	        f.setFormat("html");
+	        f.setDisplayType("html");
+	        
+	        section.add(f);
+		}
+		
+		form.add(section);
+		
+		
+		utlogger.trace("Exit getUTReportForm");
+		return form;
+	}
+	
+	public static List runAllUnitTests(boolean doReport){
+		utlogger.trace("Enter runAllUnitTests");
+		return runAllUnitTests(doReport, new ArrayList());
+	}
+	
+	
+	public static String getErrorHtml(String ruleName, String argName, String msg){
+		String html = "<tr style=" + qt + "background-color: " + redBG + ";" + qt + ">" 
+					+ td + ruleName + "</td>"
+			 		+ td + argName +"</td>"
+			 		+ td + "FAILED</td>"
+					+ td + msg + "</td></tr>";
+					
+		return html;
+	}
+	
+	public static String getSuccessHtml(String ruleName, String argName){
+		String html = "<tr style=" + qt + "background-color: " + greenBG + ";" + qt + ">" 
+				+ td + ruleName + "</td> " 
+				+ td +  argName +"</td> "
+			 	+ td + "SUCCESS</td>"
+				+ td +  "__</td></tr>";
+					
+		return html;
+	}
+	
+	public static List runAllUnitTests(boolean doReport, List categories){
+		utlogger.trace("Enter runAllUnitTests");
+		List results = new ArrayList();
+		
+		utlogger.debug("In scope categories (empty means all): " + categories);
+		
+		utlogger.trace("Get the Custom Map");
+		Custom utMap = context.getObjectByName(Custom.class, "SST Unit Test Mappings");
+		
+		if (utMap == null){
+			utlogger.warn("Whoops, the custom object SST Unit Test Mappings is missing.");
+			return null;
+		}
+		
+		utlogger.trace("Get the rule map object");
+		Attributes ruleMap = utMap.get("Rules");
+		
+		if (ruleMap == null){
+			utlogger.error("Whoops, no rule map to process");
+			return null;
+		}
+		
+		utlogger.trace("Get the rule names");
+		List rules = ruleMap.getKeys();
+		
+		if (rules == null || rules.isEmpty()){
+			utlogger.warn("Whoops, you haven't configured any test rules.  There's nothing to process.");
+			return null;
+		}
+		
+		utlogger.trace("Have rules: " + rules);
+		Map argMap;
+		Map resultMap;
+		
+		for (String ruleName : rules){
+			utlogger.trace("Have rule name: " + ruleName);
+			
+			Map eMap = ruleMap.get(ruleName);
+			if (eMap == null){
+				utlogger.error("Invalid entry. Skip");
+				continue;
+			}
+			
+			String enabled = eMap.get("Enabled");
+			utlogger.trace("Check if rule enabled: " + enabled);
+			
+			if (enabled == null || !Boolean.parseBoolean(enabled)){
+				utlogger.debug("UT rule is disabled.  Skip");
+				continue;
+			}
+			
+			String category = eMap.get("Category");
+			utlogger.trace("Check if rule category in list: " + category);
+			utlogger.trace("cats size: " + categories.size());
+			if (categories != null && categories.size() > 0 && !categories.contains(category)){
+				utlogger.debug("rule not in scope. Skip.");
+				continue;
+			}
+			
+			Rule rule = context.getObjectByName(Rule.class, ruleName);
+			
+			utlogger.trace("Get arg files");
+			List argFiles = eMap.get("Args");
+			
+			utlogger.trace("Check to see if rule exists");
+			if (rule == null){
+				utlogger.warn("No rule found: " + ruleName);
+				String err = "OBJECT NOT FOUND.  THIS UNIT TEST RULE HASN'T BEEN CODED YET.";
+				
+				resultMap = new HashMap();
+				resultMap.put("ruleName", ruleName);
+				resultMap.put("category", category);
+				resultMap.put("argFile", "N/A");
+				resultMap.put("useCase", "N/A");
+				resultMap.put("status", "FAILURE");
+				resultMap.put("bgColor", redBG);
+				resultMap.put("message", err);
+				results.add(resultMap);
+				
+				utlogger.warn("Skip to next rule");
+				continue;
+			}
+			
+			utlogger.trace("Have arg files: " + argFiles);
+			
+			for (String argFile : argFiles){
+				argMap = null;
+				int nameStart = "%%SST_UT_ARGS_PATH%%".length();
+				String argName = argFile.substring(nameStart);
+				
+				try {
+					utlogger.trace("Get arg file: " + argFile);
+					argMap = (Map)getObjectFromFile(argFile);
+				} catch (Exception e){
+					utlogger.warn("Exception thrown.  No arg file found: " + argFile + ". Exception was: " + e.toString());
+				}
+				
+				utlogger.trace("Have the map: " + argMap);
+				
+				
+				if (argMap == null){
+					utlogger.warn("No arg map for file " + argFile);
+					
+					String err = "OBJECT NOT FOUND.  THIS UNIT TEST ARG FILE HASN'T BEEN CODED YET.";
+					resultMap = new HashMap();
+					resultMap.put("ruleName", ruleName);
+					resultMap.put("category", category);
+					resultMap.put("argFile", argName);
+					resultMap.put("status", "FAILURE");
+					resultMap.put("useCase", "N/A");
+					resultMap.put("bgColor", redBG);
+					resultMap.put("message", err);
+					results.add(resultMap);
+					
+					utlogger.warn("Skip to next arg file");
+					continue;
+				}
+				
+				String useCase = argMap.get("useCase");
+				
+				Object actualResult = null;
+				
+				try {
+					actualResult = context.runRule(rule, argMap);
+				
+				} catch (Exception e){
+					String err = "EXCEPTION EXECUTING METHOD: " + e.toString() + ".";
+					utlogger.error(err);
+					
+					resultMap = new HashMap();
+					resultMap.put("ruleName", ruleName);
+					resultMap.put("category", category);
+					resultMap.put("argFile", argName);
+					resultMap.put("status", "FAILURE");
+					resultMap.put("useCase", useCase);
+					resultMap.put("bgColor", redBG);
+					resultMap.put("message", err);
+					results.add(resultMap);
+					
+					utlogger.warn("Skip to next arg file");
+					break;
+				}
+				
+				
+				Object expectedResult = argMap.get("expectedResult");
+				
+				boolean success = isSuccess(actualResult, expectedResult);
+				String argsFileName = argMap.get("argsFileName");
+				
+				
+				if (success){
+					
+					resultMap = new HashMap();
+					resultMap.put("ruleName", ruleName);
+					resultMap.put("category", category);
+					resultMap.put("argFile", argName);
+					resultMap.put("status", "SUCCESS");
+					resultMap.put("useCase", useCase);
+					resultMap.put("bgColor", greenBG);
+					resultMap.put("message", "__");
+					results.add(resultMap);
+					
+				} else {
+				
+					Object er = expectedResult;
+					Object ar = actualResult;
+					
+					if (expectedResult instanceof AbstractXmlObject){
+						er = "<textarea rows='4' cols='50'>" + expectedResult.toXml() + "</textarea>";
+					}
+					
+					if (actualResult instanceof AbstractXmlObject){
+						ar = "<textarea rows='4' cols='50'>" + actualResult.toXml()+ "</textarea>";
+					}
+           
+		            if((expectedResult instanceof String && expectedResult.length() > 300) ||
+		              (actualResult instanceof String && actualResult.length() > 300)) {
+		              er = "<textarea rows='4' cols='50'>" + expectedResult + "</textarea>";
+		              ar = "<textarea rows='4' cols='50'>" + actualResult + "</textarea>";
+		            }
+					
+					String err = "EXPECTED RESULT == " + er + ".<br> ACTUAL RESULT == " + ar + ".";
+					resultMap = new HashMap();
+					resultMap.put("ruleName", ruleName);
+					resultMap.put("category", category);
+					resultMap.put("argFile", argName);
+					resultMap.put("status", "FAILURE");
+					resultMap.put("useCase", useCase);
+					resultMap.put("bgColor", redBG);
+					resultMap.put("message", err);
+					results.add(resultMap);
+					
+				}
+				
+			}
+			
+		}
+		
+		utlogger.trace("Exit runAllUnitTests");
+		return results;
+	}
+	
+	public static void writeHtmlFile(Map fieldsMap, String fileName){
+		utlogger.trace("Enter writeHtmlFile");
+		
+		utlogger.trace("Get email template");
+		EmailTemplate et = context.getObjectByName(EmailTemplate.class, "SST Unit Test Report Email");
+		
+		utlogger.trace("Get body");
+		String body = et.getBody();
+		
+		utlogger.trace("Get velocity context");
+		VelocityContext vContext = new VelocityContext(fieldsMap);
+		
+		try {
+ 
+ 			utlogger.trace("Get file: " + fileName);
+	      	File file = new File(fileName);
+	  
+ 
+			if (file.createNewFile()){
+				utlogger.debug("File is created!");
+			}else{
+			  	utlogger.debug("File already exists.");
+			}
+			
+			utlogger.trace("Create file writer");
+			FileWriter writer = new FileWriter(file);
+			String tag = "UT Report";
+			
+			utlogger.trace("Use Velocity to convert and populate the writer.");
+			boolean success = Velocity.evaluate(vContext, writer, tag, body);
+			
+			utlogger.trace("Flush and close");
+			writer.flush();
+			writer.close();
+ 
+    	} catch (IOException e) {
+	      e.printStackTrace();
+		}
+		
+		utlogger.trace("Exit writeHtmlFile");
+	}
+	
+	public Object getObjectFromFile(String filePath) throws GeneralException{
+    	utlogger.trace("Entering getObjectFromFile..." + filePath);
+        Object o;
+        String xml = Util.readFile(filePath);
+        XMLObjectFactory f = XMLObjectFactory.getInstance();
+        o = (Object)f.parseXml(context, xml, false);
+        utlogger.trace("Exiting getObjectFromFile...");
+        return o;
+    }
+    
+    public static Map getIdentityModel(){
+    	utlogger.trace("Enter getIdentityModel");
+    	
+    	Map identityModel = new HashMap();
+    	Custom utMap = context.getObjectByName(Custom.class, "SST Unit Test Mappings");
+    	
+    	if (utMap == null){
+    		utMap.error("Cant find the test mapping object");
+    	}
+    	
+    	utlogger.trace("Get the categories");
+		List types = utMap.get("Categories");
+		
+		identityModel.put("testTypes", types);
+    	
+    	utlogger.trace("Exit getIdentityModel");
+    	return identityModel;
+    }
+	
+	
+	]]>
+	</Source>
+</Rule>

@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Certification Decision Challenged Notification">
+  <Body>$challengerName has challenged the decision for '$challengeItem' in $certificationName.
+
+Comments from $challengerName:
+--------------------------------------------------------------------------------
+$!challengeComments
+--------------------------------------------------------------------------------
+
+Please login to IdentityIQ to accept or reject this challenge.
+</Body>
+  <Description>
+      Email Template for notifying a certifier that a decision has been challenged.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="challengeItem" type="string">
+        <Description>The shortDescription property of the CertificationItem being challenged.</Description>
+      </Argument>
+      <Argument name="certificationName" type="string">
+        <Description>The name of the Certification object containing the item being challenged.</Description>
+      </Argument>
+      <Argument name="challengerName" type="string">
+        <Description>The full name (first and last) of the Identity that made the challenge.</Description>
+      </Argument>
+      <Argument name="challengeComments" type="string">
+        <Description>Comments from the challenger.</Description>
+      </Argument>
+      <Argument name="certificationItem" type="CertificationItem">
+        <Description>The CertificationItem being challenged.</Description>
+      </Argument>
+      <Argument name="workItem" type="WorkItem">
+        <Description>The WorkItem for the challenge</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Certification decision for '$challengeItem' challenged</Subject>
+</EmailTemplate>
+</sailpoint>

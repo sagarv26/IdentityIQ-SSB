@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="Role Profiles Composition Report" resultAction="Rename" subType="Role Management Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="Role Composition Report">
+            <DataSource objectType="Bundle" type="Hql">
+              <Query>from Bundle bundle left outer join bundle.profiles as profile left outer join profile.application application</Query>
+              <QueryParameters>
+                <Parameter argument="applications" property="application.id"/>
+                <Parameter argument="type" property="type"/>
+                <Parameter argument="owners" property="owners"/>
+                <Parameter argument="disabled" property="disabled" valueClass="boolean"/>
+                <Parameter argument="filters" excludeHqlParameter="true" property="filters"/>
+              </QueryParameters>
+              <QueryScript>
+                <Source>
+                          
+                              import sailpoint.reporting.ReportingLibrary;
+                              String whereClause = "";
+
+                              List clauseItems = new ArrayList();
+
+                              String typeClause = ReportingLibrary.buildHqlFilter("type", "bundle.type", args);
+                              if (typeClause != null)
+                                clauseItems.add(typeClause);
+
+                              String appClause = ReportingLibrary.buildHqlFilter("applications", "application.id", args);
+                              if (appClause != null)
+                                clauseItems.add(appClause);
+
+                              String ownerClause = ReportingLibrary.buildHqlFilter("owners", "bundle.owner.id", args);
+                              if (ownerClause != null)
+                                clauseItems.add(ownerClause);
+
+                              String disabledClause = ReportingLibrary.buildHqlFilter("disabled", "bundle.disabled", args);
+                              if (disabledClause != null)
+                                clauseItems.add(disabledClause);
+
+                              String filterOption = args.containsKey("filters") ? args.get("filters") : "";
+                              if (filterOption.equalsIgnoreCase("true")){
+                                clauseItems.add(" profile is not null ");
+                              } else if (filterOption.equalsIgnoreCase("false")){
+                                clauseItems.add(" profile is null ");
+                              }
+
+
+                              if (!clauseItems.isEmpty()){
+                                 for(String c : clauseItems){
+                                    if (whereClause == ""){
+                                      whereClause = " where ";
+                                    } else {
+                                      whereClause += " and ";
+                                    }
+                                    whereClause += c;
+                                 }
+                              }
+
+                              return query + whereClause;
+                          
+                       </Source>
+              </QueryScript>
+            </DataSource>
+            <ReportForm>
+              <Reference class="sailpoint.object.Form" name="Role Profiles Composition Report Form"/>
+            </ReportForm>
+            <Columns>
+              <ReportColumnConfig field="role" header="rept_role_profiles_comp_grid_col_role" property="bundle.name" sortable="true" width="110"/>
+              <ReportColumnConfig field="profileDescription" header="rept_role_profiles_comp_grid_col_profile_description" property="profile" width="110">
+                <RenderScript>
+                  <Source>
+                          
+                              import sailpoint.tools.Message;
+                               return value != null ? value.description : Message.localize("rept_role_comp_msg_no_profiles");
+                          
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="filters" header="rept_role_profiles_comp_grid_col_filters" property="profile" width="110">
+                <RenderScript>
+                  <Source>
+                          
+                              import sailpoint.object.*;
+                              List filterStrings = new ArrayList();
+                              if (value != null &amp;&amp; value.getConstraints()  != null){
+                                  for(Filter filter : value.getConstraints() ){
+                                    filterStrings.add(filter.toString());
+                                  }
+                                }
+                              return filterStrings;
+                          
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="application" header="rept_role_profiles_comp_grid_col_profile_app" property="application.name" sortable="true" width="110"/>
+            </Columns>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>Displays information about the composition of each role in detailed format.</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessBusinessRoleCompositionReport"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument multi="true" name="applications" type="Application">
+        <Description>rept_input_biz_role_report_apps</Description>
+      </Argument>
+      <Argument multi="true" name="type" type="string">
+        <Description>rept_input_biz_role_report_type</Description>
+      </Argument>
+      <Argument multi="true" name="owners" type="Identity">
+        <Description>rept_input_biz_role_report_owners</Description>
+      </Argument>
+      <Argument name="filters" type="string">
+        <Description>rept_input_biz_role_report_composition_exceptions</Description>
+      </Argument>
+      <Argument name="disabled" type="string">
+        <Description>rept_input_biz_role_report_status</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

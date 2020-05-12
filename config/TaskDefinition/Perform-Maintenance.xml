@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition name="Perform Maintenance" subType="task_item_type_system" type="System">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="133"/>
+      <entry key="TaskDefinition.runLengthTotal" value="135721"/>
+      <entry key="TaskDefinition.runs" value="1016"/>
+      <entry key="automaticallyCloseCertifications" value="true"/>
+      <entry key="denormalizeScopes" value="true"/>
+      <entry key="finishCertifications" value="true"/>
+      <entry key="forwardInactiveWorkItems" value="true"/>
+      <entry key="phaseCertifications" value="true"/>
+      <entry key="processWorkflowEvents" value="true"/>
+      <entry key="pruneCertifications" value="true"/>
+      <entry key="pruneHistory" value="true"/>
+      <entry key="pruneRequests" value="true"/>
+      <entry key="pruneSyslogEvents" value="true"/>
+      <entry key="pruneTaskResults" value="true"/>
+      <entry key="scanRemediations" value="true"/>
+      <entry key="transitionContinuousCertifications" value="true"/>
+    </Map>
+  </Attributes>
+  <Description>Prune identity snapshots, task results, and certifications. Perform other background maintenance tasks.
+        </Description>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="System Maintenance"/>
+  </Parent>
+</TaskDefinition>
+</sailpoint>

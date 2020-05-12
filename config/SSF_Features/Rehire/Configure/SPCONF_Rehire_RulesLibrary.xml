@@ -1,0 +1,182 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="SPCONF Rehire Rules Library" language="beanshell">
+    <ReferencedRules>
+        <Reference class="sailpoint.object.Rule" name="SP Provisioning Rules Library"/>
+        <Reference class="sailpoint.object.Rule" name="SP Role Assigment Rule Library"/>
+    </ReferencedRules>
+    <Source>
+    <![CDATA[
+    import sailpoint.api.SailPointFactory;
+    import sailpoint.api.SailPointContext;
+    import sailpoint.api.Provisioner;
+    import sailpoint.object.*;
+    import sailpoint.object.ProvisioningPlan.AttributeRequest;
+    import sailpoint.object.ProvisioningPlan.AccountRequest;
+    import sailpoint.object.ProvisioningPlan.Operation; 
+    import sailpoint.tools.Util;
+    import sailpoint.tools.Message;
+    import sailpoint.tools.GeneralException;
+    import java.sql.Connection;
+    import java.sql.PreparedStatement;
+    import java.sql.ResultSet;
+    import java.sql.SQLException;
+    import java.sql.DriverManager;
+    import java.sql.Timestamp;
+    import java.util.*;
+    import java.text.*;
+    import javax.naming.Context;
+    import javax.naming.InitialContext;
+    import javax.sql.DataSource;
+    import sailpoint.api.PasswordGenerator;
+
+
+    import org.apache.commons.logging.Log;
+    import org.apache.commons.logging.LogFactory;
+
+    private static Log rlogger = LogFactory.getLog("rule.SP.Rehire.RulesLibrary");
+
+    /******************************************************************************
+        TODO:  FILL IN FOLLOWING Rehire METHODS
+    ******************************************************************************/
+    /*
+        In all rules that receive the workflow param, any workflow variable is accessible by doing workflow.get, such as:
+
+           String identityName = workflow.get("identityName");
+    */
+
+    public static boolean isRehireCustomTriggerRule(SailPointContext context, Identity previousIdentity, Identity newIdentity) {
+      rlogger.trace("Enter isRehireCustomTriggerRule");
+      boolean flag = false;
+      
+
+      // Add logic here to define whether the workflow gets triggered
+
+      rlogger.trace("Exit isRehireCustomTriggerRule");
+      return flag;
+    }
+
+    public static ProvisioningPlan buildCustomRehirePlan(SailPointContext context, Workflow workflow){
+      String identityName = workflow.get("identityName");
+      ProvisioningPlan plan = workflow.get("plan");
+      
+      if (plan == null){
+      	plan = new ProvisioningPlan();
+      }
+      
+      return plan;
+    }
+
+    /* Return the request Type */
+    public static String getRehireRequestTypeRule(SailPointContext context, Workflow workflow){
+      String requestType = "Rehire";
+
+      return requestType;
+    }
+
+    /* Return prov success email */
+    public static String getRehireProvSuccessEmailTemplateRule(SailPointContext context, Workflow workflow){
+      String val = "Rehire Success Email Template";
+
+      return val;
+    }
+
+    /* Return prov failure email */
+    public static String getRehireProvFailureEmailTemplateRule(SailPointContext context, Workflow workflow){
+      String val = "Rehire Failure Email Template";
+
+      return val;
+    }
+
+    /* Return approved email */
+    public static String getRehireApprovedEmailTemplateRule(SailPointContext context, Workflow workflow){
+      String val = "Rehire Approved Email Template";
+
+      return val;
+    }
+
+    /* Return rejected email */
+    public static String getRehireRejectedEmailTemplateRule(SailPointContext context, Workflow workflow){
+      String val = "Rehire Rejected Email Template";
+
+      return val;
+    }
+
+    /* Return prov success email to */
+    public static String getRehireProvSuccessEmailToRule(SailPointContext context, Workflow workflow){
+      Identity identity = context.getObject(Identity.class, workflow.get("identityName"));
+      String val = identity.getEmail();
+
+      context.decache(identity);
+      identity = null;
+
+      return val;
+    }
+
+    /* Return prov failure email to */
+    public static String getRehireProvFailureEmailToRule(SailPointContext context, Workflow workflow){
+      Identity identity = context.getObject(Identity.class, workflow.get("identityName"));
+      String val = identity.getEmail();
+
+      context.decache(identity);
+      identity = null;
+
+      return val;
+    }
+
+    /* Return approved email to */
+    public static String getRehireApprovedEmailToRule(SailPointContext context, Workflow workflow){
+      Identity identity = context.getObject(Identity.class, workflow.get("identityName"));
+      String val = identity.getEmail();
+
+      context.decache(identity);
+      identity = null;
+
+      return val;
+    }
+
+    /* Return rejected email to */
+    public static String getRehireRejectedEmailToRule(SailPointContext context, Workflow workflow){
+      String val = "somedefaultaddress@sailpoint.com";
+
+      return val;
+    }
+
+    /* Do any updates to workflow variables before ProvisioningPlan is compiled */
+    public static void rehireBeforePlanRule(SailPointContext context, Workflow workflow){
+      rlogger.trace("Enter Rehire beforePlanRule");
+
+      rlogger.trace("Getting extension attributes that can be used for customizations");
+      Attributes identityModel = initWorkflowAttributesVar(workflow, "identityModel");
+      Attributes spExtAttrs = initWorkflowAttributesVar(workflow, "spExtAttrs");
+
+      //TODO:  CAN PUT LOGIC HERE TO INITIALIZE VALUES
+
+      workflow.put("identityModel", identityModel);
+      workflow.put("spExtAttrs", spExtAttrs);
+
+      rlogger.trace("Exit Rehire beforePlanRule");
+    }
+
+    /* Do any updates to workflow variables before ProvisioningProject is provisioned */
+    public static void rehireBeforeProvisionRule(SailPointContext context, Workflow workflow){
+      rlogger.trace("Enter Rehire beforeProvisionRule");
+
+      rlogger.trace("Exit Rehire beforeProvisionRule");
+    }
+
+    /* Do any updates to workflow variables after ProvisioningProject is provisioned */
+    public static void rehireAfterProvisionRule(SailPointContext context, Workflow workflow){
+      rlogger.trace("Enter Rehire afterProvisionRule");
+     
+      rlogger.trace("Exit Rehire afterProvisionRule");
+    }
+
+    public static void rehireNoRequestRule(SailPointContext context, Workflow workflow){
+      rlogger.trace("Enter Rehire noRequestRule");
+     
+      rlogger.trace("Exit Rehire noRequestRule");
+    }
+    ]]>
+    </Source>
+</Rule>

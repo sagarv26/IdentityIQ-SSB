@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.OIMApplicationGenerator" name="OIM Application Creator" subType="task_item_type_system" template="true" type="System">
+  <Description>
+            Automatically discover and create OIM Resource Applications.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument multi="true" name="oimAppIds" required="true" type="Application">
+        <Prompt>task_in_oim_generator_applications</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="appsCreated" type="int">
+        <Prompt>task_out_oim_generator_apps_created</Prompt>
+      </Argument>
+      <Argument name="appsIgnored" type="int">
+        <Prompt>task_out_oim_generator_apps_ignored</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

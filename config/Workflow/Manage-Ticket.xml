@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow libraries="Identity,IdentityRequest,Group" name="Manage Ticket" type="Subprocess">
+  <Variable input="true" name="project" required="true">
+    <Description>
+      Project that is being provisioninged.
+    </Description>
+  </Variable>
+  <Variable input="true" name="identityRequestId" output="true" required="true">
+    <Description>
+      The ID of the IdentityRequest object which can can be used to read/update 
+      the external ticket id. 
+    </Description>
+  </Variable>
+  <Variable input="true" name="ticketManagementApplication" required="true">
+    <Description>
+      Ticketing application that supports creating/updating objects of type ticket.
+    </Description>
+  </Variable>
+  <Variable input="true" name="ticketDataGenerationRule">
+    <Description>
+      A rule that builds up the ticketing provisioning plan based on the workflow
+      context.  This rule gets all of the arguments to this subprocess 
+      plus the curreent workflow context.  The rule can return either a 
+      ProvisioningPlan or a Map of name value pairs. 
+      
+      The rule name can be specified here on the subprocess or on the 
+      ticketManagementApplication config under the same name as this 
+      variable.
+    </Description>
+  </Variable>
+  <Variable input="true" name="action" required="true">
+    <Description>
+      This is a breadcrumb given to the rule to help it generate the proper
+      provisioning plan for the current injection point.  There will be several
+      default injection points that will map to an action.
+     
+      OOTB There are four points which all workflow are injected and will map to the
+      "actions" passed into this subprocess.
+     
+      open
+      postApproval
+      postProvisioning
+      close
+    </Description>
+  </Variable>
+  <Variable initializer="true" input="true" name="trace">
+    <Description>
+      Used for debugging this subprocess and when set to true trace
+      statements will be sent to stdout.
+    </Description>
+  </Variable>
+  <Variable name="ticketPlan">
+    <Description>
+      Plan that is generated during the processing of the ticektDataGenerationRule
+      execution.  This will eventually be turned in to the ticketProject which can 
+      be provisioned.
+    </Description>
+  </Variable>
+  <Variable name="ticketProject">
+    <Description>
+      Variable that will hold our compiled project, that eventually will be 
+      provisioned to the backend ticketing system.
+    </Description>
+  </Variable>
+  <Variable input="true" name="ticketId" output="true">
+    <Description>
+      Variable that will hold the ticketId, it may be passed in for update
+      and will be returned on create.  If this value is null AND the
+      its not a create action, the ticket id will be read from 
+      the identityRequest.externalTicketId field.
+    </Description>
+  </Variable>
+  <Variable input="true" name="priority">
+    <Description>
+      String version of WorkItem.level that will be used
+      to set the priority of any workitems.
+    </Description>
+  </Variable>
+  <Description>
+   A workflow subprocss designed to allow service/help desk tickets opened
+   or updated during the lifecycle of a workflow.
+  </Description>
+  <Step icon="Start" name="Start" posX="27" posY="12"/>
+  <Step action="call:generateTicketPlan" name="Generate Ticket Plan" posX="132" posY="12" resultVariable="ticketPlan">
+    <Arg name="priority" value="ref:priority"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="identityRequest" value="ref:identityRequest"/>
+    <Arg name="action" value="ref:action"/>
+    <Arg name="application" value="ref:ticketManagementApplication"/>
+    <Arg name="rule" value="ref:ticketDataGenerationRule"/>
+    <Arg name="ticketId" value="ref:ticketId"/>
+    <Description>
+      A workflow service that will call to the generation rule to help
+      generate an 'ObjectRequest' based provisioning plan that will be used to 
+      create/update the ticket.  If the rule returns a plan that plan will be 
+      returned directly by the buildTicketPlan call.  the rule returns a Map it will 
+      be converted into a provisioning plan.
+    </Description>
+  </Step>
+  <Step action="call:compileGroupProject" name="Compile Ticket" posX="251" posY="12" resultVariable="ticketProject">
+    <Arg name="plan" value="ref:ticketPlan"/>
+    <Arg name="requester" value="ref:launcher"/>
+    <Arg name="source" value="ref:source"/>
+    <Arg name="disableRetryRequest" value="true"/>
+    <Arg name="optimisticProvisioning" value="false"/>
+    <Description>
+      Compile the generated plan in a project so it can be provisioned.
+      These will normally compile down to a single targeted connector plan.      
+    </Description>
+  </Step>
+  <Step icon="Task" name="Provision Ticket" posX="379" posY="12">
+    <Arg name="priority" value="ref:priority"/>
+    <Arg name="project" value="ref:ticketProject"/>
+    <Arg name="foregroundProvisioning" value="true"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Description>
+      Call the standard subprocess to initialize the request, this includes
+      auditing, building the approvalset, compiling the plan into 
+      project and checking policy violations.
+    </Description>
+    <Return name="retries" to="retries"/>
+    <Return name="project" to="ticketProject"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Provision with retries"/>
+    </WorkflowRef>
+    <Transition to="Update IdentityRequest External ID"/>
+  </Step>
+  <Step action="call:updateExternalTicketId" condition="script:( action.startsWith(&quot;open&quot;) );" name="Update IdentityRequest External ID" posX="551" posY="12" resultVariable="ticketId">
+    <Arg name="project" value="ref:ticketProject"/>
+    <Arg name="application" value="ref:ticketManagementApplication"/>
+    <Description>
+      Typically only called once, after the create of the ticket. This call will update
+      the IdentityRequest.externalTicketId with the returned ticketId (String).
+    </Description>
+  </Step>
+  <Step icon="Stop" name="End" posX="722" posY="12"/>
+</Workflow>
+</sailpoint>

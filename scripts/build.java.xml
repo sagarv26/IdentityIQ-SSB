@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="services.standard.build.java">
+    <!-- targets responsible for taking custom java artifacts and compiling them into a customerName.jar-->
+
+    <path id="build.compile.classpath">
+      <!-- Sometimes SailPoint patches core classes to add new methods. In 
+           order to support compiling custom classes against these patched 
+           classes we need the eFix-ed classes and patched classes in the 
+           class path _ahead_ of the out-of-the-box application .jar files.  
+           This is the reverse of the way the services build used to build 
+           the class path. -20131001, AHampton. -->
+        <pathelement path="${build.iiqBinaryExtract}/WEB-INF/classes"/>
+        <fileset dir="${build.iiqBinaryExtract}/WEB-INF/lib">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="./lib">
+            <include name="**/*.jar"/>
+        </fileset>              
+    </path>
+
+    <target name="compile">
+        <mkdir dir="${build}/classes"/>
+        <mkdir dir="web/WEB-INF/classes"/>
+        <if>
+            <equals arg1="${pre6.3}" arg2="true"/>
+            <then>
+                <echo message="IIQ version is pre-6.3: excluding Generic Importer and Certification Exclusion Framework from compilation."/>
+                <property name="genericImporterExcludePattern" value="sailpoint/services/standard/task/genericImport/**"/>
+            	 <property name="exclusionFrameworkExcludePattern" value="sailpoint/services/standard/exclusionframework/**"/>
+            </then>
+        </if>
+        <if>
+            <equals arg1="${pre6.4}" arg2="true"/>
+            <then>
+                <echo message="IIQ version is pre-6.4: excluding IIQ Loopback Connector from compilation."/>
+                <property name="loopbackConnectorExcludePattern" value="sailpoint/services/standard/connector/LoopbackConnector.java"/>
+            </then>
+        </if>
+      <!-- 20160211, setting JDK 1.6 source and targets for backward JVM compatibility. -AHampton -->
+        <javac srcdir="src" source="1.6" target="1.6" destdir="${build.iiqBinaryExtract}/WEB-INF/classes" debug="true" classpathref="build.compile.classpath" includeantruntime="last">
+            <!-- uncomment these to explore the occasional warning, but there's
+                 a lot of harmless stuff in here now, so don't leave them on
+                 all the time
+            <compilerarg value="-Xlint:deprecation"/>
+            <compilerarg value="-Xlint:unchecked"/>
+            -->
+        	   <exclude name="${genericImporterExcludePattern}"/>
+        	   <exclude name="${loopbackConnectorExcludePattern}"/>
+        	   <exclude name="${exclusionFrameworkExcludePattern}"/>
+        </javac>
+        <copy todir="${build}/classes">
+            <fileset dir="${build.iiqBinaryExtract}/WEB-INF/classes">
+                <include name="**/*.class"/>
+            </fileset>
+        </copy>
+        <copy todir="${build.iiqBinaryExtract}/WEB-INF/classes">
+            <fileset dir="src">
+                <include name="**/*.hbm.xml"/>
+            </fileset>
+        </copy>
+    </target>
+   
+    <target name="-createCustomJar" depends="compile">
+        <jar destfile="${build}/identityiqCustomizations.${customer}.jar" basedir="${build}/classes"/>
+    </target>
+ 
+    <target name="-generateDTD">
+        <if>
+            <not>
+                <available file="${dtd}"/>
+            </not>
+            <then>
+                <echo>Generating ${build.iiqBinaryExtract}/sailpoint.${IIQVersion}${IIQPatchLevel}.dtd...</echo>
+                <java classname="sailpoint.launch.Launcher" fork="true">
+                    <arg line="sailpoint.tools.xml.DTDGenerator &quot;${dtd}&quot;"/>
+                    <classpath>
+                        <pathelement path="${build.iiqBinaryExtract}/WEB-INF/classes"/>
+                        <pathelement location="${build.iiqBinaryExtract}/WEB-INF/lib/identityiq.jar"/>
+                    </classpath>
+                </java>
+            </then>
+        </if>
+    </target>
+   
+   <target name="includeCustomJar" depends="-createCustomJar,-generateDTD">
+        <move todir="${build.iiqBinaryExtract}/WEB-INF/lib">
+            <fileset dir="${build}">
+                <include name="*.jar"/>
+            </fileset>
+        </move>
+    </target>  
+   
+
+</project>

@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Certification">
+  <Body>A new access certification report has been assigned to you: $workItemName.
+
+Login and view your work item inbox to complete this access certification report.
+    </Body>
+  <Description>
+      Email Template for notifying work item owners of new certifications.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workItemName" type="string">
+        <Description>The description property (also the name property) of the certification WorkItem.</Description>
+      </Argument>
+      <Argument name="workItem" type="WorkItem">
+        <Description>The WorkItem object for the certification.</Description>
+      </Argument>
+      <Argument name="certification" type="Certification">
+        <Description>The Certification object.</Description>
+      </Argument>
+      <Argument name="requesterName" type="string">
+        <Description>The display name of the Identity that requested the certification.</Description>
+      </Argument>
+      <Argument name="ownerName" type="string">
+        <Description>The display name of the Identity that owns the certification.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>New access certification: $workItemName</Subject>
+</EmailTemplate>
+</sailpoint>

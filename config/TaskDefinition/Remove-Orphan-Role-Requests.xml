@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.RemoveOrphanRoleRequestsTask" name="Remove Orphan Role Requests" progressMode="String" subType="task_item_type_system" type="System">
+  <Description>Remove orphaned requests for roles that no longer exist</Description>
+  <Signature>
+    <Returns>
+      <Argument name="numRequestsRemoved" type="int">
+        <Prompt>task_out_remove_orphan_role_requests_removed</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

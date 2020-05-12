@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="Generic Importer - Role Importer demo - Text File" resultAction="Delete" subType="task_item_type_generic" type="Generic">
+  <Attributes>
+    <Map>
+      <entry key="genericImportDriverClass" value="TextFileImport"/>
+      <entry key="importLoggerLevel" value="debug"/>
+      <entry key="importLoggerName" value="sailpoint.services.task.roleImportDemo"/>
+      <entry key="importManualHeader" value="Bundle.name(+Bundle),Bundle.owner(Identity),ManagedAttribute.application(Application),Identity.name(Identity)"/>
+      <entry key="importRowRule" value="RoleImporter_RowRule"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate"/>
+      <entry key="text_fileDelimiter" value=","/>
+      <entry key="text_fileName" value="C:\Beanstalk_SVN_Root\GenericImporter\config\SSF_Tools\GenericImporter\Samples\Role Importer\Text\RoleImporterExample.csv"/>
+      <entry key="text_hasHeader" value="true"/>
+    </Map>
+  </Attributes>
+  <Description>Process Role data via a Text File.
+Ability to:
+Add/Remove Roles
+Add/Remove Entitlements from Roles
+Add/Remove Role Memberships
+</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Generic Importer"/>
+  </Parent>
+</TaskDefinition>

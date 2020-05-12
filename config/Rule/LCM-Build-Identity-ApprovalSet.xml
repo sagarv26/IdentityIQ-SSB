@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="LCM Build Identity ApprovalSet">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Approval Library"/>
+  </ReferencedRules>
+  <Source>
+    
+      import sailpoint.object.ProvisioningPlan;
+      import sailpoint.object.ProvisioningPlan.AttributeRequest;
+      import sailpoint.object.ProvisioningPlan.AccountRequest;
+      import sailpoint.object.ApprovalSet;
+      import sailpoint.object.ApprovalItem;
+      import sailpoint.object.Attributes;
+      import sailpoint.tools.Util;
+
+      ApprovalSet set = new ApprovalSet();
+      if ( plan != null ) {
+          List accountRequests = plan.getAccountRequests();
+          for ( AccountRequest request : accountRequests ) {
+              ApprovalItem item = new ApprovalItem();
+              item.setApplication(request.getApplication());
+              item.setInstance(request.getInstance());
+              item.setNativeIdentity(request.getNativeIdentity());
+              item.setOperation(request.getOperation().toString());
+              List attrRequestFlat = flattenAttributeRequests(request.getAttributeRequests());
+              if ( attrRequestFlat != null ) {
+                  item.setValue(attrRequestFlat);
+              } 
+              Attributes attributes = getAttributeRequestArguments(request.getAttributeRequests());
+              item.setAttributes(attributes);
+              
+              // for these requests comments come in on the plan
+              String comments = plan.getComments();
+              if ( Util.getString(comments) != null ) {
+                  item.setRequesterComments(comments);
+              }
+              set.add(item);
+          }
+
+          // while we are here lets annotate the plan with previousValues
+          if ( flow.equals("IdentityEditRequest") ) {
+              AccountRequest iiqRequest = plan.getAccountRequest("IIQ");    
+              if ( iiqRequest != null ) {
+                  List attributeRequests = iiqRequest.getAttributeRequests();
+                  if ( Util.size(attributeRequests) &gt; 0 ) {
+                      Identity id = context.getObject(Identity.class, identityName);
+                      if ( id != null )  {
+                          for ( AttributeRequest req : attributeRequests ) {
+                              String name = req.getName();
+                              if ( name != null ) {
+                                  // We have to be carefull here, if we see manager display
+                                  // the displayName
+                                  Object prevValue = id.getAttribute(name);
+                                  if ( prevValue != null ) {
+                                      if (name.equals("manager") ) {
+                                          String displayName = getIdentityProperty((String)prevValue, "displayName");
+                                          if ( displayName != null ) {
+                                              prevValue = displayName;
+                                          }
+                                      }
+                                      else if (prevValue instanceof Identity) {
+                                          prevValue = (String)prevValue.getDisplayableName();
+                                      }
+                                      else  if(prevValue instanceof List) {
+                                          /* Thanks to type erasure there is no way for us to write something like
+                                           * prevValue instanceof List&lt;Identity&gt; so break it into steps.  Check if
+                                           * prevValue is a List.  If it has any elements get the first one. If that
+                                           * is an instance of Identity then assume the rest of the elements are too
+                                           * and then build a List of displayable names, because that is what we do
+                                           * with Identitys. */
+                                          List prevValueList = (List) prevValue;
+                                          if(prevValueList.size() &gt; 0) {
+                                              if(prevValueList.get(0) instanceof Identity) {
+                                                  List identityIds = new ArrayList(prevValueList.size());
+                                                  for (Object value : prevValueList) {
+                                                      Identity identity = (Identity) value;
+                                                      identityIds.add(identity.getDisplayableName());
+                                                  }
+                                                  prevValue = identityIds;
+                                              }
+                                          }
+                                      }
+                                      req.put(ProvisioningPlan.ARG_PREVIOUS_VALUE, prevValue);
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      return set;
+    
+  </Source>
+</Rule>
+</sailpoint>

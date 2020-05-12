@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell"  
+          name="BSMT LockingTest QueueBuilder Rule"       
+          type="BuildMap" >
+  <Description>QueueBuilder Rule</Description>  
+  <Source><![CDATA[
+// Library inclusions for BeanShell.
+import java.lang.*;
+import sailpoint.api.*;
+import sailpoint.object.*;
+
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
+Logger log = Logger.getLogger("sailpoint.services.BeanShellMultiThreading.QueueBuilder");
+log.setLevel((Level) Level.DEBUG);  // TODO: Remove this in production rules.
+
+// Sanity checking to make sure we were passed a valid workQueue reference.
+if ((void == workQueue) || (null == workQueue)) {
+   log.error("Received a null or void workQueue reference.");
+   return;
+}
+if ( !(workQueue instanceof java.util.concurrent.BlockingQueue) ) {
+   log.error("Received a workQueue that is not a BlockingQueue.");
+   log.error("Data type for workQueue is: " + workQueue.getClass().getName());
+   return;
+}  
+
+// Sanity checking to make sure we were passed a valid shared thread state.
+if ((void == sharedThreadState) || (null == sharedThreadState)) {
+   log.error("Received a null or void sharedThreadState.");
+   return;
+}
+if ( !(sharedThreadState instanceof ConcurrentHashMap) ) {
+   log.error("Received a sharedThreadState that is not a ConcurrentHashMap.");
+   return;
+} 
+
+// Add your logic here!
+String numTestUpdatesStr = sharedThreadState.get("numTestUpdates");
+
+log.debug("Inside QueueBuilder Rule, numTests is: " + numTestUpdatesStr);
+
+int numTests = Integer.parseInt(numTestUpdatesStr);
+
+for (int i=0; i<numTests; i++) {
+   String queItem = "queueItem" + i;
+   workQueue.add(queItem);
+}
+
+log.debug("Completed QueueBuilder Rule.");
+
+return;
+]]>
+  </Source>
+</Rule>
+</sailpoint>

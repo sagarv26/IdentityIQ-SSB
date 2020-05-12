@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="Role Composition Access Review Live Report" progressMode="Percentage" resultAction="Rename" subType="Access Review and Certification Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="Certification Report">
+            <DataSource dataSourceClass="sailpoint.reporting.datasource.CertificationLiveReportDataSource" objectType="CertificationItem" type="Java">
+              <QueryParameters>
+                <Parameter argument="type" defaultValue="BusinessRoleComposition" property="parent.certification.type" valueClass="sailpoint.object.Certification$Type"/>
+                <Parameter argument="tags" property="parent.certification.tags.id"/>
+                <Parameter argument="certificationGroups" property="parent.certification.certificationGroups.id"/>
+                <Parameter argument="roles" property="parent.targetId"/>
+                <Parameter argument="creationDate" property="parent.certification.created" valueClass="daterange"/>
+                <Parameter argument="signedDate" property="parent.certification.signed" valueClass="daterange"/>
+                <Parameter argument="expirationDate" property="parent.certification.expiration" valueClass="daterange"/>
+              </QueryParameters>
+            </DataSource>
+            <ReportForm>
+              <Reference class="sailpoint.object.Form" name="Role Composition Access Review Report Form"/>
+            </ReportForm>
+            <Columns>
+              <ReportColumnConfig field="role" header="rept_comp_cert_col_role" property="parent.targetName" sortable="true" width="110"/>
+              <ReportColumnConfig field="objectType" header="rept_comp_cert_col_obj_type" property="type" sortable="true" width="110"/>
+              <ReportColumnConfig field="objectName" header="rept_comp_cert_col_obj_name" property="targetName" sortable="true" width="110"/>
+              <ReportColumnConfig field="description" header="rept_comp_cert_col_revoke_desc" property="targetId" scriptArguments="type,targetName" sortable="true" width="110">
+                <RenderScript>
+                  <Source>
+                        
+                          return sailpoint.reporting.ReportingLibrary.describeCompositionItem(context, locale, scriptArgs.get("type"), value, scriptArgs.get("targetName"));
+                        
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="certName" header="rept_cert_col_cert_access_review" property="parent.certification.name" sortable="true" width="110"/>
+              <ReportColumnConfig field="certGroupName" header="rept_cert_col_cert_grp_name" property="parent.certification.certificationGroups.name" sortable="true" width="110"/>
+              <ReportColumnConfig field="tags" header="rept_cert_col_tags" property="parent.certification.tags.name" subQueryKey="id" width="110"/>
+              <ReportColumnConfig field="status" header="rept_comp_cert_col_status" property="summaryStatus" sortable="true" width="110"/>
+              <ReportColumnConfig field="decision" header="rept_comp_cert_col_decision" property="action.status" sortable="true" width="110"/>
+              <ReportColumnConfig field="remediationCompleted" header="rept_cert_col_revoke_completed" property="action" width="110">
+                <RenderScript>
+                  <Source>
+                          import sailpoint.reporting.ReportingLibrary;
+                          import sailpoint.tools.Util;
+                          import java.lang.String;
+                          String status = ReportingLibrary.getRemediationStatus(context, value);
+                          return Util.isNullOrEmpty(status) ? "" : status;
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="decisionMaker" header="rept_comp_cert_col_decider" property="action.actorName" sortable="true" width="110"/>
+              <ReportColumnConfig field="comments" header="rept_comp_cert_col_decider_comments" property="action" width="110">
+                <RenderScript>
+                  <Source>
+                          return value != null ? value.getComments() : null;
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="exclusionExplanation" header="rept_cert_col_exclusion_explanation" property="parent.certification" width="110">
+                <RenderScript>
+                  <Source>
+                          
+                          if (value != null){
+                            List archivedEntities = value.fetchArchivedEntities(context);
+                            if (archivedEntities != null
+                                &amp;&amp; archivedEntities.size() &gt; 0
+                                &amp;&amp; archivedEntities.get(0) != null) {
+                              return archivedEntities.get(0).getExplanation();
+                            }
+                          }
+                          
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+            </Columns>
+            <InitializationRule>
+              <Reference class="sailpoint.object.Rule" name="Certification Report Customizer"/>
+            </InitializationRule>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>Displays information about all role composition certifications in detailed format.</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessManagerCertificationReport"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument name="exclusions" type="boolean"/>
+      <Argument multi="true" name="certificationGroups" type="CertificationGroup"/>
+      <Argument multi="true" name="roles" type="Bundle">
+        <Description>rept_input_biz_role_cert_report_biz_roles</Description>
+      </Argument>
+      <Argument name="creationDate" type="date">
+        <Description>rept_input_cert_report_create_dt</Description>
+      </Argument>
+      <Argument name="signedDate" type="date">
+        <Description>rept_input_cert_report_signed_date</Description>
+      </Argument>
+      <Argument name="expirationDate" type="date">
+        <Description>rept_input_cert_report_exp_dt</Description>
+      </Argument>
+      <Argument multi="true" name="tags" type="Tag">
+        <Description>rept_input_cert_report_tags</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

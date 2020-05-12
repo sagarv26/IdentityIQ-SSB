@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell"  
+          name="BeanShell MultiThreading Example Queue Builder"                 
+          type="BuildMap" >
+  <Description>BeanShell MultiThreading Example Queue Builder</Description>  
+  <Source><![CDATA[
+// Library inclusions for BeanShell.
+import java.lang.*;
+import sailpoint.api.*;
+import sailpoint.object.*;
+
+import java.util.concurrent.BlockingQueue;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
+Logger log = Logger.getLogger("sailpoint.services.BeanShellMultiThreading.Queue");
+// log.setLevel((Level) Level.DEBUG);  // TODO: Remove this in production rules.
+
+// Sanity checking to make sure we were passed a valid workQueue reference.
+if ((void == workQueue) || (null == workQueue)) {
+   log.error("Received a null or void workQueue reference.");
+   return;
+}
+if ( !(workQueue instanceof java.util.concurrent.BlockingQueue) ) {
+   log.error("Received a workQueue that is not a BlockingQueue.");
+   log.error("Data type for workQueue is: " + workQueue.getClass().getName());
+   return;
+}  
+
+// Begin our specifc queue building logic here.  Ususally this involves a 
+// projection query to build the work queue out with some list of IDs for some
+// kind of sailpoint.object.* data type.  The IDs are then passed through the
+// queue to the worker threads which invoke the item rule once per each
+// item added here.
+
+// In this example we add Link object IDs, which are simply Strings, to
+// the workQueue. 
+int numLinksRead = 0;
+QueryOptions qo = new QueryOptions();
+ArrayList colNames = new ArrayList();
+colNames.add("id");
+Iterator it = context.search(Link.class, qo, colNames);
+while (it.hasNext()) {
+   Object [] result = it.next();
+   String id = (String) result[0];
+   workQueue.add(id);
+   numLinksRead++;	
+}
+sailpoint.tools.Util.flushIterator(it);
+
+log.debug("Added " + numLinksRead + " Link IDs to the workQueue");
+
+// Once we are done adding objects to the work queue we simply return back.
+return ;
+]]>
+  </Source>
+</Rule>
+</sailpoint>

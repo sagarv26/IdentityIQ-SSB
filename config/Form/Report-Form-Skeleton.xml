@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Report Form Skeleton" type="Report">
+  <Attributes>
+    <Map>
+      <entry key="isWizard" value="true"/>
+      <entry key="labelAlign" value="top"/>
+    </Map>
+  </Attributes>
+  <Button action="save" label="button_save"/>
+  <Button action="preview" label="button_preview"/>
+  <Button action="exec" label="button_save_and_exec"/>
+  <Button action="cancel" label="button_cancel"/>
+  <Section columns="2" label="label_standard_properties" name="Standard Properties">
+    <Field columnSpan="2" displayName="label_name" name="name" required="true" value="ref:name"/>
+    <Field defaultValue="Rename" displayName="label_previous_result_action" name="resultActions" value="ref:resultActions">
+      <AllowedValuesDefinition>
+        <Value>
+          <List>
+            <List>
+              <String>Rename</String>
+              <String>task_result_action_rename_old</String>
+            </List>
+            <List>
+              <String>RenameNew</String>
+              <String>task_result_action_rename_new</String>
+            </List>
+            <List>
+              <String>Cancel</String>
+              <String>task_result_action_cancel</String>
+            </List>
+            <List>
+              <String>Delete</String>
+              <String>task_result_action_delete</String>
+            </List>
+          </List>
+        </Value>
+      </AllowedValuesDefinition>
+      <Attributes>
+        <Map>
+          <entry key="xtype" value="spDropdown"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="label_scope" name="resultScope" type="Scope" value="ref:resultScope">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source>
+                  import sailpoint.api.ScopeService;
+                  ScopeService scopeSvc = new ScopeService(context);
+                  return !scopeSvc.isScopingEnabled();
+                </Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="label_description" displayType="textarea" name="description" value="ref:description"/>
+    <Field displayName="label_email_recipients" multi="true" name="emailIdentities" type="Identity" value="ref:emailIdentities"/>
+    <Field displayName="label_task_host" name="taskHost" type="string" value="ref:taskHost"/>
+    <Field displayName="label_allow_concurrency" name="allowConcurrency" type="boolean" value="ref:allowConcurrency"/>
+    <Field displayName="rept_form_label_email_format" displayType="checkbox" multi="true" name="emailFileFormat" type="string" value="ref:emailFileFormat">
+      <AllowedValuesDefinition>
+        <Value>
+          <List>
+            <List>
+              <String>PDF</String>
+              <String>rept_form_email_format_pdf</String>
+            </List>
+            <List>
+              <String>CSV</String>
+              <String>rept_form_email_format_csv</String>
+            </List>
+          </List>
+        </Value>
+      </AllowedValuesDefinition>
+      <ValidationScript>
+        <Source>
+          
+          import java.util.*;
+          import sailpoint.tools.Util;
+          import sailpoint.web.messages.MessageKeys;
+
+          List errors = null;
+          List emailRecips = form.getField("emailIdentities").getValue();
+          List fileTypes = form.getField("emailFileFormat").getValue();
+
+          if (!Util.isEmpty(emailRecips) &amp;&amp; Util.isEmpty(fileTypes)){
+            errors = new ArrayList();
+            errors.add(MessageKeys.REPT_FORM_ERR_NO_EMAIL_FORMAT);
+          }
+
+          return errors;
+          
+        </Source>
+      </ValidationScript>
+    </Field>
+    <Field displayName="label_require_signoff" name="signoffRequired" postBack="true" type="boolean" value="ref:signoffRequired"/>
+    <Field columnSpan="2" hidden="true" name="workItemConfigPanel">
+      <Attributes>
+        <Map>
+          <entry key="contentEl" value="workItemConfig"/>
+          <entry key="hidden" value="script: return signoffRequired == null || signoffRequired == false"/>
+          <entry key="xtype" value="panel"/>
+        </Map>
+      </Attributes>
+    </Field>
+  </Section>
+  <Section columns="2" label="label_report_layout" name="layout">
+    <Field displayName="rept_arg_sort" name="sort" value="ref:sort">
+      <Attributes>
+        <Map>
+          <entry key="xtype" value="sortinput"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="rept_arg_group_by" name="gridGrouping" value="ref:gridGrouping"/>
+    <Field columnSpan="2" displayName="rept_arg_columns" helpKey="rept_arg_columns_help" multi="true" name="columns" value="ref:columns">
+      <Attributes>
+        <Map>
+          <entry key="xtype" value="itemselector"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="rept_form_field_disable_summary" helpKey="rept_form_help_disable_summary" name="disableSummary" type="boolean" value="ref:disableSummary"/>
+    <Field displayName="rept_form_field_disable_detail" helpKey="rept_form_help_disable_detail" name="disableDetail" type="boolean" value="ref:disableDetail"/>
+  </Section>
+</Form>
+</sailpoint>

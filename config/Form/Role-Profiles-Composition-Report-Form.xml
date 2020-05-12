@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Role Profiles Composition Report Form" type="Report">
+  <Section columns="2" label="report_role_profiles_comp_section_role_props" name="customProperties">
+    <Field displayName="report_role_profiles_comp_filter_status" helpKey="report_role_profiles_comp_help_status" name="disabled" type="string" value="ref:disabled">
+      <AllowedValues>
+        <List>
+          <String>null</String>
+          <String>report_role_profiles_comp_filter_status_all</String>
+        </List>
+        <List>
+          <String>true</String>
+          <String>report_role_profiles_comp_filter_status_disabled</String>
+        </List>
+        <List>
+          <String>false</String>
+          <String>report_role_profiles_comp_filter_status_enabled</String>
+        </List>
+      </AllowedValues>
+    </Field>
+    <Field displayName="report_role_profiles_comp_filter_profiles" helpKey="report_role_profiles_comp_help_profiles" name="filters" type="string" value="ref:filters">
+      <AllowedValues>
+        <List>
+          <String>null</String>
+          <String>report_role_profiles_comp_filter_profiles_all</String>
+        </List>
+        <List>
+          <String>false</String>
+          <String>report_role_profiles_comp_filter_profiles_disabled</String>
+        </List>
+        <List>
+          <String>true</String>
+          <String>report_role_profiles_comp_filter_profiles_enabled</String>
+        </List>
+      </AllowedValues>
+    </Field>
+    <Field displayName="report_role_profiles_comp_filter_apps" helpKey="report_role_profiles_comp_help_apps" multi="true" name="applications" type="Application" value="ref:applications"/>
+    <Field displayName="report_role_profiles_comp_filter_owners" helpKey="report_role_profiles_comp_help_owners" multi="true" name="owners" type="Identity" value="ref:owners">
+      <Attributes>
+        <Map>
+          <entry key="identitySuggestFilter" value="Owner"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="report_role_profiles_comp_filter_type" helpKey="report_role_profiles_comp_help_type" multi="true" name="type" type="Bundle" value="ref:type">
+      <Attributes>
+        <Map>
+          <entry key="objectColumn" value="type"/>
+        </Map>
+      </Attributes>
+    </Field>
+  </Section>
+</Form>
+</sailpoint>

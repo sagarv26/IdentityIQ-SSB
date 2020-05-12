@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.TargetIndexer" name="Effective Access Indexing" progressMode="String" subType="task_item_type_system" template="true" type="System">
+  <Description>
+          Calculate the indirect target associations (Tcodes, etc.) for entitlements and roles.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="indexEntitlementTargets" type="boolean">
+        <Prompt>task_in_target_index_do_ent_targets</Prompt>
+      </Argument>
+      <Argument name="indexRoleTargets" type="boolean">
+        <Prompt>task_in_target_index_do_role_targets</Prompt>
+      </Argument>
+      <Argument name="indexRoleEntitlements" type="boolean">
+        <Prompt>task_in_target_index_do_role_ents</Prompt>
+      </Argument>
+      <Argument name="indexRolePermissions" type="boolean">
+        <Prompt>task_in_target_index_do_role_perms</Prompt>
+      </Argument>
+      <Argument name="indexUnstructuredTargets" type="boolean">
+        <Prompt>task_in_target_index_do_unstructured</Prompt>
+      </Argument>
+      <Argument name="refreshFulltext" type="boolean">
+        <Prompt>task_in_target_index_do_fulltext</Prompt>
+      </Argument>
+      <Argument name="fullReset" type="boolean">
+        <Prompt>task_in_target_index_full_reset</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="rolesIndexed" type="int">
+        <Prompt>task_out_target_index_roles_indexed</Prompt>
+      </Argument>
+      <Argument name="entitlementsIndexed" type="int">
+        <Prompt>task_out_target_index_ents_indexed</Prompt>
+      </Argument>
+      <Argument name="targetsAdded" type="int">
+        <Prompt>task_out_target_index_added</Prompt>
+      </Argument>
+      <Argument name="targetsRetained" type="int">
+        <Prompt>task_out_target_index_retained</Prompt>
+      </Argument>
+      <Argument name="targetsRemoved" type="int">
+        <Prompt>task_out_target_index_removed</Prompt>
+      </Argument>
+      <Argument name="targetsReset" type="int">
+        <Prompt>task_out_target_index_reset</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

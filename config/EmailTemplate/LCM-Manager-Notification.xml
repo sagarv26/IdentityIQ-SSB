@@ -1,0 +1,141 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="LCM Manager Notification">
+  <Body>
+      
+#if ( $approvalSet )
+#if ( $approvalSet.hasApproved() ) 
+$launcher requested the following account changes for employee '$identityDisplayName' and they were APPROVED.
+
+#foreach ($item in $approvalSet.approved)
+#if ( $item.owner &amp;&amp; $item.owner != $launcher ) 
+        Approved By: $item.owner
+#end
+#if ( $item.comments)
+#foreach ($comment in $item.comments)
+Completion Comments: $comment
+#end
+#end
+        Application: $item.applicationName
+#if ( $item.nativeIdentity )       
+           Account : $item.nativeIdentity
+#end           
+#if ( $item.instance ) 
+          Instance : $item.instance
+#end
+          Operation: $item.operation
+#if ( $item.displayName )          
+          Attribute: $item.displayName
+#elseif ( $item.name ) 
+          Attribute: $item.name
+#end
+#if ( $item.displayValue )
+           Value(s): $item.displayValue
+#elseif ( $item.csv ) 
+           Value(s): $item.csv
+#end
+#if ( $item.requesterComments )
+ Requester Comments: $item.requesterComments
+#end
+
+#end
+#end
+#if ( $approvalSet.hasRejected() ) 
+$launcher requested the following account changes for employee '$identityDisplayName' and they were REJECTED.
+
+#foreach ($item in $approvalSet.rejected)
+        Rejected By: $item.rejecters
+#if ( $item.comments)
+#foreach ($comment in $item.comments)
+Completion Comments: $comment
+#end
+#end
+        Application: $item.applicationName
+#if ( $item.nativeIdentity )       
+           Account : $item.nativeIdentity
+#end           
+#if ( $item.instance ) 
+          Instance : $item.instance
+#end
+          Operation: $item.operation
+#if ( $item.displayName )          
+          Attribute: $item.displayName
+#elseif ( $item.name ) 
+          Attribute: $item.name
+#end
+#if ( $item.displayValue )
+           Value(s): $item.displayValue
+#elseif ( $item.csv ) 
+           Value(s): $item.csv
+#end
+#if ( $item.requesterComments )
+ Requester Comments: $item.requesterComments
+#end
+
+#end
+#end
+## 
+## Handle case where the items are not approved or rejected when the
+## approvalScheme is none.
+##
+#if ( $approvalScheme == "none" )
+$launcher requested the following changes for employee '$identityDisplayName' and the request required no approval because approvals are disabled.
+
+#foreach ($item in $approvalSet.items)
+#if ( $item.comments)
+#foreach ($comment in $item.comments)
+Completion Comments: $comment
+#end
+#end
+        Application: $item.applicationName
+#if ( $item.nativeIdentity )       
+           Account : $item.nativeIdentity
+#end           
+#if ( $item.instance ) 
+          Instance : $item.instance
+#end
+          Operation: $item.operation
+#if ( $item.displayName )          
+          Attribute: $item.displayName
+#elseif ( $item.name ) 
+          Attribute: $item.name
+#end
+#if ( $item.displayValue )
+           Value(s): $item.displayValue
+#elseif ( $item.csv ) 
+           Value(s): $item.csv
+#end
+#if ( $item.requesterComments )
+ Requester Comments: $item.requesterComments
+#end
+#end
+#end
+#end
+      
+    </Body>
+  <Description>
+      Email Template for notifying managers when an employee's account(s) are modified.
+      Note that in addition to the declared arguments, all workflow variables,
+      Step arguments, and Approval arguments defined in the Workflow are
+      also available.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workflow" type="Workflow">
+        <Description>The Workflow object being executed.</Description>
+      </Argument>
+      <Argument name="approvalSet" type="ApprovalSet">
+        <Description>The ApprovalSet object contained in the workflow.</Description>
+      </Argument>
+      <Argument name="launcher" type="string">
+        <Description>The name of the Identity that launched the workflow.</Description>
+      </Argument>
+      <Argument name="identityDisplayName" type="string">
+        <Description>The display name of the Identity that is being changed.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Account changes for $identityDisplayName were processed</Subject>
+</EmailTemplate>
+</sailpoint>

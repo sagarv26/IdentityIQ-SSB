@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Applications Detail Report Form" type="Report">
+  <Section columns="2" label="rept_app_section_label" name="customProperties">
+    <Field displayName="rept_app_filter_applications" helpKey="task_in_account_aggregation_applications" multi="true" name="applications" type="Application" value="ref:applications"/>
+    <Field displayName="rept_app_filter_owners" helpKey="rept_input_app_report_owners" multi="true" name="owners" type="Identity" value="ref:owners">
+      <Attributes>
+        <Map>
+          <entry key="identitySuggestFilter" value="Owner"/>
+        </Map>
+      </Attributes>
+    </Field>
+  </Section>
+</Form>
+</sailpoint>

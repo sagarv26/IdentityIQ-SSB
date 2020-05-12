@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="Environment Information Report" progressMode="Percentage" resultAction="Rename" subType="Administration Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="knownBadVersions">
+        <value>
+          <Map>
+            <entry key="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+            <entry key="com.mysql.jdbc.Driver"/>
+            <entry key="oracle.jdbc.driver.OracleDriver">
+              <value>
+                <List>
+                  <String>2111220-fc074b0027bc6f77a67a4c4aac2f490d</String>
+                </List>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="report">
+        <value>
+          <LiveReport title="Environment Information Report">
+            <DataSource dataSourceClass="sailpoint.reporting.datasource.EnvironmentInformationDataSource" type="Java"/>
+            <Columns>
+              <ReportColumnConfig field="objectType" header="rept_environment_information_object_type" property="objectType" sortable="true" width="110"/>
+              <ReportColumnConfig field="property" header="rept_environment_information_property" property="property" width="110"/>
+              <ReportColumnConfig field="value" header="rept_environment_information_value" property="value" width="110"/>
+            </Columns>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>Displays statistics about IdentityIQ environment</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessEnvironmentInformationReport"/>
+  </RequiredRights>
+</TaskDefinition>
+</sailpoint>

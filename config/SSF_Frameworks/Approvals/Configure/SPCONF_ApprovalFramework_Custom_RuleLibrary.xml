@@ -1,0 +1,367 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="SPCONF Approval Framework Rules Library" language="beanshell">
+	<ReferencedRules>
+	    <Reference class="sailpoint.object.Rule" name="SP Approval Framework Standard Rules Library"/>
+	    <Reference class="sailpoint.object.Rule" name="Approval Library"/>
+    </ReferencedRules>
+	<Source>
+	<![CDATA[
+	import sailpoint.object.*;
+	import sailpoint.api.SailPointContext;
+	import java.util.*;
+	import java.text.*;
+   	import sailpoint.object.ProvisioningPlan;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+	import sailpoint.tools.Util;
+    import sailpoint.tools.Message;
+    
+    import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	private static Log logger = LogFactory.getLog("rule.SP.ApprovalFramework.RulesLibrary");
+	
+	
+	/***********************************************************************************************
+		Get Approval Types
+	************************************************************************************************/
+	public static List cstGetApprovalTypesStepRule(SailPointContext context, Map params){
+		return cstGetApprovalTypesStepRule(context, params.get("workflow"));
+	}
+	
+	public static List cstGetApprovalTypesStepRule(SailPointContext context,Workflow workflow){
+		logger.trace("Enter cstGetApprovalTypesStepRule");
+		
+		
+		List returnApprovalTypes = new ArrayList();
+		
+		/*
+			Hard code types with this logic:
+		*/
+		/*
+		returnApprovalTypes.add("Manager");
+		returnApprovalTypes.add("Owner");
+		returnApprovalTypes.add("Director");
+		*/
+		
+		/*
+			Use the following call to get all approvals tied to roles and entitlements via requiredApprovals
+			extended attributes:
+		*/
+		
+		ApprovalSet approvalSet = workflow.get("approvalSet");
+		returnApprovalTypes = defaultGetApprovalTypesUseExtended(context, approvalSet, workflow);
+		
+		
+		logger.trace("Exit cstGetApprovalTypesStepRule: " + returnApprovalTypes);
+		return returnApprovalTypes;
+	}
+	
+	
+	/***********************************************************************************************
+		Pre Approval Rules
+	************************************************************************************************/
+	public static boolean cstPreApprovalDefaultSplitterRule(SailPointContext context, Map params){
+		return cstPreApprovalDefaultSplitterRule( context, params.get("workflow"), params.get("approvalType"));
+	}
+	
+	public static boolean cstPreApprovalDefaultSplitterRule(SailPointContext context, Workflow workflow, String approvalType){
+		logger.trace("Enter cstPreApprovalDefaultSplitterRule");
+		
+		
+		ApprovalSet approvalSet = workflow.get("approvalSet");
+		boolean hasItems = defaultPreApprovalSetSplitterUseExtended(context, approvalSet, workflow, approvalType);
+		
+		logger.trace("Exit cstPreApprovalDefaultSplitterRule: " + hasItems);
+		return hasItems;
+	}
+	
+	
+	public static boolean cstPreApprovalDoNothingRule(SailPointContext context, Map params){
+		return cstPreApprovalDoNothingRule( context, params.get("workflow"), params.get("approvalType"));
+	}
+	
+	public static boolean cstPreApprovalDoNothingRule(SailPointContext context, Workflow workflow, String approvalType){
+		logger.trace("Enter cstPreApprovalDoNothingRule");
+		
+		
+		ApprovalSet approvalSet = workflow.get("approvalSet");
+		boolean hasItems = true;
+		
+		logger.trace("Exit cstPreApprovalDoNothingRule: " + hasItems);
+		return hasItems;
+	}
+	
+	public static boolean cstPreApprovalExampleWithAutoApprovesRule(SailPointContext context, Map params){
+		return cstPreApprovalExampleWithAutoApprovesRule( context, params.get("workflow"), params.get("approvalType"));
+	}
+	
+	// USE THE FOLLOWING METHOD AS AN EXAMPLE OF HOW TO "SET ASIDE" APPROVAL ITEMS THAT DON'T REQUIRE THE GIVEN
+	// APPROVAL TYPE.  WHEN DOING THIS, BE SURE TO HAVE AN AFTER SCRIPT THAT WILL MERGE THOSE ITEMS BACK IN.
+	// SEE cstApprovalAfterScriptDefaultMergerRule AS AN EXAMPLE.  
+	public static boolean cstPreApprovalExampleWithAutoApprovesRule(SailPointContext context, 
+		Workflow workflow, String approvalType){
+		
+		logger.trace("Enter cstPreApprovalExampleWithAutoApprovesRule");
+		
+		ApprovalSet approvalSet = workflow.get("approvalSet");
+		
+		logger.trace("Get the approval items");
+		List approvalItems = approvalSet.getItems();
+		List autoApproveItems = new ArrayList();
+		
+		if (approvalItems == null || approvalItems.isEmpty()){
+			logger.warn("No items.");
+			return false;
+		}
+		
+		logger.trace("Loop the approval items");
+		for (ApprovalItem item : approvalItems){
+			
+			boolean autoApprove = false;
+			
+			/*************************************************
+			 START LOGIC HERE
+			*************************************************/
+			logger.trace("Processing logic specific to what was requested to determine if an approval is required for the given item");
+			
+			
+			
+			/*************************************************
+			 END LOGIC HERE
+			*************************************************/
+			if (autoApprove){
+				logger.debug("Adding item to be auto approved");
+				autoApproveItems.add(item);
+			}
+		}
+		
+		logger.trace("Update the workflow variables approvalSet and tempApprovalSetRem.");
+		pushAutoApproveItems(workflow, autoApproveItems, approvalSet);
+		
+		boolean hasItems = true;
+		
+		if (approvalSet.isEmpty()){
+			hasItems = false;
+		}
+		
+		logger.trace("Exit cstPreApprovalExampleWithAutoApprovesRule: " + hasItems);
+		return hasItems;
+	}
+	
+	/***********************************************************************************************
+		Get Custom Form Rules
+	************************************************************************************************/
+	public static Object getCSTDefaultApprovalFormRule(SailPointContext context, Map params){
+		return getCSTDefaultApprovalFormRule(context, params.get("workflow"));
+	}
+	
+	public static Object getCSTDefaultApprovalFormRule(SailPointContext context, Workflow workflow){
+		logger.trace("Enter getCSTDefaultApprovalFormRule");
+	
+		String identityName = workflow.get("identityName");
+		Identity id = context.getObjectByName(Identity.class, identityName);
+		Form form = new Form();
+		
+		//TODO:  ADD LOGIC HERE TO BUILD OUT FORM
+		
+		logger.trace("Exit getCSTDefaultApprovalFormRule");
+		return form;
+	}
+	
+	// TODO:  ADD METHODS TO BUILD OUT CUSTOM FORMS
+	
+	public static Object getRohitExampleApprovalFormRule(SailPointContext context, Workflow workflow){
+		logger.trace("Enter getRohitExampleApprovalFormRule");
+		
+		String currentApprovalType = workflow.get("currentApprovalType");
+		ApprovalSet approvalSet = workflow.get("tmpApprovalSet");
+		logger.trace("tmpApprovalSet: " + tmpApprovalSet.toXml());
+		
+		ProvisioningPlan plan = workflow.get("plan");
+		HashMap identityModel = workflow.get("identityModel");
+	
+		logger.trace("identityModel: " + identityModel);
+		logger.trace("plan: " + plan.toXml());
+		String request = workflow.get("requestType");
+		logger.trace("request type: " + request);
+		
+		Attributes customAttributes = workflow.get("spExtAttrs");
+		
+		String approvalFormName = "CST Approval Form Name";
+		
+		approvalForm = context.getObjectByName(Form.class, approvalFormName);
+		
+		if (approvalForm == null) {
+		  return null;
+		}
+			
+		approvalForm = approvalForm.deepCopy(context);
+		logger.trace("Started building Custom fields");
+		
+		Form.Section fsection= approvalForm.getSection("customFormSection");
+		
+		List skipVars = new ArrayList();
+		 
+		skipVars.add("identityRequestId");
+		skipVars.add("source");
+		skipVars.add("requester");
+		skipVars.add("assignment");
+		skipVars.add("requestIdLink");
+		skipVars.add("launcherEmailDisplay");
+		skipVars.add("identityEmailDisplay");
+		skipVars.add("sp_root_url");
+		skipVars.add("oneui_root_url");
+		skipVars.add("request_type");
+		skipVars.add("requestType");
+		skipVars.add("provisioningEmailRule");
+		skipVars.add("formRule");
+		skipVars.add("serviceCallRequired");
+		skipVars.add("WORKGROUP");
+		skipVars.add("openCI");
+	 
+		int counter = 0;
+		 
+		if(customAttributes!=null){
+		
+		    List keylist = new ArrayList(customAttributes.keySet());
+		
+			if(keylist != null && keylist.size() > 0){
+		   
+				counter = keylist.size();                 
+				Collections.sort(keylist);
+	
+				for(String key : keylist) {
+		
+					if(!skipVars.contains(key)) {
+						Field field = new Field();
+						field.setPrompt(key);
+						field.setPriority(counter);
+						field.setSortable(true);
+						
+						if(customAttributes.get(key) == null || "".equals(customAttributes.get(key))) {
+							field.setValue("");
+						} else {
+							field.setValue(customAttributes.get(key));
+						}
+						 
+						fsection.append(field);
+					}
+					
+					counter--;
+				}
+			}
+						 
+			logger.trace("customAttributes: " + customAttributes.toString());   
+		}
+		
+		logger.trace("Exit getRohitExampleApprovalFormRule");
+		return form;
+	}
+	
+	/***********************************************************************************************
+		Get Approvers Rules
+	************************************************************************************************/
+	public static Object cstGetApproversManagerRule(SailPointContext context, Map params){
+		return cstGetApproversManagerRule(context, params.get("workflow"));
+	}
+	
+	public static Object cstGetApproversManagerRule(SailPointContext context, Workflow workflow){
+		logger.trace("Enter cstGetApproversManagerRule");
+		
+		
+		/*
+			TODO: TEST THIS WORKS FOR PROVING OUT FRAMEWORK THEN SWITCH TO BE BASED ON THEIR ACTUAL
+			DATA MODEL --> INN CODE OR GENERAL MANAGER...
+		*/
+		String identityName = workflow.get("identityName");
+		Identity id = context.getObjectByName(Identity.class, identityName);
+		String managerName = null;
+		
+		if (id != null){
+			Identity mgr = id.getManager();
+			if (mgr != null){
+				managerName = mgr.getName();
+			}
+		}
+		
+		logger.trace("Exit cstGetApproversManagerRule");
+		return managerName;
+	}
+	
+	
+	public static Object cstGetApproversOwnerRule(SailPointContext context, Map params){
+		return cstGetApproversOwnerRule(context, params.get("workflow"));
+	}
+	
+	public static Object cstGetApproversOwnerRule(SailPointContext context, Workflow workflow){
+		logger.trace("Enter cstGetApproversOwnerRule");
+		
+		
+		//Copy of the LCM Build Owner Approvals Rules
+       // Attributes needed in the rule context: 
+       //
+       // plan - ProvisioningPlan object 
+       //
+       // approvalSet - An ApprovalSet representing the "cart"
+       // 
+       // fallbackApprover - String representing who gets the approval
+       //                    if we can't resolve one.  
+       //
+       // identityName - name of the identity being operated on
+       //
+       //
+       
+       ApprovalSet approvalSet = workflow.get("tmpApprovalSet");
+       ProvisioningPlan plan = workflow.get("plan");
+       String identityName = workflow.get("identityName");
+       String fallbackApprover = workflow.get("fallbackApprover");
+       String launcher = workflow.get("launcher");
+       
+       List approvals = new ArrayList();
+       if ( approvalSet != null ) {
+           // 
+           // Build a map of owner to ApprovalSet from each of the things in the plan 
+           // 
+           Map ownerMap = buildOwnerMap("owner", approvalSet, plan, fallbackApprover, identityName, true);
+           if ( ownerMap != null) {
+               approvals = buildApprovalsFromMap(ownerMap, identityName, launcher);
+           } 
+       }
+       
+       return ( Util.size(approvals) > 0 ) ? approvals : null;
+	}
+	
+	
+	
+	
+	/***********************************************************************************************
+		Approval After Script Rules
+	************************************************************************************************/
+	public static Object cstApprovalAfterScriptDoNothingRule(SailPointContext context, Map params){
+		
+		return null;
+	}
+	
+	public static void cstApprovalAfterScriptDefaultMergerRule(SailPointContext context, Map params){
+		
+		cstApprovalAfterScriptDefaultMergerRule(context, params.get("approvalSet"), 
+			params.get("tempApprovalSetRem"),params.get("approvalType"));
+			
+		return;
+	}
+	
+	
+	public static void cstApprovalAfterScriptDefaultMergerRule(SailPointContext context, ApprovalSet approvalSet, ApprovalSet tempApprovalSetRem, String approvalType){
+		logger.trace("Enter cstApprovalAfterScriptDefaultMergerRule");
+		
+		defaultAfterScriptMergeSplit(context, approvalSet, tempApprovalSetRem, true, approvalType);
+		return;
+	}
+	
+	
+	
+	]]>
+	</Source>
+</Rule>

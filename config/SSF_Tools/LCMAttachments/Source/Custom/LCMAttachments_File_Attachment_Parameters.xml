@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="File Attachment Parameters">
+  <Attributes>
+    <Map>
+      <entry key="basePath" value="%%SP_LCM_ATTACHMENTS_BASE_PATH%%"/>
+      <entry key="baseUrl" value="%%SP_LCM_ATTACHMENTS_BASE_URL%%"/>
+      <entry key="maxLimit" value="%%SP_LCM_ATTACHMENTS_MAX_FILES%%"/>
+      <entry key="maxSizeInMB" value="%%SP_LCM_ATTACHMENTS_MAX_SIZE_IN_MB%%"/>
+      <entry key="permittedExtensions" value="%%SP_LCM_ATTACHMENTS_PERMITTED_EXTENSIONS%%"/>
+    </Map>
+  </Attributes>
+</Custom>

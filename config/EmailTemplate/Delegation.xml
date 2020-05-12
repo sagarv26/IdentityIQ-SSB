@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Delegation">
+  <Body>$!requesterName has delegated the following work item to you: $!workItemName.
+
+Comments from $!requesterName:
+--------------------------------------------------------------------------------
+$!comments
+--------------------------------------------------------------------------------
+
+Login and view your work item inbox to complete this request.
+    </Body>
+  <Description>
+      Email Template for notifying work item owners of new delegations.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workItemName" type="string">
+        <Description>The description property (also the name property) of the delegation WorkItem.</Description>
+      </Argument>
+      <Argument name="comments" type="string">
+        <Description>Comments from the delegator.</Description>
+      </Argument>
+      <Argument name="certification" type="Certification">
+        <Description>The Certification object containing the delegated item.</Description>
+      </Argument>
+      <Argument name="requesterName" type="string">
+        <Description>The display name of the Identity that requested the delegation.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>New delegation request: $!workItemName</Subject>
+</EmailTemplate>
+</sailpoint>

@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="SPCONF Leaver Rules Library" language="beanshell">
+	<ReferencedRules>
+	    <Reference class="sailpoint.object.Rule" name="SP Provisioning Rules Library"/>
+	    <Reference class="sailpoint.object.Rule" name="SP Role Assigment Rule Library"/>
+    </ReferencedRules>
+	<Source>
+	<![CDATA[
+	import sailpoint.api.SailPointFactory;
+	import sailpoint.api.SailPointContext;
+	import sailpoint.api.Provisioner;
+	import sailpoint.object.*;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+    import sailpoint.object.ProvisioningPlan.Operation; 
+	import sailpoint.tools.Util;
+    import sailpoint.tools.Message;
+    import sailpoint.tools.GeneralException;
+    import java.sql.Connection;
+	import java.sql.PreparedStatement;
+	import java.sql.ResultSet;
+	import java.sql.SQLException;
+	import java.sql.DriverManager;
+    import java.sql.Timestamp;
+	import java.util.*;
+	import java.text.*;
+	import javax.naming.Context;
+	import javax.naming.InitialContext;
+	import javax.sql.DataSource;
+	import sailpoint.api.PasswordGenerator;
+	
+	
+    import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	private static Log llogger = LogFactory.getLog("rule.SP.Leaver.RulesLibrary");
+	
+	/******************************************************************************
+		TODO:  FILL IN FOLLOWING Leaver METHODS
+	******************************************************************************/
+	/*
+		In all rules that receive the workflow param, any workflow variable is accessible by doing workflow.get, such as:
+		
+			String identityName = workflow.get("identityName");
+	*/
+	
+	public static boolean isLeaverCustomTriggerRule(SailPointContext context, Identity previousIdentity, Identity newIdentity){
+		boolean flag = false;
+		
+		return flag;
+	}
+	
+	/* Return the request Type */
+	public static String getLeaverRequestTypeRule(SailPointContext context, Workflow workflow){
+		String requestType = "Leaver";
+		
+		return requestType;
+	}
+	
+	public static ProvisioningPlan buildCustomLeaverPlan(SailPointContext context, Workflow workflow){
+		ProvisioningPlan plan = workflow.get("plan");
+		if (plan == null){
+			plan = new ProvisioningPlan();
+			
+		}
+		
+		//write the logic to build out the rest of the plan
+		return plan;
+	}
+	
+	/* Return prov success email */
+	public static String getLeaverProvSuccessEmailTemplateRule(SailPointContext context, Workflow workflow){
+		String val = "Leaver Success Email Template";
+		
+		return val;
+	}
+	
+	/* Return prov failure email */
+	public static String getLeaverProvFailureEmailTemplateRule(SailPointContext context, Workflow workflow){
+		String val = "Leaver Failure Email Template";
+		
+		return val;
+	}
+	
+	/* Return approved email */
+	public static String getLeaverApprovedEmailTemplateRule(SailPointContext context, Workflow workflow){
+		String val = "Leaver Approved Email Template";
+		
+		return val;
+	}
+	
+	/* Return rejected email */
+	public static String getLeaverRejectedEmailTemplateRule(SailPointContext context, Workflow workflow){
+		String val = "Leaver Rejected Email Template";
+		
+		return val;
+	}
+	
+	/* Return prov success email to */
+	public static String getLeaverProvSuccessEmailToRule(SailPointContext context, Workflow workflow){
+		Identity identity = context.getObject(Identity.class, workflow.get("identityName"));
+		String val = identity.getEmail();
+		
+		context.decache(identity);
+		identity = null;
+		
+		return val;
+	}
+	
+	/* Return prov failure email to */
+	public static String getLeaverProvFailureEmailToRule(SailPointContext context, Workflow workflow){
+		Identity identity = context.getObject(Identity.class, workflow.get("identityName"));
+		String val = identity.getEmail();
+		
+		context.decache(identity);
+		identity = null;
+		
+		return val;
+	}
+	
+	/* Return approved email to */
+	public static String getLeaverApprovedEmailToRule(SailPointContext context, Workflow workflow){
+		Identity identity = context.getObject(Identity.class, workflow.get("identityName"));
+		String val = identity.getEmail();
+		
+		context.decache(identity);
+		identity = null;
+		
+		return val;
+	}
+	
+	/* Return rejected email to */
+	public static String getLeaverRejectedEmailToRule(SailPointContext context, Workflow workflow){
+		String val = "somedefaultaddress@sailpoint.com";
+		
+		return val;
+	}
+	
+	/* Do any updates to workflow variables before ProvisioningPlan is compiled */
+	public static void leaverBeforePlanRule(SailPointContext context, Workflow workflow){
+		llogger.trace("Enter Leaver beforePlanRule");
+		
+		llogger.trace("Getting extension attributes that can be used for customizations");
+		Attributes identityModel = initWorkflowAttributesVar(workflow, "identityModel");
+		Attributes spExtAttrs = initWorkflowAttributesVar(workflow, "spExtAttrs");
+		
+		//TODO:  CAN PUT LOGIC HERE TO INITIALIZE VALUES
+		
+		workflow.put("identityModel", identityModel);
+		workflow.put("spExtAttrs", spExtAttrs);
+		
+		llogger.trace("Exit Leaver beforePlanRule");
+	}
+	
+	/* Do any updates to workflow variables before ProvisioningProject is provisioned */
+	public static void leaverBeforeProvisionRule(SailPointContext context, Workflow workflow){
+		llogger.trace("Enter Leaver beforeProvisionRule");
+		
+		llogger.trace("Exit Leaver beforeProvisionRule");
+	}
+	
+	/* Do any updates to workflow variables after ProvisioningProject is provisioned */
+	public static void leaverAfterProvisionRule(SailPointContext context, Workflow workflow){
+		llogger.trace("Enter Leaver afterProvisionRule");
+		
+		// sample code below:
+		/*List errors = getErrors(context, workflow);
+		
+		String identityName = workflow.get("identityName");
+		if (identityName != null){
+			setInactive(context, identityName, true);
+		}*/
+		
+		llogger.trace("Exit Leaver afterProvisionRule");
+	}
+	
+	/* Do any updates to workflow variables if there was no request to process */
+	public static void leaverNoRequestRule(SailPointContext context, Workflow workflow){
+		
+	}
+	
+	public static boolean getScheduleSunset(Workflow workflow){
+		llogger.trace("Enter Leaver getScheduleSunset");
+		
+		boolean launch = false;
+		
+		//TODO:  ADD LOGIC HERE
+		
+		llogger.trace("Exit Leaver getScheduleSunset");
+		return launch;
+	}
+	
+	public static Date getSunsetDate(Workflow workflow){
+		llogger.trace("Enter Leaver getSunsetDate");
+		
+		Date scheduleDate = new Date();
+		
+		/*
+		Calendar thisCalendar = Calendar.getInstance();
+	       thisCalendar.setTime(new Date());
+	       thisCalendar.add(Calendar.SECOND, %%SUNSET_SCHEDULE_SECONDS%%);
+	       Date scheduleDate = thisCalendar.getTime();
+	       llogger.debug("The scheduleDate is " + scheduleDate);
+	       */
+		
+		llogger.trace("Exit Leaver getSunsetDate");
+		return scheduleDate;
+	}
+
+	]]>
+	</Source>
+</Rule>

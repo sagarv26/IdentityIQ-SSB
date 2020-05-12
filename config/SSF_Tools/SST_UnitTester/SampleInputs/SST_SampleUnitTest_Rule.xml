@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="SST Sample Unit Test Rule" language="beanshell">
+	<!--  <ReferencedRules>
+		<Reference class="sailpoint.object.Rule" name="Something Rules Library"/>
+	</ReferencedRules>-->
+	<Signature returnType="Map">
+		<Inputs>
+			<Argument name="argsFileName"/>
+			<Argument name="inputValue"/>
+			<Argument name="expectedResult"/>
+		</Inputs>
+    	<Returns/>
+	</Signature>
+	<Source>
+		<![CDATA[
+			import sailpoint.object.*;
+			import java.util.*;
+			
+			import org.apache.commons.logging.Log;
+			import org.apache.commons.logging.LogFactory;
+		
+			private static Log utlogger = LogFactory.getLog("rule.SST.UnitTest.RulesLibrary");
+			
+			utlogger.trace("Enter SST Sample Unit Test Rule");
+			
+			utlogger.trace("Have the input value: " + inputValue);
+			utlogger.trace("Have the expectedResult: " + expectedResult);
+			
+			String returnVal = "TestValue1";
+			
+			utlogger.trace("Exit SST Sample Unit Test Rule: " + returnVal);
+			return returnVal;
+		]]>
+	</Source>
+</Rule>

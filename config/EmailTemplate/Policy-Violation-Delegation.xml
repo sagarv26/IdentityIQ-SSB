@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Policy Violation Delegation">
+  <Body>A violation of policy '$violation.policyName' rule '$violation.constraintName' for user '$violation.identity.name' has been delegated to you for action.
+    </Body>
+  <Description>
+      Email Template for notifying users of the delegation of a policy violation.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workItem" type="WorkItem">
+        <Description>The WorkItem object representing the delegation.</Description>
+      </Argument>
+      <Argument name="violation" type="PolicyViolation">
+        <Description>The PolicyViolation object being delegated.</Description>
+      </Argument>
+      <Argument name="actor" type="Identity">
+        <Description>The Identity object performing the delegation.</Description>
+      </Argument>
+      <Argument name="description" type="string">
+        <Description>A short description of the violation.</Description>
+      </Argument>
+      <Argument name="comments" type="string">
+        <Description>Comments from the actor about the delegation.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Policy violation on $violation.identity.name</Subject>
+</EmailTemplate>
+</sailpoint>

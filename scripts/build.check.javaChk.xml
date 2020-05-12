@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="javachecks" >
+    
+<!-- 
+    snellepalli:Automatic Build Checks
+    Checks Java files for System.out(should not have) and whether they have comments(should have)
+-->
+  
+  <target name="sp.services.runCodeChecks">
+    
+     <touch file="../build/buildChecks/buildCheckSysOut.log" mkdirs="true"/>
+     <echo file="../build/buildChecks/buildCheckSysOut.log"  >
+====================== Check for System.out====================
+The following files have System.out statements.  Consider using logging instead.
+     </echo>
+
+     <touch file="../build/buildChecks/buildCheckComment.log" mkdirs="true"/>
+     <echo file="../build/buildChecks/buildCheckComment.log"  >
+====================== Check for Comments======================
+The following files seem to have no comments.  Please consider using comments to improve code readability.
+     </echo>
+
+   
+
+     <foreach param="javafile" target="javachk">
+      <path>
+      <fileset dir="../src">
+        <include name="**/*.java"/>
+      </fileset>
+      </path>
+     </foreach>
+     <echo file="../build/buildChecks/buildCheckSysOut.log" append="true" >
+====================== End Check for System.out================
+
+     </echo>
+     <echo file="../build/buildChecks/buildCheckComment.log"  append="true">
+====================== End Check for Comments==================
+
+     </echo>
+
+
+  </target>
+   
+  <target name="javachk">
+    <unset name="spSysoutMatches"/>
+    <loadfile property="grepFileContent" srcFile="${javafile}"/>
+
+    <grep   in="${grepFileContent}" multiline="false" quiet="true" property="spSysoutMatches" regex=".*System\.out\.print.*" separator="${line.separator}"/>
+
+    <if>
+    <isset property="spSysoutMatches"/>
+    <then>
+      <echo file="../build/buildChecks/buildCheckSysOut.log" append="true">
+${javafile}:  ${spSysoutMatches}
+      </echo>
+    </then>
+    </if>
+
+    <unset name="spCommentMatches"/>
+    <grep allmatches="yes" in="${grepFileContent}"  quiet="true" multiline="true" 
+      property="spCommentMatches" 
+      regex="//.*|(?s)/\*.*?\*/" 
+      separator="${line.separator}"/>
+      <if>
+      <not> <isset property="spCommentMatches"/> </not>
+      <then> 
+          <echo file="../build/buildChecks/buildCheckComment.log"  append="true">
+${javafile} 
+           </echo>
+      </then>
+      </if>
+
+  </target>
+</project>

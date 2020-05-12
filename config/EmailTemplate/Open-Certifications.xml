@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Open Certifications">
+  <Body>Dear $certifier,
+
+You have $certification_count certification(s) outstanding.  Please login to
+IdentityIQ to complete your certifications.
+
+Sincerely,
+The Recertification Admin Team
+    </Body>
+  <Description>
+      Email Template for notifying a manager/app owner that they have open certifications outstanding.
+      This is an "instant" email sent on demand from the certification dashboard components.
+      See EmailBean and Emailer.compileOpenCertEmail for context.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="certifierName" type="string">
+        <Description>The full name (first and last) of the Identity that owns certifications.</Description>
+      </Argument>
+      <Argument name="certificationCount" type="string">
+        <Description>The number of certifications the identity owns, passed as a String.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>$certification_count Certification(s) Outstanding</Subject>
+</EmailTemplate>
+</sailpoint>

@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="Sample Entitlement Owner Certification Exclusion Set">
+  <Attributes>
+    <Map>
+      <entry key="entitySelectors">
+        <value>
+          <List>
+              <Filter ignoreCase="true" operation="EQ" property="value" value="Benefits"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="itemSelectors">
+        <value>
+          <List>
+            <CompositeFilter operation="AND">
+              <Filter operation="EQ" property="nativeIdentity" value="djones"/>
+              <Filter operation="EQ" property="application" value="Active_Directory"/>
+            </CompositeFilter>
+            <CompositeFilter operation="AND">
+              <Filter operation="EQ" property="identity.name" value="Adam.Kennedy"/>
+            </CompositeFilter>
+          </List>
+        </value>
+      </entry>
+      <entry key="mode" value="EXCLUDE"/>
+      <entry key="reason" value="Exclude entitlements, accounts and identities example"/>
+    </Map>
+  </Attributes>
+</Custom>

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.CompleteOrphanIdentityRequestsTask" name="Complete Orphan Identity Requests" subType="task_item_type_system" type="System">
+  <Description>Remove identity requests for older completed requests</Description>
+  <Signature>
+    <Returns>
+      <Argument name="numRequestsCompleted" type="int">
+        <Prompt>task_out_complete_orphan_identity_requests_completed</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

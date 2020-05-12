@@ -1,0 +1,372 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow name="Identity Request Approve" type="Subprocess">
+  <Variable input="true" name="identityName" required="true">
+    <Description>
+      The name of the identity object being modified.
+    </Description>
+  </Variable>
+  <Variable input="true" name="batchRequestId">
+    <Description>
+      Batch request id.
+    </Description>
+  </Variable>
+  <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>
+      The displayName of the identity being updated.
+      This may be passed in, if not the script queries for this
+      using a projection query and falls back to the name.
+    </Description>
+  </Variable>
+  <Variable initializer="script:getIdentityProperty(identityName, &quot;id&quot;)" input="true" name="identityId">
+    <Description>
+      The id of the identity being updated.
+    </Description>
+  </Variable>
+  <Variable input="true" name="identityRequestId">
+    <Description>
+       The ID of the IdentityRequest for this request.
+    </Description>
+  </Variable>
+  <Variable input="true" name="approvalScheme" required="true">
+    <Description>
+      A csv string that specifies how approvals should be generated for
+      the incoming request.
+
+      The value can be any of the values below, combined together but
+      are always processed in this order:
+
+      1. manager
+      2. owner
+      3. securityOfficer
+
+      Any rejected items from previous approvals will be omitted from the
+      next phase of approvers.
+
+      none - disabled approvals
+
+      owner - the object owner gets the approval
+              For Role approvals this is the Role object owner. When dealing
+              with things like Unlock and other account level changes
+              the approvals will be assigned to the the application owner.
+
+      manager - The manager will get all approvals
+
+      securityOfficer - The identity named security the security in the variable
+                        securityOfficerName.
+
+    </Description>
+  </Variable>
+  <Variable initializer="serial" input="true" name="approvalMode">
+    <Description>
+     A string that specifies how we should handle the approvals.
+
+     By default this is serial since most of these request with
+     the exception of manager transfers will have only one approver.
+
+     parallel
+       Approvals are processed concurrently and there must be consensus,
+       we wait for all approvers to approve.  The first approver that
+       rejects terminates the entire approval.
+
+     parallelPoll
+       Approvals are processed concurrently but consensus is not required.
+       All approvals will be processed, we don't stop if there are any
+       rejections.
+
+     serial
+       Approvals are processed one at a time and there must be consensus.
+       The first approver that rejects terminates the entire approval.
+
+     serialPoll
+       Approvals are processed in order but consensus is not required.
+       All approvals will be processed, we don't stop if there are any
+       rejections.  In effect we are "taking a poll" of the approvers.
+
+     any
+      Approvals are processed concurrently, the first approver to
+      respond makes the decision for the group.
+    </Description>
+  </Variable>
+  <Variable input="true" name="fallbackApprover" required="true">
+    <Description>
+      A String that specifies the name of the Identity that will
+      be assigned any approvals where the owner of the approver
+      can't be resolved. Example if the scheme is "owner" and the
+      application doesn't specify and owner.
+    </Description>
+  </Variable>
+  <Variable input="true" name="securityOfficerName">
+    <Description>
+       The name of the identity that will be sent approvals
+       during security officer approvals.
+    </Description>
+  </Variable>
+  <Variable input="true" name="batchRequestApprover">
+    <Description>
+       Identity responsible for approving batch requests.
+    </Description>
+  </Variable>
+  <Variable initializer="false" input="true" name="includeRejectedItemsInApprovalChain">
+    <Description>
+       When using multi approvalSchemes a flag to indicate if new
+       approvals in the chain will include rejected items.
+    </Description>
+  </Variable>
+  <Variable input="true" name="policyViolations">
+    <Description>
+       List of policy violations that were found during our initial policy scan.
+       This list is passed into each work item so the approvers can see
+       pending violations.
+    </Description>
+  </Variable>
+  <Variable input="true" name="flow">
+    <Description>
+      The name of the LCM flow that launched this workflow.
+
+      This is one of these values:
+
+      AccountsRequest
+      EntitlementsRequest
+      RolesRequest
+      IdentityCreateRequest
+      IdentityEditRequest
+      ForgotPassword
+      ExpiredPassword
+      PasswordRequest
+
+    </Description>
+  </Variable>
+  <Variable input="true" name="trace">
+    <Description>
+      Used for debugging this subprocess and when set to true trace
+      statements will be sent to stdout.
+    </Description>
+  </Variable>
+  <Variable input="true" name="approvalSet" output="true">
+    <Description>
+       This attributes is set during the "Build Approval Set" step,
+       which builds this list by going through the ProvisioningPlan
+       to build the line items that need to be approved,
+
+       This variable includes all ApprovalItems that are part of
+       the request process and is updated during the AfterScript
+       of the approval process by assimilating the decisions
+       and comments from the Approvals copy of the ApprovalItem.
+    </Description>
+  </Variable>
+  <Variable initializer="LCM Identity Update Approval" input="true" name="managerEmailTemplate">
+    <Description>
+       Name of the email template to use when manager of pending approvals.
+    </Description>
+  </Variable>
+  <Variable initializer="LCM Identity Update Approval" input="true" name="ownerEmailTemplate">
+    <Description>
+       Name of the email template to use when notifying the owner of pending approvals.
+    </Description>
+  </Variable>
+  <Variable initializer="LCM Identity Update Approval" input="true" name="securityOfficerEmailTemplate">
+    <Description>
+       Name of the email template to use when notifying the security officer of pending approvals.
+    </Description>
+  </Variable>
+  <Variable initializer="Batch Approval" input="true" name="batchApproverEmailTemplate">
+    <Description>
+       Name of the email template to use when notifying the batch approver of pending approval.
+    </Description>
+  </Variable>
+  <Variable input="true" name="workItemComments">
+    <Description>
+       List of global workflow comments to be appended to the approval workitem.
+    </Description>
+  </Variable>
+  <Variable input="true" name="managerElectronicSignature">
+    <Description>
+       The name of the electronic signature object that should be used when workitems
+       are completed by a manager.
+    </Description>
+  </Variable>
+  <Variable input="true" name="ownerElectronicSignature">
+    <Description>
+       The name of the electronic signature object that should be used when workitems
+       are completed by object owners.
+    </Description>
+  </Variable>
+  <Variable input="true" name="securityOfficerElectronicSignature">
+    <Description>
+       The name of the electronic signature object that should be used when workitems
+       are completed by the security officer.
+    </Description>
+  </Variable>
+  <Variable input="true" name="batchApproverElectronicSignature">
+    <Description>
+       The name of the electronic signature object that should be used when workitems
+       are completed by the batch approver when performing batch operations.
+    </Description>
+  </Variable>
+  <Variable input="true" name="priority">
+    <Description>
+      String version of WorkItem.level that will be used
+      to set the priority of the workitems generated
+      as part of any generated approvals.
+    </Description>
+  </Variable>
+  <Variable name="tmpApprovalSet">
+    <Description>
+       Temporary and transient  ApprovalSet used to hold filtered
+       approval sets as we transition through the approval chain.
+    </Description>
+  </Variable>
+  <Variable name="tmpApproval">
+    <Description>
+       Temporary and transient list of Approval object used to hold filtered
+       approval as we transition through the approval chain.
+    </Description>
+  </Variable>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Approval Library"/>
+    <Reference class="sailpoint.object.Rule" name="LCM Workflow Library"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="28" posY="10">
+    <Transition to="Start Approval"/>
+  </Step>
+  <Step icon="Task" name="Start Approval" posX="28" posY="149">
+    <Transition to="Manager Approval" when="script:isApprovalEnabled(approvalScheme, &quot;manager&quot;)"/>
+    <Transition to="Build Owner ApprovalSet" when="script:isApprovalEnabled(approvalScheme, &quot;owner&quot;)"/>
+    <Transition to="Build Security Officer ApprovalSet" when="script:isApprovalEnabled(approvalScheme, &quot;securityOfficer&quot;)"/>
+    <Transition to="Batch Request Approval" when="script:isApprovalEnabled(approvalScheme, &quot;batchRequest&quot;)"/>
+    <Transition to="end"/>
+  </Step>
+  <Step icon="Approval" name="Manager Approval" posX="172" posY="7">
+    <Approval mode="serial" owner="call:buildManagerApproval" renderer="lcmWorkItemRenderer.xhtml" send="approvalSet,identityDisplayName,identityName,policyViolations">
+      <AfterScript>
+        <Source>
+          import sailpoint.workflow.IdentityRequestLibrary;
+
+            assimilateWorkItemApprovalSet(wfcontext, item, approvalSet);
+            IdentityRequestLibrary.assimilateWorkItemApprovalSetToIdentityRequest(wfcontext, approvalSet);
+            auditDecisions(item);
+        </Source>
+      </AfterScript>
+      <Arg name="workItemIdentityRequestId" value="ref:identityRequestId"/>
+      <Arg name="workItemElectronicSignature" value="ref:managerElectronicSignature"/>
+      <Arg name="workItemRequester" value="$(launcher)"/>
+      <Arg name="workItemDescription" value="Manager Approval - Account Changes for User: $(identityDisplayName)"/>
+      <Arg name="workItemNotificationTemplate" value="ref:managerEmailTemplate"/>
+      <Arg name="workItemTargetClass" value="sailpoint.object.Identity"/>
+      <Arg name="workItemTargetName" value="$(identityName)"/>
+      <Arg name="workItemTargetId" value="$(identityId)"/>
+      <Arg name="workItemPriority" value="ref:priority"/>
+    </Approval>
+    <Description>
+      If approvalScheme contains manager, send an approval for all
+      requested items in the request. This approval will get the entire
+      approvalSet as part of the workitem.
+    </Description>
+    <Transition to="Build Owner ApprovalSet" when="script:isApprovalEnabled(approvalScheme, &quot;owner&quot;)"/>
+    <Transition to="Build Security Officer ApprovalSet" when="script:isApprovalEnabled(approvalScheme, &quot;securityOfficer&quot;)"/>
+    <Transition to="end"/>
+  </Step>
+  <Step action="script:filterApprovalSet(approvalSet,includeRejectedItemsInApprovalChain,false)" icon="Task" name="Build Owner ApprovalSet" posX="237" posY="212" resultVariable="tmpApprovalSet">
+    <Transition to="Owner Approval"/>
+  </Step>
+  <Step icon="Approval" name="Owner Approval" posX="389" posY="211">
+    <Approval mode="ref:approvalMode" owner="call:buildOwnerApprovals" renderer="lcmWorkItemRenderer.xhtml" send="identityDisplayName,identityName,policyViolations">
+      <AfterScript>
+        <Source>
+
+          import sailpoint.workflow.IdentityRequestLibrary;
+
+          if ( item == null )
+              return;
+
+          assimilateWorkItemApprovalSet(wfcontext, item, approvalSet);
+          IdentityRequestLibrary.assimilateWorkItemApprovalSetToIdentityRequest(wfcontext, approvalSet);
+          auditDecisions(item);
+        </Source>
+      </AfterScript>
+      <Arg name="approvalSet" value="ref:tmpApprovalSet"/>
+      <Arg name="workItemDescription" value="Owner Approval - Account Changes for User: $(identityDisplayName)"/>
+      <Arg name="workItemElectronicSignature" value="ref:ownerElectronicSignature"/>
+      <Arg name="workItemIdentityRequestId" value="ref:identityRequestId"/>
+      <Arg name="workItemNotificationTemplate" value="ref:ownerEmailTemplate"/>
+      <Arg name="workItemPriority" value="ref:priority"/>
+      <Arg name="workItemRequester" value="$(launcher)"/>
+    </Approval>
+    <Description>
+      If approvalScheme contains owner, send approvals out to all
+      of the owners for items in the request. The main approvalSet
+      is broken up into owner specific approval sets and assimilated
+      back into the main approvalset as decisions are made.
+
+      The previous decisions made on the items will be present along
+      with any comments made by the manager.
+
+      This step will be skipped if all items are
+      rejected and includeRejectedItemsInApprovalChain is set to false
+    </Description>
+    <Transition to="Build Security Officer ApprovalSet" when="script:isApprovalEnabled(approvalScheme, &quot;securityOfficer&quot;)"/>
+    <Transition to="end"/>
+  </Step>
+  <Step action="script:filterApprovalSet(approvalSet,includeRejectedItemsInApprovalChain,false)" icon="Task" name="Build Security Officer ApprovalSet" posX="309" posY="61" resultVariable="tmpApprovalSet">
+    <Transition to="Security Officer Approval"/>
+  </Step>
+  <Step condition="script:!isNull(tmpApprovalSet) &amp;&amp; !tmpApprovalSet.isEmpty()" icon="Approval" name="Security Officer Approval" posX="698" posY="59">
+    <Approval mode="serial" owner="call:buildSecurityOfficerApproval" renderer="lcmWorkItemRenderer.xhtml" send="identityDisplayName,identityName,policyViolations">
+      <AfterScript>
+        <Source>
+          import sailpoint.workflow.IdentityRequestLibrary;
+
+          assimilateWorkItemApprovalSet(wfcontext, item, approvalSet);
+          IdentityRequestLibrary.assimilateWorkItemApprovalSetToIdentityRequest(wfcontext, approvalSet);
+        </Source>
+      </AfterScript>
+      <Arg name="approvalSet" value="ref:tmpApprovalSet"/>
+      <Arg name="workItemElectronicSignature" value="ref:securityOfficerElectronicSignature"/>
+      <Arg name="workItemIdentityRequestId" value="ref:identityRequestId"/>
+      <Arg name="workItemRequester" value="$(launcher)"/>
+      <Arg name="workItemDescription" value="Security Officer Approval - Account Changes for User: $(identityDisplayName)"/>
+      <Arg name="workItemNotificationTemplate" value="ref:securityOfficerEmailTemplate"/>
+      <Arg name="workItemPriority" value="ref:priority"/>
+      <Arg name="workItemTargetClass" value="sailpoint.object.Identity"/>
+      <Arg name="workItemTargetName" value="ref:identityName"/>
+      <Arg name="workItemTargetId" value="ref:identityId"/>
+    </Approval>
+    <Description>
+     If approvalScheme contains securityOfficer and the securityOfficeName is
+     non null this step will send items with decisions and comments
+     from the cart for final decision.
+
+     The previous decisions made on the item will be present along with
+     any comments made in previous approval steps.
+    </Description>
+    <Transition to="Batch Request Approval"/>
+  </Step>
+  <Step icon="Approval" name="Batch Request Approval" posX="833" posY="59">
+    <Approval mode="serial" owner="ref:batchRequestApprover" renderer="lcmWorkItemRenderer.xhtml" send="identityDisplayName,identityName">
+      <AfterScript>
+        <Source>
+          assimilateWorkItemApprovalSet(wfcontext, item, approvalSet);
+        </Source>
+      </AfterScript>
+      <Arg name="approvalSet" value="ref:approvalSet"/>
+      <Arg name="workItemDescription" value="Batch Request Approval requested by $(launcher)"/>
+      <Arg name="workItemElectronicSignature" value="ref:batchApproverElectronicSignature"/>
+      <Arg name="workItemIdentityRequestId" value="ref:identityRequestId"/>
+      <Arg name="workItemNotificationTemplate" value="ref:batchApproverEmailTemplate"/>
+      <Arg name="workItemPriority" value="ref:priority"/>
+      <Arg name="workItemRequester" value="$(launcher)"/>
+      <Arg name="workItemTargetClass" value="sailpoint.object.BatchRequest"/>
+      <Arg name="workItemTargetId" value="ref:batchRequestId"/>
+    </Approval>
+    <Description>
+     If approvalScheme contains batchRequest and the batchRequestApprover is
+     non null this step will send items with decisions and comments
+     from the cart for final decision.
+    </Description>
+    <Transition to="end"/>
+  </Step>
+  <Step icon="Stop" name="end" posX="920" posY="1"/>
+</Workflow>
+</sailpoint>

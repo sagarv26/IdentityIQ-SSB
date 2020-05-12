@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell"  name="SP Dynamic Field Value Rule" type="FieldValue">
+  <Description>
+  	This rule uses information in the field that calls the rule to dynamically
+  	call a method in the library SPCONF Field Value Rules Library.  Each field
+  	that calls this rule must have a corresponding method in that library with the following
+  	naming convention: getFV_AppName_FieldName_Rule.  For a field without a default value,
+  	the signature must be (SailPointContext context, Identity identity, String op).  
+  	For a field with a default value, the signature must be:
+  	(SailPointContext context, Identity identity, String op, Object defaultValue).
+  </Description>
+  <Signature returnType="Object"/>
+  <ReferencedRules>
+	<Reference class="sailpoint.object.Rule" name="SPCONF Field Value Rules Library"/>
+  </ReferencedRules>
+  <Source>
+    import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	private Log logger = LogFactory.getLog("rule.SP.FieldValue.RulesLibrary");
+	
+	logger.trace("Enter getDynamicFieldValueRule");
+		
+	logger.trace("Have field: " + field);
+	
+	if (field == null){
+		return "no field passed in.  this is impossible so this is just a sanity check.";
+	}
+	
+	String fieldName = field.getName();
+	String appName = field.getApplication();
+	Object defaultValue = field.getDefaultValue();
+	
+	String templateOp = field.getTemplate();
+	String op = "Create";
+	if (templateOp != null){
+		op = templateOp;
+	}
+	
+	logger.trace("Template: " + templateOp);
+	logger.trace("Field name: " + fieldName);
+	logger.trace("App name: " + appName);
+	logger.trace("Op: " + op);
+	logger.trace("default value: " + defaultValue);
+	
+	Object val = null;
+		
+	logger.debug("Replacing all invalid characters");
+	String aName = appName;
+	
+	if (appName != null){
+		aName=appName.replaceAll(" ", "_");
+	}
+	
+	String fName = fieldName.replaceAll("-", "_");
+	fName = fName.replaceAll(" ", "_");
+    fName = fName.replaceAll("\\.", "_");
+	
+	String methodName = "getFV_" + aName + "_" + fName + "_Rule"; 
+	logger.debug("Have the method name: " + methodName);
+	
+	Object[] params; 
+	
+	if (defaultValue == null || defaultValue == void){
+		logger.debug("Build the parameters without a default value");
+		params = new Object[] {context,identity,op};
+	} else {
+		logger.debug("Build the parameters with a default value");
+		params = new Object[] {context,identity,op,defaultValue};
+	}
+	
+	try {
+		logger.trace("Dynamically invoke method: " + methodName);
+		val = this.invokeMethod(methodName, params);
+	} catch (Exception e){
+		logger.error("Exception with value of field { " + fieldName + " }, invoking method, " + methodName + ": " + e);
+		val = "CHECK CONFIG";
+	}
+	
+	logger.trace("Exit dynamic field value rule with val: " + val);
+	return val;
+  </Source>
+</Rule>

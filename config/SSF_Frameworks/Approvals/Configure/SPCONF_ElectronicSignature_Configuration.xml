@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+	<ImportAction name="merge">
+		<Configuration name="ElectronicSignature">
+			<Attributes>
+				<Map>
+					<entry key="types">
+						<value>
+							<List>
+								<ESignatureType displayName=""
+									name="SP Default Electronic Signature">
+									<Map>
+										<entry key="en_US"
+											value="Electronic Signature Required:  Please provide your user name and password." />
+									</Map>
+								</ESignatureType>
+							</List>
+						</value>
+					</entry>
+				</Map>
+			</Attributes>
+		</Configuration>
+	</ImportAction>
+</sailpoint>

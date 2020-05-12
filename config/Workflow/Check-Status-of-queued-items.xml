@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow libraries="Identity,IdentityRequest" name="Check Status of queued items" type="Subprocess">
+  <Variable input="true" name="project" output="true" required="true">
+    <Description>
+      Project that has account requests in the QUEUED state.
+    </Description>
+  </Variable>
+  <Variable initializer="script:new Integer(60);" input="true" name="provisioningStatusCheckInterval" type="integer">
+    <Description>
+      The interval in minutes to retry the check status call,
+      defaults to 1 hour.
+    </Description>
+  </Variable>
+  <Variable initializer="script:new Integer(-1);" name="provisioningMaxStatusChecks" type="integer">
+    <Description>
+       The maximum number of status checks that will be tried before failure 
+       of the provisioning activities.  A value of -1 will execute
+       indefinetly, which is the default.
+    </Description>
+  </Variable>
+  <Variable input="true" name="disableIdentityRequests">
+    <Description>
+      May be passed by the calling workflow to disable processing of
+      IdentityRequest objects after provisioning.  This option should
+      be passed by any workflow that is not used by LCM and does not
+      maintain the IdentityRequest model.  This avoids logging a warning
+      when the IdentityRequest is not found.
+    </Description>
+  </Variable>
+  <Variable initializer="false" input="true" name="trace">
+    <Description>
+      Used for debugging this subprocess and when set to true trace
+      statements will be sent to stdout.
+    </Description>
+  </Variable>
+  <Variable input="true" name="splitProvisioning">
+    <Description>
+      True to denote this is a partial of the full ProvisioningPlan. This should be true in the case of LCM Provisioning
+      splits.
+    </Description>
+  </Variable>
+  <Variable name="statusChecks" output="true" type="integer">
+    <Description>
+       The number of status checks performed during the execution
+       of the provisioning activities.
+    </Description>
+  </Variable>
+  <Step icon="Start" name="Start" posX="25" posY="233">
+    <Transition to="Requires Check"/>
+  </Step>
+  <Step action="call:requiresStatusCheck" icon="Task" name="Requires Check" posX="134" posY="233" resultVariable="requiresStatusCheck">
+    <Arg name="project" value="ref:project"/>
+    <Description>
+       Up front check to compute if the status check is necessary.
+
+       Dig into the plan and check to see if any of the plan results have 
+       queued items with requestIds??
+
+       If both are not true, bail out -- otherwise enter a loop 
+       that will checking for status.       
+    </Description>
+    <Transition to="Initialize Status Checks" when="script:(requiresStatusCheck)"/>
+    <Transition to="Apply Committed Results"/>
+  </Step>
+  <Step icon="Task" name="Initialize Status Checks" posX="192" posY="119">
+    <Description>
+      When visiting for the first time initalize the 
+      statusChecks counter variable and avoid the sleep that we'll 
+      want when looping while checking status.
+    </Description>
+    <Script>
+      <Source>
+        if ( statusChecks == null ) { 
+            statusChecks = new Integer(0); 
+        } else {
+            statusChecks++;
+        }
+        wfcontext.getWorkflowCase().put("statusChecks", statusChecks);
+      </Source>
+    </Script>
+    <Transition to="Calculate Max Checks"/>
+  </Step>
+  <Step action="call:getProvisioningMaxStatusChecks" name="Calculate Max Checks" posX="344" posY="119" resultVariable="provisioningMaxStatusChecks">
+    <Description> 
+       Calculate the maxRetries variable by digging into the
+       retry project in an attempt to resolve the maxRetries 
+       from the applications that are involved falling back
+       to a system config.
+    </Description>
+    <Transition to="Calculate StatusCheck Threshold"/>
+  </Step>
+  <Step action="call:getProvisioningStatusCheckInterval" name="Calculate StatusCheck Threshold" posX="526" posY="119" resultVariable="provisioningCheckStatusInterval">
+    <Arg name="project" value="ref:project"/>
+    <Description> 
+       Calculate the provisioningStatusCheckInterval variable by digging into the
+       retry project in an attempt to resolve the maxRetries 
+       from the applications that are involved falling back
+       to the workflow setting.
+    </Description>
+    <Transition to="CheckStatus" when="script:(statusChecks == 0)"/>
+    <Transition to="Wait for next check"/>
+  </Step>
+  <Step name="Wait for next check" posX="584" posY="16" wait="ref:provisioningCheckStatusInterval">
+    <Description>
+       Pause and waiting for things to happen on the PE side.  
+       Use the configurable interval to determine how long
+       we wait in between checks.
+    </Description>
+    <Transition to="CheckStatus"/>
+  </Step>
+  <Step action="call:checkProvisioningStatus" name="CheckStatus" posX="730" posY="16" resultVariable="project">
+    <Arg name="project" value="ref:project"/>
+    <Description> 
+       Call the connector's checkStatus method for each queued item found in a project.
+       This method will also update the status on the plan as items complete.
+    </Description>
+  </Step>
+  <Step action="call:refreshIdentityRequestAfterProvisioning" name="Refresh Identity Request" posX="730" posY="121">
+    <Arg name="project" value="ref:project"/>
+    <Arg name="disableIdentityRequests" value="ref:disableIdentityRequests"/>
+    <Description> 
+       Refresh the identity request to include provisioning results returned
+       from the connector's checkStatus any other provisioning side effects updated in the project.
+       
+       This method gives us the update of each access request item so it can
+       be displayed in the UI as they complete instead of waiting for
+       the entire process to complete.
+       
+       Note that the disableIdentityRequests input variable is passed
+       to skip request processing if we're being called from a non-LCM workflow.
+       It is easier to pass this option than to transition around this step.
+    </Description>
+    <Transition to="Requires Check" when="script:( provisioningMaxStatusChecks == -1 || statusChecks &lt; provisioningMaxStatusChecks)"/>
+    <Transition to="Timeout" when="script:( statusChecks >= provisioningMaxStatusChecks )"/>
+    <Transition to="Apply Committed Results"/>
+  </Step>
+  <Step action="call:addMessage" name="Timeout" posX="916" posY="118">
+    <Arg name="message" value="Max number of status checks occurred."/>
+    <Description> 
+    </Description>
+    <Transition to="Apply Committed Results"/>
+  </Step>
+  <Step action="call:applyCommittedResults" condition="script: return (statusChecks != null );" icon="Task" name="Apply Committed Results" posX="916" posY="229">
+    <Arg name="project" value="ref:project"/>
+    <Description>
+      Apply any of the commited plans, account requests or attribute requests 
+      that result from our checking the request status.
+    </Description>
+    <Transition to="End"/>
+  </Step>
+  <Step icon="Stop" name="End" posX="1116" posY="229"/>
+</Workflow>
+</sailpoint>

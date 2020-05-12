@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="services.standard.build.config.xml">
+
+    <!-- ********************************************************** -->
+    <!-- targets responsible for taking custom xml, doing environment token replacement and making a custom init.xml-->
+    <!-- ********************************************************** -->
+
+    <!-- import stock (default) iiq artifacts (no lcm, no custom stuff) -->
+    <target name="import-stock" depends="-security.Init">
+        <echo>Importing stock IIQ with: console iiqBeans -c "import '${build.iiqBinaryExtract}/WEB-INF/config/init-default_org.xml'"</echo>
+        <java classname="sailpoint.launch.Launcher" fork="true" failonerror="true" inputstring="${console_user}&#xA;${console_pass}&#xA;">
+            <arg line="console iiqBeans -c &quot;import '${build.iiqBinaryExtract}/WEB-INF/config/init-default_org.xml'&quot;"/>
+            <classpath>
+                <pathelement path="${build.iiqBinaryExtract}/WEB-INF/classes"/>
+                <pathelement location="${build.iiqBinaryExtract}/WEB-INF/lib/identityiq.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+    <!-- import custom iiq artifacts) -->
+    <target name="import-custom" depends="-security.Init">
+        <echo>Importing custom objects with: console iiqBeans -c "import '${build.iiqBinaryExtract}/WEB-INF/config/sp.init-custom.xml'"</echo>
+        <java classname="sailpoint.launch.Launcher" fork="true" failonerror="true" inputstring="${console_user}&#xA;${console_pass}&#xA;">
+            <arg line="console iiqBeans -c &quot;import '${build.iiqBinaryExtract}/WEB-INF/config/sp.init-custom.xml'&quot;"/>
+            <classpath>
+                <pathelement path="${build.iiqBinaryExtract}/WEB-INF/classes"/>
+                <pathelement location="${build.iiqBinaryExtract}/WEB-INF/lib/identityiq.jar"/>
+            </classpath>
+        </java>
+    </target>
+    
+    <!-- import stock (default) LCM-related iiq artifacts) -->
+    <target name="import-lcm" depends="-security.Init">
+        <if>
+            <equals arg1="${usingLcm}" arg2="true"/>
+            <then>
+                <echo>Importing default LCM objects with: console iiqBeans -c "import '${build.iiqBinaryExtract}/WEB-INF/config/init-lcm.xml'"</echo>
+                <java classname="sailpoint.launch.Launcher" fork="true" failonerror="true" inputstring="${console_user}&#xA;${console_pass}&#xA;">
+                    <arg line="console iiqBeans -c &quot;import '${build.iiqBinaryExtract}/WEB-INF/config/init-lcm.xml'&quot;"/>
+                    <classpath>
+                        <pathelement path="${build.iiqBinaryExtract}/WEB-INF/classes"/>
+                        <pathelement location="${build.iiqBinaryExtract}/WEB-INF/lib/identityiq.jar"/>
+                    </classpath>
+                </java>
+            </then>
+            <else>
+                <echo>Skipping lcm import, as lcm is not enabled (usingLcm is not "true" in build properties)</echo>
+            </else>
+        </if>
+        
+    </target>
+
+    <!-- import all artfacts in order - stock iiq, stock lcm, custom -->
+    <target name="import-all">
+        <echo>Calling import for stock iiq, stock lcm, then custom artifacts</echo>
+        <antcall target="import-stock"/>
+        <antcall target="import-lcm"/>
+        <antcall target="import-custom"/>
+    </target>
+
+    <!-- deprecated target for backwards compatiblity -->
+    <target name="import">
+        <echo message="target 'import' is DEPRECATED and may be removedin a future SSB release - use 'import-custom' instead..."/>
+        <sleep seconds="5"/>
+        <antcall target="import-custom"/>
+    </target>
+
+    <target name="runUpgrade" depends="-security.Init" >
+        <echo>Running patch command for ${IIQVersion}${IIQPatchLevel}</echo>
+        <java classname="sailpoint.launch.Launcher" fork="true" failonerror="true" inputstring="${console_user}&#xA;${console_pass}&#xA;">
+            <arg line="patch ${IIQVersion}${IIQPatchLevel}"/>
+            <classpath>
+                <pathelement path="${build.iiqBinaryExtract}/WEB-INF/classes"/>
+                <pathelement location="${build.iiqBinaryExtract}/WEB-INF/lib/identityiq.jar"/>
+            </classpath>
+        </java>
+    </target>
+   
+    <target name="build-inits" depends="validatetokens,validate">
+        <build-init initFile="${build.iiqBinaryExtract}/WEB-INF/config/sp.init-custom.xml">
+            <fileset dir="${build.iiqBinaryExtract}/WEB-INF/config">
+                <include name="custom/**/*.xml"/>
+                 <include name="custom/**/*.XML"/>
+                <include name="custom/**/*.jrxml"/>
+                <exclude name="custom/**/*-init.xml"/>
+                <exclude name="custom/**/*.hbm.xml"/>
+                <exclude name="custom/**/cert_*.xml"/>
+                <exclude name="custom/**/template*/*.xml"/>
+                <!-- Do not move over the template xml into the build dir -->
+                <exclude name="custom/**/*Template.xml"/>
+
+                <!-- 
+                Exclude items named in this target's excludes file.
+                each line in the file is treated as an exclusion pattern.
+                for this use here, (and the import stuff only) lines are prefixed with "custom/".
+                see prepareFiles target that uses the same but expects a broader pattern 
+                if you want ignored files to be stripped out import AND copy actions.
+                -->
+                <excludesfile name="${target}.ignorefiles.properties" if="ignorefiles.is.found"/>
+               
+                <!-- A.DUNFEE = - CUSTOM EXCLUDE FOR UNIT TEST OBJECTS -->
+                <exclude name="custom/**/Args/**"/>
+                <exclude name="custom/**/*Args*"/>
+            </fileset>
+        </build-init>
+        <if>
+            <not>
+                <resourceexists>
+                    <file file="${build.iiqBinaryExtract}/WEB-INF/config/init-default_org.xml"/>
+                </resourceexists>
+            </not>
+            <then>
+                <move file="${build.iiqBinaryExtract}/WEB-INF/config/init.xml"
+                      tofile="${build.iiqBinaryExtract}/WEB-INF/config/init-default_org.xml" failonerror="true"/>
+            </then>
+        </if>
+        <if>
+            <equals arg1="${usingLcm}" arg2="true"/>
+            <then>
+                <build-init initFile="${build.iiqBinaryExtract}/WEB-INF/config/init.xml">
+                    <fileset dir="${build.iiqBinaryExtract}/WEB-INF/config">
+                        <include name="init-default_org.xml"/>
+                        <include name="init-lcm.xml"/>  
+                        <include name="patch/*.xml"/>
+                        <include name="sp.init-custom.xml"/>
+                        <exclude name="**/*.hbm.xml"/>
+                    </fileset>
+                </build-init>
+            </then>
+            <else>
+                <build-init initFile="${build.iiqBinaryExtract}/WEB-INF/config/init.xml">
+                    <fileset dir="${build.iiqBinaryExtract}/WEB-INF/config">
+                        <include name="init-default_org.xml"/>
+                        <include name="patch/*.xml"/>        
+                        <include name="sp.init-custom.xml"/>
+                        <exclude name="**/*.hbm.xml"/>
+                    </fileset>
+                </build-init>                
+            </else>
+        </if>
+    </target>
+
+
+    <target name="prepareCustomConfig" depends="prepareFiles,build-inits">
+        <replaceregexp file="${build.iiqBinaryExtract}/WEB-INF/config/sp.init-custom.xml" match="\\" replace="/" flags="g" />
+        <replaceregexp file="${build.iiqBinaryExtract}/WEB-INF/config/init.xml" match="\\" replace="/" flags="g" />
+    </target>
+
+    <target name="prepareFiles" depends="setExclusions">
+        <delete dir="${build.customXMLDir}"/>
+        
+        <copy todir="${build.customXMLDir}">
+            <fileset dir="config">
+                <!-- if you have XML that is a template for automatic configuration generation then please use the
+                following name convention-->
+                <exclude name="**/*Template.xml"/>
+                <!-- Do not move over the anything in any Samples folder into the build dir -->
+                <exclude name="**/Samples/**"/>
+                <!-- Exclude individual components -->
+                <exclude name="${ssf.features.excludepattern}"/>
+                <exclude name="${ssf.frameworks.excludepattern}"/>
+                <exclude name="${sst.unittester.excludepattern}"/>
+                <exclude name="${emailapprovals.excludepattern}"/>
+                <exclude name="${breakglass.excludepattern}"/>
+                <exclude name="${genericimporter.excludepattern}"/>
+                <exclude name="${objectexporter.excludepattern}"/>
+                <exclude name="${multithreadedbeanshellkit.excludepattern}"/>
+                <exclude name="${reportextractor.excludepattern}"/>
+                <exclude name="${rulerunnertask.excludepattern}"/>
+                <exclude name="${ssptools.excludepattern}"/>
+                <exclude name="${correlationMigrator.excludepattern}"/>
+                <exclude name="${workgroupMigrator.excludepattern}"/>
+                <exclude name="${emailTemplateEditor.excludepattern}"/>
+                <exclude name="${iIQLoopbackConnector.excludepattern}"/> 
+                <exclude name="${enhancedEmailNotifier.excludepattern}"/>
+                <exclude name="${exclusionFramework.excludepattern}"/>
+                <exclude name="${lcmAttachments.excludepattern}"/>
+                <exclude name="${serverSpecificTaskLauncher.excludepattern}"/>
+                <exclude name="${passwordExpirationReminder.excludepattern}"/> 
+                <exclude name="${pluginImporter.excludepattern}"/>
+                <exclude name="**/.keep"/>
+                <!-- 
+                Exclude items named in this target's excludes file.
+                Each line in the file is treated as an exclusion pattern.
+                For this use here, we can't have the lines prefixed with "custom/".
+                -->
+                <excludesfile name="${target}.ignorefiles.properties" if="ignorefiles.is.found"/>
+            </fileset>
+        </copy>
+        <if>
+           <resourcecontains resource="${target}.target.properties" substring="="/>
+           <then>
+              <replace dir="${build.customXMLDir}" replacefilterfile="${target}.target.properties" includes="**/*.xml, **/*.XML"/>
+           </then>
+        </if>
+
+        <!-- use a custom iiq properties file for a target -->
+        <copy file="${target}.iiq.properties" tofile="${build.iiqBinaryExtract}/WEB-INF/classes/iiq.properties"
+              failonerror="false" overwrite="true"/>
+
+        <!-- use a custom log4j properties file for a target -->
+        <if>
+          <available file="${target}.log4j.properties"/>
+          <then> 
+             <echo message="Copying ${target}.log4j.properties to ${build.iiqBinaryExtract}/WEB-INF/classes/log4j.properties"/>
+             <copy file="${target}.log4j.properties" tofile="${build.iiqBinaryExtract}/WEB-INF/classes/log4j.properties"
+              failonerror="false" overwrite="true"/>
+          </then>
+        </if>
+    </target>
+
+    <!-- ********************************************************** -->
+    <!-- Target: strip-ids                                          -->
+    <!-- Strip out id modified and created tags from custom xml     -->
+    <!-- ********************************************************** -->
+    <target name="-strip-ids">
+        <echo message="Removing hibernate object attributes from xml files"/>
+        <replaceregexp flags="g">
+            <regexp pattern="\s(id|created|modified)=[&quot;']\w+[&quot;']"/>
+            <substitution expression=""/>
+            <fileset dir="${build.customXMLDir}">
+                <include name="**/*.xml"/>
+                <!--<exclude name="**/${init-file}" />-->
+            </fileset>
+        </replaceregexp>
+    </target>
+
+    <!-- ********************************************************** -->
+    <!-- Target: validate                                           -->
+    <!-- Validate custom XML files                                  -->
+    <!-- ********************************************************** -->
+    <target name="validate" depends="-strip-ids">
+        <echo message="Validating Custom XML objects"/>
+      <echo message="${build.customXMLDir}"/>
+        <xmlvalidate>
+         <!--
+          <fileset dir="${build.customXMLDir}" includes="**/*.xml" />
+         -->
+            <fileset dir="${build.customXMLDir}">
+               <include name="**/*.xml"/>
+               
+               <!-- A.DUNFEE = - CUSTOM EXCLUDE FOR UNIT TEST OBJECTS -->
+               <exclude name="**/Args/**"/>
+               <exclude name="**/*Args*"/>
+               
+            </fileset>
+            <xmlcatalog>
+                <dtd publicId="sailpoint.dtd" location="${dtd}"/>
+            </xmlcatalog>
+        </xmlvalidate>
+    </target>
+   
+    <!--                                                            -->
+    <!-- Target: validatetokens                                     -->
+    <!-- Validate all xml files for missed tokens                   -->
+    <!--                                                            -->
+    <target name="validatetokens">
+        <echo message="Validating XML files for missed tokens..."/>
+      <!-- Delete already existing lock file -->
+      <delete file=".lock"/>
+      <!-- Executing the Validations class -->
+        <java classname="sailpoint.services.tools.ant.Validations" fork="false">
+            <arg line="'${user.dir}'"/>
+         <arg line="${target}.target.properties"/>
+            <classpath>
+                <pathelement location="lib/services-tools.jar"/>
+            </classpath>
+        </java>
+      <fail message="XML file validation failed - one or more tokens are missing...">
+         <condition>
+            <resourcecount count="1">
+               <fileset id="lock" dir="." includes=".lock"/>
+            </resourcecount>
+         </condition>
+      </fail>
+    </target>
+   
+    <target name="setExclusions">
+        <!-- Set properties for file paths to exclude depending on -->
+        <!-- deployment options set in build.properties            -->
+        <if>
+           <not>
+              <equals arg1="${deploySSF}" arg2="true"/>
+           </not>
+           <then>
+              <property name="ssf.features.excludepattern" value="SSF_Features/**"/>
+              <property name="ssf.frameworks.excludepattern" value="SSF_Frameworks/**"/>
+           </then>
+        </if>
+        <if>
+           <not>
+              <equals arg1="${deploySSTUnitTester}" arg2="true"/>
+           </not>
+           <then>
+              <property name="sst.unittester.excludepattern" value="SSF_Tools/SST_UnitTester/**"/>
+           </then>
+        </if>
+        <if>
+           <not>
+              <equals arg1="${deployEmailApprovals}" arg2="true"/>
+           </not>
+           <then>
+              <property name="emailapprovals.excludepattern" value="SSF_Tools/EmailApprovals/**"/>
+           </then>
+        </if>
+        <if>
+           <not>
+              <equals arg1="${deployBreakGlass}" arg2="true"/>
+           </not>
+           <then>
+              <property name="breakglass.excludepattern" value="SSF_Tools/BreakGlassAccessRequest/**"/>
+           </then>
+        </if>
+        <if>
+           <or>
+              <equals arg1="${pre6.3}" arg2="true"/>
+              <not>
+                 <equals arg1="${deployGenericImporter}" arg2="true"/>
+              </not>
+           </or>
+           <then>
+              <property name="genericimporter.excludepattern" value="SSF_Tools/GenericImporter/**"/>
+           </then>
+        </if>
+        <if>
+           <not>
+              <equals arg1="${deployObjectExporter}" arg2="true"/>
+           </not>
+           <then>
+              <property name="objectexporter.excludepattern" value="SSF_Tools/XMLExportTask/**"/>
+           </then>
+        </if>
+        <if>
+           <not>
+              <equals arg1="${deployMultiThreadedBeanShellKit}" arg2="true"/>
+           </not>
+           <then>
+              <property name="multithreadedbeanshellkit.excludepattern" value="SSF_Tools/MultiThreadedBeanShellKit/**"/>
+           </then>
+        </if>
+        <if>
+           <not>
+              <equals arg1="${deployReportExtractor}" arg2="true"/>
+           </not>
+           <then>
+              <property name="reportextractor.excludepattern" value="SSF_Tools/ReportExtractor/**"/>
+           </then>
+        </if>
+        <if>
+           <not>
+              <equals arg1="${deployRuleRunnerTask}" arg2="true"/>
+           </not>
+           <then>
+              <property name="rulerunnertask.excludepattern" value="SSF_Tools/RuleRunnerTask/**"/>
+           </then>
+        </if>
+        <if>
+           <not>
+              <equals arg1="${deploySSPTools}" arg2="true"/>
+           </not>
+           <then>
+              <property name="ssptools.excludepattern" value="SSP_Tools/**"/>
+           </then>
+        </if>
+        <if>
+           <not>
+              <equals arg1="${deployCorrelationMigrator}" arg2="true"/>
+           </not>
+           <then>
+              <property name="correlationMigrator.excludepattern" value="SSF_Tools/CorrelationMigrator/**"/>
+           </then>
+        </if>
+        <if>
+           <not>
+              <equals arg1="${deployWorkgroupMigrator}" arg2="true"/>
+           </not>
+           <then>
+              <property name="workgroupMigrator.excludepattern" value="SSF_Tools/WorkgroupMigrator/**"/>
+           </then>
+        </if>
+        <if>
+           <not>
+              <equals arg1="${deployEmailTemplateEditor}" arg2="true"/>
+           </not>
+           <then>
+              <property name="emailTemplateEditor.excludepattern" value="SSF_Tools/EmailTemplateEditor/**"/>
+           </then>
+        </if> 
+        <if>
+           <or>
+              <equals arg1="${pre6.4}" arg2="true"/>
+              <not>
+                 <equals arg1="${deployIIQLoopbackConnector}" arg2="true"/>
+              </not>
+           </or>
+           <then>
+              <property name="iIQLoopbackConnector.excludepattern" value="SSF_Tools/IIQ_Connector/**"/>
+           </then>
+        </if>
+        <if>
+           <not>
+              <equals arg1="${deployEnhancedEmailNotifier}" arg2="true"/>
+           </not>
+           <then>
+              <property name="enhancedEmailNotifier.excludepattern" value="SSF_Tools/EnhancedEmailNotifier/**"/>
+           </then>
+        </if> 
+        <if>
+           <not>
+              <equals arg1="${deployExclusionFramework}" arg2="true"/>
+           </not>
+           <then>
+              <property name="exclusionFramework.excludepattern" value="SSF_Tools/CertificationExclusionFramework/**"/>
+           </then>
+        </if> 
+        <if>
+           <or>
+              <equals arg1="${pre6.2}" arg2="true"/>
+              <not>
+                 <equals arg1="${deployServerSpecificTaskLauncher}" arg2="true"/>
+               </not>
+           </or>
+           <then>
+              <property name="serverSpecificTaskLauncher.excludepattern" value="SSF_Tools/ServerSpecificTaskLauncher/**"/>
+           </then>
+        </if>
+        <if>
+           <and>
+              <equals arg1="${pre7.0}" arg2="true"/>
+              <equals arg1="${deployLCMAttachments}" arg2="true"/>
+           </and>
+           <then>
+              <property name="lcmAttachments.excludepattern" value="SSF_Tools/LCMAttachments/Source/Workflow/7.x/**"/>
+           </then>
+        </if>
+        <if>
+           <not>
+              <equals arg1="${deployLCMAttachments}" arg2="true"/>
+           </not>
+           <then>
+              <property name="lcmAttachments.excludepattern" value="SSF_Tools/LCMAttachments/**"/>
+           </then>
+        </if>
+        <if>
+           <not>
+              <equals arg1="${deployPasswordExpirationReminder}" arg2="true"/>
+           </not>
+           <then>
+              <property name="passwordExpirationReminder.excludepattern" value="SSF_Tools/PasswordExpirationReminder/**"/>
+           </then>
+        </if> 
+        <if>
+           <or>
+              <equals arg1="${pre7.1}" arg2="true"/>
+              <not>
+                 <equals arg1="${deployPluginImporter}" arg2="true"/>
+              </not>
+           </or>
+           <then>
+              <property name="pluginImporter.excludepattern" value="ServiceDefinition/SSB_PluginImporterService.xml"/>
+           </then>
+        </if>             
+    </target>
+
+    <!-- 
+        we check for build.properties console_user and console_pass.
+        then they are injected so we can use them for import commands.
+     -->
+    <target name="-security.Init" depends="init-properties">
+        <!-- check if either property is null/missing -->
+        <condition property="empty.Principal">
+            <or>
+                <not> <isset property="console_user"/> </not>
+                <equals arg1="${console_user}" arg2=""/>
+            </or>
+        </condition>
+        
+        <condition property="empty.Password">
+            <or>
+                <not> <isset property="console_pass"/> </not>
+                <equals arg1="${console_pass}" arg2=""/>
+            </or>
+        </condition>
+
+        <if>
+            <or>
+                <isset property="empty.Principal"/> 
+                <isset property="empty.Password"/>
+            </or>
+            <then>
+                <echo>Either console_user or console_pass missing in build properties (or both)</echo>
+                <!-- we blank out console_user property so the ReadFromConsole class kicks off a fresh ask for credentials -->
+                <condition property="console_user" value="">
+                    <not> <isset property="console_user"/> </not>
+                </condition>
+                
+                <!-- note the actual message for input may be changed with the ReadFromConsole class -->
+                <input message="Please enter password for ${console_user} [secure]:" addproperty="credentials_from_form" defaultvalue="${console_user}">
+                    <handler classname="sailpoint.services.tools.ant.ReadFromConsole" >
+                        <classpath>
+                            <pathelement location="lib/services-tools.jar"/>
+                        </classpath>
+                    </handler> 
+                </input>
+                
+                <script language="javascript">
+                <![CDATA[
+                    credentials_from_form = project.getProperty("credentials_from_form");
+                    var res = credentials_from_form.split("\n"); 
+                    project.setProperty("console_user",res[0]);
+                    project.setProperty("console_pass",res[1]);
+                ]]>
+                </script>
+
+                <!-- just in case you want to print out credentials for debugging -->
+                <!-- <echo message="console_user:[${console_user}] console_pass:${console_pass}"/> -->
+            </then>
+            <else>
+                <echo>Both console_user and console_pass detected</echo>
+                <!-- <echo message="console_user:${console_user} console_pass:${console_pass}"/>-->
+            </else>
+        </if>
+   </target>
+   
+</project>

@@ -1,0 +1,381 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" name="Edit Email Template" type="Subprocess">
+  <Variable initializer="string:true" name="transient"/>
+  <Variable name="description"/>
+  <Variable name="subject"/>
+  <Variable name="templateId"/>
+  <Variable name="templateName"/>
+  <Variable name="mainBodyHtml"/>
+  <Variable name="mainBodyPlain"/>
+  <Variable initializer="string:false" name="newTemplate"/>
+  <Variable input="true" name="requester"/>
+  <Variable initializer="string:false" name="enableColorControls"/>
+  <Variable initializer="string:false" name="trace"/>
+  <Step icon="Start" name="Start" posX="20" posY="20">
+    <Transition to="Select Email Template"/>
+  </Step>
+  <Step icon="Default" name="Select Email Template" posX="115" posY="20">
+    <Approval name="Select Email Template" owner="ref:requester" return="templateId,newTemplate" send="">
+      <AfterScript>
+        <Source><![CDATA[
+  import sailpoint.object.EmailTemplate;
+  if(!"new".equals(templateId)) {
+    EmailTemplate t=context.getObjectById(EmailTemplate.class, templateId);
+    if(t!=null) {
+      workflow.put("templateName", t.getName());
+    }
+  }
+      ]]></Source>
+      </AfterScript>
+      <Arg name="workItemType" value="Approval"/>
+      <Form name="Select Email Template">
+        <Attributes>
+          <Map>
+            <entry key="pageTitle" value="Select Email Template"/>
+          </Map>
+        </Attributes>
+        <Button action="next" label="Next"/>
+        <Button action="cancel" label="Cancel"/>
+        <Section>
+          <Field displayName="Template" name="templateId" type="string" value="new">
+            <AllowedValuesDefinition>
+              <Script>
+                <Source><![CDATA[
+import sailpoint.object.EmailTemplate;
+import sailpoint.object.QueryOptions;
+     
+List items=new ArrayList();
+ArrayList item=new ArrayList();
+item.add("new");
+item.add("-- Create new email template --");
+items.add(item);
+                  
+QueryOptions qo = new QueryOptions(); 
+qo.setOrderBy("name");           
+
+Iterator it = context.search(EmailTemplate.class, qo, "name,id");                   
+while ( (null != it) && (it.hasNext()) ) {
+   Object [] thisTemplate = it.next();
+   String templateName = thisTemplate[0];
+   String templateId = thisTemplate[1];
+   item=new ArrayList();
+   item.add(templateId);
+   item.add(templateName);
+   items.add(item);
+}
+return items;
+                ]]></Source>
+              </Script>
+            </AllowedValuesDefinition>
+          </Field>
+        </Section>
+      </Form>
+    </Approval>
+    <Arg name="requester" value="ref:requester"/>
+    <Transition to="Edit Template"/>
+  </Step>
+  <Step icon="Default" name="Edit Template" posX="238" posY="20">
+    <Approval name="Edit Template" owner="ref:requester" return="templateName,description,subject,mainBodyPlain,mainBodyHtml,templateType" send="templateName,newTemplate,templateId,enableColorControls">
+      <Arg name="workItemType" value="Approval"/>
+      <Form name="Edit Template">
+        <Attributes>
+          <Map>
+            <entry key="labelAlign" value="top"/>
+            <entry key="pageTitle" value="Edit Template"/>
+          </Map>
+        </Attributes>
+        <Button action="next" label="Save"/>
+        <Button action="cancel" label="Cancel"/>
+        <Section name="nameSection">
+          <Field displayName="Template Name" name="templateName" required="true" type="string">
+            <Attributes>
+              <Map>
+                <entry key="readOnly">
+                  <value>
+                    <Script>
+                      <Source>  
+if ("new".equals(templateId)) {
+   form.setPageTitle("Create Template");
+   return false;
+} else {
+   return true;
+}
+                      </Source>
+                    </Script>
+                  </value>
+                </entry>
+                <entry key="width" value="1000"/>
+              </Map>
+            </Attributes>
+            <Script>
+              <Source><![CDATA[return templateName;]]></Source>
+            </Script>
+            <ValidationScript>
+              <Source><![CDATA[
+import sailpoint.object.EmailTemplate;
+if ("new".equals(templateId)) {                 
+   if (null != value && null != context.getObjectByName(EmailTemplate.class, value)) {
+      return "A template with that name already exists.";
+   }
+}
+               ]]></Source>
+            </ValidationScript>
+          </Field>
+          </Section>
+          <Section name="emailSection">
+          <Field displayName="Subject" name="subject" required="true" type="string">
+            <Attributes>
+              <Map>
+                <entry key="width" value="1000"/>
+              </Map>
+            </Attributes>
+            <Script>
+              <Source><![CDATA[import sailpoint.object.EmailTemplate;
+if("new".equals(templateId)) return "";
+EmailTemplate t=context.getObjectById(EmailTemplate.class, templateId);
+
+return t.getSubject();]]></Source>
+            </Script>
+          </Field>
+          <Field displayName="Template Type" filterString="" name="templateType" postBack="true" type="string">
+            <AllowedValuesDefinition>
+              <Value>
+                <List>
+                  <String>HTML</String>
+                  <String>Plain Text</String>
+                </List>
+              </Value>
+            </AllowedValuesDefinition>
+            <Script>
+              <Source><![CDATA[import sailpoint.object.EmailTemplate;
+               
+if("new".equals(templateId)) return "HTML";
+EmailTemplate t=context.getObjectById(EmailTemplate.class, templateId);
+String body = t.getBody();
+if (body == null) { 
+   return "HTML";
+}
+                
+if (body.toLowerCase().contains("<html")) {
+   return "HTML";
+} else {
+   return "Plain Text";           
+}
+              ]]></Source>
+            </Script>
+          </Field>
+          <Field displayName="Message Body" displayType="textarea" dynamic="true" name="mainBodyHtml" type="other">
+            <Attributes>
+              <Map>
+                <entry key="enableColors">
+                  <value>
+                    <Script>
+                      <Source>
+                         return Boolean.valueOf(enableColorControls);
+                      </Source>
+                    </Script>
+                  </value>
+                </entry>
+                <entry key="height" value="500"/>
+                <entry key="hidden">
+                  <value>
+                    <Script>
+                      <Source><![CDATA[
+                         if (null != templateType && templateType.equalsIgnoreCase("HTML")) {
+                            return false;
+                         } else {
+                            return true;
+                         }  
+                         ]]></Source>
+                    </Script>
+                  </value>
+                </entry>
+                <entry key="width" value="1000"/>
+                <entry key="xtype" value="htmleditor"/>
+              </Map>
+            </Attributes>
+            <Script>
+              <Source><![CDATA[import sailpoint.object.EmailTemplate;
+import org.apache.commons.lang.StringEscapeUtils;
+            
+if("new".equals(templateId)) return "<br>"; // Need to return something to prevent it displaying "null"
+EmailTemplate t=context.getObjectById(EmailTemplate.class, templateId);
+String body = t.getBody();
+if (body == null)
+   return "<br>";
+body = StringEscapeUtils.unescapeHtml(body);
+
+return body;           
+              ]]></Source>
+            </Script>
+          </Field>
+          <Field displayName="Message Body" displayType="textarea" dynamic="true" name="mainBodyPlain" type="string">
+            <Attributes>
+              <Map>
+                <entry key="height" value="500"/>
+                <entry key="hidden">
+                  <value>
+                    <Script>
+                      <Source><![CDATA[
+                         if (null != templateType && templateType.equalsIgnoreCase("HTML")) {
+                            return true;
+                         } else {
+                            return false;
+                         }  
+                         ]]></Source>
+                    </Script>
+                  </value>
+                </entry>
+                <entry key="width" value="1000"/>
+              </Map>
+            </Attributes>
+            <Script>
+              <Source><![CDATA[import sailpoint.object.EmailTemplate;
+
+if("new".equals(templateId)) return "";
+EmailTemplate t=context.getObjectById(EmailTemplate.class, templateId);
+String body = t.getBody();
+if (body == null)
+   return "";
+
+return body; 
+              ]]></Source>
+            </Script>
+          </Field>
+        </Section>
+        <Section name="descriptionSection">
+          <Field displayName="Template Description" displayType="textarea" name="description" type="string">
+            <Script>
+              <Source><![CDATA[import sailpoint.object.EmailTemplate;
+if("new".equals(templateId)) return "";
+EmailTemplate t=context.getObjectById(EmailTemplate.class, templateId);
+
+return t.getDescription();]]></Source>
+            </Script>
+            <Attributes>
+              <Map>
+                <entry key="width" value="1000"/>
+              </Map>
+            </Attributes>
+          </Field>
+        </Section>
+        <Section name="availableVariablesSection" type="text">
+          <Field name="availableVariables" displayName="" readOnly="true">
+            <Script>
+              <Source><![CDATA[
+import sailpoint.object.Argument;
+import sailpoint.object.EmailTemplate;
+import sailpoint.object.Signature;
+
+String variableText = "";
+if("new".equals(templateId)) {
+   field.setHidden(true);
+   return null;
+}
+                
+EmailTemplate t=context.getObjectById(EmailTemplate.class, templateId);
+Signature sig = t.getSignature();
+if (null != sig) {
+   List args = sig.getArguments();
+   if (null != args && !args.isEmpty()) {
+      for (Argument arg : args) {
+         String lineText = "<b>$" + arg.getName() + "</b>: " + arg.getDescription();
+         if (variableText == "") {
+            variableText = "<p><b>Variables available in this template</b><br><br>" + lineText;
+         } else {       
+            variableText = variableText + "<br>" + lineText;
+         }
+      }
+   }
+}
+       
+return variableText;
+
+              ]]></Source>
+            </Script>
+            <Attributes>
+              <Map>
+                <entry key="width" value="1000"/>
+              </Map>
+            </Attributes>
+          </Field>
+        </Section>
+        <Section name="warningSection" type="text">
+          <Field name="warning" displayName="" readOnly="true">
+            <Attributes>
+              <Map>
+                <entry key="fieldStyle">
+                  <value>
+                    <Attributes>
+                      <Map>
+                        <entry key="color" value="red"/>
+                        <entry key="fontWeight" value="bold"/>
+                      </Map>
+                    </Attributes>
+                  </value>
+                </entry>
+              </Map>
+            </Attributes>
+            <Script>
+              <Source><![CDATA[
+String version = sailpoint.Version.getVersion();
+String patchLevel = sailpoint.Version.getPatchLevel();
+if (patchLevel.equals(""))
+   patchLevel = "GA";
+boolean problemVersion = false;
+if (version.equals("7.0")) {
+  if ( patchLevel.equals("GA") || patchLevel.equals("p1") || patchLevel.equals("p2") || patchLevel.equals("p3") || patchLevel.equals("p4") || patchLevel.equals("p5") ) {
+     problemVersion = true;                 
+  }
+}
+if ( version.equals("7.1") && patchLevel.equals("GA") ) {
+  problemVersion = true;                 
+}
+
+if (problemVersion) {
+  return "Your current version of IdentityIQ (" + version + patchLevel + ") has a known issue that causes line endings in form field data to be removed.  This can cause problems with the formatting of the email template.  To avoid this you should patch your installation to 7.0p6, 7.1p1 or higher.";
+} else {
+   field.setHidden(true);    
+   return null;
+}
+              ]]></Source>
+            </Script>
+          </Field>
+        </Section>
+      </Form>
+    </Approval>
+    <Transition to="Save Template"/>
+  </Step>
+  <Step icon="Default" name="Save Template" posX="344" posY="20">
+    <Script>
+      <Source><![CDATA[import sailpoint.object.EmailTemplate;
+import org.apache.commons.lang.StringEscapeUtils;
+EmailTemplate et=null;
+if("new".equals(templateId)) {
+  et=new EmailTemplate();
+  et.setName(templateName);
+} else {
+  et=context.getObjectById(EmailTemplate.class, templateId);
+}
+et.setDescription(description);
+et.setSubject(subject);
+
+String template;
+if (templateType !=null && templateType.equalsIgnoreCase("HTML")) {
+   template = "\n<html>\n<body>\n" + mainBodyHtml + "\n</body>\n</html>\n";
+   // The htmleditor control puts everything on the same line, so add some
+   // line spacings between tags to make it a little easier on the eye.
+   template = template.replace("><", ">\n<");
+} else {
+   template = mainBodyPlain;
+}        
+et.setBody(template);
+context.saveObject(et);
+context.commitTransaction();
+        ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="439" posY="20"/>
+</Workflow>

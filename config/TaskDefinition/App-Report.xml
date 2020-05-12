@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition name="App Report" resultAction="Rename" subType="Application Reports" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="9"/>
+      <entry key="TaskDefinition.runLengthTotal" value="18"/>
+      <entry key="TaskDefinition.runs" value="2"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="applications">
+        <value>
+          <List>
+            <String>HR System Employees</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="disableDetail" value="false"/>
+      <entry key="disableSummary" value="false"/>
+      <entry key="reportColumnOrder" value="name, numberAccounts, lastAgg, oldRefresh, newRefresh, totalAssignments, totalAttributes"/>
+      <entry key="reportSortAsc">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="reportSortBy" value="name"/>
+    </Map>
+  </Attributes>
+  <Description>Displays information about each application in detailed format.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Application Status Report"/>
+  </Parent>
+</TaskDefinition>
+</sailpoint>

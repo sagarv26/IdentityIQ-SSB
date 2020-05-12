@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="Sample Manager Certification Exclusion Set">
+  <Attributes>
+    <Map>
+      <entry key="entitySelectors">
+        <value>
+          <List>
+            <CompositeFilter operation="AND">
+              <Filter ignoreCase="true" operation="EQ" property="name" value="Adam.Kennedy"/>
+            </CompositeFilter>
+            <CompositeFilter operation="AND">
+              <Filter ignoreCase="true" operation="EQ" property="dept" value="Accounting"/>
+            </CompositeFilter>
+          </List>
+        </value>
+      </entry>
+      <entry key="itemSelectors">
+        <value>
+          <List>
+            <CompositeFilter operation="AND">
+              <Filter ignoreCase="true" operation="EQ" property="name" value="Customer Service"/>
+              <Filter operation="EQ" property="class" value="Bundle"/>
+            </CompositeFilter>
+            <CompositeFilter operation="AND">
+              <Filter ignoreCase="true" matchMode="START" operation="LIKE" property="name" value="Accounts"/>
+              <Filter operation="EQ" property="class" value="Bundle"/>
+            </CompositeFilter>
+            <CompositeFilter operation="AND">
+              <Filter ignoreCase="true" operation="EQ" property="policyName" value="Account Policy"/>
+              <Filter operation="EQ" property="class" value="PolicyViolation"/>
+            </CompositeFilter>
+            <CompositeFilter operation="AND">
+              <Filter matchMode="START" operation="LIKE" property="memberOf" value="CN=Development"/>
+              <Filter operation="EQ" property="class" value="EntitlementGroup"/>
+              <Filter operation="EQ" property="application" value="Corporate AD"/>
+            </CompositeFilter>
+            <CompositeFilter operation="AND">
+              <Filter matchMode="START" operation="LIKE" property="ma.displayName" value="Training"/>
+              <Filter operation="EQ" property="class" value="EntitlementGroup"/>
+              <Filter operation="EQ" property="application" value="TimesheetSystem"/>
+            </CompositeFilter>
+          </List>
+        </value>
+      </entry>
+      <entry key="mode" value="EXCLUDE"/>
+      <entry key="reason" value="Exclude identities, roles, entitlements and policy violations example"/>
+    </Map>
+  </Attributes>
+</Custom>

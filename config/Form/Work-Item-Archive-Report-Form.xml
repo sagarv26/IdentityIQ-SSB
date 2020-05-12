@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Work Item Archive Report Form" type="Report">
+  <Section columns="2" label="rept_workitem_section_workitem_props" name="customProperties">
+    <Field displayName="report_filter_owners" helpKey="rept_input_work_item_report_owners" multi="true" name="owners" type="Identity" value="ref:owners">
+      <Attributes>
+        <Map>
+          <entry key="identitySuggestFilter" value="Owner"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="report_filter_requesters" helpKey="rept_input_work_item_report_requesters" multi="true" name="requesters" type="Identity" value="ref:requesters"/>
+    <Field displayName="report_filter_work_item_level" helpKey="rept_input_work_item_report_priority" multi="true" name="levels" type="string" value="ref:levels">
+      <AllowedValuesDefinition>
+        <Script>
+          <Source>
+                      import sailpoint.object.*;
+                      List l = new ArrayList();
+                      for(WorkItem.Level enumItem : WorkItem.Level.values()) {
+                        List l2 = new ArrayList();
+                        l2.add(enumItem.toString());
+                        l2.add(enumItem.getMessageKey());
+                        l.add(l2);
+                      }
+                      return l;
+                  </Source>
+        </Script>
+      </AllowedValuesDefinition>
+    </Field>
+    <Field displayName="report_filter_work_item_type" helpKey="rept_input_work_item_report_types" multi="true" name="types" type="string" value="ref:types">
+      <AllowedValuesDefinition>
+        <Script>
+          <Source>
+                      
+                      import sailpoint.object.*;
+                      List l = new ArrayList();
+                      for(WorkItem.Type enumItem : WorkItem.Type.values()) {
+                        if (enumItem != WorkItem.Type.Generic &amp;&amp;
+                              enumItem != WorkItem.Type.Test &amp;&amp;
+                              enumItem != WorkItem.Type.Event)
+                          {
+                            List l2 = new ArrayList();
+                            l2.add(enumItem.toString());
+                            l2.add(enumItem.getMessageKey());
+                            l.add(l2);
+                          }
+                      }
+                      return l;
+                      
+                  </Source>
+        </Script>
+      </AllowedValuesDefinition>
+    </Field>
+    <Field displayName="report_filter_work_item_state" helpKey="rept_input_work_item_report_states" multi="true" name="states" type="string" value="ref:states">
+      <AllowedValuesDefinition>
+        <Script>
+          <Source>
+                    import sailpoint.object.*;
+                    return WorkItem.State.getWorkItemStatesList();
+                  </Source>
+        </Script>
+      </AllowedValuesDefinition>
+    </Field>
+    <Field displayName="report_filter_work_item_status_option" helpKey="rept_input_work_item_report_status" name="statusOptions" type="string" value="ref:statusOptions">
+      <AllowedValues>
+        <List>
+          <String>null</String>
+          <String>work_item_status_all</String>
+        </List>
+        <List>
+          <String>active</String>
+          <String>work_item_status_active</String>
+        </List>
+        <List>
+          <String>archive</String>
+          <String>work_item_status_archived</String>
+        </List>
+      </AllowedValues>
+    </Field>
+    <Field columnSpan="1" displayName="rept_workitem_field_reminders_min" helpKey="rept_workitem_help_reminders_min" name="remindersMin" type="int" value="ref:remindersMin"/>
+    <Field columnSpan="1" displayName="rept_workitem_field_reminders_max" helpKey="rept_workitem_help_reminders_max" name="remindersMax" type="int" value="ref:remindersMax"/>
+  </Section>
+</Form>
+</sailpoint>

@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form name="LCM Identity Approval" type="Workflow">
+  <Attributes>
+    <Map>
+      <entry key="subtitle" value="lcm_identity_approval_subtitle"/>
+    </Map>
+  </Attributes>
+</Form>
+</sailpoint>

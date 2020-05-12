@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE ServiceDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<ServiceDefinition executor="sailpoint.services.standard.tasklauncher.TaskLauncherService" hosts="global" interval="30" name="TaskLauncher">
+  <Description>
+      Service definition for the SSD Server-Specific Task Launcher service.
+    </Description>
+</ServiceDefinition>

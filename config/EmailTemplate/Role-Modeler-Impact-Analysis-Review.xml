@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Role Modeler - Impact Analysis Review">
+  <Body>An impact analysis of role '$(roleName)' has been assigned to you.
+
+Login and view your work item inbox to complete this review.
+  </Body>
+  <Description>
+    Email Template for notifying role impact analysis reviewers.
+    Note that in addition to the declared arguments, all workflow variables,
+    Step arguments, and Approval arguments defined in the Workflow are
+    also available.
+  </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workflow">
+        <Description>The Workflow object being executed.</Description>
+      </Argument>
+      <Argument name="item">
+        <Description>The WorkItem representing the review</Description>
+      </Argument>
+      <Argument name="launcher" type="string">
+        <Description>The name of the Identity that launched the workflow.</Description>
+      </Argument>
+      <Argument name="roleName" type="string">
+        <Description>The name of the role being analyzed.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Review impact analysis of role: $(roleName)</Subject>
+</EmailTemplate>
+</sailpoint>

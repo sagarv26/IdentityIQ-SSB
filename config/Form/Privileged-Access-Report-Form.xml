@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Privileged Access Report Form" type="Report">
+  <Section columns="2" label="rept_priv_access_section_priv_account_attrs" name="Privileged Account Attributes">
+    <Attributes>
+      <Map>
+        <entry key="subtitle" value="rept_priv_access_section_instructions"/>
+      </Map>
+    </Attributes>
+  </Section>
+  <Section columns="2" label="rept_priv_access_section_account_props" name="Account Properties">
+    <Field columnSpan="1" displayName="rept_identity_roles_field_app" helpKey="rept_identity_roles_help_app" multi="true" name="applications" type="Application" value="ref:applications"/>
+  </Section>
+  <Section columns="2" label="rept_priv_access_section_identity_props" name="Identity Properties"/>
+  <Section columns="2" label="rept_priv_access_section_identity_extended_props" name="Identity Extended Properties"/>
+</Form>
+</sailpoint>

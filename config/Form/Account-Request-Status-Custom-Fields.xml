@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Account Request Status Custom Fields" type="Report">
+  <Section columns="2" label="rept_lcm_account_request_parameters" name="customProperties">
+    <Field columnSpan="1" displayName="report_approvers" helpKey="rept_input_lcm_request_status_report_approver" multi="true" name="approvers" type="Identity" value="ref:approvers"/>
+    <Field columnSpan="1" displayName="report_requesters" helpKey="rept_input_lcm_request_status_report_requester" multi="true" name="requestors" type="Identity" value="ref:requestors"/>
+    <Field columnSpan="1" displayName="report_applications" helpKey="rept_input_lcm_request_status_report_apps" multi="true" name="applications" type="Application" value="ref:applications"/>
+    <Field columnSpan="1" displayName="report_target_identities" helpKey="rept_input_lcm_request_status_report_target_identity" multi="true" name="targetIdentities" type="Identity" value="ref:targetIdentities"/>
+    <Field columnSpan="1" displayName="report_requested_date_range" helpKey="rept_input_lcm_request_status_report_create_dt_start_use" name="requestDateRange" type="string" value="ref:requestDateRange">
+      <Attributes>
+        <Map>
+          <entry key="xtype" value="daterange"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field columnSpan="1" displayName="report_finished_date_range" helpKey="rept_identity_roles_help_last_refresh" name="completionDateRange" type="string" value="ref:completionDateRange">
+      <Attributes>
+        <Map>
+          <entry key="xtype" value="daterange"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field columnSpan="1" displayName="report_status" helpKey="rept_identity_roles_help_status" name="status" type="string" value="ref:status">
+      <AllowedValues>
+        <List>
+          <String>completed</String>
+          <String>report_completed</String>
+        </List>
+        <List>
+          <String>approved</String>
+          <String>report_approved</String>
+        </List>
+        <List>
+          <String>rejected</String>
+          <String>report_rejected</String>
+        </List>
+        <List>
+          <String>pending</String>
+          <String>report_pending</String>
+        </List>
+        <List>
+          <String>canceled</String>
+          <String>report_canceled</String>
+        </List>
+      </AllowedValues>
+    </Field>
+  </Section>
+</Form>
+</sailpoint>

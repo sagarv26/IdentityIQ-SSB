@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="LCM Build Owner Approvals">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Approval Library"/>
+  </ReferencedRules>
+  <Source>
+    
+       import sailpoint.object.ApprovalSet;
+       import sailpoint.object.ProvisioningPlan;
+       import sailpoint.workflow.IdentityLibrary;
+
+       //
+       // Attributes needed in the rule context: 
+       //
+       // plan - ProvisioningPlan object 
+       //
+       // approvalSet - An ApprovalSet representing the "cart"
+       // 
+       // fallbackApprover - String representing who gets the approval
+       //                    if we can't resolve one.  
+       //
+       // identityName - name of the identity being operated on
+       //
+       //
+       List approvals = new ArrayList();
+       if ( approvalSet != null ) {
+           // 
+           // Build a map of owner to ApprovalSet from each of the things in the plan 
+           // 
+           Map ownerMap = buildOwnerMap("owner", approvalSet, plan, fallbackApprover, identityName, !IdentityLibrary.isElectronicSignatureEnabled(wfcontext));
+           if ( ownerMap != null) {
+               approvals = buildApprovalsFromMap(ownerMap, identityName, launcher);
+           } 
+       }
+       return ( Util.size(approvals) &gt; 0 ) ? approvals : null;
+    
+  </Source>
+</Rule>
+</sailpoint>

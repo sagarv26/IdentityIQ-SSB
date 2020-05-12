@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="Privileged Access Report" progressMode="Percentage" resultAction="Rename" subType="Identity and User Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="Privileged Access Report">
+            <DataSource objectType="Link" type="Filter">
+              <QueryParameters>
+                <Parameter argument="managers" property="identity.manager.id"/>
+                <Parameter argument="applications" property="application.id"/>
+              </QueryParameters>
+            </DataSource>
+            <ReportForm>
+              <Reference class="sailpoint.object.Form" name="Privileged Access Report Form"/>
+            </ReportForm>
+            <Columns>
+              <ReportColumnConfig field="user" header="rept_priv_user_username" property="displayName" sortable="true" width="110"/>
+              <ReportColumnConfig field="risk" header="rept_priv_user_risk_score" property="identity.scorecard.compositeScore" sortable="true" width="110"/>
+              <ReportColumnConfig field="firstname" header="rept_priv_user_first_name" property="identity.firstname" sortable="true" width="110"/>
+              <ReportColumnConfig field="lastname" header="rept_priv_user_last_name" property="identity.lastname" sortable="true" width="110"/>
+              <ReportColumnConfig field="manager" header="rept_priv_user_manager" property="identity.manager.displayName" sortable="true" width="110"/>
+              <ReportColumnConfig field="application" header="rept_priv_user_application" property="application.name" sortable="true" width="110"/>
+            </Columns>
+            <InitializationRule>
+              <Reference class="sailpoint.object.Rule" name="Privileged Access Report Customizer"/>
+            </InitializationRule>
+            <ValidationRule>
+              <Reference class="sailpoint.object.Rule" name="Privileged Access Report Validation Rule"/>
+            </ValidationRule>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>A detailed view of privileged users currently detected by IdentityIQ.</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessUserReport"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument name="firstname" type="string">
+        <Description>rept_input_user_report_fname</Description>
+      </Argument>
+      <Argument name="lastname" type="string">
+        <Description>rept_input_user_report_lname</Description>
+      </Argument>
+      <Argument name="email" type="string">
+        <Description>rept_input_user_report_email</Description>
+      </Argument>
+      <Argument name="applications" type="Application">
+        <Description>rept_input_user_report_apps</Description>
+      </Argument>
+      <Argument multi="true" name="managers" type="Identity">
+        <Description>rept_input_user_report_mgrs</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

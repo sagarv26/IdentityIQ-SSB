@@ -1,0 +1,248 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow  explicitTransitions="true" libraries="Identity" name="SP Provision Processor Sub" type="subprocesses">
+  <Variable input="true" name="trigger">
+    <Description>The IdentityTrigger</Description>
+  </Variable>
+  <Variable input="true" name="event">
+    <Description>The IdentityChangeEvent</Description>
+  </Variable>
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity.</Description>
+  </Variable>
+  <Variable input="true" name="requestor">
+    <Description>The name of the requestor.</Description>
+  </Variable>
+  <Variable initializer="script:(source != void) ? source : &quot;LCM&quot;" input="true" name="source">
+    <Description>
+      String version of sailpoint.object.Source to indicate
+      where the request originated.  Defaults to LCM.
+    </Description>
+  </Variable>
+  <Variable name='plan' input='true' />
+  <Variable name='requestType' input='true' />
+  <Variable name='flow' input="true" initializer="string:AccessRequest" />
+  <Variable name='project' />
+  <Variable name='suppressNotifications' input='true' />
+  <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>
+      The displayName of the identity being updated.
+      Query for this using a projection query and fall back to the name.
+    </Description>
+  </Variable>
+  <Variable name='optimisticProvisioning' initializer="true" />
+  <Variable name='foregroundProvisioning' input="true" initializer="false"/>
+  <Variable name='doRefresh' initializer="false" />
+  <Variable name='trace' initializer="true" />
+  <Variable name='approvalSet' />
+  <Variable name='fallbackApprover' initializer='spadmin'/>
+  <Variable name='identityRequestId' output='true' />
+  <Variable name='doProcessProject' />
+  
+  <Variable name="noApplicationTemplates" input="true" initializer="script:(noApplicationTemplates != void) ? noApplicationTemplates : false" />
+  <Variable name="workItemPriority" input="true" initializer="script:(workItemPriority != void) ? workItemPriority : &quot;Normal&quot;" />
+  
+  
+  
+  <!-- REQUIRED INPUT VARIABLES -->
+  <Variable name='updateStandardPostProvEmails' input='true' />
+  <Variable name='updateStandardPostApproveEmails' input='true' />
+  <Variable name='emailArgList' input='true' />
+  <Variable name="successTo" input='true' />
+  <Variable name="failureTo" input='true' />
+  <Variable name="successTemplate" input='true' />
+  <Variable name="failureTemplate" input='true' />
+  
+  <Variable name="approvedTo" input='true' />
+  <Variable name="rejectedTo" input='true' />
+  <Variable name="approvedTemplate" input='true' />
+  <Variable name="rejectedTemplate" input='true' />
+  
+  <Variable name="formTemplate" input="true" initializer="Identity Update">
+    <Description>
+      Template used when processing provisioning forms.
+    </Description>
+  </Variable>
+  
+  <!-- New variable to be a generic container of attributes that can be set at highest level
+  	workflow and then referenced in various rules -->
+  <Variable name="spExtAttrs" input='true' />
+  <Variable name="identityModel" input="true" />
+  <RuleLibraries>
+	    <Reference class="sailpoint.object.Rule" name="SP Provisioning Rules Library"/>
+  </RuleLibraries>
+  <Description>Process a new employee.</Description>
+  <Step icon="Start" name="Start">
+  	<Script>
+  		<Source>
+  			
+  		</Source>
+  	</Script>
+  	<Transition to="end" when="script:plan == null || plan.getAccountRequests() == null || plan.getAccountRequests().size() &lt; 1" />
+    <Transition to="Initialize"/>
+  </Step>
+  <Step icon="Task" name="Initialize">
+    <Arg name="flow" value="ref:flow"/>
+    <Arg name="formTemplate" value="ref:formTemplate"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="priority" value="ref:workItemPriority"/>
+    <Arg name="policiesToCheck" value="ref:policiesToCheck"/>
+    <Arg name="policyScheme" value="ref:policyScheme"/>
+    <Arg name="source" value="ref:source"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="noApplicationTemplates" value="ref:noApplicationTemplates"/>
+    <Arg name="requireViolationReviewComments" value="ref:requireViolationReviewComments"/>
+    <Arg name="allowRequestsWithViolations" value="ref:allowRequestsWithViolations"/>
+    <Arg name="enableRetryRequest" value="ref:enableRetryRequest"/>
+    <Arg name="endOnProvisioningForms" value="ref:endOnProvisioningForms"/>
+    <Arg name="endOnManualWorkItems" value="ref:endOnManualWorkItems"/>
+    <Description>
+      Call the standard subprocess to initialize the request, this includes
+      auditing, building the approvalset, compiling the plan into 
+       project and checking policy violations.
+    </Description>
+    <Return name="project" to="project"/>
+    <Return name="approvalSet" to="approvalSet"/>
+    <Return name="policyViolations" to="policyViolations"/>
+    <Return name="identityRequestId" to="identityRequestId"/>
+    <Return name="violationReviewDecision" to="violationReviewDecision"/>
+    <Return merge="true" name="workItemComments" to="workItemComments"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Identity Request Initialize"/>
+    </WorkflowRef>
+    <Transition to="end" when="script:(&quot;cancel&quot;.equals(violationReviewDecision) || ((size(policyViolations) > 0 ) &amp;&amp; (policyScheme.equals(&quot;fail&quot;))))"/>
+    <Transition to="Persist Identity Request Id"/>
+  </Step>
+  <Step name="Persist Identity Request Id">
+  	<Script>
+  		<Source>
+  			persistIdentityRequestId(context, wfcontext, identityRequestId);
+  		</Source>
+  	</Script>
+  	<Transition to="Check Project"/>
+  </Step>
+  <Step name="Check Project" resultVariable="doProcessProject">
+  	<Script>
+  		<Source>
+  			return doProcessProject(context, project);
+  		</Source>
+  	</Script>
+  	<Transition to="Approve" when="script:doProcessProject == true"/>
+  	<Transition to="end" />
+  </Step>
+  <Step icon="Task" name="Approve">
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Arg name="fallbackApprover" value="spadmin"/>
+    <Arg name="flow" value="ref:flow"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="policyScheme" value="ref:policyScheme"/>
+    <Arg name="policyViolations" value="ref:policyViolations"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="workItemComments" value="ref:workItemComments"/>
+    <Arg name="requestType" value="ref:requestType" />
+    <Arg name="emailArgList" value="ref:emailArgList" />
+    <Arg name="approvedTo" value="ref:approvedTo" />
+    <Arg name="rejectedTo" value="ref:rejectedTo" />
+    <Arg name="requestor" value="ref:requestor" />
+    <Arg name="project" value="ref:project" />
+    <Arg name="updateStandardPostApproveEmails" value="ref:updateStandardPostApproveEmails" />
+    <Arg name="approvedTemplate" value="ref:approvedTemplate" />
+    <Arg name="rejectedTemplate" value="ref:rejectedTemplate" />
+    <Arg name="spExtAttrs" value="ref:spExtAttrs" />
+    <Arg name="identityModel" value="ref:identityModel" />
+    <Description>
+      Call the standard subprocess that will handle the built-in
+      owner, manager and security officer approval schemes.
+    </Description>
+    <Return name="approvalSet" to="approvalSet"/>
+    <Return name="project" to="project"/>
+    <Return name="plan" to="plan"/>
+    <Return name="emailArgList" to="emailArgList"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="SP Dynamic Approval Sub"/>
+    </WorkflowRef>
+    <Transition to="Provision"/>
+  </Step>
+  <Step icon="Task" name="Provision">
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Arg name="fallbackApprover" value="ref:fallbackApprover"/>
+    <Arg name="foregroundProvisioning" value="ref:foregroundProvisioning"/>
+    <Arg name="formTemplate" value="Identity Update"/>
+    <Arg name="flow" value="ref:flow"/>
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Arg name="manualActionsEmailTemplate" value="Pending Manual Changes"/>
+    <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+    <Arg name="policyViolations" value="ref:policyViolations"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="policyScheme" value="ref:policyScheme"/>
+    <Arg name="plan" value="ref:plan" />
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="doRefresh" value="ref:doRefresh"/>
+    <Arg name="priority" value="ref:workItemPriority"/>
+    <Arg name="workItemComments" value="ref:workItemComments"/>
+    <Description>
+      Call the standard subprocess that will process the 
+      approval decisisions and do provisioning.  This 
+      includes calling any configured provisioning 
+      connectors and building manual actions.
+    </Description>
+    <Return name="project" to="project"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="SP Identity Request Provision"/>
+    </WorkflowRef>
+    <Transition to="Refresh" when="ref:doRefresh"/>
+    <Transition to="View Post Provision Project"/>
+  </Step>
+  
+  <Step name="View Post Provision Project">
+  	<Script>
+  		<Source>
+  			
+  		</Source>
+  	</Script>
+  	<Transition to='Build Emails' />
+  </Step>
+  
+ 
+  <Step action="call:refreshIdentity" icon="Default" name="Refresh" posX="329" posY="138">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="processTriggers" value="false"/>
+    <Transition to="Build Emails" when="updateStandardPostProvEmails==&quot;true&quot;"/>
+  	<Transition to="Finalize"/>
+  </Step>
+  
+  <Step name="Build Emails" resultVariable="emailArgList">
+  	<Script>
+  		<Source>
+  			return getPostProvProjectEmailArgs(context, project, workflow, true);
+  		</Source>
+  	</Script>
+  	<Transition to="Finalize"/>
+  </Step>
+  
+   <Step catches="complete" icon="Task" name="Finalize">
+    <Arg name="project" value="ref:project"/>
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="identityRequestId" value="ref:identityRequestId"/>
+    <Arg name="suppressNotifications" value="ref:suppressNotifications"/>
+    <Description>
+      Call the standard subprocess that can audit/finalize the request.
+    </Description>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Identity Request Finalize"/>
+    </WorkflowRef>
+   <Transition to='end' />
+  </Step>
+ 
+  <Step icon="Stop" name="end"/>
+</Workflow>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition executor="sailpoint.services.standard.task.WorkgroupImporter" name="Workgroup Importer" progressInterval="5000" progressMode="String" resultAction="Delete" subType="task_item_type_generic" template="true" type="Generic">
+  <Description>Import workgroups and their memberships</Description>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="Full path of the CSV file where the workgroup data will be imported from" name="importFile" required="true" type="string">
+        <Prompt>Import file</Prompt>
+      </Argument>
+      <Argument helpKey="Modify any existing workgroups but do not create any that appear in the file but are not present in IdentityIQ" name="doNotCreate" type="boolean">
+        <Prompt>Modify existing workgroups only - do not create new ones</Prompt>
+      </Argument>
+      <Argument helpKey="Ignore workgroup memberships in import file" name="ignoreMembers" type="boolean">
+        <Prompt>Do not import workgroup members</Prompt>
+      </Argument>
+      <Argument helpKey="Ignore workgroup descriptions in import file" name="ignoreDescription" type="boolean">
+        <Prompt>Do not import workgroup descriptions</Prompt>
+      </Argument>
+      <Argument helpKey="Ignore workgroup capabilities in import file" name="ignoreCapabilities" type="boolean">
+        <Prompt>Do not import workgroup capabilities</Prompt>
+      </Argument>
+      <Argument helpKey="Ignore workgroup owners in import file" name="ignoreOwner" type="boolean">
+        <Prompt>Do not import workgroup owners</Prompt>
+      </Argument>
+      <Argument helpKey="Ignore workgroup email addresses in import file" name="ignoreEmail" type="boolean">
+        <Prompt>Do not import workgroup email addresses</Prompt>
+      </Argument>
+      <Argument helpKey="Ignore workgroup notifiction option in import file" name="ignoreNotificationOption" type="boolean">
+        <Prompt>Do not import workgroup notification option</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="totalProcessed" type="string">
+        <Prompt>Total workgroups processed</Prompt>
+      </Argument>
+      <Argument name="totalUpdated" type="string">
+        <Prompt>Workgroups updated</Prompt>
+      </Argument>
+      <Argument name="totalCreated" type="string">
+        <Prompt>Workgroups created</Prompt>
+      </Argument>
+      <Argument name="totalIgnored" type="string">
+        <Prompt>Workgroups ignored</Prompt>
+      </Argument>
+      <Argument name="identitiesNotFound" type="string">
+        <Prompt>Workgroup members not found</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>

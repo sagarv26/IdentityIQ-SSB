@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Bulk Reassignment">
+  <Body>$!requesterName has assigned $numNewIdentities users to you for access certification.  These have been added to $certificationName.
+
+Description: $!description
+
+Comments from $!requesterName:
+--------------------------------------------------------------------------------
+$!comments
+--------------------------------------------------------------------------------
+
+Login and view your work item inbox to complete this access certification report.
+    </Body>
+  <Description>
+      Email Template for notifying a user when they have been reassigned identities
+      from an existing certification.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="certificationName" type="string">
+        <Description>The name of the Certification containing the items to reassign.</Description>
+      </Argument>
+      <Argument name="certification" type="Certification">
+        <Description>The Certification object containing the items to reassign.</Description>
+      </Argument>
+      <Argument name="owner" type="Identity">
+        <Description>The Identity object receiving the reassignment request.</Description>
+      </Argument>
+      <Argument name="comments" type="string">
+        <Description>Comments from the reassigner.</Description>
+      </Argument>
+      <Argument name="description" type="string">
+        <Description>Description of the reassignment.</Description>
+      </Argument>
+      <Argument name="numNewIdentities" type="string">
+        <Description>Number of identities reassigned, passed as a string.</Description>
+      </Argument>
+      <Argument name="requesterName" type="string">
+        <Description>The display name of the Identity that requested the reassignment.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>New certification reassignment request: $certificationName</Subject>
+</EmailTemplate>
+</sailpoint>

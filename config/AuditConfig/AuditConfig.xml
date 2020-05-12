@@ -1,0 +1,150 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<AuditConfig name="AuditConfig">
+  <AuditActions>
+    <AuditAction displayName="audit_action_login" name="login"/>
+    <AuditAction displayName="audit_action_logout" name="logout"/>
+    <AuditAction displayName="audit_action_loginFailure" name="loginFailure"/>
+    <AuditAction displayName="audit_action_session_timeout" name="SessionTimeout"/>
+    <AuditAction displayName="audit_action_import" name="import"/>
+    <AuditAction displayName="audit_action_run" name="run"/>
+    <AuditAction displayName="audit_action_emailSent" name="emailSent"/>
+    <AuditAction displayName="audit_action_emailFailure" name="emailFailure"/>
+    <AuditAction displayName="audit_action_delegate" name="delegate"/>
+    <AuditAction displayName="audit_action_completeDelegation" name="completeDelegation"/>
+    <AuditAction displayName="audit_action_revokeDelegation" name="revokeDelegation"/>
+    <AuditAction displayName="audit_action_reassign" name="reassign"/>
+    <AuditAction displayName="audit_action_rescindCertification" name="rescindCertification"/>
+    <AuditAction displayName="audit_action_remediate" name="remediate"/>
+    <AuditAction displayName="audit_action_signoff" name="signoff"/>
+    <AuditAction displayName="audit_action_signoffEscalation" name="signoffEscalation"/>
+    <AuditAction displayName="audit_action_escalate" name="escalate"/>
+    <AuditAction displayName="audit_action_expire" name="expire"/>
+    <AuditAction displayName="audit_action_approve" name="approve"/>
+    <AuditAction displayName="audit_action_reject" name="reject"/>
+    <AuditAction displayName="audit_action_startWorkflow" name="startWorkflow"/>
+    <AuditAction displayName="audit_action_updateRole" name="updateRole"/>
+    <AuditAction displayName="audit_action_disableRole" name="disableRole"/>
+    <AuditAction displayName="audit_action_Forward" enabled="true" name="Forward"/>
+    <AuditAction displayName="audit_action_WorkItemAssignment" name="WorkItemAssignment"/>
+    <AuditAction displayName="audit_action_RemediationItemAssignment" name="RemediationItemAssignment"/>
+    <AuditAction displayName="audit_action_historiesPruned" name="historiesPruned"/>
+    <AuditAction displayName="audit_action_taskResultsPruned" name="taskResultsPruned"/>
+    <AuditAction displayName="audit_action_requestsPruned" name="requestsPruned"/>
+    <AuditAction displayName="audit_action_syslogEventsPruned" name="syslogEventsPruned"/>
+    <AuditAction displayName="audit_action_certificationsPruned" name="certificationsPruned"/>
+    <AuditAction displayName="audit_action_certificationsArchived" name="certificationsArchived"/>
+    <AuditAction displayName="audit_action_certificationArchivesPruned" name="certificationArchivesPruned"/>
+    <AuditAction displayName="audit_action_certificationsFinished" name="certificationsFinished"/>
+    <AuditAction displayName="audit_action_remediationsScanned" name="remediationsScanned"/>
+    <AuditAction displayName="audit_action_inactiveWorkItemsForwarded" name="inactiveWorkItemsForwarded"/>
+    <AuditAction displayName="audit_action_scopesDenormalized" name="scopesDenormalized"/>
+    <AuditAction displayName="audit_action_certificationsPhased" name="certificationsPhased"/>
+    <AuditAction displayName="audit_action_certificationItemsPhased" name="certificationItemsPhased"/>
+    <AuditAction displayName="audit_action_continuousCertsProcessed" name="continuousCertsProcessed"/>
+    <AuditAction displayName="audit_action_continuousCertItemsRequired" name="continuousCertItemsRequired"/>
+    <AuditAction displayName="audit_action_continuousCertItemsOverdue" name="continuousCertItemsOverdue"/>
+    <AuditAction displayName="audit_action_pruneProvisioningTransactions" name="provisioningTransactionsPruned"/>
+    <AuditAction displayName="audit_action_provision" name="provision"/>
+    <AuditAction displayName="audit_action_expansion" name="expansion"/>
+    <AuditAction displayName="audit_action_identityCorrelation" name="identityCorrelation"/>
+    <AuditAction displayName="audit_action_linkMoved" name="linkMoved"/>
+    <AuditAction displayName="audit_action_identityLifecycleEvent" enabled="true" name="identityLifecycleEvent"/>
+    <AuditAction displayName="audit_action_activate" enabled="true" name="activate"/>
+    <AuditAction displayName="audit_action_deactivate" enabled="true" name="deactivate"/>
+    <AuditAction displayName="audit_action_violationAllowException" name="violationAllowException"/>
+    <AuditAction displayName="audit_action_violationCorrection" name="violationCorrection"/>
+    <AuditAction displayName="audit_action_violationDelegate" name="violationDelegate"/>
+    <AuditAction displayName="audit_action_plugin_installed" name="PluginInstalled"/>
+    <AuditAction displayName="audit_action_plugin_upgraded" name="PluginUpgraded"/>
+    <AuditAction displayName="audit_action_plugin_uninstalled" name="PluginUninstalled"/>
+    <AuditAction displayName="audit_action_plugin_enabled" name="PluginEnabled"/>
+    <AuditAction displayName="audit_action_plugin_disabled" name="PluginDisabled"/>
+    <AuditAction displayName="audit_action_plugin_configuration_changed" name="PluginConfigurationChanged"/>
+    <AuditAction displayName="audit_action_alert_processed" name="AlertProcessed"/>
+    <AuditAction displayName="audit_action_alert_action_created" name="AlertActionCreated"/>
+    <AuditAction displayName="audit_action_ApproveLineItem" enabled="true" name="ApproveLineItem"/>
+    <AuditAction displayName="audit_action_AccountsRequestStart" enabled="true" name="AccountsRequestStart"/>
+    <AuditAction displayName="audit_action_Comment" enabled="true" name="Comment"/>
+    <AuditAction displayName="audit_action_Create" enabled="true" name="Create"/>
+    <AuditAction displayName="audit_action_Delete" enabled="true" name="Delete"/>
+    <AuditAction displayName="audit_action_Disable" enabled="true" name="Disable"/>
+    <AuditAction displayName="audit_action_Enable" enabled="true" name="Enable"/>
+    <AuditAction displayName="audit_action_EntitlementAdd" enabled="true" name="EntitlementAdd"/>
+    <AuditAction displayName="audit_action_EntitlementRemove" enabled="true" name="EntitlementRemove"/>
+    <AuditAction displayName="audit_action_EntitlementsRequestStart" enabled="true" name="EntitlementsRequestStart"/>
+    <AuditAction displayName="audit_action_ExpirePasswordStart" enabled="true" name="ExpirePasswordStart"/>
+    <AuditAction displayName="audit_action_ForgotPasswordStart" enabled="true" name="ForgotPasswordStart"/>
+    <AuditAction displayName="audit_action_IdentityCreateRequestStart" enabled="true" name="IdentityCreateRequestStart"/>
+    <AuditAction displayName="audit_action_IdentityEditRequestStart" enabled="true" name="IdentityEditRequestStart"/>
+    <AuditAction displayName="audit_action_ManualChange" enabled="true" name="ManualChange"/>
+    <AuditAction displayName="audit_action_Modify" enabled="true" name="Modify"/>
+    <AuditAction displayName="audit_action_PasswordRequestStart" enabled="true" name="PasswordsRequestStart"/>
+    <AuditAction displayName="audit_action_PasswordChanged" enabled="true" name="PasswordChange"/>
+    <AuditAction displayName="audit_action_PasswordChangeFailure" enabled="true" name="PasswordChangeFailure"/>
+    <AuditAction displayName="audit_action_ForgotPasswordChange" enabled="true" name="ForgotPasswordChange"/>
+    <AuditAction displayName="audit_action_ExpiredPasswordChange" enabled="true" name="ExpiredPasswordChange"/>
+    <AuditAction displayName="audit_action_ProvisioningComplete" enabled="true" name="ProvisioningComplete"/>
+    <AuditAction displayName="audit_action_ProvisioningFailure" enabled="true" name="ProvisioningFailure"/>
+    <AuditAction displayName="audit_action_RegistrationStart" enabled="true" name="RegistrationStart"/>
+    <AuditAction displayName="audit_action_RejectLineItem" enabled="true" name="RejectLineItem"/>
+    <AuditAction displayName="audit_action_RoleAdd" enabled="true" name="RoleAdd"/>
+    <AuditAction displayName="audit_action_RoleRemove" enabled="true" name="RoleRemove"/>
+    <AuditAction displayName="audit_action_RolesRequestStart" enabled="true" name="RolesRequestStart"/>
+    <AuditAction displayName="audit_action_Unlock" enabled="true" name="Unlock"/>
+    <AuditAction displayName="audit_action_IdentityLocked" enabled="true" name="IdentityLocked"/>
+    <AuditAction displayName="audit_action_IdentityUnlocked" enabled="true" name="IdentityUnlocked"/>
+    <AuditAction displayName="audit_action_AuthAnswerIncorrect" enabled="true" name="AuthAnswerIncorrect"/>
+    <AuditAction displayName="audit_action_AccessRequestStart" enabled="true" name="AccessRequestStart"/>
+    <AuditAction displayName="audit_action_PasswordPolicyChange" enabled="true" name="PasswordPolicyChange"/>
+    <AuditAction displayName="audit_action_ServerUpDown" enabled="true" name="ServerUpDown"/>
+    <AuditAction displayName="audit_action_APIConfigurationChange" enabled="true" name="APIConfigurationChange"/>
+  </AuditActions>
+  <AuditAttributes>
+    <AuditAttribute class="Identity" displayName="audit_attribute_assignedRoles" name="assignedRoles"/>
+    <AuditAttribute class="Identity" displayName="audit_attribute_capabilities" name="capabilities"/>
+    <AuditAttribute class="Identity" displayName="audit_attribute_controlledScopes" name="controlledScopes"/>
+    <AuditAttribute class="Identity" displayName="audit_attribute_password" name="password"/>
+    <AuditAttribute class="Identity" displayName="audit_attribute_scope" name="scope"/>
+    <AuditAttribute class="Identity" displayName="audit_attribute_correlationStatus" name="correlationStatus"/>
+  </AuditAttributes>
+  <AuditClasses>
+    <AuditClass name="ActivityDataSource"/>
+    <AuditClass name="Application"/>
+    <AuditClass name="AuditConfig"/>
+    <AuditClass displayName="Role" name="Bundle"/>
+    <AuditClass name="Category"/>
+    <AuditClass name="Capability"/>
+    <AuditClass name="Configuration"/>
+    <AuditClass name="EmailTemplate"/>
+    <AuditClass name="GroupFactory"/>
+    <AuditClass name="JasperTemplate"/>
+    <AuditClass name="MessageTemplate"/>
+    <AuditClass name="MiningConfig"/>
+    <AuditClass name="ObjectConfig"/>
+    <AuditClass name="Policy"/>
+    <AuditClass name="RequestDefinition"/>
+    <AuditClass name="RightConfig"/>
+    <AuditClass name="Rule"/>
+    <AuditClass name="ScoreConfig"/>
+    <AuditClass name="TaskDefinition"/>
+    <AuditClass name="TaskSchedule"/>
+    <AuditClass name="TimePeriod"/>
+    <AuditClass name="UIConfig"/>
+    <AuditClass name="Workflow"/>
+  </AuditClasses>
+  <AuditSCIMResources>
+    <AuditSCIMResource create="true" delete="true" name="User" update="true"/>
+    <AuditSCIMResource name="Application"/>
+    <AuditSCIMResource name="Entitlement"/>
+    <AuditSCIMResource name="Role"/>
+    <AuditSCIMResource create="true" delete="true" name="Account" update="true"/>
+    <AuditSCIMResource name="Workflow"/>
+    <AuditSCIMResource name="TaskResult"/>
+    <AuditSCIMResource create="true" name="LaunchedWorkflow"/>
+    <AuditSCIMResource name="PolicyViolation"/>
+    <AuditSCIMResource name="CheckedPolicyViolation"/>
+  </AuditSCIMResources>
+</AuditConfig>
+</sailpoint>

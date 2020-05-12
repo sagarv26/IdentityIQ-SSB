@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Base Identity Report Form" type="Report">
+  <Section columns="2" label="rept_users_auth_section_identity_props" name="Identity Attributes"/>
+  <Section columns="2" label="rept_users_auth_section_extended" name="Identity Extended Attributes"/>
+  <Section columns="2" label="rept_identity_roles_section_props" name="Identity Properties">
+    <Field columnSpan="1" displayName="rept_identity_roles_field_app" helpKey="rept_identity_roles_help_app" multi="true" name="identityApplications" type="Application" value="ref:identityApplications"/>
+    <Field columnSpan="1" displayName="rept_identity_roles_field_capability" helpKey="rept_identity_roles_help_capability" multi="true" name="capabilities" type="Capability" value="ref:capabilities"/>
+    <Field columnSpan="1" displayName="rept_identity_roles_field_roles" helpKey="rept_identity_roles_help_roles" multi="true" name="identityRoles" type="Bundle" value="ref:identityRoles"/>
+    <Field columnSpan="1" displayName="rept_identity_roles_field_group_def" helpKey="rept_identity_roles_help_group_def" multi="true" name="groupDefinitions" type="GroupDefinition" value="ref:groupDefinitions"/>
+    <Field columnSpan="1" displayName="rept_identity_roles_field_last_refresh" helpKey="rept_identity_roles_help_last_refresh" name="lastRefresh" type="string" value="ref:lastRefresh">
+      <Attributes>
+        <Map>
+          <entry key="xtype" value="daterange"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field columnSpan="1" displayName="rept_identity_roles_field_last_login" helpKey="rept_identity_roles_help_last_login" name="lastLogin" type="string" value="ref:lastLogin">
+      <Attributes>
+        <Map>
+          <entry key="xtype" value="daterange"/>
+        </Map>
+      </Attributes>
+    </Field>
+  </Section>
+</Form>
+</sailpoint>

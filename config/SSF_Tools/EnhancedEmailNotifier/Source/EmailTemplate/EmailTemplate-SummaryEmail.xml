@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate name="Summary Email">
+  <Body><![CDATA[
+
+#macro ( displayableName $identity $emailAddress)
+#if( $identity ) 
+$identity.displayableName
+#else
+$emailAddress
+#end
+#end
+
+#macro ( autoRender $renderHint) 
+   #set ( $renderHint = $renderHints.get($summaryKey) )
+   #set ( $columns = $renderHint.columns )
+	<h3>$renderHint.title</h3>
+   <table>
+   <tr>
+   #foreach ( $column in $columns )
+   	<th>$column.label</th>
+   #end
+  	</tr>
+  	#set ( $items = $summeries.get($summaryKey) )
+   #set ( $class = "odd" )
+   #foreach ( $data in $items )
+   	## We can add some additional variables here to
+   	## pass to the evaluator if required
+   $!data.put( "serverRootPath", ${serverRootPath} )
+   
+   ## Now render
+   	<tr class="$class">
+   	#foreach ( $column in $columns )
+   		<td>
+   		$velocityEvaluator.evaluate($column.value, $data)	    	
+   		</td>
+   	#end
+   	</tr>   	
+   	#if ($class == "odd")
+   		#set ( $class = "even" )
+   	#else 
+   		#set ( $class = "odd" )
+   	#end
+   #end
+	</table>
+#end
+ 
+ <html>
+  <head>
+  	<style type="text/css">
+body {
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+	font-size: 12px;
+	font-style: normal;
+	font-variant: normal;
+}
+
+th {
+	text-align: left;
+}
+
+tr.odd {
+    background-color:#eeeeee;
+}
+
+tr.even { 
+	background-color:#ffffff; 
+}
+
+	</style>
+  </head>
+  <body>
+<p>Hi #displayableName ($identity, $to)</p>
+<p>Please find a summary of communications sent to you since $spTools.formatDate($createdDate, 2, 3)</p>
+#foreach ($summaryKey in $summeries.keySet())
+	##
+	## For each Email Template which is trapped we 
+	## need to render it here.  You should get all the persitable
+	## data which was provided in the email options when
+	## the orginal email was created.
+	##
+	#if ( $summaryKey.equals('PUT YOUR EMAIL TEMPLATE HERE') )
+	
+		<p>
+		    <h3>$summaryKey</h3>
+		    #set ($items = $summeries.get($summaryKey))
+		    <table><tr><th>Date/Time created</th></tr>
+		    #foreach ($itemMap in $items)
+		    
+		    	## Process the item map ... e.g.:
+		    	<tr><td>$spTools.formatDate($itemMap.createdDate, 3, 3)</td></tr>
+		    	
+		    #end 
+	    	</table>
+	    </p>
+	    ##  To process additional templates, then add
+	    ##elseif ( $summaryKey.equals('PUT YOUR EMAIL TEMPLATE HERE'))  etc.
+	    ## 
+	    ## do not change anything below this line
+	    ##
+    #else
+    	##
+    	## Auto render the email, as the template renderer was not found above
+    	##
+    	
+		#autoRender( $renderHints.get($summaryKey) )
+				
+	#end
+#end
+</body>
+</html>
+]]></Body>
+  <Description>
+      Emai template for summary emails
+    </Description>
+  <Signature>
+  
+  </Signature>
+  <Subject>#macro ( displayableName $identity $emailAddress)
+#if( $identity ) 
+$identity.displayableName
+#else
+$emailAddress
+#end
+#end
+Summary email for #displayableName ($identity, $to) - $spTools.formatDate($dateNow,3, 1)</Subject>
+</EmailTemplate>

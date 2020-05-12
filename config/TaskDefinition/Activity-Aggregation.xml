@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.ActivityDataSourceScan" name="Activity Aggregation" progressInterval="5000" progressMode="String" subType="task_item_type_activity_aggregation" template="true" type="ActivityAggregation">
+  <Description>
+            Template for activity scanning. This task will iterate over
+            an application's activity datasource, correlate the activity
+            back to an Identity and then store the correlated activities.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="datasource" required="true" type="ActivityDataSource">
+        <Prompt>task_in_activity_aggregation_datasource</Prompt>
+      </Argument>
+      <Argument name="trackLastPosition" type="boolean">
+        <Prompt>task_in_activity_aggregation_track_last_position</Prompt>
+      </Argument>
+      <Argument name="keepUncorrelatedActivities" type="boolean">
+        <Prompt>task_in_activity_aggregation_keep_uncorrelated_activities</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="total" type="int">
+        <Prompt>task_out_activity_aggregation_total</Prompt>
+      </Argument>
+      <Argument name="correlated" type="int">
+        <Description>
+                        The total number of activities correlated to identities.
+                    </Description>
+        <Prompt>task_out_activity_aggregation_correlated</Prompt>
+      </Argument>
+      <Argument name="uncorrrelated" type="int">
+        <Description>
+                        The total number of activities not correlated to identities.
+                    </Description>
+        <Prompt>task_out_activity_aggregation_uncorrrelated</Prompt>
+      </Argument>
+      <Argument name="filtered" type="int">
+        <Description>
+                        The total number of activities ignored.
+                    </Description>
+        <Prompt>task_out_activity_aggregation_filtered</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

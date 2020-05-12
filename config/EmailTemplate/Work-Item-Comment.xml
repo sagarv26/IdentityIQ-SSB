@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Work Item Comment">
+  <Body>Comment added to work item "$workItemName" by $commentAuthor on $spTools.formatDate($commentDate,3,1)
+
+--------------------------------------------------------------------------------
+$!commentText</Body>
+  <Description>
+      Email Template for notifying the requester/owner of a work item
+      that a new comment has been added.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workItem" type="WorkItem">
+        <Description>The WorkItem object on which the comment was added.</Description>
+      </Argument>
+      <Argument name="workItemName" type="string">
+        <Description>The name (also the description) of the WorkItem.</Description>
+      </Argument>
+      <Argument name="comment" type="Comment">
+        <Description>The Comment object with information about the comment.</Description>
+      </Argument>
+      <Argument name="commentAuthor" type="string">
+        <Description>The name of the Identity that made the comment.</Description>
+      </Argument>
+      <Argument name="commentDate" type="date">
+        <Description>The date the comment was made, represented as a java.util.Date object.</Description>
+      </Argument>
+      <Argument name="commentText" type="string">
+        <Description>The text of the comment.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>New comments added to work item "$workItemName"</Subject>
+</EmailTemplate>
+</sailpoint>

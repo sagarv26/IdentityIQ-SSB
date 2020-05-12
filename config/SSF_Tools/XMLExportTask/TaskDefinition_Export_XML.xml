@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition executor="sailpoint.services.standard.task.ExportXML" name="XML Object Exporter" progressInterval="5000" progressMode="String" resultAction="Delete" subType="task_item_type_generic" template="true" type="Generic">
+  <Description>Export XML of IIQ objects.</Description>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="Path to the directory under which the export structure will be placed." name="basePath" required="true" type="string">
+        <Prompt>Base path for export</Prompt>
+      </Argument>
+      <Argument helpKey="If true, all IDs and created/modified timestamps will be removed in the exported files." name="removeIDs" type="boolean">
+        <Prompt>Remove IDs from exported XML</Prompt>
+      </Argument>
+      <Argument helpKey="If true, CDATA sections will be added where appropriate in the XML and the code will be unescaped." name="addCData" type="boolean">
+        <Prompt>Add CDATA sections</Prompt>
+      </Argument>
+      <Argument helpKey="Comma-separated list of class names to export.  If blank, all classes will be exported.  Use 'default' for a default set of classes, or use default in the list e.g. 'default,Scope,Bundle'" name="classNames" type="string">
+        <Prompt>Classes to export (leave blank for all, use 'default' for a default set of classes)</Prompt>
+      </Argument>
+      <Argument helpKey="Only objects that have been created or updated after this date will be included in the export." name="fromDate" type="date">
+        <Prompt>Only include objects updated or created after this date</Prompt>
+      </Argument>
+      <Argument helpKey="Leave blank for default naming format or choose a naming format with the following optional variables: $Class$ = Object Class, $Name$ = Object Name" name="namingFormat" type="string">
+        <Prompt>Naming format (see help text for variables)</Prompt>
+      </Argument>
+      <Argument helpKey="Optional - enter the path to a target.properties file for replacement of values with SSB tokens from the file.  Leave blank if not required." name="targetPropsFile" type="string">
+        <Prompt>target.properties file for reverse-tokenization for SSB</Prompt>
+      </Argument>
+      <Argument helpKey="Optional - enter the path to a directory containing XML files for merge comparisons for supported classes.  Leave blank if not required." name="mergeCompareDirPath" type="string">
+        <Prompt>Directory containing original XML files for comparison when creating merge files</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="exportDetails" type="string">
+        <Prompt>Objects exported</Prompt>
+      </Argument>
+      <Argument name="objectsExported" type="int">
+        <Prompt>Total objects exported</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>

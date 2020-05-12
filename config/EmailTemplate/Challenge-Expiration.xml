@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Challenge Expiration">
+  <Body>The challenge period for '$challengeItem' has expired.  This certification decision can
+no longer be contested.
+    </Body>
+  <Description>
+      Email Template for notifying a challenger that they can no longer challenge a certification decision.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="challengeItem" type="string">
+        <Description>The short description of the CertificationItem being challenged.</Description>
+      </Argument>
+      <Argument name="certificationName" type="string">
+        <Description>The name of the certification containing the item being challenged.</Description>
+      </Argument>
+      <Argument name="certification" type="Certification">
+        <Description>The Certification object.</Description>
+      </Argument>
+      <Argument name="certificationItem" type="CertificationItem">
+        <Description>The CertificationItem being challenged.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Challenge expired for '$challengeItem'</Subject>
+</EmailTemplate>
+</sailpoint>

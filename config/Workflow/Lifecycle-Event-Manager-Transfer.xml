@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow explicitTransitions="true" libraries="Identity" name="Lifecycle Event - Manager Transfer" type="IdentityLifecycle">
+  <Variable input="true" name="trigger">
+    <Description>The IdentityTrigger</Description>
+  </Variable>
+  <Variable input="true" name="event" transient="true">
+    <Description>
+      The IdentityChangeEvent.  It can be used to build
+      the provisioning plan, but does not need to be
+      persisted with the case, so marked as transient.
+    </Description>
+  </Variable>
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity.</Description>
+  </Variable>
+  <Description>Process a user when they change managers.</Description>
+  <Step icon="Start" name="Start" posX="28" posY="10">
+    <Transition to="Process user"/>
+  </Step>
+  <Step icon="Message" name="Process user" posX="148" posY="10">
+    <Description>Process the user that transferred managers.</Description>
+    <Script>
+      <Source>
+      
+       import sailpoint.object.*;
+
+       String identityFullname = event.getIdentityFullName();
+       Identity oldManager = (null != event.getOldObject()) ? event.getOldObject().getManager() : null;
+       Identity newManager = (null != event.getObject()) ? event.getObject().getManager() : null;
+
+       String oldManagerName = (null != oldManager) ? oldManager.getDisplayableName() : null;
+       String newManagerName = (null != newManager) ? newManager.getDisplayableName() : null;
+
+       System.out.println(identityFullname + " changed managers from " + oldManagerName + " to " + newManagerName);
+      
+      </Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="268" posY="10"/>
+</Workflow>
+</sailpoint>

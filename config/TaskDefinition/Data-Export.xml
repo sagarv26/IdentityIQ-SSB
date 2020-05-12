@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.DataExportExecutor" formPath="/monitor/tasks/dataExportInclude.xhtml" name="Data Export" progressInterval="5000" progressMode="String" subType="task_item_type_generic" template="true" type="Generic">
+  <Description>
+            Template for creating a data export task.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="database" type="string">
+        <Prompt>task_in_data_export_database</Prompt>
+      </Argument>
+      <Argument name="username" type="string">
+        <Prompt>task_in_data_export_database_uname</Prompt>
+      </Argument>
+      <Argument name="password" type="secret">
+        <Prompt>task_in_data_export_database_password</Prompt>
+      </Argument>
+      <Argument name="driverClass" type="string">
+        <Prompt>task_in_data_export_database_driverClass</Prompt>
+      </Argument>
+      <Argument name="dbUrl" type="string">
+        <Prompt>task_in_data_export_database_url</Prompt>
+      </Argument>
+      <Argument name="exportIdentities" type="boolean">
+        <Prompt>task_in_data_export_identities</Prompt>
+      </Argument>
+      <Argument name="exportIdentitiesRiskScores" type="boolean">
+        <Prompt>task_in_data_export_identities_risk_scores</Prompt>
+      </Argument>
+      <Argument name="exportAccounts" type="boolean">
+        <Prompt>task_in_data_export_accounts</Prompt>
+      </Argument>
+      <Argument name="exportCertifications" type="boolean">
+        <Prompt>task_in_data_export_certs</Prompt>
+      </Argument>
+      <Argument name="identitiesExportMode" type="string">
+        <Prompt>task_in_data_export_identities_mode</Prompt>
+      </Argument>
+      <Argument name="accountsExportMode" type="string">
+        <Prompt>task_in_data_export_accounts_mode</Prompt>
+      </Argument>
+      <Argument name="certificationsExportMode" type="string">
+        <Prompt>task_in_data_export_certs_mode</Prompt>
+      </Argument>
+      <Argument name="identitiesExportFilter" type="string">
+        <Prompt>task_in_data_export_identities_filter</Prompt>
+      </Argument>
+      <Argument name="accountsExportFilter" type="string">
+        <Prompt>task_in_data_export_accounts_filter</Prompt>
+      </Argument>
+      <Argument name="certificationsExportFilter" type="string">
+        <Prompt>task_in_data_export_certs_filter</Prompt>
+      </Argument>
+      <Argument name="promoteManagedAttributes" type="boolean">
+        <Prompt>task_in_identity_refresh_promote_managed_attributes</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="identitiesExported" type="int">
+        <Prompt>task_out_data_export_identities</Prompt>
+      </Argument>
+      <Argument name="accountsExported" type="int">
+        <Prompt>task_out_data_export_accounts</Prompt>
+      </Argument>
+      <Argument name="certificationsExported" type="int">
+        <Prompt>task_out_data_export_certs</Prompt>
+      </Argument>
+      <Argument name="identitiesPruned" type="int">
+        <Prompt>task_out_data_export_pruned_identities</Prompt>
+      </Argument>
+      <Argument name="accountsPruned" type="int">
+        <Prompt>task_out_data_export_pruned_accounts</Prompt>
+      </Argument>
+      <Argument name="certificationsPruned" type="int">
+        <Prompt>task_out_data_export_pruned_certs</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

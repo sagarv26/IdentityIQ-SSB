@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition  executor="sailpoint.services.standard.task.CustomJavaMailServerTask"  name="Email Approvals Task" progressInterval="5000" progressMode="String" resultAction="Rename" template="true" type="Generic">
+  <Description>
+Processes Approve/Deny By Email. This can be run on a schedule. 
+</Description>
+  <Signature>
+    <Returns>
+      <Argument name="requestApproved" type="string">
+        <Prompt>Requests Approved </Prompt>
+      </Argument>
+      <Argument name="requestDenied" type="string">
+        <Prompt>Requests Rejected </Prompt>
+      </Argument>
+      <Argument name="requestIgnored" type="string">
+        <Prompt>Requests Ignored </Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>

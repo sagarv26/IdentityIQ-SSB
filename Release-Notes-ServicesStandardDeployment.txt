@@ -1,0 +1,150 @@
+Patch Revision: 4.0.1
+Released: 29 September 2017
+
+****************************************
+BUGS FIXED IN THIS REVISION:
+****************************************
+ - Fixes to the Server-Specific Task Launcher and Manual Correlation Export Task to 
+   ensure compatibility with IdentityIQ 7.2
+
+
+Release: SSD v4 GA
+Released: 30 June 2017 
+
+****************************************
+OVERVIEW OF RELEASE
+****************************************
+
+Version 4 of the consolidated Services Standard Deployment (SSD) contains a number of new
+components, enhancements and fixes.
+
+
+****************************************
+NEW TO THIS RELEASE:
+****************************************
+
+SSB: 
+    - Build Checks: a series of checks around the build process to alert the deployer to 
+      common misconfigurations and deviations from best practices. The results of these 
+      checks are written to a log file.  Checks in this release allow logging of the 
+      following:
+         - Unencrypted passwords in Application XML objects
+         - Unencrypted passwords in iiq.properties files
+         - Use of wildcard import statements in BeanShell code in XML files
+         - Absence of code comments in Java source code
+         - Presence of System.out statements in Java source code
+         - XML files that do not conform to a given naming convention
+      Deployers may also build their own build checks.
+    - Automated deployment of any IdentityIQ plugins included with the build (for 
+      IdentityIQ 7.1 and above).
+    - New 'initial-build' target for performing a repeatable initial build of IdentityIQ 
+      from scratch (MySQL, SQL Server).
+    - New 'cleanWeb' target to remove all of the IdentityIQ application files and folders 
+      from the application server.
+    - New 'runSql' target to run arbitrary SQL scripts against the IdentityIQ database.         
+    - Restructure and tidy up of some of the existing SSB targets.
+    - Ability to define a different version of log4j.properties for each environment.
+    - Configuration of IdentityIQ session timeout in the build. 
+    - Updates to SSB User Guide.
+
+SSF Tools:
+    - Certification Exclusion Framework: simplifies the definition of exclusions in
+      IdentityIQ certifications by replacing complex exclusion rules with logic maintained
+      in a separate filter-driven configuration that is more intuitive.
+    - Access Request Attachments: permits the upload of files as attachments during an 
+      access request so that they can be viewed by the approver to aid in making an 
+      approval decision or as background information.
+    - Server-Specific Task Launcher: launches a task on a specified server or servers.
+      Also allows a partitioned task to be executed across a specified group of servers.
+    - Password Expiration Reminder: provides a mechanism to send notifications to users 
+      via IdentityIQ when the passwords on their accounts in integrated target systems
+      are about to expire. Can also generate a policy violation and perform additional
+      custom steps when an account password has expired.
+
+SSP Tools: 
+    - Task Resulter: provides a simple screen to view the results of account aggregation 
+      tasks, including information unavailable in the main Task Results page, such as 
+      aggregation duration and speed (in records per second).  It is useful for measuring 
+      performance of your account aggregations.
+
+SST Tools:
+    - SST JUnit IdentityIQ Helper: allows implementers to leverage the JUnit framework for
+      unit testing an IdentityIQ implementation in an IDE.  The helper classes allow the 
+      unit tester to easily access the SailPointContext and some of the functionality 
+      of the IdentityIQ Console to reduce the time taken to implement unit tests.
+    
+
+Bugs fixed since SSD v3 GA
+
+ - The SSB 'import' target was not prompting for authentication when the IdentityIQ
+   username and password had been changed from the default.
+ - The SSB environment-specific build.properties file naming convention did not match the 
+   format used by other types of properties files.
+ - The SSB Log4j Properties Updater was not handling non-alpha Logger variable names 
+   correctly.
+ - The SSB 'document' target was placing technical documentation in web-accessible folder.
+   The documentation is now placed in doc/TechnicalConfig/ under the build folder.
+ - Some SSB targets, including 'prepareCustomConfig' and 'import-custom' were not ignoring
+   files listed in ignorefiles.properties.
+ - In the SSF ProvisionProcessor Framework, the SP Provision Processor Sub workflow was 
+   referencing an incorrect email template name for manual provisioning actions.
+ - The Object Exporter noIdNameMap hidden option stopped working in IdentityIQ 7.1, giving
+   an 'Unable to find ClassMapping for SailPointObject' error.
+ - The Object Exporter reverse-tokenization feature produced unexpected results when blank
+   or whitespace token values were present in the reverse-tokenization properties file.
+ - The Enhanced Email Notifier produced a 'No serializer' error when running the Summary 
+   Email Processor Task.
+
+****************************************
+NOTES
+****************************************
+SSF provisioning now runs in the background by default for all the SSF features, which
+means provisioning will not happen until the next time the Perform Maintenance task runs.
+This is the recommended setting to avoid identity locking conflicts during identity 
+refreshes.
+
+If you are currently using a version of the SSF features and frameworks from SSD v1.1 or
+earlier there is no simple upgrade procedure for these components.  An upgrade would be a
+more in-depth exercise carried out by a trained and experienced IdentityIQ implementer.
+
+****************************************
+SUMMARY OF SSD
+****************************************
+
+The SSD consists of the following packages:
+
+Services Standard Build (SSB) - Standard packaging and build process.
+Services Standard Frameworks (SSF) - Reusable frameworks, features and tools.  
+Services Standard Words (SSW) - Document templates (not shipped with the SSD but provided 
+on Compass)
+Services Standard Performance (SSP) - Performance tools
+Services Standard Test (SST) - Testing tools
+
+
+****************************************
+SUMMARY OF CONTENTS
+****************************************
+
+SSB:            Standard IdentityIQ build tool.
+
+
+SSF:  
+    Frameworks: Field Value, Role Assignment, Dynamic Emails, Approvals, Provision 
+                Processor
+    Features:   Joiner, Mover, Leaver, Attribute Synch, Terminate Identity, Rehire
+    Tools:      Multi-threaded Beanshell Kit, Report Extractor, XML Exporter Task, 
+                Generic Importer, Email Approvals tool, Break Glass Access Request,
+                Correlation Migrator, Workgroup Migrator, Enhanced Email Notifier,
+                IdentityIQ Loopback Connector, Email Template Editor, Certification
+                Exclusion Framework, Access Request Attachments, Server-Specific 
+                Task Launcher, Password Expiration Reminder
+
+SSP: 
+    Tools:      DB Performance Rule, Sizing Rule, DB Row Count Rule, Task Resulter
+
+SST:
+    Tools:      Unit Tester, JUnit IdentityIQ Helper
+    
+
+For more details on the SSD please visit:
+https://community.sailpoint.com/community/identityiq/sailpoint-toolkits/standard-services-deployment

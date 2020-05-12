@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.UnstructuredTargetScan" formPath="/monitor/tasks/targetAggregationTask.xhtml" name="Target Aggregation" progressInterval="5000" progressMode="String" subType="task_item_type_target_aggregation" template="true" type="TargetAggregation">
+  <Description>
+            Template Task for running target aggregations.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="targetSource" type="TargetSource">
+        <Prompt>task_in_target_aggregation_target_source</Prompt>
+      </Argument>
+      <Argument name="targetApplication" type="Application">
+        <Prompt>task_in_target_aggregation_target_source</Prompt>
+      </Argument>
+      <Argument name="promoteInherited" type="boolean">
+        <Prompt>task_in_target_aggregation_promote_inherited</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="total" type="int">
+        <Description>
+                        The total number of targets processed.
+                    </Description>
+        <Prompt>task_out_target_aggregation_total</Prompt>
+      </Argument>
+      <Argument name="correlated" type="int">
+        <Description>
+                        The total number of targets that correlated to one or more objects.
+                    </Description>
+        <Prompt>task_out_target_aggregation_correlated</Prompt>
+      </Argument>
+      <Argument name="uncorrelated" type="int">
+        <Description>
+                        The total number of targets that did not correlate to any objects.
+                    </Description>
+        <Prompt>task_out_target_aggregation_uncorrelated</Prompt>
+      </Argument>
+      <Argument name="mappingsProcessed" type="int">
+        <Description>
+                        The total number of Access Mappings processed
+                    </Description>
+        <Prompt>task_out_target_aggregation_mappings_processed</Prompt>
+      </Argument>
+      <Argument name="mappingsUnCorrelated" type="int">
+        <Prompt>task_out_target_aggregation_mappings_uncorrelated</Prompt>
+      </Argument>
+      <Argument name="targetsDeleted" type="int">
+        <Description>
+                        The total number of Targets Deleted
+                    </Description>
+        <Prompt>task_out_target_aggregation_targets_deleted</Prompt>
+      </Argument>
+      <Argument name="associationsDeleted" type="int">
+        <Description>
+                        The total number of TargetAssociations deleted
+                    </Description>
+        <Prompt>task_out_target_aggregation_associations_deleted</Prompt>
+      </Argument>
+      <Argument name="deleteTime" type="string">
+        <Description>
+                        Time spent deleting old targets
+                    </Description>
+        <Prompt>task_out_target_aggregation_delete_time</Prompt>
+      </Argument>
+      <Argument name="associationDeleteTime" type="string">
+        <Description>
+                        Time spent deleting old TargetAssociations
+                    </Description>
+        <Prompt>task_out_target_aggregation_association_delete_time</Prompt>
+      </Argument>
+      <Argument name="processTime" type="string">
+        <Description>
+                        Time spent processing targets
+                    </Description>
+        <Prompt>task_out_target_aggregation_process_time</Prompt>
+      </Argument>
+      <Argument name="adornmentTime" type="string">
+        <Description>
+                        Time spent adorning targets to cubes and account groups
+                    </Description>
+        <Prompt>task_out_target_aggregation_adornment_time</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

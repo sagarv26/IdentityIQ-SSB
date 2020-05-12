@@ -1,0 +1,178 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="SP Terminate Identity Rules Library" language="beanshell">
+	<ReferencedRules>
+	    <Reference class="sailpoint.object.Rule" name="SP Provisioning Rules Library"/>
+    </ReferencedRules>
+	<Source>
+	<![CDATA[
+	import sailpoint.api.SailPointFactory;
+	import sailpoint.api.SailPointContext;
+	import sailpoint.api.Provisioner;
+	import sailpoint.object.*;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+    import sailpoint.object.ProvisioningPlan.Operation; 
+	import sailpoint.tools.Util;
+    import sailpoint.tools.Message;
+    import sailpoint.tools.GeneralException;
+    import java.sql.Connection;
+	import java.sql.PreparedStatement;
+	import java.sql.ResultSet;
+	import java.sql.SQLException;
+	import java.sql.DriverManager;
+    import java.sql.Timestamp;
+	import java.util.*;
+	import java.text.*;
+	import javax.naming.Context;
+	import javax.naming.InitialContext;
+	import javax.sql.DataSource;
+	import sailpoint.api.PasswordGenerator;
+	import sailpoint.api.Matchmaker;
+	import sailpoint.api.IdentityService;
+	
+	
+    import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	private static Log tilogger = LogFactory.getLog("rule.SP.TerminateIdentity.RulesLibrary");
+	
+	
+	
+	public boolean initUseEntryForm(SailPointContext context, Workflow workflow){
+		tilogger.trace("Enter initUseEntryForm");
+		boolean flag = false;
+		Custom mappingObj = getTerminateIdMappingObject(context);
+		
+		String useForm = mappingObj.get("Use Custom Entry Form");
+		
+		flag = Boolean.parseBoolean(useForm);
+		
+		if (flag){
+			tilogger.trace("Get and add the entry form to the workflow");
+			String entryFormName = mappingObj.get("Entry Form Name");
+			
+			Form ef = context.getObjectByName(Form.class, entryFormName);
+			
+			if (ef != null){
+				tilogger.trace("Have entry form, add to workflow");
+				workflow.put("entryForm", ef);
+			}
+		}
+		
+		String confirmFormName = mappingObj.get("Confirm Form Name");
+		Form cf = context.getObjectByName(Form.class, confirmFormName);
+		
+		if (cf != null){
+			tilogger.trace("Have confirm form, add to workflow");
+			workflow.put("confirmForm", cf);
+		}
+		
+		tilogger.trace("Exit initUseEntryForm: " + flag);
+		return flag;
+	}
+	
+	public ProvisioningPlan getDynamicTerminateIdPlan(SailPointContext context, String identityName, Workflow workflow){
+		tilogger.trace("Enter getDynamicTerminateIdPlan");
+		
+		Identity identity = context.getObjectByName(Identity.class, identityName);
+		
+		ProvisioningPlan plan = getDynamicTerminateIdPlan (context, identity, workflow);
+		
+		return plan;
+	}
+	
+	public ProvisioningPlan getDynamicTerminateIdPlan(SailPointContext context, Identity identity, Workflow workflow){
+		tilogger.trace("Enter getDynamicTerminateIdPlan");
+		
+		ProvisioningPlan plan = new ProvisioningPlan();
+		plan.setIdentity(identity);	
+		
+		Custom mappingObj = getTerminateIdMappingObject(context);
+		
+		if (mappingObj != null){
+			tilogger.trace("Get the con types");
+			List conTypes = mappingObj.get("Plan Construction Types");
+			
+			boolean disAccts = false;
+			boolean delAccts = false;
+			List disAcctsList = new ArrayList();
+			List delAcctsList = new ArrayList();
+			List links = identity.getLinks();
+			
+			tilogger.trace("Have term id plan construction types: " + conTypes);
+			
+			if (conTypes.contains("Disable Accounts")){
+				tilogger.debug("Disable Accounts is true");
+				disAccounts = true;
+				disAcctsList = mappingObj.get("Disable Accounts Applications");
+			}
+			
+			if (conTypes.contains("Delete Accounts")){
+				tilogger.debug("Delete Accounts is true");
+				delAccounts = true;
+				delAcctsList = mappingObj.get("Delete Accounts Applications");
+			}
+			
+			if (disAccounts || delAccounts){
+				tilogger.trace("Process Disable and/or Delete Accounts for TerminateId");
+				AccountRequest.Operation acctOp;
+				
+				tilogger.trace("Loop the links");
+				for (Link link : links){
+					app = link.getApplication();
+					appName = app.getName();
+					nativeId = link.getNativeIdentity();
+					instance = link.getInstance();
+					
+					boolean addReq = false;
+					
+					if (delAcctsList.contains(appName)){
+						addReq = true;
+						acctOp = AccountRequest.Operation.Delete;
+					} else if (disAcctsList.contains(appName)){
+						addReq = true;
+						acctOp = AccountRequest.Operation.Disable;
+					}
+					
+					if (addReq){
+						String ae = appName + "-" + instance + "-" + nativeId;
+						tilogger.trace("Adding account request for: " + ae);
+						AccountRequest acctReq = new AccountRequest(acctOp, appName, instance, nativeId);
+						tilogger.debug("Add account request: " + acctReq.toXml());
+						plan.add(acctReq);
+					}
+				}
+			}
+			
+			if (conTypes.contains("Custom Rule")){
+				tilogger.trace("Call buildCustomTerminateIdentityPlan");
+				
+				workflow.put("plan", plan);
+				plan = buildCustomTerminateIdentityPlan(context, workflow);
+				
+			} 
+			
+			
+		}
+		
+		plan.setComments("Adding TerminateId Access");
+		
+		tilogger.trace("Set plan identity " + identity);
+		plan.setIdentity(identity);
+		
+		tilogger.trace("Exit getDynamicTerminateIdPlan: " + plan.toXml());
+		return plan;
+	}
+	
+	public static Custom getTerminateIdMappingObject(SailPointContext context){
+		tilogger.trace("Enter getTerminateIdMappingObject");
+		
+		Custom mappingObj = context.getObjectByName(Custom.class, "SPCONF Terminate Identity Mappings Custom");
+		tilogger.trace("Exit getTerminateIdMappingObject: " + mappingObj);
+		return mappingObj;
+	}
+	
+	]]>
+	</Source>
+</Rule>

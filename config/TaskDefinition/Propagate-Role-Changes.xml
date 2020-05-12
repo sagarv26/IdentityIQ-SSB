@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.RoleChangePropagator" name="Propagate Role Changes" progressInterval="5000" progressMode="String" subType="task_item_type_identity" template="true" type="Identity">
+  <Description>
+            Template for role propagation.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="help_task_in_num_of_minutes" name="duration" type="int">
+        <Prompt>task_in_num_of_mins</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_apply_active_policies" name="checkPolicies" type="boolean">
+        <Prompt>task_in_account_aggregation_check_policies</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_in_keep_inactive_violations" name="keepInactiveViolations" type="boolean">
+        <Prompt>task_in_identity_refresh_keep_inactive_violations</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_in_policy_list" name="policies" type="string">
+        <Prompt>task_in_policy_scan_policies</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_in_role_propagation_partitioning" name="enablePartitioning" type="boolean">
+        <Prompt>task_in_role_propagation_partitioning</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="total" type="int">
+        <Prompt>task_out_num_identity_updates</Prompt>
+      </Argument>
+      <Argument name="eventsProcessed" type="int">
+        <Prompt>task_out_num_event_processed</Prompt>
+      </Argument>
+      <Argument name="eventsNotPropagated" type="int">
+        <Prompt>task_out_num_events_not_propagated</Prompt>
+      </Argument>
+      <Argument name="eventsPending" type="int">
+        <Prompt>task_out_num_event_pending</Prompt>
+      </Argument>
+      <Argument name="policies" type="string">
+        <Prompt>task_out_identity_refresh_policies</Prompt>
+      </Argument>
+      <Argument name="policyViolations" type="int">
+        <Prompt>task_out_identity_refresh_policy_violations</Prompt>
+      </Argument>
+      <Argument name="policyNotifications" type="int">
+        <Prompt>task_out_identity_refresh_policy_notifications</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

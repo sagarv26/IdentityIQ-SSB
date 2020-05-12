@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow libraries="Role,Identity" name="Scheduled Role Activation" resultExpiration="1" type="ScheduledRoleActivation">
+  <Variable input="true" name="eventType">
+    <Description>The type of the role activation event.  This will be one of the constants defined in RoleEventGenerator: roleActivation or roleDeactivation</Description>
+  </Variable>
+  <Variable input="true" name="role">
+    <Description>The database id of the role we're changing.</Description>
+  </Variable>
+  <Variable input="true" name="roleName">
+    <Description>The name of the role we're changing.</Description>
+  </Variable>
+  <Variable editable="true" initializer="script:System.getProperty(&quot;iiq.forceRefreshAfterScheduledRoleChange&quot;)" name="doRefresh">
+    <Description>Set to true to cause a full identity refresh after activation.</Description>
+  </Variable>
+  <Variable name="activate">
+    <Script>
+      <Source>
+        // we sholld only be here for activation or deactivation events, 
+        // but err on the side of activation in case the type is wrong
+        import sailpoint.api.RoleEventGenerator;
+        return !RoleEventGenerator.EVENT_TYPE_ROLE_DEACTIVATION.equals(eventType);
+      </Source>
+    </Script>
+  </Variable>
+  <Variable editable="true" initializer="false" name="noRolePropagation" type="boolean">
+    <Description>Set to true to disable role change propagation.</Description>
+  </Variable>
+  <Description>
+Workflow called when a role is ready to be enabled or disabled.
+  </Description>
+  <Step icon="Start" name="start" posX="30" posY="10">
+    <Transition to="Activate Role"/>
+  </Step>
+  <Step action="call:enableRole" condition="ref:activate" icon="Task" name="Activate Role" posX="140" posY="10">
+    <Arg name="role" value="ref:role"/>
+    <Transition to="Deactivate Role"/>
+  </Step>
+  <Step action="call:disableRole" condition="!ref:activate" icon="Task" name="Deactivate Role" posX="260" posY="10">
+    <Arg name="role" value="ref:role"/>
+    <Transition to="Audit Success"/>
+  </Step>
+  <Step action="audit" icon="Audit" name="Audit Success" posX="390" posY="10">
+    <Arg name="source" value="ref:launcher"/>
+    <Arg name="action" value="script:(activate) ? &quot;activate&quot; : &quot;deactivate&quot;"/>
+    <Arg name="target" value="ref:roleName"/>
+    <Arg name="string1" value="script:((activate) ? &quot;Activated &quot; : &quot;Deactivated &quot;) + roleName"/>
+    <Arg name="string2" value="Success"/>
+    <Transition to="Refresh Identities"/>
+  </Step>
+  <Step action="call:refreshIdentities" condition="ref:doRefresh" icon="Task" name="Refresh Identities" posX="525" posY="10">
+    <Arg name="identitiesWithRoles">
+      <Script>
+        <Source>
+          // if we're deactivating, only refresh roles that have us
+          import sailpoint.api.RoleEventGenerator;
+          Object retval = null;
+          if (RoleEventGenerator.EVENT_TYPE_ROLE_DEACTIVATION.equals(eventType)) 
+             retval = role;
+          return retval;
+      </Source>
+      </Script>
+    </Arg>
+    <Arg name="correlateEntitlements" value="true"/>
+    <Arg name="provision" value="true"/>
+    <Arg name="doManualActions" value="false"/>
+    <Transition to="end"/>
+  </Step>
+  <Step icon="Stop" name="end" posX="650" posY="10"/>
+</Workflow>
+</sailpoint>

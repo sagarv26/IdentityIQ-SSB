@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<ObjectConfig name="Bundle">
+  <Attributes>
+    <Map>
+      <entry key="roleTypeDefinitions">
+        <value>
+          <List>
+            <RoleTypeDefinition displayName="Organizational" icon="organizationalIcon" name="organizational" noAssignmentSelector="true" noAutoAssignment="true" noDetection="true" noIIQ="true" noManualAssignment="true" noPermits="true" noProfiles="true" noRequirements="true" notPermittable="true" notRequired="true">
+              <Description>
+Defines a collection of roles that typically correspond to departments or business units within an organizational hierarchy.
+                </Description>
+              <RequiredRights>
+                <Reference class="sailpoint.object.SPRight" name="ManageOrganizationalRoles"/>
+              </RequiredRights>
+            </RoleTypeDefinition>
+            <RoleTypeDefinition displayName="Business" icon="businessIcon" name="business" noDetection="true" noIIQ="true" noProfiles="true" notPermittable="true" notRequired="true">
+              <Description>
+Defines a collection of users that perform similar functions within the organization.  Business Roles are associated with IT Roles or Entitlement Roles to provide specific levels of access to enterprise IT resources.
+                </Description>
+              <RequiredRights>
+                <Reference class="sailpoint.object.SPRight" name="ManageBusinessRoles"/>
+              </RequiredRights>
+            </RoleTypeDefinition>
+            <RoleTypeDefinition displayName="IT" icon="itIcon" name="it" noAssignmentSelector="true" noAutoAssignment="true" noIIQ="true" noManualAssignment="true" noPermits="true" noRequirements="true">
+              <Description>
+Defines a collection of IT entitlements which can be associated with
+Business Roles to provide users with specific access rights.  IT Roles can be
+constrained to entitlements within a single application or expanded to include
+entitlements across applications.
+                </Description>
+              <RequiredRights>
+                <Reference class="sailpoint.object.SPRight" name="ManageITRoles"/>
+              </RequiredRights>
+            </RoleTypeDefinition>
+            <RoleTypeDefinition displayName="Entitlement" icon="entitlementIcon" name="entitlement" noAssignmentSelector="true" noAutoAssignment="true" noIIQ="true" noManualAssignment="true" noPermits="true" noRequirements="true">
+              <Description>
+Defines a single IT entitlement necessary to access data or perform
+a specific action within a target system.
+                </Description>
+              <RequiredRights>
+                <Reference class="sailpoint.object.SPRight" name="ManageEntitlementRoles"/>
+              </RequiredRights>
+            </RoleTypeDefinition>
+          </List>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+</ObjectConfig>
+</sailpoint>

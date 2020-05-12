@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow handler="sailpoint.api.StandardWorkflowHandler" libraries="Identity,BatchRequest,IdentityRequest" name="Batch Request Wrapper" taskType="LCM" type="BatchProvisioning">
+  <Variable initializer="parallelPoll" input="true" name="approvalMode">
+    <Description>
+     A string that specifies how we should handle the approvals.
+
+     parallel
+       Approvals are processed concurrently and there must be consensus,
+       we wait for all approvers to approve.  The first approver that
+       rejects terminates the entire approval.
+ 
+     parallelPoll 
+       Approvals are processed concurrently but consensus is not required.
+       All approvals will be processed, we don't stop if there are any
+       rejections.  
+
+     serial
+       Approvals are processed one at a time and there must be consensus.
+       The first approver that rejects terminates the entire approval.
+
+     serialPoll
+       Approvals are processed in order but consensus is not required.
+       All approvals will be processed, we don't stop if there are any
+       rejections.  In effect we are "taking a poll" of the approvers.
+
+     any
+      Approvals are processed concurrently, the first approver to 
+      respond makes the decision for the group.
+    </Description>
+  </Variable>
+  <Variable initializer="spadmin" input="true" name="fallbackApprover">
+    <Description>
+      A String that specifies the name of the Identity that will
+      be assigned any approvals where the owner of the approver
+      can't be resolved. Example if the scheme is "owner" and the
+      application doesn't specify and owner.
+    </Description>
+  </Variable>
+  <Variable initializer="batchRequest" input="true" name="approvalScheme">
+    <Description>
+      For batch requests you should use the batchRequest scheme.
+    </Description>
+  </Variable>
+  <Variable initializer="false" name="trace">
+    <Description>
+      Used for debugging this workflow and when set to true trace
+      will be sent to stdout.
+    </Description>
+  </Variable>
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity being updated.</Description>
+  </Variable>
+  <Variable initializer="spadmin" input="true" name="batchRequestApprover">
+    <Description>The name of the batch request approver.</Description>
+  </Variable>
+  <Variable name="requireBatchRequestApproval">
+    <Description>
+       True or false. specifies whether or not we need to worry about the approval step.
+    </Description>
+  </Variable>
+  <Variable input="true" name="batchApproverElectronicSignature">
+    <Description>
+       The name of the electronic signature object that should be used when workitems 
+       are completed by the batch approver when performing batch operations.
+    </Description>
+  </Variable>
+  <Variable name="approvalSet">
+    <Description>
+       This attributes is set during the "Build Approval Set" step,
+       which builds this list by going through the ProvisioningPlan
+       to build the line items that need to be approved,
+
+       This variable includes all ApprovalItems that are part of 
+       the request process and is updated during the AfterScript
+       of the approval process by assimilating the decisions 
+       and comments from the Approvals copy of the ApprovalItem.
+    </Description>
+  </Variable>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Approval Library"/>
+    <Reference class="sailpoint.object.Rule" name="LCM Workflow Library"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="25" posY="131">
+    <Transition to="Approve" when="script:requireBatchRequestApproval"/>
+    <Transition to="Launch Batch Workflows"/>
+  </Step>
+  <Step icon="Task" name="Approve" posX="83" posY="12">
+    <Arg name="workItemComments"/>
+    <Arg name="approvalMode" value="ref:approvalMode"/>
+    <Arg name="approvalScheme" value="ref:approvalScheme"/>
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Arg name="flow" value="ref:flow"/>
+    <Arg name="fallbackApprover" value="ref:fallbackApprover"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="batchRequestId" value="ref:batchRequestId"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="batchRequestApprover" value="ref:batchRequestApprover"/>
+    <Arg name="batchApproverElectronicSignature" value="ref:batchApproverElectronicSignature"/>
+    <Arg name="batchApproverEmailTemplate" value="Batch Approval"/>
+    <Description>
+      Call the standard subprocess that will handle the built-in
+      owner, manager and security officer approval schemes.
+    </Description>
+    <Return name="approvalSet" to="approvalSet"/>
+    <Return name="workItemComments"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Identity Request Approve"/>
+    </WorkflowRef>
+    <Transition to="Batch Request Rejected" when="script:approvalSet.hasRejected()"/>
+    <Transition to="Launch Batch Workflows"/>
+  </Step>
+  <Step action="call:launchBatchWorkflows" icon="Task" name="Launch Batch Workflows" posX="285" posY="127">
+    <Arg name="batchRequestId" value="ref:batchRequestId"/>
+    <Arg name="background" value="ref:requireBatchRequestApproval"/>
+    <Description>
+      Call library method to launch all the workflows
+    </Description>
+    <Transition to="end"/>
+  </Step>
+  <Step action="call:requestRejected" icon="Task" name="Batch Request Rejected" posX="339" posY="8">
+    <Arg name="batchRequestId" value="ref:batchRequestId"/>
+    <Description>
+      Update request with rejected status and result
+    </Description>
+    <Transition to="end"/>
+  </Step>
+  <Step icon="Stop" name="end" posX="444" posY="127"/>
+</Workflow>
+</sailpoint>

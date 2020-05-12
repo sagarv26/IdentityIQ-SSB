@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC
+                "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!-- (c) Copyright 2008 SailPoint Technologies, Inc., All Rights Reserved. -->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:c="http://java.sun.com/jstl/core" 
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:t="http://myfaces.apache.org/tomahawk"
+      xmlns:sp="http://sailpoint.com/ui">
+<body>
+
+<ui:composition template="/appPage.xhtml">
+
+  <ui:define name="title">#{msgs.lcm_workitem_renderer_title}</ui:define>
+
+  <ui:define name="headerItems">
+    <sp:style serveOffset="#{base.requestContextPath}/css/sailpoint/component">
+      <src>image-radio.css</src>
+    </sp:style>
+    <sp:script>
+      <src>#{base.requestContextPath}/scripts/sailpoint/workItem.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/web/workitem/lcmWorkItem.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/Suggest.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/grid/PagingGrid.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/grid/PropertyGrid.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/component/IdentityDetailPopup.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/component/TemplateWithTooltips.js?#{debug.revision}</src>   
+      <src>#{base.requestContextPath}/scripts/sailpoint/templates/EntitlementsTemplate.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/component/RoleDetailPanel.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/component/ImageRadio.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/misc.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/web/workitem/Workitem.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/component/ElectronicSignaturePopup.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/accountGroup.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/FileUploader.js?#{debug.revision}</src>
+    </sp:script>
+<!-- PageName: lcmWorkItemRenderer.xhtml -->
+    <script type="text/javascript">
+      <!--//--><![CDATA[//><!--
+        helpKey = 'WORK_ITEM';
+
+        SailPoint.web.workitem.SIGNATURE_MEANING = "#{sp:escapeJavascript(workItem.signatureMeaning)}";
+        SailPoint.web.workitem.ORIGINAL_AUTH_ID = "#{sp:escapeJavascript(workItem.originalAuthId)}";
+        SailPoint.web.workitem.NATIVE_AUTH_ID = "#{sp:escapeJavascript(workItem.nativeAuthId)}";
+
+        Ext.onReady(function () {
+            makeTableMulticolored(Ext.getDom('approvalItemsTable'), true, true, 'odd', 'even');
+            var formsGrid = Ext.create('SailPoint.myReadOnlyFileUploadGrid', {
+            filters: {workItemId: '#{workItem.objectId}', action: 'view'}
+            });
+        });
+
+      //--><!]]>
+    </script>
+  </ui:define>
+
+  <ui:define name="body">
+    <f:view>
+      <h:messages infoClass="formInfo" warnClass="formWarn" errorClass="formError" fatalClass="formError" />
+      <h:form styleClass="form" id="editForm">
+
+          <h:inputHidden id="id" value="#{workItem.object.id}"/>
+          <h:inputHidden id="signatureAuthId" value="#{workItem.signatureAuthId}"/>
+          <h:inputHidden id="signaturePass" value="#{workItem.signaturePass}"/>
+          <h:inputHidden id="decisions" value="#{workItem.decisions}" />
+          <h:inputHidden id="bulkDecision" value="#{workItem.bulkDecision}" />
+
+          <ui:include src="summaryFieldset.xhtml"/>
+          <ui:include src="commentsFieldset.xhtml"/>
+
+          <div id="unsavedChangesDiv" class="certificationIdentityChanged" style="width:100%;display:none">
+              <h:graphicImage alt="" url="/images/icons/dialogue_error_16.png"
+                style="vertical-align:middle; padding:0px 3px 2px 0px;"/>
+              #{msgs.workitem_unsaved_item}
+          </div>
+          <div id="finishAllItemsDiv" class="certificationIdentityChanged" style="width:100%;display:none">
+              <h:graphicImage alt="" url="/images/icons/dialogue_error_16.png"
+                style="vertical-align:middle; padding:0px 3px 2px 0px;"/>
+              #{msgs.arm_finish_all_items_before_complete}
+          </div>
+
+          <ui:fragment>
+            <ui:include src="lcmFileUploadView.xhtml">
+               <ui:param name="workitemId" value="#{workItem.object.id}" />
+            </ui:include>
+          </ui:fragment>
+
+          <ui:fragment rendered="#{workItem.attributes['policyViolations'] != null}">
+            <ui:include src="lcmApprovalViolations.xhtml">
+              <ui:param name="workitemId" value="#{workItem.objectId}" />
+            </ui:include>
+          </ui:fragment>
+
+          <!-- TODO: the header should be pushed into workflowDetails.xhtml -->
+          <div class="spTabledContent" style="margin:5px">
+            <table class="spTable" cellspacing="0">
+              <tr>
+                <th><h:outputText value="#{msgs.details}"/></th>
+              </tr>
+              <tr>
+                <td>
+                  <ui:include src="approvalItemsBulkDecisionInclude.xhtml">
+                    <ui:param name='title' value="#{workItem.attributes['approvalItemsTitle']}"/>
+                  </ui:include>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <br/>
+        <div class="buttonRow">
+          <h:commandButton style="display: none" id="completeBtn" action="#{workItem.complete}" onclick="SailPoint.workitem.ApprovalItemGrid.persistDecisions( '#{workItem.object.id}', SailPoint.DecisionTracker, SailPoint.BulkDecision.decision ); return true;"/>
+
+          <ui:fragment rendered="#{workItem.editable}">
+
+            <h:commandButton onclick="checkDisableClick('editForm:completeBtn', true); return false;"
+                             value="#{msgs.button_complete}"
+                             id="completeStub"
+                             title="#{msgs.button_title_click_when_finished}"
+                             styleClass="primaryBtn"/>
+
+            <h:commandButton style="display: none" id="saveBtn" action ="#{workItem.save}" onclick="SailPoint.workitem.ApprovalItemGrid.persistDecisions( '#{workItem.object.id}', SailPoint.DecisionTracker, SailPoint.BulkDecision.decision ); return true;" type="submit"/>
+
+            <h:commandButton onclick="checkDisableClick('editForm:saveBtn');"
+                             type="button"
+                             value="#{msgs.button_save}"
+                             title="#{msgs.button_title_click_to_save_work_item}"
+                             id="saveStub"
+                             styleClass="primaryBtn"/>
+
+            <h:commandButton onclick="forwardWorkItem('#{workItem.object.id}', null, SailPoint.NAV_PAGE_HOME, false, SailPoint.getWorkItemPriority()); return false;"
+                             value="#{msgs.button_forward}"
+                             title="#{msgs.button_title_click_to_forward}"
+                             styleClass="primaryBtn"/>
+
+          </ui:fragment>
+          <ui:fragment rendered="#{!workItem.editable}">
+            <h:commandButton action="#{workItem.save}"
+                             value="#{msgs.button_save}"
+                             title="#{msgs.button_title_click_to_save_work_item}"
+                             styleClass="primaryBtn"/>
+          </ui:fragment>
+          <h:commandButton action="#{workItem.cancel}" 
+                           immediate="true" 
+                           value="#{msgs.button_cancel}" 
+                           styleClass="secondaryBtn"/>
+        </div>
+
+      </h:form>
+    </f:view>
+  </ui:define>
+</ui:composition>
+
+</body>
+</html>

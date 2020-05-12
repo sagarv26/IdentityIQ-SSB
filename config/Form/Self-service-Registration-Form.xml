@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Self-service Registration Form" type="RegisterIdentity">
+  <Attributes>
+    <Map>
+      <entry key="pageTitle" value="new_user_registration_title"/>
+      <entry key="subtitle" value="new_user_registration_description"/>
+    </Map>
+  </Attributes>
+  <Description>This form is used to for self-service registration.</Description>
+  <Section>
+    <Field displayName="user_name" name="name" required="true" type="string">
+      <ValidationRule>
+        <Reference class="sailpoint.object.Rule" name="LCM Validate Identity Name"/>
+      </ValidationRule>
+    </Field>
+    <Field displayName="first_name" name="firstname" required="true" type="string"/>
+    <Field displayName="last_name" name="lastname" required="true" type="string"/>
+    <Field displayName="email" name="email" required="true" type="string">
+      <Attributes>
+        <Map>
+          <entry key="vtype" value="email"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="label_password" name="password" required="true" type="secret">
+      <ValidationRule>
+        <Reference class="sailpoint.object.Rule" name="LCM Validate Password"/>
+      </ValidationRule>
+    </Field>
+    <Field displayName="label_confirm_password" name="confirmPassword" required="true" type="secret">
+      <ValidationScript>
+        <Source>
+            
+            import java.util.*;
+            import sailpoint.web.messages.MessageKeys;
+            import sailpoint.tools.Message;
+  
+            List errors = null;
+            String pw = $(password);
+            String cPw = $(confirmPassword);
+            if( (pw == null &amp;&amp; cPw != null) || (pw != null &amp;&amp; cPw == null) || (pw != null &amp;&amp; !pw.equals(cPw))) {
+                errors = new ArrayList();
+                Message msg = new Message();
+                msg.setKey(MessageKeys.ERROR_IDENTITY_CONFIRM_PASS_MISMATCH);
+                errors.add(msg);
+            }
+  
+            return errors;
+            
+          </Source>
+      </ValidationScript>
+    </Field>
+  </Section>
+  <Button action="next" label="register"/>
+  <Button action="cancel" label="nav_cancel"/>
+</Form>
+</sailpoint>

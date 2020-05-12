@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+	<TaskDefinition executor="sailpoint.tools.task.RuleRunnerTask"
+		name="SP Rule Runner Task" progressInterval="5000" progressMode="String"
+		resultAction="Rename" template="true" type="Generic">
+		<Description>
+			Rule Runner - Runs a rule defined below. This can be scheduled to run
+			rules at certain predefined intervals.
+		</Description>
+		<Signature>
+			<Inputs>
+				<Argument name="ruleID" type="Rule">
+					<Prompt>Rule to execute: </Prompt>
+				</Argument>
+			</Inputs>
+			<Returns>
+				<Argument name="success" type="boolean">
+					<Prompt>Success: </Prompt>
+				</Argument>
+				<Argument name="messages" type="string">
+					<Prompt>Messages from rule: </Prompt>
+				</Argument>
+			</Returns>
+		</Signature>
+	</TaskDefinition>
+</sailpoint>

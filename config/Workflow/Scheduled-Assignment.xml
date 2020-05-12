@@ -1,0 +1,221 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow libraries="Identity" name="Scheduled Assignment" resultExpiration="-1" type="ScheduledAssignment">
+  <Variable input="true" name="identity">
+    <Description>The database id of the target identity</Description>
+  </Variable>
+  <Variable input="true" name="identityName">
+    <Description>The name of the target identity</Description>
+  </Variable>
+  <Variable input="true" name="assigner">
+    <Description>The name of the identity considered to be the source of the assignment.
+This is used for the audit event.  It is not necessary to make the assignment
+becuase the original assigner will also be stored in RoleAssignment metadata
+in the cube.</Description>
+  </Variable>
+  <Variable editable="true" initializer="script:System.getProperty(&quot;iiq.forceRefreshAfterScheduledRoleChange&quot;)" name="doRefresh">
+    <Description>Set to true to cause a cube refresh after the assignment</Description>
+  </Variable>
+  <Variable input="true" name="eventType">
+    <Description>The type of assignment.  This will be one of the constants defined in RoleEventGenerator.</Description>
+  </Variable>
+  <Variable input="true" name="role">
+    <Description>The database id of the role to assign, if this is a role event</Description>
+  </Variable>
+  <Variable input="true" name="roleName">
+    <Description>The name of the role to assign, if this is a role event</Description>
+  </Variable>
+  <Variable input="true" name="assignmentId">
+    <Description>The unique id of the RoleAssignment, if this is a role event</Description>
+  </Variable>
+  <Variable input="true" name="application">
+    <Description>The database id of an application, if this is an entitlement event</Description>
+  </Variable>
+  <Variable input="true" name="applicationName">
+    <Description>The name of an application, if this is an entitlement event</Description>
+  </Variable>
+  <Variable input="true" name="instance">
+    <Description>The name of an application instance, if this is an entitlement event</Description>
+  </Variable>
+  <Variable input="true" name="nativeIdentity">
+    <Description>The specific id of the target account in the application, if this is an entitlement event</Description>
+  </Variable>
+  <Variable input="true" name="name">
+    <Description>The name of an attribute in the account schema, if this is an entitlement event</Description>
+  </Variable>
+  <Variable input="true" name="value">
+    <Description>The value of the account attribute, if this is an entitlement event</Description>
+  </Variable>
+  <Variable initializer="false" input="true" name="enableRetryRequest">
+    <Description>
+      When set to true it will disable the workflow retry loop and let the
+      Provision step launch requests to handle the retries.  Enabling
+      this flag will enable some older functionality.
+    </Description>
+  </Variable>
+  <Variable initializer="true" input="true" name="enableManualAccountSelection">
+    <Description>When set to &amp;#39;true&amp;#39; the system will send out Account Selection Notification emails 
+    for users with more than one account on any one application and the system 
+    can&amp;#39;t determine the provisioning account.
+    This may be passed in from the refresh task arguments.</Description>
+  </Variable>
+  <Variable name="project">
+    <Description>ProvisioningProject compiled from the Request</Description>
+  </Variable>
+  <Variable editable="true" initializer="false" input="true" name="doManualActions">
+    <Description>When set to &amp;#39;true&amp;#39; the unmanged plan from the provisioning project
+      will be converted into one or more manual action work items to request
+      the changes since they can&amp;#39;t be done automatically.
+      This may be passed in from the refresh task arguments.</Description>
+  </Variable>
+  <Variable initializer="false" name="identityHasOutstandingForms"/>
+  <Description>
+Workflow called to handle a scheduled assignment and deassignments,
+commonly known as "sunrise" and "sunset".  These are intended to
+be used only from Request objects that are scheduled by the provisioning
+plan evaluator.
+  </Description>
+  <Step icon="Start" name="start" posX="28" posY="10">
+    <Transition to="Compile Assignment Project"/>
+  </Step>
+  <Step action="call:compileScheduledAssignmentProject" icon="Task" name="Compile Assignment Project" posX="161" posY="10" resultVariable="project">
+    <Arg name="identity" value="ref:identity"/>
+    <Arg name="application" value="ref:application"/>
+    <Arg name="nativeIdentity" value="ref:nativeIdentity"/>
+    <Arg name="name" value="ref:name"/>
+    <Arg name="value" value="ref:value"/>
+    <Arg name="role" value="ref:role"/>
+    <Arg name="assigner" value="ref:assigner"/>
+    <Arg name="eventType" value="ref:eventType"/>
+    <Arg name="instance" value="ref:instance"/>
+    <Arg name="assignmentId" value="ref:assignmentId"/>
+    <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+    <Arg name="disableRetryRequest" value="!ref:enableRetryRequest"/>
+    <Arg name="enableManualAccountSelection" value="ref:enableManualAccountSelection"/>
+    <Transition to="Inspect Project"/>
+  </Step>
+  <Step name="Inspect Project" posX="336" posY="10">
+    <Script>
+      <Source>
+        // hooks for project customization before execution
+      </Source>
+    </Script>
+    <Transition to="Check For Outstanding Forms" when="!ref:identityHasOutstandingForms"/>
+    <Transition to="Do Provisioning Forms"/>
+  </Step>
+  <Step action="call:outstandingProvisioningFormsForIdentity" name="Check For Outstanding Forms" resultVariable="identityHasOutstandingForms">
+    <Arg name="identity" value="ref:identity"/>
+    <Arg name="project" value="ref:project"/>
+    <Transition to="Recompile" when="ref:identityHasOutstandingForms"/>
+    <Transition to="Do Provisioning Forms"/>
+  </Step>
+  <Step action="call:compileScheduledAssignmentProject" icon="Task" name="Recompile" resultVariable="project" wait="script:new Integer(5);">
+    <Arg name="identity" value="ref:identity"/>
+    <Arg name="application" value="ref:application"/>
+    <Arg name="nativeIdentity" value="ref:nativeIdentity"/>
+    <Arg name="name" value="ref:name"/>
+    <Arg name="value" value="ref:value"/>
+    <Arg name="role" value="ref:role"/>
+    <Arg name="assigner" value="ref:assigner"/>
+    <Arg name="eventType" value="ref:eventType"/>
+    <Arg name="instance" value="ref:instance"/>
+    <Arg name="assignmentId" value="ref:assignmentId"/>
+    <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+    <Arg name="disableRetryRequest" value="!ref:enableRetryRequest"/>
+    <Arg name="enableManualAccountSelection" value="ref:enableManualAccountSelection"/>
+    <ConditionScript>
+      <Source>identityHasOutstandingForms</Source>
+    </ConditionScript>
+    <Transition to="Inspect Project"/>
+  </Step>
+  <Step name="Do Provisioning Forms" posX="486" posY="10">
+    <Arg name="preferredOwner"/>
+    <Arg name="workItemComments"/>
+    <Arg name="requiredOwner"/>
+    <Arg name="fallbackOwner" value="spadmin"/>
+    <Arg name="accountSelectionOwner" value="applicationOwner"/>
+    <Arg name="formOwnerError"/>
+    <Arg name="identityDisplayName"/>
+    <Arg name="formTemplate" value="Identity Refresh"/>
+    <Arg name="disableManualAccountSelection" value="script:!isTrue(enableManualAccountSelection)"/>
+    <Arg name="calculatedAccountSelectionOwner"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="workItemForm"/>
+    <Arg name="priority"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="accountSelectionForm"/>
+    <ConditionScript>
+      <Source>project != null &amp;&amp; (project.hasQuestions() || (isTrue(enableManualAccountSelection) &amp;&amp; (project.hasUnansweredAccountSelections() ||  project.hasUnansweredProvisioningTargets())))</Source>
+    </ConditionScript>
+    <Description>
+      Call the standard subprocess for assembling, presenting, and assimilating
+      provisioning forms.
+    </Description>
+    <Return name="project" to="project"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Do Provisioning Forms"/>
+    </WorkflowRef>
+    <Transition to="Process Project Pre-Actions"/>
+  </Step>
+  <Step action="call:processProject" name="Process Project Pre-Actions">
+    <Arg name="identity" value="ref:identity"/>
+    <Arg name="project" value="ref:project"/>
+    <Transition to="Provision"/>
+  </Step>
+  <Step icon="Task" name="Provision" posX="633" posY="9">
+    <Arg name="disableIdentityRequests" value="true"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="maxRetries"/>
+    <Arg name="provisioningRetryThreshold"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="identityRequestId"/>
+    <Arg name="retryProject"/>
+    <Arg name="retries"/>
+    <Arg name="enableRetryRequest"/>
+    <Arg name="foregroundProvisioning" value="true"/>
+    <Description>
+      Execute the scheduled assignment project.
+      We call the standard subprocess that handles retries.
+      Note that the disableIdentityRequests option is passed
+      to prevent logging a warning since this workflow does
+      not maintain IdentityRequest objects.
+    </Description>
+    <Return name="project" to="project"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Provision with retries"/>
+    </WorkflowRef>
+    <Transition to="Refresh Identity"/>
+  </Step>
+  <Step action="call:refreshIdentity" condition="script:isTrue(doRefresh)" icon="Task" name="Refresh Identity" posX="786" posY="10">
+    <Arg name="identity" value="ref:identity"/>
+    <Arg name="doManualActions" value="false"/>
+    <Arg name="correlateEntitlements" value="true"/>
+    <Arg name="provision" value="true"/>
+    <Description>
+Add arguments as necessary to enable refresh features.  Provisioning is usually done
+with an option to the Activate Assignment step.  Here you might want to check
+policies or refresh the scorecard.  Correlating entitlements might pick up new
+detected roles if the provisioning was done synchronously.
+    </Description>
+    <Transition to="Manual Actions"/>
+  </Step>
+  <Step condition="script:project.getUnmanagedPlan() != null" name="Manual Actions" posX="944" posY="10">
+    <Arg name="project" value="ref:project"/>
+    <Arg name="doAudit"/>
+    <Arg name="priority"/>
+    <Arg name="identityDisplayName"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="fallbackApprover"/>
+    <Description>
+      Present work items for the parts of the project that could not be sent
+      to an integrated IDM system.
+    </Description>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Do Manual Actions"/>
+    </WorkflowRef>
+    <Transition to="end"/>
+  </Step>
+  <Step icon="Stop" name="end" posX="1086" posY="10"/>
+</Workflow>
+</sailpoint>

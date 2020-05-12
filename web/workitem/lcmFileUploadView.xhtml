@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC
+                "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!-- (c) Copyright 2008 SailPoint Technologies, Inc., All Rights Reserved. -->
+
+<html 
+  xmlns="http://www.w3.org/1999/xhtml" 
+  xmlns:sp="http://sailpoint.com/ui"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:c="http://java.sun.com/jstl/core" 
+  xmlns:f="http://java.sun.com/jsf/core" 
+  xmlns:h="http://java.sun.com/jsf/html">
+<body>
+<ui:composition>
+<ui:define name="title">#{msgs.lcm_workitem_renderer_title}</ui:define>
+
+  <ui:define name="headerItems">
+    <sp:style serveOffset="#{base.requestContextPath}/css/sailpoint/component">
+      <src>image-radio.css</src>
+    </sp:style>
+    <sp:script>
+      <src>#{base.requestContextPath}/scripts/sailpoint/workItem.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/web/workitem/lcmWorkItem.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/Suggest.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/web/workitem/lcmWorkItem.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/Suggest.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/grid/PagingGrid.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/grid/PropertyGrid.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/component/IdentityDetailPopup.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/component/ImageRadio.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/misc.js?#{debug.revision}</src>
+      <src>#{base.requestContextPath}/scripts/sailpoint/component/ElectronicSignaturePopup.js?#{debug.revision}</src>
+    </sp:script>
+  </ui:define>
+  <!-- We show a simpler view for file  Upload-->
+      <ui:fragment>
+          <div class="spTabledContent" style="margin:5px">
+            <table class="spTable" cellspacing="0">
+              <tr>
+                <th><h:outputText value="File attachments"/></th>
+              </tr>
+              <tr>
+                <td>
+                 <div id="file-upload-div-form"></div>
+                 <div id="file-upload-div-grid"></div>
+                </td>
+              </tr>
+            </table>
+          </div>
+      </ui:fragment>
+</ui:composition>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.EntitlementRoleGenerator" name="Entitlement Role Generator" subType="task_item_type_generic" template="true" type="Generic">
+  <Description>
+        Automatically creates an Entitlement Role for every entitlement found in the specified application(s)
+      </Description>
+  <Signature>
+    <Inputs>
+      <Argument multi="true" name="applications" required="true" type="Application"/>
+      <Argument name="roleType" type="string">
+        <Prompt>entitlement_role_generator_role_type</Prompt>
+      </Argument>
+      <Argument name="locale" type="string">
+        <Prompt>task_in_missing_managed_entitlements_scan_locale</Prompt>
+      </Argument>
+      <Argument name="attributeFilter" type="string">
+        <Prompt>entitlement_role_generator_role_attribute_filter</Prompt>
+      </Argument>
+      <Argument name="permissionsFilter" type="string">
+        <Prompt>entitlement_role_generator_role_permissions_filter</Prompt>
+      </Argument>
+      <Argument name="roleNamingTemplate" type="string">
+        <Prompt>entitlement_role_generator_role_naming_template</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="numRolesGenerated" type="string">
+        <Prompt>entitlement_role_generator_num_roles_generated</Prompt>
+      </Argument>
+      <Argument name="numEntitlementsFound" type="string">
+        <Prompt>entitlement_role_generator_num_entitlements_detected</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

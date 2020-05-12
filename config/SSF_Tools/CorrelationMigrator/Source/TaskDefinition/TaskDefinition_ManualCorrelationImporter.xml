@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition executor="sailpoint.services.standard.task.ManualCorrelationImporter" name="Manual Correlation Importer" progressInterval="5000" progressMode="String" resultAction="Delete" subType="task_item_type_generic" template="true" type="Generic">
+  <Description>Import manual correlations</Description>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="Full path of the CSV file where the correlation data will be imported from" name="importFile" required="true" type="string">
+        <Prompt>Import file</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="totalImported" type="string">
+        <Prompt>Accounts correlated</Prompt>
+      </Argument>
+      <Argument name="alreadyCorrelated" type="string">
+        <Prompt>Accounts already correlated</Prompt>
+      </Argument>
+      <Argument name="accountsNotFound" type="string">
+        <Prompt>Accounts not found</Prompt>
+      </Argument>
+      <Argument name="identitiesNotFound" type="string">
+        <Prompt>Identities not found</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>

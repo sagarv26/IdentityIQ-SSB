@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Template_Row">
+  <Description>After the row has been transfored, this rule will execute on with the transformed row attrbutes map</Description>
+  <Signature returnType="void">
+  	<Inputs>
+    <Argument name="log" type="org.apache.log4j.Logger">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context" type="sailpoint.api.SailPointContext">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="taskResult" type="sailpoint.object.TaskResult">
+        <Description>
+         	The current task's result object
+        </Description>
+      </Argument>
+      <Argument name="taskAttributes" type="sailpoint.object.Attributes">
+        <Description>
+          The list of task Attributes from the ask Definition
+        </Description>
+      </Argument>
+      <Argument name="row" type="sailpoint.object.Attributes">
+        <Description>
+         The row of data processed after being transformed.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source><![CDATA[
+  	import sailpoint.services.standard.task.genericImport.Transmogrifier;
+  	
+	// IIQDA hints.
+  	// Expect: sailpoint.object.Attributes row
+  	// Expect: sailpoint.object.Attributes taskAttributes
+  	// Expect: sailpoint.object.TaskResult taskResult
+ 	
+  	
+  	// Do anything here to complete the row transaction
+	
+	]]></Source>
+</Rule>

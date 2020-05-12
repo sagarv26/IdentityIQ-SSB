@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.DirectMiningTask" hidden="true" name="IT Role Mining" subType="task_item_type_role_mining" type="RoleMining">
+  <Description>
+      IT Role Mining based on a Group Definition, List of applications and threshold.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="roleName" type="Bundle">
+        <Prompt>Business Role to Mine.  Select if you want an existing Business Role to be mined</Prompt>
+      </Argument>
+      <Argument name="newRoleName" type="string">
+        <Prompt>New Business Role Name.  Enter if you want to create a new Business Role</Prompt>
+      </Argument>
+      <Argument name="defaultOwner" type="string">
+        <Prompt>Default Business Role Owner.  If creating new Business Role, enter default owner</Prompt>
+      </Argument>
+      <Argument name="containerRole" type="Bundle">
+        <Prompt>Place mined role into pre-existing Container Role.</Prompt>
+      </Argument>
+      <Argument name="groupName" type="GroupDefinition">
+        <Prompt>Optional User Population to Mine</Prompt>
+      </Argument>
+      <Argument name="filter" type="string">
+        <Prompt>Optional Filter to select Identities.  Example: department == "Finance"</Prompt>
+      </Argument>
+      <Argument multi="true" name="applications" required="true" type="Application">
+        <Prompt>Applications to Mine Entitlements From</Prompt>
+      </Argument>
+      <Argument name="threshold" required="true" type="int">
+        <Prompt>Entitlement Threshold Percentage (%)</Prompt>
+      </Argument>
+      <Argument name="simulate" type="boolean">
+        <Prompt>Simulate Mining Activity.  No Business Roles/Profiles will be created</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="filterUsed" type="String">
+        <Prompt>Filter Used to Mine:</Prompt>
+      </Argument>
+      <Argument name="numIdentitiesMined" type="String">
+        <Prompt>Total Identities Mined:</Prompt>
+      </Argument>
+      <Argument name="numCandidateEntitlements" type="String">
+        <Prompt>Candidate Entitlements:</Prompt>
+      </Argument>
+      <Argument name="numUsedEntitlements" type="String">
+        <Prompt>Used Entitlements:</Prompt>
+      </Argument>
+      <Argument name="threshold" type="String">
+        <Prompt>Threshold Percentage (%)</Prompt>
+      </Argument>
+      <Argument name="simulate" type="String">
+        <Prompt>Simulate Mining Activity:</Prompt>
+      </Argument>
+      <Argument name="taskResults" type="String">
+        <Prompt>Detailed Results:</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

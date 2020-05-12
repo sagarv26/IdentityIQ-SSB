@@ -1,0 +1,125 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.Housekeeper" name="System Maintenance" progressMode="String" resultAction="Delete" subType="task_item_type_system" template="true" type="System">
+  <Description>Prune identity snapshots, task results, and certifications. Perform other background maintenance tasks.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="help_task_prune_history" name="pruneHistory" type="boolean">
+        <Prompt>task_in_perform_maintenance_prune_history</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_prune_task_results" name="pruneTaskResults" type="boolean">
+        <Prompt>task_in_perform_maintenance_prune_task_results</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_prune_requests" name="pruneRequests" type="boolean">
+        <Prompt>task_in_perform_maintenance_prune_requests</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_prune_provisioning_transactions" name="pruneProvisioningTransactons" type="boolean">
+        <Prompt>task_in_perform_maintenance_prune_provisioning_transactions</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_prune_certs" name="pruneCertifications" type="boolean">
+        <Prompt>task_in_perform_maintenance_prune_certifications</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_autoclose_certs" name="automaticallyCloseCertifications" type="boolean">
+        <Prompt>task_in_perform_maintenance_automatically_close_certifications</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_finish_certs" name="finishCertifications" type="boolean">
+        <Prompt>task_in_perform_maintenance_finish_certifications</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_number_of_threads" name="finisherThreads" type="int">
+        <Prompt>task_in_perform_maintenance_certification_finisher_threads</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_phase_certs" name="phaseCertifications" type="boolean">
+        <Prompt>task_in_perform_maintenance_phase_certifications</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_scan_remediations" name="scanRemediations" type="boolean">
+        <Prompt>task_in_perform_maintenance_scan_remediations</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_transition_continuous_certs" name="transitionContinuousCertifications" type="boolean">
+        <Prompt>task_in_perform_maintenance_transition_cont_certs</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_forward_inactive_workitems" name="forwardInactiveWorkItems" type="boolean">
+        <Prompt>task_in_perform_maintenance_forward_inactive_work_items</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_denormalize_scopes" name="denormalizeScopes" type="boolean">
+        <Prompt>task_in_perform_maintenance_denormalize_scopes</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_prune_batch_requests" name="pruneBatchRequests" type="boolean">
+        <Prompt>task_in_perform_maintenance_prune_batch_requests</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_prune_syslog_events" name="pruneSyslogEvents" type="boolean">
+        <Prompt>task_in_perform_maintenance_prune_syslog_events</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_proces_workflow_events" name="processWorkflowEvents" type="boolean">
+        <Prompt>task_in_perform_maintenance_process_workflow_events</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_process_workflow_threads" name="workflowThreads" type="int">
+        <Prompt>task_in_perform_maintenance_workflow_threads</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_process_workflow_thread_timeout" name="workflowThreadTimeoutSeconds" type="int">
+        <Prompt>task_in_perform_maintenance_workflow_thread_timeout</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="historiesPruned" type="int">
+        <Prompt>task_out_perform_maintenance_histories_pruned</Prompt>
+      </Argument>
+      <Argument name="taskResultsPruned" type="int">
+        <Prompt>task_out_perform_maintenance_task_results_pruned</Prompt>
+      </Argument>
+      <Argument name="requestsPruned" type="int">
+        <Prompt>task_out_perform_maintenance_requests_pruned</Prompt>
+      </Argument>
+      <Argument name="syslogEventsPruned" type="int">
+        <Prompt>task_out_perform_maintenance_syslog_events_pruned</Prompt>
+      </Argument>
+      <Argument name="provisioningTransactionsPruned" type="int">
+        <Prompt>task_out_perform_maintenance_provisioning_transactions_pruned</Prompt>
+      </Argument>
+      <Argument name="certificationsArchived" type="int">
+        <Prompt>task_out_perform_maintenance_certifications_archived</Prompt>
+      </Argument>
+      <Argument name="certificationsPruned" type="int">
+        <Prompt>task_out_perform_maintenance_certifications_pruned</Prompt>
+      </Argument>
+      <Argument name="certificationsAutomaticallyClosed" type="int">
+        <Prompt>task_out_perform_maintenance_certifications_automatically_closed</Prompt>
+      </Argument>
+      <Argument name="certificationItemsAutomaticallyDecided" type="int">
+        <Prompt>task_out_perform_maintenance_certification_items_automatically_decided</Prompt>
+      </Argument>
+      <Argument name="certificationsFinished" type="int">
+        <Prompt>task_out_perform_maintenance_certifications_finished</Prompt>
+      </Argument>
+      <Argument name="certificationsFinishFailures" type="int">
+        <Prompt>task_out_perform_maintenance_certification_finish_failures</Prompt>
+      </Argument>
+      <Argument name="certificationsPhased" type="int">
+        <Prompt>task_out_perform_maintenance_certifications_phased</Prompt>
+      </Argument>
+      <Argument name="remediationsScanned" type="int">
+        <Prompt>task_out_perform_maintenance_remediations_scanned</Prompt>
+      </Argument>
+      <Argument name="continuousCertsProcessed" type="int">
+        <Prompt>task_out_perform_maintenance_cont_certs_processed</Prompt>
+      </Argument>
+      <Argument name="itemsTransitionedToCertificationRequired" type="int">
+        <Prompt>task_out_perform_maintenance_items_to_cert_required</Prompt>
+      </Argument>
+      <Argument name="itemsTransitionedToCertificationOverdue" type="int">
+        <Prompt>task_out_perform_maintenance_items_to_overdue</Prompt>
+      </Argument>
+      <Argument name="inactiveWorkItemsForwarded" type="int">
+        <Prompt>task_out_perform_maintenance_inactive_work_items_forwarded</Prompt>
+      </Argument>
+      <Argument name="scopesDenormalized" type="int">
+        <Prompt>task_out_perform_maintenance_scopes_denormalized</Prompt>
+      </Argument>
+      <Argument name="emailsSuppressed" type="String">
+        <Prompt>task_out_emails_suppressed</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

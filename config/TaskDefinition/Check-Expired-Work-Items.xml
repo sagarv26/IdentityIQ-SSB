@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.WorkItemExpirationScanner" name="Check Expired Work Items" subType="task_item_type_system" type="System">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="623"/>
+      <entry key="TaskDefinition.runLengthTotal" value="273184"/>
+      <entry key="TaskDefinition.runs" value="438"/>
+    </Map>
+  </Attributes>
+  <Description>Send reminders, escalate, or expire items.</Description>
+  <Signature>
+    <Returns>
+      <Argument name="total" type="int">
+        <Prompt>task_out_check_expired_work_items_total</Prompt>
+      </Argument>
+      <Argument name="totalWorkItems" type="int">
+        <Prompt>task_out_check_expired_work_items_work_items_total</Prompt>
+      </Argument>
+      <Argument name="totalCertItems" type="int">
+        <Prompt>task_out_check_expired_work_items_cert_items_total</Prompt>
+      </Argument>
+      <Argument name="expirations" type="int">
+        <Prompt>task_out_check_expired_work_items_expirations</Prompt>
+      </Argument>
+      <Argument name="reminders" type="int">
+        <Prompt>task_out_check_expired_work_items_reminders</Prompt>
+      </Argument>
+      <Argument name="escalations" type="int">
+        <Prompt>task_out_check_expired_work_items_escalations</Prompt>
+      </Argument>
+      <Argument name="pushes" type="int">
+        <Prompt>task_out_check_expired_work_items_pushes</Prompt>
+      </Argument>
+      <Argument name="emailsSuppressed" type="String">
+        <Prompt>task_out_emails_suppressed</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell"  
+          name="BSMT LockingTest PerItem Rule"       
+          type="BuildMap" >
+  <Description>PerItem Rule</Description>  
+  <Source><![CDATA[
+// Library inclusions for BeanShell.
+import java.lang.*;
+import sailpoint.api.*;
+import sailpoint.object.*;
+
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
+Logger log = Logger.getLogger("sailpoint.services.BeanShellMultiThreading.PerItem");
+log.setLevel((Level) Level.DEBUG);  // TODO: Remove this in production rules.
+
+// Sanity checking to make sure we were passed a valid workItem String.
+if ((void == workItem) || (null == workItem)) {
+   log.error("Received a null or void workItem string.");
+   return;
+}
+if ( !(workItem instanceof String) ) {
+   log.error("Received a workItem that is not a String.");
+   return;
+} 
+
+// Sanity checking to make sure we were passed a valid shared state.
+if ((void == sharedThreadState) || (null == sharedThreadState)) {
+   log.error("Received a null or void sharedThreadState.");
+   return;
+}
+if ( !(sharedThreadState instanceof ConcurrentHashMap) ) {
+   log.error("Received a sharedThreadState that is not a ConcurrentHashMap.");
+   return;
+} 
+
+// Add your logic here!
+// log.debug("Inside Per-Item Rule");
+String customObjName = (String) sharedThreadState.get("customName");
+
+// See if there is already a custom object, and lock it if there is.
+Custom customConfigParms = (Custom) ObjectUtil.lockObject(
+     context,              // SailPointContext              
+     Custom.class,         // Object Class - Custom.class in our case
+     null,                 // The object ID in String form
+     customObjName,        // The object Name in String form
+     // The type of lock we want - either persistent or transaction.
+     // Let's experiment with both for fun, first with PERSISTENT.
+     // PersistenceManager.LOCK_TYPE_PERSISTENT
+     PersistenceManager.LOCK_TYPE_TRANSACTION   
+);
+
+// log.debug("customConfigParms TRANSACTION locked, loaded.");
+
+String number = customConfigParms.get("nextUniqueId");
+log.debug(workItem + " Current Number is: " + 
+          (null==number ? "none generated yet => Initializing..." : number)
+          );
+if(null==number) { /* Initializing Counter */
+   customConfigParms.put("nextUniqueId", "1");
+}
+
+// Increment it, put it back and save it
+number = "" + (1 + Integer.parseInt(number));
+	
+customConfigParms.put("nextUniqueId", number);
+context.saveObject(customConfigParms);
+context.commitTransaction();
+
+// context.unlockObject(customConfigParms);
+	
+log.debug(workItem + " updated, nextUniqueId is: " + number);
+
+return;
+]]>
+  </Source>
+</Rule>
+</sailpoint> 

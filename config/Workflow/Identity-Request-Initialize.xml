@@ -1,0 +1,326 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow libraries="Identity,IdentityRequest" name="Identity Request Initialize" type="Subprocess">
+  <Variable input="true" name="identityName" required="true">
+    <Description>
+      The name of the identity object being modified.
+    </Description>
+  </Variable>
+  <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>
+      The displayName of the identity being updated.
+      This may be passed in, if not the script queries for this
+      using a projection query and falls back to the name.
+    </Description>
+  </Variable>
+  <Variable initializer="false" input="true" name="endOnManualWorkItems">
+    <Description>Option to skip requests with manual work items.</Description>
+  </Variable>
+  <Variable initializer="false" input="true" name="endOnProvisioningForms">
+    <Description>Option to skip requests with provisioning forms.</Description>
+  </Variable>
+  <Variable input="true" name="flow">
+    <Description>
+      The name of the LCM flow that launched this workflow.
+
+      This is one of these values:
+
+      AccountsRequest
+      EntitlementsRequest
+      RolesRequest
+      IdentityCreateRequest
+      IdentityEditRequest
+      ForgotPassword
+      ExpiredPassword
+      PasswordRequest
+
+    </Description>
+  </Variable>
+  <Variable input="true" name="plan" required="true">
+    <Description>The provisioning plan ready to execute.</Description>
+  </Variable>
+  <Variable input="true" name="optimisticProvisioning" required="true">
+    <Description>
+      Set to true to enable optimistic provisioning.  This will cause
+      changes to the entitlements compiled from role assignments to be
+      applied immediately to the identity cube rather than waiting
+      for the next refresh/reaggregation after the provisioning system
+      completes the request.
+    </Description>
+  </Variable>
+  <Variable input="true" name="asyncCacheRefresh">
+    <Description>
+      Set to true to enable asynchronous refresh of the policy and role
+      caches.  This speeds up response time for the LCM user, but you
+      may want to disable this during demonstrations after editing
+      the role or policy models.  This may also be enabled globally
+      in the system configuration.  This variable overrides the
+      system configuration if it has a value.
+    </Description>
+  </Variable>
+  <Variable input="true" name="policiesToCheck">
+    <Description>
+      A List of policies that should be checked. If this list is
+      empty all violations will be checked. Used in combination
+      with policyScheme.
+    </Description>
+  </Variable>
+  <Variable input="true" name="allowRequestsWithViolations">
+    <Description>
+      If this variable is set to true, requesters will be able to proceed past
+      the Policy Violation Review form without taking any action on
+      policy violations resulting from the request.
+    </Description>
+  </Variable>
+  <Variable input="true" name="requireViolationReviewComments">
+    <Description>
+      If true, requesters will be required to enter in comments if they
+      proceed with a request that will result in policy violations.
+     </Description>
+  </Variable>
+  <Variable initializer="Identity Update" input="true" name="formTemplate">
+    <Description>
+      Template used when processing provisioning forms.
+    </Description>
+  </Variable>
+  <Variable initializer="false" name="trace">
+    <Description>
+      Used for debugging this subprocess and when set to true trace
+      statements will be sent to stdout.
+    </Description>
+  </Variable>
+  <Variable initializer="continue" input="true" name="policyScheme">
+    <Description>
+      A String that specifies how policy checks effect the overall
+      process.
+
+      none - disabled policy checking
+
+      interactive -  allow requester to remove request items which are causing violations
+
+      continue -  continue if policy violations are found
+
+      fail -  fail and exit the workflow if any policy violations are found
+
+    </Description>
+  </Variable>
+  <Variable initializer="LCM" input="true" name="source">
+    <Description>
+      String version of sailpoint.object.Source to indicate
+      where the request originated.  Defaults to LCM.
+    </Description>
+  </Variable>
+  <Variable input="true" name="priority">
+    <Description>
+      String version of WorkItem.level that will be used
+      to set the priority any generated workitems. It will
+      also configure the priority of the request as
+      on the generated Access Request.
+    </Description>
+  </Variable>
+  <Variable initializer="false" input="true" name="enableRetryRequest">
+    <Description>
+      When set to true it will disable the workflow retry loop and let the
+      Provision step launch requests to handle the retries.  Enabling
+      this flag will enable some older functionality.
+    </Description>
+  </Variable>
+  <Variable name="project" output="true">
+    <Description>
+      A ProvisioningProject object describing the modifications to the identity.
+      This may include a list of Question objects which will
+      cause the generation of a Form and a WorkItem to solicit
+      additional information necessary for provisioning.
+    </Description>
+  </Variable>
+  <Variable name="policyViolations" output="true">
+    <Description>
+       List of policy violations that were found during our initial policy scan.
+       This list is passed into each work item so the approvers can see
+       pending violations.
+    </Description>
+  </Variable>
+  <Variable name="approvalSet" output="true">
+    <Description>
+       This attribute is set during the "Build Approval Set" step,
+       which builds this list by going through the ProvisioningPlan
+       to build the line items that need to be approved.
+
+       This variable includes all ApprovalItems that are part of
+       the request process and is updated during the AfterScript
+       of the approval process by assimilating the decisions
+       and comments from the Approvals copy of the ApprovalItem.
+    </Description>
+  </Variable>
+  <Variable name="identityRequest">
+    <Description>
+       The request object we get back from the create call. This is
+       primarily useful for debugging.
+    </Description>
+  </Variable>
+  <Variable name="identityRequestId">
+    <Description>
+        The id of the IdentityRequest created.
+    </Description>
+  </Variable>
+  <Variable name="violationReviewDecision" output="true">
+    <Description>
+     Decision made by the user in the Policy Violation Review step.
+     This may be one of three choices:
+
+     -ignore:   User is ignoring the violations and letting the request continue. If
+                 requireViolationReviewComments=true the user will be required to enter
+                 comments indicating why they are allowing the violations.
+
+     -remediate: Indicates that the user removed the request items that were causing the
+                 violations
+
+     -cancel:   Indicates that the user decided to abandon the request, terminating the workflow.
+
+    </Description>
+  </Variable>
+  <Variable name="workItemComments">
+    <Description>
+      Global comments accumulated during the workflow which should be shared
+      with other approvals. When a new approval is created, the comments in this
+      list will be added to the work item.
+    </Description>
+  </Variable>
+  <Description>
+      This workflow subprocess is used to initialize the various
+      object necessary when executing workflows that deal
+      with provisioning.
+
+      This subprocess was added in 5.5 in an effort to
+      break groups of related steps into a single call
+      from the top level workflow.
+
+      It now encapsulates the following services:
+
+        - Compliation of the plan into a project
+        - Build an approval set
+           defaults to using buildApprovalSet but allows it to be passed in
+        - Audit Start
+        - Create the IdentityRequest object for the request tracking
+        - Check policies
+        - Build required forms for the launcher
+
+  </Description>
+  <Step icon="Start" name="Start" posX="25" posY="15">
+    <Transition to="Compile Project"/>
+  </Step>
+  <Step action="call:compileProvisioningProject" icon="Task" name="Compile Project" posX="121" posY="15" resultVariable="project">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="requester" value="ref:launcher"/>
+    <Arg name="source" value="ref:source"/>
+    <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+    <Arg name="disableRetryRequest" value="!ref:enableRetryRequest"/>
+    <Arg name="noApplicationTemplates">
+      <Script>
+        <Source>
+            boolean ignoreForms = false;
+            if ("ForgotPassword".equals(flow) || "ExpirePassword".equals(flow)) {
+               ignoreForms = true;
+            }
+            return ignoreForms;
+        </Source>
+      </Script>
+    </Arg>
+    <Arg name="noLocking">
+      <Script>
+        <Source>
+            boolean noLocking = false;
+            if ("Lifecycle".equals(flow)) {
+               noLocking = true;
+            }
+            return noLocking;
+        </Source>
+      </Script>
+    </Arg>
+    <Description>Compile the provisioning plan into a provisioning project.
+      If you need to pass in provisioner options like "noFiltering"
+      or "noRoleDeprovisioning" you must pass them as explicit
+      arguments to the call.
+
+      The evaluation options "requester" and "source" are commonly
+      set here.
+
+      You can also pass things into the Template and Field scripts by
+      defining Args in this step.</Description>
+    <Transition to="end" when="script:(isTrue(endOnManualWorkItems) &amp;&amp; (project.getUnmanagedPlan() != null))"/>
+    <Transition to="end" when="script:(isTrue(endOnProvisioningForms) &amp;&amp; (project.hasQuestions()))"/>
+    <Transition to="Build Approval Set" when="script:isNull(approvalSet)"/>
+    <Transition to="Rebuild Approval Set"/>
+  </Step>
+  <Step action="call:buildApprovalSet" condition="script:isNull(approvalSet)" name="Build Approval Set" posX="260" posY="92" resultVariable="approvalSet">
+    <Arg name="plan" value="ref:plan"/>
+    <Return name="approvalSet" to="approvalSet"/>
+    <Transition to="Check Policies"/>
+  </Step>
+  <Step condition="script:(!policyScheme.equals(&quot;none&quot;))" name="Check Policies" posX="391" posY="92">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Arg name="policyScheme" value="ref:policyScheme"/>
+    <Arg name="policiesToCheck" value="ref:policiesToCheck"/>
+    <Arg name="asyncCacheRefresh" value="ref:asyncCacheRefresh"/>
+    <Arg name="priority" value="ref:priority"/>
+    <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+    <Arg name="flow" value="ref:flow"/>
+    <Arg name="requireViolationReviewComments" value="ref:requireViolationReviewComments"/>
+    <Arg name="allowRequestsWithViolations" value="ref:allowRequestsWithViolations"/>
+    <Return name="policyViolations" to="policyViolations"/>
+    <Return name="project" to="project"/>
+    <Return name="plan" to="plan"/>
+    <Return name="violationReviewDecision" to="violationReviewDecision"/>
+    <Return merge="true" name="workItemComments" to="workItemComments"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Identity Request Violation Review"/>
+    </WorkflowRef>
+    <Transition to="end" when="script:(&quot;cancel&quot;.equals(violationReviewDecision))"/>
+    <Transition to="end" when="script:((policyScheme.equals(&quot;fail&quot;) &amp;&amp; (size(policyViolations) > 0 )  ))"/>
+    <Transition to="Rebuild Approval Set"/>
+  </Step>
+  <Step action="call:buildApprovalSet" name="Rebuild Approval Set" posX="186" posY="252" resultVariable="approvalSet">
+    <Arg name="plan" value="ref:plan"/>
+    <Return name="approvalSet" to="approvalSet"/>
+    <Transition to="Audit Start"/>
+  </Step>
+  <Step action="call:auditLCMStart" icon="Audit" name="Audit Start" posX="396" posY="252">
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Transition to="Create Identity Request"/>
+  </Step>
+  <Step action="call:createIdentityRequest" icon="Task" name="Create Identity Request" posX="543" posY="252" resultVariable="identityRequest">
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Arg name="flow" value="ref:flow"/>
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="priority" value="ref:priority"/>
+    <Arg name="source" value="ref:source"/>
+    <Transition to="Do Provisioning Forms Pre-Approval"/>
+  </Step>
+  <Step icon="Task" name="Do Provisioning Forms Pre-Approval" posX="741" posY="252">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="priority" value="ref:priority"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="formTemplate" value="ref:formTemplate"/>
+    <Arg name="requiredOwner" value="ref:sessionOwner"/>
+    <Arg name="workItemComments" value="ref:workItemComments"/>
+    <Description>
+      Call the standard subprocess for assembling, presenting, and assimilating
+      provisioning forms that can be filled out before approvals.
+    </Description>
+    <Return name="project" to="project"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Do Provisioning Forms"/>
+    </WorkflowRef>
+    <Transition to="end"/>
+  </Step>
+  <Step icon="Stop" name="end" posX="740" posY="12"/>
+</Workflow>
+</sailpoint>

@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Report Completion">
+  <Body>Your report '$reportName' has completed. You may retrieve your report by clicking on the Report Results tab under Analyze -&gt; Reports.
+    </Body>
+  <Description>
+      Email Template for notifying report scheduler that the report execution is complete.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="reportName" type="string">
+        <Description>Name of the report that was completed</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Report execution complete</Subject>
+</EmailTemplate>
+</sailpoint>

@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.BusinessRoleReport" formPath="/analyze/reports/businessrolereportargs.xhtml" name="Role Archive Report" progressMode="Percentage" resultAction="Rename" subType="Role Management Reports" template="true" type="Report">
+  <Attributes>
+    <Map>
+      <entry key="jasperTemplate" value="BusinessRoleMainReport"/>
+    </Map>
+  </Attributes>
+  <Description> 
+      Displays role information in archive format.
+    </Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessBusinessRoleReport"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument multi="true" name="applications" type="Application">
+        <Description>rept_input_biz_role_report_apps</Description>
+      </Argument>
+      <Argument multi="true" name="type" type="string">
+        <Description>rept_input_biz_role_report_type</Description>
+      </Argument>
+      <Argument filterString="capabilitiesString != &quot;null&quot;" multi="true" name="owners" type="Identity">
+        <Description>rept_input_biz_role_report_owners</Description>
+      </Argument>
+      <Argument name="status" type="string">
+        <Description>rept_input_biz_role_report_status</Description>
+      </Argument>
+      <Argument name="resultScope" type="Scope">
+        <Description>rept_input_result_scope</Description>
+      </Argument>
+      <Argument multi="true" name="emailIdentities" type="Identity">
+        <Description>rept_input_email_recips</Description>
+      </Argument>
+      <Argument name="REPORT_MAX_COUNT" type="int">
+        <Description>rept_input_max_rows</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

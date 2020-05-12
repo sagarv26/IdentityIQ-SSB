@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.PolicyWhatIfExecutor" hidden="true" name="Policy Impact Analysis" progressInterval="5000" progressMode="String" resultAction="RenameNew" resultRenderer="policyImpactAnalysis.xhtml" subType="task_item_type_system" type="System">
+  <Description>
+            System task for performing impact analysis of policy changes.
+        </Description>
+  <Signature>
+    <Returns>
+      <Argument name="noActiveRule" type="boolean">
+        <Prompt>task_out_policy_impact_analysis_noActiveRules</Prompt>
+      </Argument>
+      <Argument name="errorMessage" type="String">
+        <Prompt>task_out_policy_impact_analysis_errorMessage</Prompt>
+      </Argument>
+      <Argument name="analysis" type="complex"/>
+      <Argument name="ruleName" type="String">
+        <Prompt>task_out_policy_impact_analysis_ruleName</Prompt>
+      </Argument>
+      <Argument name="vcount" type="int">
+        <Prompt>task_out_policy_impact_analysis_vcount</Prompt>
+      </Argument>
+      <Argument name="icount" type="int">
+        <Prompt>task_out_policy_impact_analysis_icount</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

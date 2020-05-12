@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="WorkgroupImporter_Row">
+  <Description>After the row has been transfored, this rule will execute on with the transformed row attrbutes map</Description>
+  <Signature returnType="void">
+  	<Inputs>
+    <Argument name="log" type="org.apache.log4j.Logger">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context" type="sailpoint.api.SailPointContext">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="taskResult" type="sailpoint.object.TaskResult">
+        <Description>
+         	The current task's result object
+        </Description>
+      </Argument>
+      <Argument name="taskAttributes" type="sailpoint.object.Attributes">
+        <Description>
+          The list of task Attributes from the ask Definition
+        </Description>
+      </Argument>
+      <Argument name="row" type="sailpoint.object.Attributes">
+        <Description>
+         The row of data processed after being transformed.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source><![CDATA[
+  
+  	import sailpoint.object.Identity;
+  	import sailpoint.services.standard.task.genericImport.ImporterUtil;
+  	import sailpoint.services.standard.task.genericImport.Transmogrifier;
+  	
+	// IIQDA hints.
+  	// Expect: sailpoint.object.Attributes row
+  	// Expect: sailpoint.object.Attributes taskAttributes
+  	// Expect: sailpoint.object.TaskResult taskResult
+  	 	
+ 	// Grab the object, workgroups are Identity objects
+ 	
+  	Identity wg = row.get("workgroup_name");
+  	
+  	// Set the special flag so it's a workgroup now..
+  	
+  	wg.setWorkgroup(true);
+  	
+  	// Avoid doing all the setter thing, use the tranmogrifier
+  	// instead to populate the object.  Make sure
+  	// the workgroup_ prefix is removed so the
+  	// tranmogrifier can make sense of it all.
+  	
+  	Transmogrifier transmogrifier = new Transmogrifier(context, wg, row);
+  	transmogrifier.setRemovePrefix("workgroup_");
+  	transmogrifier.mergeObjectWithRow();
+  	
+  	// persist the opbject to the database
+  	
+  	context.saveObject(wg);
+  	context.commitTransaction();
+  	
+	log.debug("Processing row: " + row.toString());
+	
+	]]></Source>
+</Rule>

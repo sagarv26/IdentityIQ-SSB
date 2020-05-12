@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="services.standard.build.custom.tomcat6.xml">
+
+    <target name="post.expansion.hook">
+         <!-- This file messes up tomcat 6 because it includes its own el-api.jar -->
+        <move failonerror="false" file="${build.iiqBinaryExtract}/WEB-INF/lib/el-api.jar" tofile="${build.iiqBinaryExtract}/WEB-INF/lib/el-api.jar.disabled"/>
+        <!-- disable database driver as one is provided by application server-->
+        <!--<move failonerror="false" file="${build.iiq.war.dir}/WEB-INF/lib/sqljdbc-1.2.jar" tofile="${build.iiq.war.dir}/WEB-INF/lib/sqljdbc-1.2.jar.disabled"/>-->
+    </target>
+
+    <target name="post.war.hook"/>
+
+    <target name="clean"/>
+
+</project>

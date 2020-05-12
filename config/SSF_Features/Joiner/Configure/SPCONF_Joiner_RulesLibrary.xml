@@ -1,0 +1,195 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="SPCONF Joiner Rules Library" language="beanshell">
+	<ReferencedRules>
+	    <Reference class="sailpoint.object.Rule" name="SP Provisioning Rules Library"/>
+	    <Reference class="sailpoint.object.Rule" name="SP Role Assigment Rule Library"/>
+    </ReferencedRules>
+	<Source>
+	<![CDATA[
+	import sailpoint.api.SailPointFactory;
+	import sailpoint.api.SailPointContext;
+	import sailpoint.api.Provisioner;
+	import sailpoint.object.*;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+    import sailpoint.object.ProvisioningPlan.Operation; 
+	import sailpoint.tools.Util;
+    import sailpoint.tools.Message;
+    import sailpoint.tools.GeneralException;
+    import java.sql.Connection;
+	import java.sql.PreparedStatement;
+	import java.sql.ResultSet;
+	import java.sql.SQLException;
+	import java.sql.DriverManager;
+    import java.sql.Timestamp;
+	import java.util.*;
+	import java.text.*;
+	import javax.naming.Context;
+	import javax.naming.InitialContext;
+	import javax.sql.DataSource;
+	import sailpoint.api.PasswordGenerator;
+	
+	
+    import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	private static Log jlogger = LogFactory.getLog("rule.SP.Joiner.RulesLibrary");
+	
+	/******************************************************************************
+		TODO:  FILL IN FOLLOWING JOINER METHODS
+	******************************************************************************/
+	/*
+		In all rules that receive the workflow param, any workflow variable is accessible by doing workflow.get, such as:
+		
+			String identityName = workflow.get("identityName");
+	*/
+	
+	public static boolean isJoinerCustomTriggerRule(SailPointContext context, Identity previousIdentity, Identity newIdentity){
+		boolean flag = false;
+		
+		return flag;
+	}
+	
+	/* Return the request Type */
+	public static String getJoinerRequestTypeRule(SailPointContext context, Workflow workflow){
+		String requestType = "Joiner";
+		
+		return requestType;
+	}
+	
+	public static ProvisioningPlan buildCustomJoinerPlan(SailPointContext context, Workflow workflow){
+		ProvisioningPlan plan = new ProvisioningPlan();
+		return plan;
+	}
+	
+	/* Return prov success email */
+	public static String getJoinerProvSuccessEmailTemplateRule(SailPointContext context, Workflow workflow){
+		String val = "Joiner Success Email Template";
+		
+		return val;
+	}
+	
+	/* Return prov failure email */
+	public static String getJoinerProvFailureEmailTemplateRule(SailPointContext context, Workflow workflow){
+		String val = "Joiner Failure Email Template";
+		
+		return val;
+	}
+	
+	/* Return approved email */
+	public static String getJoinerApprovedEmailTemplateRule(SailPointContext context, Workflow workflow){
+		String val = "Joiner Approved Email Template";
+		
+		return val;
+	}
+	
+	/* Return rejected email */
+	public static String getJoinerRejectedEmailTemplateRule(SailPointContext context, Workflow workflow){
+		String val = "Joiner Rejected Email Template";
+		
+		return val;
+	}
+	
+	/* Return prov success email to */
+	public static String getJoinerProvSuccessEmailToRule(SailPointContext context, Workflow workflow){
+		Identity identity = context.getObject(Identity.class, workflow.get("identityName"));
+		String val = identity.getEmail();
+		
+		context.decache(identity);
+		identity = null;
+		
+		return val;
+	}
+	
+	/* Return prov failure email to */
+	public static String getJoinerProvFailureEmailToRule(SailPointContext context, Workflow workflow){
+		Identity identity = context.getObject(Identity.class, workflow.get("identityName"));
+		String val = identity.getEmail();
+		
+		context.decache(identity);
+		identity = null;
+		
+		return val;
+	}
+	
+	/* Return approved email to */
+	public static String getJoinerApprovedEmailToRule(SailPointContext context, Workflow workflow){
+		Identity identity = context.getObject(Identity.class, workflow.get("identityName"));
+		String val = identity.getEmail();
+		
+		context.decache(identity);
+		identity = null;
+		
+		return val;
+	}
+	
+	/* Return rejected email to */
+	public static String getJoinerRejectedEmailToRule(SailPointContext context, Workflow workflow){
+		String val = "somedefaultaddress@sailpoint.com";
+		
+		return val;
+	}
+	
+	/* Do any updates to workflow variables before ProvisioningPlan is compiled */
+	public static void joinerBeforePlanRule(SailPointContext context, Workflow workflow){
+		jlogger.trace("Enter Joiner beforePlanRule");
+		jlogger.trace("Getting extension attributes that can be used for customizations");
+		Attributes identityModel = initWorkflowAttributesVar(workflow, "identityModel");
+		Attributes spExtAttrs = initWorkflowAttributesVar(workflow, "spExtAttrs");
+		
+		//TODO:  CAN PUT LOGIC HERE TO INITIALIZE VALUES
+		
+		workflow.put("identityModel", identityModel);
+		workflow.put("spExtAttrs", spExtAttrs);
+		
+		jlogger.trace("Exit Joiner beforePlanRule");
+	}
+	
+	/* Do any updates to workflow variables before ProvisioningProject is provisioned */
+	public static void joinerBeforeProvisionRule(SailPointContext context, Workflow workflow){
+		jlogger.trace("Enter Joiner beforeProvisionRule");
+		
+		jlogger.trace("Exit Joiner beforeProvisionRule");
+	}
+	
+	/* Do any updates to workflow variables after ProvisioningProject is provisioned */
+	public static void joinerAfterProvisionRule(SailPointContext context, Workflow workflow){
+		jlogger.trace("Enter Joiner afterProvisionRule");
+		/*List errors = getErrors(context, workflow);
+		
+		String identityName = workflow.get("identityName");
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+	  	Date now = new Date();
+	  	String joinerDate = format.format(now);
+		
+		if (identityName != null){
+			setIdentityAttribute(context, identityName, "joinerDate", joinerDate);
+		}*/
+		
+		jlogger.trace("Exit Joiner afterProvisionRule");
+	}
+	
+	/* Do any updates when a joiner occurs but a request is not required */
+	public void joinerNoRequestRule(SailPointContext context, Workflow workflow){
+		jlogger.trace("Enter Joiner joinerNoRequest");
+		
+		/*jlogger.trace("Update joiner account date");
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+		Date now = new Date();
+		String currentDate = format.format(now);
+		Identity li = ObjectUtil.lockIdentityByName(context, identityName);
+  
+		li.setAttribute("joinerAccountDate", currentDate);
+		li.setInactive(false);
+		ObjectUtil.unlockIdentity(context, li);
+		context.commitTransaction();
+		context.decache(li);
+		li = null;*/
+		
+		jlogger.trace("Exit Joiner joinerNoRequest");
+	}
+
+	]]>
+	</Source>
+</Rule>

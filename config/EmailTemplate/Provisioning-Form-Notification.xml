@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Provisioning Form Notification">
+  <Body>
+      
+A provisioning form for user $identityDisplayName needs to be completed before the provisioning request can be completed.
+
+Please login to IdentityIQ and view your work item inbox to complete this form at your earliest convenience.
+      
+     </Body>
+  <Description>
+      Email Template for notifying users when they have provisioning forms to complete.
+      This is used by the Do Provisioning Forms workflow subprocess.
+      Note that in addition to the declared arguments, all workflow variables,
+      Step arguments, and Approval arguments defined in the Workflow are
+      also available.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workflow" type="Workflow">
+        <Description>The Workflow object being executed.</Description>
+      </Argument>
+      <Argument name="item" type="WorkItem">
+        <Description>The WorkItem representing the review.</Description>
+      </Argument>
+      <Argument name="launcher" type="string">
+        <Description>The name of the Identity that launched the workflow.</Description>
+      </Argument>
+      <Argument name="identityDisplayName" type="string">
+        <Description>The display name (usually full name) of the Identity that is the target of the provisioning.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Provisioning Form for $identityDisplayName pending completion</Subject>
+</EmailTemplate>
+</sailpoint>

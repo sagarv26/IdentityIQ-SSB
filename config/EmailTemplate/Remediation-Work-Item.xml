@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Remediation Work Item">
+  <Body>$!requesterName has assigned a new remediation work item to you: $!workItemName.
+
+Comments from $!requesterName:
+--------------------------------------------------------------------------------
+$!comments
+--------------------------------------------------------------------------------
+
+Login and view your work item inbox to complete this request.
+    </Body>
+  <Description>
+      Email Template for notifying work item owners of new remediation requests.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workItemName" type="string">
+        <Description>The name (also the description) of the remediation work item.</Description>
+      </Argument>
+      <Argument name="workItem" type="WorkItem">
+        <Description>The WorkItem object representing the remediation.</Description>
+      </Argument>
+      <Argument name="requesterName" type="string">
+        <Description>The display name of the Identity that requested the remediation.</Description>
+      </Argument>
+      <Argument name="comments" type="string">
+        <Description>The Identity object that is the owner of the work item.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>New remediation request: $!workItemName</Subject>
+</EmailTemplate>
+</sailpoint>

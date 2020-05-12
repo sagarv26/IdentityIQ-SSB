@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition name="Refresh Groups" resultAction="Delete" subType="task_item_type_identity" type="Identity">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="108"/>
+      <entry key="TaskDefinition.runLengthTotal" value="108"/>
+      <entry key="TaskDefinition.runs" value="1"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="checkHistory" value="false"/>
+      <entry key="checkPolicies" value="false"/>
+      <entry key="correlateEntitlements" value="false"/>
+      <entry key="correlateScope" value="false"/>
+      <entry key="deleteDormantGroups" value="false"/>
+      <entry key="disableManagerLookup" value="false"/>
+      <entry key="doManualActions" value="false"/>
+      <entry key="enableManualAccountSelection" value="false"/>
+      <entry key="enablePartitioning" value="false"/>
+      <entry key="excludeInactive" value="false"/>
+      <entry key="filterNeedsRefresh" value="false"/>
+      <entry key="forceWorkflow" value="false"/>
+      <entry key="includeWindowModified" value="false"/>
+      <entry key="keepInactiveViolations" value="false"/>
+      <entry key="markDormantScopes" value="false"/>
+      <entry key="noAutoCreateScopes" value="false"/>
+      <entry key="noMaintenanceWindowRetry" value="false"/>
+      <entry key="noResetNeedsRefresh" value="false"/>
+      <entry key="noRoleDeprovisioning" value="false"/>
+      <entry key="processTriggers" value="false"/>
+      <entry key="promoteAttributes" value="false"/>
+      <entry key="promoteManagedAttributes" value="false"/>
+      <entry key="provision" value="false"/>
+      <entry key="refreshCertifications" value="false"/>
+      <entry key="refreshCompositeApplications" value="false"/>
+      <entry key="refreshGroups" value="true"/>
+      <entry key="refreshIdentityEntitlements" value="false"/>
+      <entry key="refreshManagerStatus" value="false"/>
+      <entry key="refreshRoleMetadata" value="false"/>
+      <entry key="refreshScorecard" value="false"/>
+      <entry key="synchronizeAttributes" value="false"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate"/>
+    </Map>
+  </Attributes>
+  <Description>Refresh indexes for all identity groups.</Description>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Identity Refresh"/>
+  </Parent>
+</TaskDefinition>
+</sailpoint>

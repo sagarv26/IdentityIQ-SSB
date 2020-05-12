@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell"  
+          name="BSMT LockingTest Cleanup"       
+          type="BuildMap" >
+  <Description>Cleanup Rule</Description>  
+  <Source><![CDATA[
+// Library inclusions for BeanShell.
+import java.lang.*;
+import sailpoint.api.*;
+import sailpoint.object.*;
+import sailpoint.tools.Util;
+import sailpoint.tools.Message;
+
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
+Logger log = Logger.getLogger("sailpoint.services.BeanShellMultiThreading.Cleanup");
+log.setLevel((Level) Level.DEBUG);  // TODO: Remove this in production rules.
+
+// Sanity checking to make sure we were passed a valid shared state.
+if ((void == sharedThreadState) || (null == sharedThreadState)) {
+   log.error("Received a null or void sharedThreadState.");
+   return;
+}
+if ( !(sharedThreadState instanceof ConcurrentHashMap) ) {
+   log.error("Received a sharedThreadState that is not a ConcurrentHashMap.");
+   return;
+} 
+
+// Add your logic here!
+log.debug("Inside Cleanup Rule");
+
+int startingNumber = Integer.parseInt(sharedThreadState.get("initUniqueId"));
+int numUpdatesExpected = Integer.parseInt(sharedThreadState.get("numTestUpdates"));
+
+// Load the current, finished state of the unique ID.
+Custom custom = context.getObjectByName(Custom.class, sharedThreadState.get("customName"));
+int finalUniqueId = Integer.parseInt(custom.get("nextUniqueId"));
+
+// Let's do the sanity check.  Are we seeing the number we expected to see?
+int expectedFinalUniqueId = startingNumber + numUpdatesExpected;
+if (finalUniqueId != expectedFinalUniqueId) {
+   log.error("Got         finalUniqueId: " + finalUniqueId);
+   log.error("Had expectedFinalUniqueId: " + expectedFinalUniqueId);
+   if (null != taskResult) {
+      String m = "ERROR: Exclusive locking error detected. ";
+      m = m + "Observed " + finalUniqueId + " expected " + expectedFinalUniqueId;      
+      taskResult.addMessage(new Message(Message.Type.Error, m, null));
+      context.saveObject(taskResult);
+   }
+} else {
+   log.debug("Number counts match up, looks like a successful run.");
+   if (null != taskResult) {
+      String m = "Successful test run, ";
+      m = m + "observed " + finalUniqueId + " and expected " + expectedFinalUniqueId;      
+      taskResult.addMessage(new Message(Message.Type.Info, m, null));
+      context.saveObject(taskResult);
+   }
+}
+
+return;
+]]>
+  </Source>
+</Rule>
+</sailpoint>

@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="User Account Attributes Report" progressMode="Percentage" resultAction="Rename" subType="Identity and User Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="User Account Attributes Report">
+            <DataSource objectType="sailpoint.object.Link" type="Filter">
+              <QueryParameters>
+                <Parameter argument="application" property="application.id"/>
+                <Parameter argument="inactive" property="identity.inactive" valueClass="boolean"/>
+              </QueryParameters>
+            </DataSource>
+            <ExtendedColumnScript>
+              <Source>
+                      
+                        import java.util.*;
+                        import sailpoint.reporting.*;
+                        import sailpoint.object.*;
+
+                        List newCols = new ArrayList();
+                        Map formValues = form.getFieldValues();
+                        if (formValues != null &amp;&amp; formValues.containsKey("application") &amp;&amp; formValues.get("application") != null){
+                          newCols = ReportingLibrary.createApplicationAttributeColumns(context, formValues.get("application"));
+                        }
+
+                        return newCols;
+                      
+                    </Source>
+            </ExtendedColumnScript>
+            <ReportForm>
+              <Reference class="sailpoint.object.Form" name="Application Account Attributes Report Form"/>
+            </ReportForm>
+            <Columns>
+              <ReportColumnConfig field="nativeIdentity" header="rept_app_account_attrs_col_account" property="nativeIdentity" sortable="true" width="110"/>
+              <ReportColumnConfig field="identityFirstname" header="firstname" property="identity.firstname" sortable="true" width="110"/>
+              <ReportColumnConfig field="identityLastname" header="lastname" property="identity.lastname" sortable="true" width="110"/>
+              <ReportColumnConfig field="identityEmail" header="email" property="identity.email" sortable="true" width="110"/>
+              <ReportColumnConfig field="identityManager" header="manager" property="identity.manager.name" sortable="true" width="110"/>
+            </Columns>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>Displays all attributes for a given account on each application</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessApplicationAccountAttributesReport"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument name="application" required="true" type="Application">
+        <Description>rept_account_attributes_app_desc</Description>
+      </Argument>
+      <Argument name="inactive" type="string">
+        <Description>rept_input_user_report_inactive</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

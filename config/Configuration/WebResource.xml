@@ -1,0 +1,325 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Configuration name="WebResource">
+  <Attributes>
+    <Map>
+      <entry key="webResources">
+        <value>
+          <List>
+            <WebResource rights="ViewApplicationStatus" url="dashboard/contentApplicationStatusDatasource.*"/>
+            <WebResource rights="ViewApplicationStatus" url="dashboard/contentApplicationStatusDatasource.*"/>
+            <WebResource rights="ViewCertificationCompletionChart" url="dashboard/contentCertificationCompletionStatusDataSource.*"/>
+            <WebResource rights="ViewCertificationCompletionChart" url="dashboard/contentCertificationCompletionStatusDataSource.*"/>
+            <WebResource rights="ViewSignoffStatus" url="dashboard/contentSignoffStatusDatasource.*"/>
+            <WebResource rights="ViewSignoffStatus" url="dashboard/contentSignoffStatusDatasource.*"/>
+            <WebResource rights="FullAccessActivityCategory" url="define/categories/activityCategories.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel, ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink,DeleteIdentitySnapshot, MonitorIdentityActivity" url="define/identity/*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/riskScores.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/businessRoleBARInclude.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/entitlementBARInclude.*"/>
+            <WebResource rights="ViewPolicy, ManagePolicy" url="define/policy/*"/>
+            <WebResource rights="ViewAlert, FullAccessAlertDefinition, ViewAlertDefinition" url="define/alerts/*"/>
+            <WebResource rights="FullAccessApplicationRiskModel" url="define/riskScores/appScores.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel, FullAccessApplicationRiskModel, FullAccessIdentityRisk, FullAccessApplicationRisk" url="define/riskScores/activityMonitoringInclude.*"/>
+            <WebResource rights="FullAccessApplicationRiskModel" url="define/riskScores/appComponentsInclude.*"/>
+            <WebResource rights="FullAccessApplicationRiskModel" url="define/riskScores/appCompositeInclude.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel, FullAccessApplicationRiskModel, FullAccessIdentityRisk, FullAccessApplicationRisk" url="define/riskScores/bandsInclude.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/bandOverviewInclude.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/businessRoleBARUpdate.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/compensatingControlsInclude.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/compositeScoringInclude.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/customScoreInclude.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/entitlementAttributesInclude.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/entitlementBARAppDataSource.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/entitlementPermissionsInclude.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/roleRiskQueryJSON.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/barOverviewInclude.*"/>
+            <WebResource rights="FullAccessWorkflows" url="define/workflow/workflow.*"/>
+            <WebResource rights="FullAccessWorkflows" url="include/include/subprocessesDataSource.*"/>
+            <WebResource rights="FullAccessWorkflows" url="define/workflow/workflowDataSource.*"/>
+            <WebResource rights="FullAccessWorkflows" url="define/workflow/workflowStepDataSource.*"/>
+            <WebResource rights="FullAccessWorkflows" url="define/workflow/workflowAutoLayoutJSON.*"/>
+            <WebResource rights="FullAccessWorkflows" url="define/workflow/workflowQueryJSON.*"/>
+            <WebResource rights="FullAccessIdentityTriggers" url="define/trigger/*"/>
+            <WebResource rights="FullAccessGroup, ManageWorkgroup, ViewWorkgroup, ViewGroups, ViewPopulations" url="define/groups/*"/>
+            <WebResource rights="ViewRole, ManageRole" url="define/roles/modeler/*"/>
+            <WebResource rights="ViewRole, ManageRole" url="define/roles/automatedMining/*"/>
+            <WebResource rights="ViewRole, ManageRole" url="define/roles/roleMining/*"/>
+            <WebResource rights="ViewRole, ManageRole" url="define/roles/miningTemplatesDataSource.*"/>
+            <WebResource rights="ViewRole, ManageRole" url="monitor/tasks/viewRoleMiningResultsDataSource.*"/>
+            <WebResource rights="ViewRole, ManageRole" url="define/roles/search/*"/>
+            <WebResource rights="ViewRole, ManageRole" url="define/roles/roleTabs.*"/>
+            <WebResource rights="ViewRole, ManageRole" url="define/roles/version/versionDataSource.*"/>
+            <WebResource rights="ViewApplication, ManageApplication" url="define/applications/*"/>
+            <WebResource rights="*" url="monitor/tasks/renderResults.*"/>
+            <WebResource rights="*" url="define/roles/modeler/roleEditor.*"/>
+            <WebResource rights="*" url="define/roles/modeler/permitsDataStore.*"/>
+            <WebResource rights="*" url="define/roles/modeler/requirementsDataStore.*"/>
+            <WebResource rights="*" url="define/roles/modeler/memberOfDataStore.*"/>
+            <WebResource rights="*" url="define/roles/modeler/entitlementQuery.*"/>
+            <WebResource rights="*" url="define/roles/modeler/roleTypeDefQuery.*"/>
+            <WebResource rights="*" url="define/roles/modeler/allowedPermitsQuery.*"/>
+            <WebResource rights="*" url="define/roles/modeler/allowedRequirementsQuery.*"/>
+            <WebResource rights="ManagedAttributePropertyAdministrator, ManagedAttributeProvisioningAdministrator" url="define/groups/accountGroups.*"/>
+            <WebResource rights="ManagedAttributePropertyAdministrator, ManagedAttributeProvisioningAdministrator, ViewAccountGroups" url="define/groups/editAccountGroup.*"/>
+            <WebResource rights="ManagedAttributePropertyAdministrator, ManagedAttributeProvisioningAdministrator" url="define/groups/entitlementCatalogDataSource.*"/>
+            <WebResource rights="ManagedAttributePropertyAdministrator, ManagedAttributeProvisioningAdministrator" url="define/groups/entitlementCatalogDataSource.*"/>
+            <WebResource rights="ManagedAttributePropertyAdministrator, ManagedAttributeProvisioningAdministrator" url="define/groups/inheritedNameOnlyAccountGroupsDataSource.*"/>
+            <WebResource rights="ViewPopulations, FullAccessGroup" url="define/groups/populationsDataSource.*"/>
+            <WebResource rights="ViewPopulations, FullAccessGroup" url="define/groups/populationsDataSource.*"/>
+            <WebResource rights="ViewGroups, FullAccessGroup" url="define/groups/groupsDataSource.*"/>
+            <WebResource rights="ViewGroups, FullAccessGroup" url="define/groups/groupsDataSource.*"/>
+            <WebResource rights="*" url="analyze/reports/viewResult.*"/>
+            <WebResource rights="*" url="rest/report"/>
+            <WebResource rights="FullAccessCertificationSchedule" url="monitor/scheduleCertifications/*"/>
+            <WebResource rights="ViewGroupCertification, FullAccessCertifications" url="monitor/scheduleCertifications/certificationGroup.*"/>
+            <WebResource rights="FullAccessCertifications" url="monitor/scheduleCertifications/editCertificationSchedule.*"/>
+            <WebResource rights="ReadTaskResults, FullAccessTask" url="monitor/tasks/viewTasks.*"/>
+            <WebResource rights="ReadTaskResults, FullAccessTask" url="monitor/tasks/viewResultsDataSource.*"/>
+            <WebResource rights="ReadTaskResults, FullAccessTask" url="monitor/tasks/viewTasksDataSource.*"/>
+            <WebResource rights="ViewRole, ManageRole" url="monitor/tasks/viewRoleMiningResultsDataSource.*"/>
+            <WebResource rights="ViewRole, ManageRole" url="monitor/tasks/taskResultStatusDataSource.*"/>
+            <WebResource rights="FullAccessTask" url="monitor/tasks/*"/>
+            <WebResource rights="FullAccessReport, FullAccessTask" url="monitor/tasks/schedulePanel.*"/>
+            <WebResource rights="*" url="monitor/tasks/renderResults.*"/>
+            <WebResource rights="FullAccessRequest" url="monitor/requests/requests.*"/>
+            <WebResource rights="FullAccessRequest" url="monitor/requests/request.*"/>
+            <WebResource rights="ViewCertifications, ViewRole, ViewAccountGroups, ViewActivity, ViewIdentityRequest, ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink,DeleteIdentitySnapshot, MonitorIdentityActivity, ViewAuditLog, ViewProcessInstrumentation, ViewSyslog, ViewLink" url="analyze/analyzeTabs.*"/>
+            <WebResource rights="ViewCertifications, ViewRole, ViewAccountGroups, ViewActivity, ViewIdentityRequest, ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink,DeleteIdentitySnapshot, MonitorIdentityActivity, ViewAuditLog, ViewProcessInstrumentation, ViewSyslog, ViewLink" url="analyze/baseGrid.*"/>
+            <WebResource rights="ViewCertifications, ViewRole, ViewAccountGroups, ViewActivity, ViewIdentityRequest, ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink,DeleteIdentitySnapshot, MonitorIdentityActivity, ViewAuditLog, ViewProcessInstrumentation, ViewSyslog, ViewLink" url="analyze/gridStateDataSource.*"/>
+            <WebResource rights="ViewCertifications, ViewRole, ViewAccountGroups, ViewActivity, ViewIdentityRequest, ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink,DeleteIdentitySnapshot, MonitorIdentityActivity, ViewAuditLog, ViewProcessInstrumentation, ViewSyslog, ViewLink" url="analyze/searchDisplayFields.*"/>
+            <WebResource rights="ViewCertifications, ViewRole, ViewAccountGroups, ViewActivity, ViewIdentityRequest, ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink,DeleteIdentitySnapshot, MonitorIdentityActivity, ViewAuditLog, ViewProcessInstrumentation, ViewSyslog, ViewLink" url="analyze/searchRememberPanel.*"/>
+            <WebResource rights="ViewCertifications, ViewRole, ViewAccountGroups, ViewActivity, ViewIdentityRequest, ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink,DeleteIdentitySnapshot, MonitorIdentityActivity, ViewAuditLog, ViewProcessInstrumentation, ViewSyslog, ViewLink" url="analyze/searchResultsInclude.*"/>
+            <WebResource rights="ViewCertifications, ViewRole, ViewAccountGroups, ViewActivity, ViewIdentityRequest, ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink,DeleteIdentitySnapshot, MonitorIdentityActivity, ViewAuditLog, ViewProcessInstrumentation, ViewSyslog, ViewLink" url="analyze/searchResultsState.*"/>
+            <WebResource rights="ViewCertifications, ViewRole, ViewAccountGroups, ViewActivity, ViewIdentityRequest, ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink,DeleteIdentitySnapshot, MonitorIdentityActivity, ViewAuditLog, ViewProcessInstrumentation, ViewSyslog, ViewLink" url="analyze/searchUserItems.*"/>
+            <WebResource rights="ViewCertifications, ViewRole, ViewAccountGroups, ViewActivity, ViewIdentityRequest, ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink,DeleteIdentitySnapshot, MonitorIdentityActivity, ViewAuditLog, ViewProcessInstrumentation, ViewSyslog, ViewLink" url="analyze/suggestAttribute.*"/>
+            <WebResource rights="FullAccessReport" url="analyze/reports/*"/>
+            <WebResource rights="ViewAccountGroups" url="analyze/accountGroup/accountGroupDataSource.*"/>
+            <WebResource rights="ViewActivity" url="analyze/activity/activityDataSource.*"/>
+            <WebResource rights="ViewAuditLog" url="analyze/audit/auditDataSource.*"/>
+            <WebResource rights="ViewCertifications" url="analyze/certification/certificationDataSource.*"/>
+            <WebResource rights="ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink, DeleteIdentitySnapshot, MonitorIdentityActivity" url="analyze/identity/advancedIdentityDataSource.*"/>
+            <WebResource rights="ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink, DeleteIdentitySnapshot, MonitorIdentityActivity" url="analyze/identity/identityDataSource.*"/>
+            <WebResource rights="ViewIdentityRequest" url="analyze/identityRequest/identityRequestDataSource.*"/>
+            <WebResource rights="ViewProcessInstrumentation" url="analyze/process/processInstrumentationApprovalOverviewDataSource.*"/>
+            <WebResource rights="ViewProcessInstrumentation" url="analyze/process/processInstrumentationDataSource.*"/>
+            <WebResource rights="ViewProcessInstrumentation" url="analyze/process/processInstrumentationExecutionsDataSource.*"/>
+            <WebResource rights="ViewProcessInstrumentation" url="analyze/process/processInstrumentationStepDetailsDataSource.*"/>
+            <WebResource rights="ViewProcessInstrumentation" url="analyze/process/processInstrumentationStepExecutorsDataSource.*"/>
+            <WebResource rights="ViewProcessInstrumentation" url="analyze/process/processInstrumentationStepOverviewDataSource.*"/>
+            <WebResource rights="ViewRole" url="analyze/role/roleDataSource.*"/>
+            <WebResource rights="ViewSyslog" url="analyze/syslog/syslogDataSource.*"/>
+            <WebResource rights="ViewLink" url="analyze/link/linkDataSource.*"/>
+            <WebResource rights="FullAccessIdentityRisk" url="manage/riskScores/riskScores.*"/>
+            <WebResource rights="FullAccessIdentityRisk" url="manage/riskScores/riskScoresDataSource.*"/>
+            <WebResource rights="FullAccessIdentityRisk" url="manage/riskScores/riskScoresFilters.*"/>
+            <WebResource rights="FullAccessIdentityCorrelation" url="manage/correlation/*"/>
+            <WebResource rights="*" url="manage/workItems/workItems.*"/>
+            <WebResource rights="FullAccessApplicationRisk" url="manage/riskScores/appRiskScores.*"/>
+            <WebResource rights="FullAccessApplicationRisk" url="manage/riskScores/appRiskScoresDataSource.*"/>
+            <WebResource rights="FullAccessBatchRequest" url="manage/batchRequest/batchRequests.*"/>
+            <WebResource rights="FullAccessBatchRequest" url="manage/batchRequest/batchItemsDataSource.*"/>
+            <WebResource rights="FullAccessBatchRequest" url="manage/batchRequest/batchRequestsDataSource.*"/>
+            <WebResource rights="FullAccessBatchRequest" url="manage/batchRequest/batchRequestDetails.*"/>
+            <WebResource rights="FullAccessProvisioningTransaction, ViewProvisioningTransaction, FullAccessTaskManagement, ViewTaskManagement" url="adminConsole/index.*">
+              <ChildResources>
+                <String>adminConsole/*</String>
+              </ChildResources>
+            </WebResource>
+            <WebResource rights="FullAccessProvisioningTransaction, ViewProvisioningTransaction, FullAccessTaskManagement, ViewTaskManagement" url="adminConsole/*"/>
+            <WebResource rights="FullAccessSystemConfig, FullAccessTimePeriod, FullAccessIdentityMapping, ManageScope, ViewScope, FullAccessAuditConfig, FullAccessLoginConfig, FullAccessAccountMapping, ImportFromFile, FullAccessForms, FullAccessDynamicScope, ViewQuickLinks, FullAccessOAuthClientConfiguration, ViewOAuthClientConfiguration" url="systemSetup/index.*">
+              <ChildResources>
+                <String>systemSetup/loginConfig.*</String>
+                <String>systemSetup/identities/identitySourceMappings.*</String>
+                <String>systemSetup/accounts/accountSourceMapping.*</String>
+                <String>systemSetup/appObjectConfig.*</String>
+                <String>systemSetup/appObjectAttribute.*</String>
+                <String>systemSetup/roleObjectConfig.*</String>
+                <String>systemSetup/system.*</String>
+                <String>systemSetup/scopes/*</String>
+                <String>systemSetup/lcm/*</String>
+                <String>systemSetup/timePeriods/*</String>
+                <String>systemSetup/audit.*</String>
+                <String>systemSetup/electronicSignatures.*</String>
+                <String>systemSetup/hostConfig.*</String>
+                <String>systemSetup/import.*</String>
+                <String>systemSetup/forms.*</String>
+                <String>systemSetup/objectAttributesDataSource.*</String>
+                <String>systemSetup/quicklinkPopulationsEditor.*</String>
+                <String>systemSetup/apiAuthentication.*</String>
+              </ChildResources>
+            </WebResource>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/system.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/systemCompliance.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/systemLifecycle.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/lcm/lcmConfig.*"/>
+            <WebResource rights="FullAccessAccountMapping" url="systemSetup/accounts/accountSourceMapping.*"/>
+            <WebResource rights="ImportFromFile" url="systemSetup/import.*"/>
+            <WebResource rights="FullAccessForms" url="systemSetup/forms.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/electronicSignatures.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/hostConfig.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/roleObjectConfig.*"/>
+            <WebResource rights="FullAccessTimePeriod" url="systemSetup/timePeriods/*"/>
+            <WebResource rights="FullAccessIdentityMapping" url="systemSetup/identities/identitySourceMappings.*"/>
+            <WebResource rights="ManageScope, ViewScope" url="systemSetup/scopes/*"/>
+            <WebResource rights="FullAccessAuditConfig" url="systemSetup/audit.*"/>
+            <WebResource rights="FullAccessLoginConfig" url="systemSetup/loginConfig.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/appObjectConfig.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/appObjectAttribute.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/objectAttributesDataSource.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/managedAttributeAttribute.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/managedAttributeConfig.*"/>
+            <WebResource rights="FullAccessDynamicScope, ViewQuickLinks" url="systemSetup/quicklinkPopulationsEditor.*"/>
+            <WebResource rights="FullAccessOAuthClientConfiguration, ViewOAuthClientConfiguration" url="systemSetup/apiAuthentication.*"/>
+            <WebResource rights="*" url="systemSetup/scopes/scopesSuggest.*"/>
+            <WebResource rights="ManageRules" url="include/rules/ruleEditorDataSource.*"/>
+            <WebResource rights="FullAccessBeansPage, FullAccessThreadsPage, FullAccessAboutPage, FullAccessMemoryPage, FullAccessMetersPage, FullAccessLoggingPage, FullAccessDatabasePage, FullAccessDebugPage" url="debug/index.*">
+              <ChildResources>
+                <String>debug/beans.*</String>
+                <String>debug/threads.*</String>
+                <String>debug/about.*</String>
+                <String>debug/memory.*</String>
+                <String>debug/meters.*</String>
+                <String>debug/logging.*</String>
+                <String>debug/database.*</String>
+                <String>debug/debug.*</String>
+                <String>debug/caches.*</String>
+              </ChildResources>
+            </WebResource>
+            <WebResource rights="FullAccessBeansPage" url="debug/beans.*"/>
+            <WebResource rights="FullAccessThreadsPage" url="debug/threads.*"/>
+            <WebResource rights="FullAccessAboutPage" url="debug/about.*"/>
+            <WebResource rights="FullAccessMemoryPage" url="debug/memory.*"/>
+            <WebResource rights="FullAccessMetersPage" url="debug/meters.*"/>
+            <WebResource rights="FullAccessLoggingPage" url="debug/logging.*"/>
+            <WebResource rights="FullAccessDatabasePage" url="debug/database.*"/>
+            <WebResource rights="FullAccessDebugPage" url="debug/debug.*"/>
+            <WebResource rights="FullAccessDebugPage" url="debug/caches.*"/>
+            <WebResource rights="*" url="identity/viewAccountGroupWrapper.*"/>
+            <WebResource rights="*" url="define/groups/counterAccountGroupsDataSource.*"/>
+            <WebResource rights="*" url="define/groups/inheritedAccountGroupsDataSource.*"/>
+            <WebResource rights="*" url="define/groups/inheritingAccountGroupsDataSource.*"/>
+            <WebResource rights="*" url="define/groups/permissionsDataSource.*"/>
+            <WebResource rights="*" url="define/groups/accountGroupMembersDataSource.*"/>
+            <WebResource rights="*" url="define/groups/accountGroupAccessDataSource.*"/>
+            <WebResource rights="FullAccessDebugPage" url="debug/connections.*"/>
+            <WebResource rights="FullAccessDebugPage" url="debug/count.*"/>
+            <WebResource rights="FullAccessDebugPage" url="debug/edit.*"/>
+            <WebResource rights="FullAccessDebugPage" url="debug/list.*"/>
+            <WebResource rights="FullAccessDebugPage" url="debug/metersGrid.*"/>
+            <WebResource rights="FullAccessDebugPage" url="debug/result.*"/>
+            <WebResource rights="FullAccessDebugPage" url="debug/timeMachine.*"/>
+            <WebResource rights="FullAccessDebugPage" url="debug/view.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/authQuestions.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/email.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/identitiesSettings.*"/>
+            <WebResource rights="ImportFromFile" url="systemSetup/importResults.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/mailSettings.*"/>
+            <WebResource rights="FullAccessLoginConfig" url="systemSetup/login.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/loginContent.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/miscellaneous.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/objectAttribute.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/objectConfigCommon.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/passReset.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/passwords.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/roleObjectAttribute.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/roles.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/roleType.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/roleTypeIncludedAttributes.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/roleTypeIncludedAttributesDataSource.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/roleTypesDataSource.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/roleTypesGrid.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/smsReset.*"/>
+            <WebResource rights="FullAccessLoginConfig" url="systemSetup/ssoConfig.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/workItemSettings.*"/>
+            <WebResource rights="FullAccessDynamicScope, ViewQuickLinks" url="systemSetup/quicklinkPopulationConfiguration.*"/>
+            <WebResource rights="FullAccessDynamicScope, ViewQuickLinks" url="systemSetup/quicklinkPopulationQuicklinksDataSource.*"/>
+            <WebResource rights="FullAccessAccountMapping" url="systemSetup/accounts/accountMappingsDataSource.*"/>
+            <WebResource rights="FullAccessAccountMapping" url="systemSetup/accounts/addSource.*"/>
+            <WebResource rights="FullAccessAccountMapping" url="systemSetup/accounts/deleteSource.*"/>
+            <WebResource rights="FullAccessAccountMapping" url="systemSetup/accounts/editIdentityAttribute.*"/>
+            <WebResource rights="FullAccessAccountMapping" url="systemSetup/accounts/selectIdentitySource.*"/>
+            <WebResource rights="FullAccessIdentityMapping" url="systemSetup/identities/addIdentitySource.*"/>
+            <WebResource rights="FullAccessIdentityMapping" url="systemSetup/identities/addIdentityTarget.*"/>
+            <WebResource rights="FullAccessIdentityMapping" url="systemSetup/identities/deleteIdentitySource.*"/>
+            <WebResource rights="FullAccessIdentityMapping" url="systemSetup/identities/editIdentityAttribute.*"/>
+            <WebResource rights="FullAccessIdentityMapping" url="systemSetup/identities/identityMappingsDataSource.*"/>
+            <WebResource rights="FullAccessIdentityMapping" url="systemSetup/identities/selectIdentitySource.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/lcm/additionalOptions.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/lcm/businessProcesses.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/lcm/identityPolicy.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/lcm/lifecycleActions.*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/lcm/lifecycleActionsInclude.*"/>
+            <WebResource rights="FullAccessBatchRequest" url="manage/batchRequest/createBatchRequest.*"/>
+            <WebResource rights="ViewAccountGroups" url="analyze/accountGroup/accountGroupDataSource.*"/>
+            <WebResource rights="ViewActivity" url="analyze/activity/activityDataSource.*"/>
+            <WebResource rights="ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink, DeleteIdentitySnapshot, MonitorIdentityActivity" url="analyze/identity/advancedIdentityDataSource.*"/>
+            <WebResource rights="FullAccessApplicationRisk" url="manage/riskScores/appRiskScoresDataSource.*"/>
+            <WebResource rights="ViewAuditLog" url="analyze/audit/auditDataSource.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel, FullAccessApplicationRiskModel, FullAccessIdentityRisk, FullAccessApplicationRisk" url="define/riskScores/bandConfigJSON.*"/>
+            <WebResource rights="FullAccessBatchRequest" url="manage/batchRequest/batchItemsDataSource.*"/>
+            <WebResource rights="FullAccessBatchRequest" url="manage/batchRequest/batchRequestsDataSource.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/businessRoleScoringInclude.*"/>
+            <WebResource rights="ViewCertifications" url="analyze/certification/certificationDataSource.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/certificationsInclude.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/entitlementScoringInclude.*"/>
+            <WebResource rights="ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink, DeleteIdentitySnapshot, MonitorIdentityActivity" url="analyze/identity/identityDataSource.*"/>
+            <WebResource rights="ViewIdentityRequest" url="analyze/identityRequest/identityRequestDataSource.*"/>
+            <WebResource rights="ViewLink" url="analyze/link/linkDataSource.*"/>
+            <WebResource rights="ViewRole, ManageRole" url="define/roles/miningTemplatesDataSource.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/policyViolationsBARInclude.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel" url="define/riskScores/policyViolationsInclude.*"/>
+            <WebResource rights="FullAccessIdentityRisk" url="manage/riskScores/riskScoresDataSource.*"/>
+            <WebResource rights="ViewRole" url="analyze/role/roleDataSource.*"/>
+            <WebResource rights="FullAccessWorkflows" url="include/subprocessesDataSource.*"/>
+            <WebResource rights="FullAccessWorkflows" url="define/workflow/workflowDataSource.*"/>
+            <WebResource rights="ViewSyslog" url="analyze/syslog/syslogDataSource.*"/>
+            <WebResource rights="*" url="external/*"/>
+            <WebResource rights="ViewAccountGroups" url="analyze/accountGroup/*"/>
+            <WebResource rights="ViewActivity" url="analyze/activity/*"/>
+            <WebResource rights="ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink, DeleteIdentitySnapshot, MonitorIdentityActivity, ViewPolicy, ManagePolicy, ViewRole, ManageRole" url="analyze/advanced/*"/>
+            <WebResource rights="ViewAuditLog" url="analyze/audit/*"/>
+            <WebResource rights="ViewCertifications" url="analyze/certification/*"/>
+            <WebResource rights="ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink, DeleteIdentitySnapshot, MonitorIdentityActivity" url="analyze/identity/*"/>
+            <WebResource rights="ViewIdentityRequest" url="analyze/identityRequest/*"/>
+            <WebResource rights="ViewLink" url="analyze/link/*"/>
+            <WebResource rights="ViewProcessInstrumentation" url="analyze/process/*"/>
+            <WebResource rights="ViewRole" url="analyze/role/*"/>
+            <WebResource rights="ViewSyslog" url="analyze/syslog/*"/>
+            <WebResource rights="*" url="certification/*"/>
+            <WebResource rights="*" url="dashboard/*"/>
+            <WebResource rights="FullAccessDebugPage" url="debug/*"/>
+            <WebResource rights="FullAccessActivityCategory" url="define/categories/*"/>
+            <WebResource rights="FullAccessWorkflows" url="define/workflow/*"/>
+            <WebResource rights="*" url="identities/identities.*"/>
+            <WebResource rights="ViewRole, ManageRole" url="define/roles/version/*"/>
+            <WebResource rights="*" url="identity/*"/>
+            <WebResource rights="*" url="include/*"/>
+            <WebResource rights="*" url="lcm/*"/>
+            <WebResource rights="*" url="manage/accessRequest/*"/>
+            <WebResource rights="*" url="manage/certification/*"/>
+            <WebResource rights="*" url="manage/policyViolations/*"/>
+            <WebResource rights="*" url="manage/workItems/*"/>
+            <WebResource rights="FullAccessSystemConfig" url="systemSetup/*"/>
+            <WebResource rights="*" url="ui/*"/>
+            <WebResource rights="*" url="user/*"/>
+            <WebResource rights="*" url="workitem/*"/>
+            <WebResource rights="*" url="policyViolation/*"/>
+            <WebResource rights="FullAccessPlugin" url="plugins/plugins.*"/>
+            <WebResource rights="*" url="plugins/pluginPage.*"/>
+            <WebResource rights="*" url="plugins/pluginHelper.*"/>
+            <WebResource rights="*" url="plugins/pluginHelperSnippet.*"/>
+            <WebResource rights="*" url="pam/pam.*"/>
+            <WebResource rights="FullAccessIdentityRiskModel, ViewIdentity, SetIdentityPassword, SetIdentityCapability, DeleteIdentityLink, MoveIdentityLink,DeleteIdentitySnapshot, MonitorIdentityActivity" url="define/identity/identities.jsf"/>
+            <WebResource rights="*" url="accessRequest/accessRequest.jsf"/>
+            <WebResource rights="*" url="identityRequest/identityRequest.jsf"/>
+            <WebResource rights="FullAccessIdentityCorrelation" url="manage/correlation/identityAttributes.json"/>
+            <WebResource rights="*" url="manage/correlation/appAccounts.json"/>
+          </List>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+</Configuration>
+</sailpoint>

@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC
+                "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!-- (c) Copyright 2017 SailPoint Technologies, Inc., All Rights Reserved. -->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:t="http://myfaces.apache.org/tomahawk"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:sp="http://sailpoint.com/ui">
+<body>
+
+<ui:composition>
+
+    <script type="text/javascript">
+      <!--//--><![CDATA[//><!--
+        helpKey = 'APPLICATION';
+
+        function getFieldValue(field) {
+            var val = null;
+            var fileName = $(field);
+            if ( fileName ) {
+               val = fileName.value;
+            }
+            return val;
+        }
+        Ext.onReady(function () {
+           Ext.QuickTips.init();
+
+           // This is our validation hook
+           Page.on('beforeSave', function() {
+              // var clientID = getFieldValue('editForm:clientID');
+               //Validator.validateNonBlankString(hostName, "Client ID cannot be null!");
+
+               //var clientSecret = getFieldValue('editForm:clientSecret');
+               //Validator.validateNonBlankString(adminName, "Client Secret cannot be null!");
+               
+               //var refreshToken = getFieldValue('editForm:refreshToken');
+               //Validator.validateNonBlankString(password, "Refresh Token cannot be null!");                             
+               
+               //var domainName = getFieldValue('editForm:domainName');
+               //Validator.validateNonBlankString(domainName, "Domain Name cannot be null!");                             
+               
+               //var groupDetails = getFieldValue('editForm:groupDetails');
+               //Validator.validateNonBlankString(domainName, "Choose a value for Read Group Details!");                             
+                             
+               var errors = Validator.getErrors();
+               if (errors && errors.length > 0) {
+                   var errorDivTop = $('formErrorsTop');
+                   var errorDivBottom = $('formErrorsBottom');
+                   Validator.displayErrors(errorDivBottom); 
+                   Validator.displayErrors(errorDivTop); 
+                   return false;
+               }
+               //return false will kill cancel the save
+               return true;
+           });
+
+        });
+
+       //--><!]]>
+    </script>
+    <f:view>
+
+      <h:outputText styleClass="sectionHeader" value="#{applicationObject.type} #{msgs.label_configuration}"/><br/><br/>
+      <div id='formErrorsTop' class="formError" style="display:none"/>
+
+      <div id="accountSettings" class='spContent'>
+        <table class="spTable" style="border:0px" cellspacing="0">
+        
+			<!--
+				Ignore non correlated
+			-->
+			<tr>
+            <td class='titleColumn certScheduleTitleCol'>
+              <h:outputText style='padding:5px' value="Ignore non correlated identities"/>
+            </td>
+            <td class="certScheduleHelpCol">
+              <h:graphicImage id="imgHlpignoreNonCorrelated" styleClass="helpIcon" 
+                              url="/images/icons/dashboard_help_16.png" 
+                               alt="Only include correlated identities on aggregation"/>
+            </td>
+            <td>
+              <h:selectBooleanCheckbox value="#{applicationObject.attributes['ignoreNonCorrelatedIdentities']}"
+                           disabled="#{!sp:hasRight(facesContext, 'ManageApplication')}"
+                           readonly="#{!sp:hasRight(facesContext, 'ManageApplication')}"/>
+            </td>
+          </tr>
+		  <!--
+				Ignore identities without entitlements
+			-->
+			<tr>
+            <td class='titleColumn certScheduleTitleCol'>
+              <h:outputText style='padding:5px' value="Ignore identities with no entitlements"/>
+            </td>
+            <td class="certScheduleHelpCol">
+              <h:graphicImage id="imgHlpLyncServer" styleClass="helpIcon" 
+                              url="/images/icons/dashboard_help_16.png" 
+                               alt="Only aggregate identities which have entitements assigned to them"/>
+            </td>
+            <td>
+              <h:selectBooleanCheckbox value="#{applicationObject.attributes['ignoreIdentitiesWithNoEntitlements']}"
+                           disabled="#{!sp:hasRight(facesContext, 'ManageApplication')}"
+                           readonly="#{!sp:hasRight(facesContext, 'ManageApplication')}"/>
+            </td>
+          </tr>
+		  
+        	<!-- 
+        	
+        		Filter Identities
+        	 -->
+          <tr>
+            <td class='titleColumn certScheduleTitleCol'>
+              <h:outputText style='padding:5px' value="Identity filter"/>   
+              <h:outputText styleClass="requiredText" value="*"/>           
+            </td>
+
+            <td class="certScheduleHelpCol">
+              <h:graphicImage id="imgHlpAccountName" styleClass="helpIcon" url="/images/icons/dashboard_help_16.png" 
+                              alt="Filter expression to limit the identities on aggregation"/>
+
+            </td>
+            <td>
+              <h:inputText id="accountName"
+                           value="#{applicationObject.attributes['identiyFilter']}"                           
+                           size="80"
+                           disabled="#{!sp:hasRight(facesContext, 'ManageApplication')}"
+                           readonly="#{!sp:hasRight(facesContext, 'ManageApplication')}"/>
+            </td>
+          </tr>
+          
+        </table>
+
+      </div>
+
+      <div id='formErrorsBottom' class="formError" style="display:none"/>
+    </f:view>
+</ui:composition>
+
+</body>
+</html>

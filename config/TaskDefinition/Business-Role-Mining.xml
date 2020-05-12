@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.BusinessFunctionalRoleGenerator" hidden="true" name="Business Role Mining" resultAction="Rename" subType="task_item_type_role_mining" type="RoleMining">
+  <Description>
+        Mine Business Roles based on organizational and functional identity attributes
+      </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="tieredIdentityMiningAttrs" required="true" type="string">
+        <Prompt>Comma-separated list of identity mining attributes (required).</Prompt>
+      </Argument>
+      <Argument name="owner" required="true" type="string">
+        <Prompt>Default owner of mined roles (required).</Prompt>
+      </Argument>
+      <Argument name="genContainerRole" type="boolean">
+        <Prompt>Place mined business roles into auto-generated organizational roles using top-tier attribute.</Prompt>
+      </Argument>
+      <Argument name="containerRole" required="true" type="Bundle">
+        <Prompt>Place mined roles into single, pre-existing Container Role.</Prompt>
+      </Argument>
+      <Argument name="bfrPrefix" type="string">
+        <Prompt>Optional prefix to apply to all mined role names.</Prompt>
+      </Argument>
+      <Argument name="minimumRoleSize" type="int">
+        <Prompt>Minimum number of users in each mined role.</Prompt>
+      </Argument>
+      <Argument name="createSubRoles" type="boolean">
+        <Prompt>Use sub-roles in the mining process (optional).</Prompt>
+      </Argument>
+      <Argument name="computeCoverage" type="boolean">
+        <Prompt>Compute population statistics (optional).</Prompt>
+      </Argument>
+      <Argument name="uidNaming" type="boolean">
+        <Prompt>Use generic uid naming for mined roles (default: filter-based naming).</Prompt>
+      </Argument>
+      <Argument name="simulate" type="boolean">
+        <Prompt>Perform What-If mining analysis (no roles are created).</Prompt>
+      </Argument>
+      <Argument name="mineITRoles" type="boolean">
+        <Prompt>Mine for IT entitlements on each generated Business Functional Role (optional).</Prompt>
+      </Argument>
+      <Argument name="applications" type="Application">
+        <Prompt>If mining for IT Roles, the Application(s) whose entitlements will be mined.</Prompt>
+      </Argument>
+      <Argument name="threshold" required="true" type="int">
+        <Prompt>If mining for IT Roles, the percentage threshold for inclusion of an entitlement.</Prompt>
+      </Argument>
+      <Argument name="itRoleAssociation" type="boolean">
+        <Prompt>Associate the mined IT Role to the BFR using "required" policy (default is "permits").</Prompt>
+      </Argument>
+      <Argument name="attachITProfiles" type="boolean">
+        <Prompt>Attach mined IT profiles to BFR instead of creating an IT role.</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="simulation" type="string">
+        <Prompt>Simulation:</Prompt>
+      </Argument>
+      <Argument name="miningInput" type="string">
+        <Prompt>Identity Mining Attributes:</Prompt>
+      </Argument>
+      <Argument name="rolesCreated" type="string">
+        <Prompt>Roles mined:</Prompt>
+      </Argument>
+      <Argument name="rolesUpdated" type="string">
+        <Prompt>Roles updated:</Prompt>
+      </Argument>
+      <Argument name="rolesDiscarded" type="string">
+        <Prompt>Roles discarded:</Prompt>
+      </Argument>
+      <Argument name="roleCoverage" type="string">
+        <Prompt>Coverage of mined roles:</Prompt>
+      </Argument>
+      <Argument name="entMiningStats" type="string">
+        <Prompt>Entitlement mining stats:</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

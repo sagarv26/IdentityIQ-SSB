@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="services.standard.build.filelayout">
+
+    <target name="prepBinaries" depends="-expandGAreleaseAndPatches,-laydownWebDirectoryOverrides,-copySSDPlugins"/>
+
+    <target name="-expandGAreleaseAndPatches">
+        <if>
+            <not>
+                <available file="base/ga/identityiq-${IIQVersion}.zip"/>
+            </not>
+            <then>
+                <property name="critical.failure"
+                          value="Could not find file (identityiq-${IIQVersion}.zip}) IIQ GA binaries for the specified build version ${IIQVersion} in the /base/ga directory. You can download these files from https://community.sailpoint.com "/>
+               <fail message="${critical.failure}"/>
+            </then>
+        </if>
+        <if>
+            <and>
+                <and>
+                    <isset property="IIQPatchLevel"/>
+                    <length string="${IIQPatchLevel}" when="greater" length="1"/>
+                </and>
+                <not>
+                    <available file="base/patch/identityiq-${IIQVersion}${IIQPatchLevel}.jar"/>
+                </not>
+            </and>
+
+            <then>
+                <property name="critical.failure"
+                          value="Could not find file (identityiq-${IIQVersion}${IIQPatchLevel}.jar}) IIQ patch binaries for the specified build version ${IIQVersion}${IIQPatchLevel} in the /base/patch directory.  You can download these files from https://community.sailpoint.com "/>
+                <fail message="${critical.failure}"/>
+            </then>
+
+            <else>
+                <echo>Found IIQ binaries for ${IIQVersion}${IIQPatchLevel}. Building for this version.</echo>
+            </else>
+        </if>
+    	
+	  	  <!-- Automatically build the base/efix/N.XpY directory.  The build should be smart enough
+	  	       to do this own its own and not require that a user create a new directory by hand. -->
+	  	  <if>
+	  	       <available file="base/efix/${IIQVersion}${IIQPatchLevel}" type="dir"/>
+	  	  	    <then>
+	  	  	        <echo>Will look for eFixes in directory: base/efix/${IIQVersion}${IIQPatchLevel} ...</echo>
+	  	  	    </then>
+	  	       <else>
+	  	       	  <echo>Creating directory for future eFixes: base/efix/${IIQVersion}${IIQPatchLevel} ...</echo>
+	  	       	  <mkdir dir="base/efix/${IIQVersion}${IIQPatchLevel}"/>
+	  	       </else>    	  	
+	  	  </if>    	
+
+        <if>
+            <not>
+                <available file="${build.iiqBinaryExtract}"/>
+            </not>
+            <then>
+                <trycatch property="critical.failure">
+                    <try>
+                        <echo>Extracting GA release binary...</echo>
+                        <mkdir dir="${build.iiqBinaryExtract}"/>
+                        <unzip dest="${build.iiqBinaryExtract}">
+                            <fileset dir="base/ga/">
+                                <include name="identityiq-${IIQVersion}.zip"/>
+                            </fileset>
+                        </unzip>
+                        <echo>Extracting WAR file...</echo>
+                        <unzip dest="${build.iiqBinaryExtract}">
+                            <fileset dir="${build.iiqBinaryExtract}">
+                                <include name="identityiq.war"/>
+                            </fileset>
+                        </unzip>
+                        <delete file="${build.iiqBinaryExtract}/identityiq.war"/>
+                        <echo>Overlaying patch version ${IIQVersion}${IIQPatchLevel}</echo>
+                        <unzip dest="${build.iiqBinaryExtract}">
+                            <fileset dir="base/patch">
+                                <include name="identityiq-${IIQVersion}${IIQPatchLevel}.jar"/>
+                            </fileset>
+                        </unzip>
+                        <echo>Overlaying efixes from /base/efix/${IIQVersion}${IIQPatchLevel}</echo>
+                        <unzip dest="${build.iiqBinaryExtract}">
+                            <fileset dir="base/efix/${IIQVersion}${IIQPatchLevel}">
+                            	<include name="*.jar"/>
+                            	<include name="*.zip"/>                            	
+                            </fileset>
+                        </unzip>
+                    </try>
+                    <catch>
+                        <echo>Critical failure while extracting core binaries. Make sure required files exit, ${line.separator}
+                            are not corrupted and a directory exists for /base/efix/x.xpx version your are building.${line.separator}
+                            Note: You need a directory (Ex. /base/efix/5.1p3 ) even if you don't have any efixes yet.
+                        </echo>
+                        <fail message="${critical.failure}"/>
+                    </catch>
+                </trycatch>
+            </then>
+            <else>
+                <echo>Binaries already extracted. Use clean to force a expansion</echo>
+            </else>
+        </if>
+    </target>
+
+    <target name="-laydownWebDirectoryOverrides">
+		<!-- Revised 2013-02-25 by Adam E. Hampton.  Added the force overwrite to true. -->
+    	<!-- We had problems where UI customizations that were written before a patch   -->
+    	<!-- Ended up with a date stamp in SVN from before the patch came out.  This    -->
+    	<!-- caused the build to see the newer patch files unzipped from the patch      -->
+    	<!-- and to not overwrite the UI customizations.  While I can see this maybe    -->
+    	<!-- being the correct call because it would 'force' a knowledgeable developer  -->
+    	<!-- to review and re-check in the UI customizations after a patch it causes    -->
+    	<!-- more problems that it fixes by making the UI customizations break after    -->
+    	<!-- every patch gets appled.                                                   -->
+    	<!-- Behavior is now to forcefuly overwrite customizations checked into source  -->
+    	<!--  control from the services standard build regardless of modification date  -->
+    	<!-- specificall for the /web/** items.                                         -->
+		<copy todir="${build.iiqBinaryExtract}" overwrite="true">
+		    <fileset dir="web">
+		        <include name="**/*"/>
+                <exclude name="**/.keep"/>
+		    </fileset>
+		</copy>
+    	
+    	<!-- Added 2012-02-14 for automating branded IIQ splash screens.           -->
+    	<!-- Copy in the appropriate branding screen based TARGET environment or   -->
+    	<!-- copy in the appropriate branding screen based on what host we run on. -->
+	    <!-- If you want to setup IIQ from this build w/ correct branding add your -->
+    	<!-- login.gif.TARGETNAME to the web/images directory or  -->
+    	<!-- login.gif.HOSTNAME to the web/images directory. -->
+    	<if>
+    	  <available file="web/images/login-${target}.gif"/>
+    	  <then>
+    	  	<copy file="web/images/login-${target}.gif"              tofile="${build.iiqBinaryExtract}/images/login.gif"        overwrite="true" failonerror="false"/>
+    	  </then>
+    	</if>    	
+    	<if>
+    	  <available file="web/images/headerSPLogo-${target}.jpg"/>
+    	  <then>
+    	  	<copy file="web/images/headerSPLogo-${target}.jpg"       tofile="${build.iiqBinaryExtract}/images/headerSPLogo.jpg" overwrite="true" failonerror="false"/>
+    	  </then>
+    	</if>
+    	<if>
+    	  <available file="web/images/login-${env.HOSTNAME}.gif"/>
+    	  <then>
+    	  	<copy file="web/images/login-${env.HOSTNAME}.gif"        tofile="${build.iiqBinaryExtract}/images/login.gif"        overwrite="true" failonerror="false"/>
+    	  </then>
+    	</if>    	
+    	<if>
+    	  <available file="web/images/headerSPLogo-${env.HOSTNAME}.jpg"/>
+    	  <then>
+    	  	<copy file="web/images/headerSPLogo-${env.HOSTNAME}.jpg" tofile="${build.iiqBinaryExtract}/images/headerSPLogo.jpg" overwrite="true" failonerror="false"/>
+    	  </then>
+    	</if>
+    	<!-- end support for automated branding images. -->
+    	
+    	<!-- Added 2012-02-14 for automating re-naming of license.bea files.  -->
+    	<!-- This is necessary to support communicating with the CTSA PIM     -->
+    	<!-- when the CTSA PIM is hosted on WebLogic.  This takes files like  -->
+    	<!-- dev-license.bea and re-names them to license.bea where           -->
+    	<!-- appropriate.  -->
+    	<if>
+    	  <available file="web/WEB-INF/classes/${target}-license.bea"/>
+    	  <then>
+    	  	<copy file="web/WEB-INF/classes/${target}-license.bea" tofile="${build.iiqBinaryExtract}/WEB-INF/classes/license.bea" overwrite="true" failonerror="false"/>
+    	  </then>
+    	</if>
+    	
+    </target>
+
+    <target name="-copySSDPlugins">
+    	<if>
+    	   <and>
+    	   	<not>
+    	   		<equals arg1="${pre7.1}" arg2="true"/>
+    	   	</not>
+    	      <equals arg1="${deployTaskResulter}" arg2="true"/>
+    	   </and>
+    	   <then>
+            <copy todir="${build.iiqBinaryExtract}/plugins/system/SSB/install">
+                <fileset dir="ssdplugins/TaskResulter">
+                    <include name="**/*.zip"/>
+                </fileset>
+            </copy>
+    	   </then>
+    	 </if>
+    </target>
+	
+    <target name="dist" depends="init-properties" description="Take the finished iiq build and copy it to the application server directory">
+        <mkdir dir="${IIQHome}"/>
+        <copy todir="${IIQHome}">
+            <fileset dir="${build.iiqBinaryExtract}">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+    </target>
+
+</project>

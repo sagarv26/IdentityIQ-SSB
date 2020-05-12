@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="services.standard.build.custom.web_xml_timeout.xml">
+<!-- Modify the web_xml_timeout value in web.xml -->
+	<target name="web_xml_timeout" description="Change session timeout in web.xml">
+		<!-- Sets timeout set to 60 minutes -->
+		<replaceregexp file="${build}/extract/WEB-INF/web.xml" match="&lt;!--\s*$\s*&lt;session-config&gt;" replace="&lt;session-config&gt;" flags="m" />
+		<replaceregexp file="${build}/extract/WEB-INF/web.xml" match="&lt;/session-config&gt;\s*$\s*--&gt;" replace="&lt;/session-config&gt;" flags="m" />
+		<replaceregexp file="${build}/extract/WEB-INF/web.xml" match="&lt;session-timeout&gt;\d+&lt;/session-timeout&gt;" replace="&lt;session-timeout&gt;60&lt;/session-timeout&gt;" />
+	   <echo message="Modified web_xml_timeout value in ${build}/extract/WEB-INF/web.xml"/> 
+	</target>
+
+	<!-- The post expansion hook is called after war file is expanded to build/extract. -->
+	<target name="post.expansion.hook">
+		<antcall inheritall="true" target="web_xml_timeout" />
+	</target>
+
+	<target name="post.war.hook" />
+
+	<target name="clean" />
+
+</project>

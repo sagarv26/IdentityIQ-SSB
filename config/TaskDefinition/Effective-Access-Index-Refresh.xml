@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition name="Effective Access Index Refresh" subType="task_item_type_system" type="System">
+  <Attributes>
+    <Map>
+      <entry key="indexEntitlementTargets" value="true"/>
+      <entry key="indexRoleTargets" value="true"/>
+    </Map>
+  </Attributes>
+  <Description>
+          Calculate the indirect target associations (Tcodes, etc.) for entitlements and roles.
+        </Description>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Effective Access Indexing"/>
+  </Parent>
+</TaskDefinition>
+</sailpoint>

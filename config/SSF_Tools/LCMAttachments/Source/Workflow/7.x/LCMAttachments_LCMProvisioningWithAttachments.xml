@@ -1,0 +1,836 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+
+<!-- **********************************************************************
+  -
+  - Modified version of LCM Provisioning to work with the Access Request
+  - Attachments SSD component.  This will not work with versions of
+  - IdentityIQ earlier than 7.0.  See the documentation included with the
+  - SSD for instructions on configuring for earlier versions.
+  -
+  ********************************************************************** -->
+
+<Workflow name="LCM Provisioning with Attachments"
+          type="LCMProvisioning"
+          configForm="Provisioning Workflow Config Form"
+          taskType="LCM"
+          libraries="Identity,Role,PolicyViolation,LCM,BatchRequest"
+          handler="sailpoint.api.StandardWorkflowHandler">
+          
+  <RuleLibraries>
+    <Reference name="LCM Workflow Library" class="sailpoint.object.Rule"/>
+  </RuleLibraries>
+
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity being updated.</Description>
+  </Variable>
+
+  <Variable input="true" name="endOnManualWorkItems" initializer="false" >
+    <Description>Option to skip requests with manual work items.</Description>
+  </Variable>
+
+  <Variable input="true" name="endOnProvisioningForms" initializer="false" >
+    <Description>Option to skip requests with provisioning forms.</Description>
+  </Variable>
+
+  <Variable input="true" name="identityDisplayName"
+            initializer='script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)'>
+    <Description>
+      The displayName of the identity being updated.
+      Query for this using a projection query and fall back to the name.
+    </Description>
+  </Variable>
+
+  <Variable input="true" name="plan">
+    <Description>The provisioning plan ready to execute.</Description>
+  </Variable>
+
+  <Variable input="true" name="flow">
+    <Description>
+      The name of the LCM flow that launched this workflow.
+
+      This is one of these three values:
+
+      AccountsRequest
+      EntitlementsRequest
+      RolesRequest
+    </Description>
+  </Variable>
+
+  <Variable initializer='false' name='optimisticProvisioning' editable='true'>
+    <Description>
+      Set to true to enable optimistic provisioning.  This will cause
+      changes to the entitlements compiled from role assignments to be
+      applied immediately to the identity cube rather than waiting
+      for the next refresh/reaggregation after the provisioning system
+      completes the request.
+    </Description>
+  </Variable>
+
+  <Variable name='foregroundProvisioning' editable='true' initializer='true'>
+    <Description>
+      Normally provisioning is done in a step that uses the "background"
+      option to force the workflow to be suspend and be resumed in a
+      background task thread.  This prevents the browser session from
+      hanging since provision can sometimes take a long time.  For demos
+      and testing it can be better to do this in the foreground so that
+      provisioning will have been performed when control is returned to the
+      user.  This prevents having to run the Perform Maintenance task to
+      see the results of the request.
+    </Description>
+  </Variable>
+
+  <Variable name='batchRequestItemId' input='true'>
+    <Description>
+      Used by the batch interface to record back individual request item status. The specific item id for the individual request in the batch file.
+    </Description>
+  </Variable>
+
+  <Variable name='doRefresh' editable='true'>
+    <Description>
+      Set to true to cause an identity refresh after the changes in the plan
+      have been provisioned.  This is normally off, you might want this on
+      if you want modification of identity or link attributes to result in
+      an immediate re-evaluation of assigned and detected roles.
+    </Description>
+  </Variable>
+
+  <Variable initializer="user,requester" input="true" name="notificationScheme">
+    <Description>
+     A string that specifies who should be notified when the request has been complete.
+     The value can be null or a csv of one or more of the following options.
+
+     none or null
+       disable notifications
+
+     user
+       Identity that is being update will be notified.
+
+     manager
+       The manager of the Identity that is being updated will be notified.
+
+     requester
+       The person that has requested the update will be notified.
+    </Description>
+  </Variable>
+
+  <Variable name="userEmailTemplate" input="true" initializer="LCM User Notification">
+    <Description>
+     The email template to use for user notification.
+    </Description>
+  </Variable>
+
+  <Variable name="requesterEmailTemplate" input="true" initializer="LCM Requester Notification">
+    <Description>
+     The email template to use for requester notification.
+    </Description>
+  </Variable>
+
+  <Variable name="managerEmailTemplate" input="true" initializer="LCM Manager Notification">
+    <Description>
+     The email template to use for manager notification.
+    </Description>
+  </Variable>
+
+  <Variable name="securityOfficerEmailTemplate" input="true">
+    <Description>
+     The email template to use for security officer notification.
+    </Description>
+  </Variable>
+
+  <Variable initializer="parallel" input="true" name="approvalMode">
+    <Description>
+        A string that specifies how we should handle the approvals.
+
+        By default this is serial since most of these request with
+        the exception of manager transfers will have only one approver.
+
+        parallel
+        Approvals are processed concurrently and there must be consensus,
+        we wait for all approvers to approve.  The first approver that
+        rejects terminates the entire approval.
+
+        parallelPoll
+        Approvals are processed concurrently but consensus is not required.
+        All approvals will be processed, we don't stop if there are any
+        rejections.
+
+        serial
+        Approvals are processed one at a time and there must be consensus.
+        The first approver that rejects terminates the entire approval.
+
+        serialPoll
+        Approvals are processed in order but consensus is not required.
+        All approvals will be processed, we don't stop if there are any
+        rejections.  In effect we are "taking a poll" of the approvers.
+
+        any
+        Approvals are processed concurrently, the first approver to
+        respond makes the decision for the group.
+    </Description>
+  </Variable>
+
+  <Variable initializer="owner" input="true" name="approvalScheme">
+    <Description>
+      A csv string that specifies how approval items should be generated
+      for the incoming request.
+
+      The value can be "none", in which case approvals are disabled.
+
+      The value can also be a combination of any of the values below
+      in any order, separated by commas. The order in which they are
+      specified is the order in which they are processed:
+
+      owner
+        The object owner gets the approval item.
+        For Role approvals this is the Role object owner.
+        For Entitlement approvals this is the Entitlement object owner.
+
+      manager
+        The manager gets the approval item.
+
+      securityOfficer
+        The identity in the variable securityOfficerName gets the approval item.
+
+      identity
+        The identities/workgroups in the variable approvingIdentities get the approval item.
+    </Description>
+  </Variable>
+
+  <Variable name="approvalEmailTemplate" input="true" initializer="LCM Identity Update Approval">
+    <Description>
+     The email template to use for approval notifications.
+    </Description>
+  </Variable>
+
+  <Variable name="workItemPriority" initializer="Normal" input="true">
+    <Description>
+       The String version of a WorkItem.Priority. This variable is
+       used to set the priority on all of the workitems generated
+       as part of this workflow and also set on the IdentityRequest
+       object.
+    </Description>
+  </Variable>
+
+  <Variable input="true" name="securityOfficerName">
+    <Description>
+       The name of the identity that will be sent approvals
+       during security officer approvals.
+    </Description>
+  </Variable>
+
+  <Variable initializer="spadmin" input="true" name="fallbackApprover">
+    <Description>
+      A String that specifies the name of the Identity that will
+      be assigned any approvals where the owner of the approver
+      can't be resolved. Example if the scheme is "owner" and the
+      application doesn't specify and owner.
+    </Description>
+  </Variable>
+
+  <Variable initializer="continue" input="true" name="policyScheme">
+    <Description>
+      A String that specifies how policy checks effect the overall
+      process.
+
+      none - disabled policy checking
+
+      continue -  continue if policy violations are found
+
+      interactive -  allow requester to remove request items which are causing violations
+
+      fail -  this option will cause the workflow to terminate immediately if any policy violations are found.
+              Note that the requester will not be notified that the workflow has terminated.
+    </Description>
+  </Variable>
+
+  <Variable name='enableRetryRequest' input='true' initializer='false'>
+    <Description>
+      When set to true it will disable the workflow retry loop and let the
+      Provision step launch requests to handle the retries.  Enabling
+      this flag will enable some older functionality.
+    </Description>
+  </Variable>
+
+  <Variable input="true" name="policiesToCheck">
+    <Description>
+      A List of policies that should be checked. If this list is
+      empty all violations will be checked. Used in combination
+      with policyScheme.
+    </Description>
+  </Variable>
+
+  <Variable input="true" name="source" initializer="LCM">
+    <Description>
+      String version of sailpoint.object.Source to indicate
+      where the request originated.  Defaults to LCM.
+    </Description>
+  </Variable>
+
+  <Variable name="trace" initializer='false'>
+    <Description>
+      Used for debugging this workflow and when set to true trace
+      will be sent to stdout.
+    </Description>
+  </Variable>
+
+  <Variable name="approvalSet">
+    <Description>
+       This attributes is set during the "Build Approval Set" step,
+       which builds this list by going through the ProvisioningPlan
+       to build the line items that need to be approved,
+
+       This variable includes all ApprovalItems that are part of
+       the request process and is updated during the AfterScript
+       of the approval process by assimilating the decisions
+       and comments from the Approvals copy of the ApprovalItem.
+    </Description>
+  </Variable>
+
+  <Variable name="allowRequestsWithViolations" initializer="true">
+    <Description>
+      If this variable is set to true, requesters will be able to proceed past
+      the Policy Violation Review form without taking any action on
+      policy violations resulting from the request. This is only relevant
+      if policyScheme=interactive.
+    </Description>
+  </Variable>
+
+  <Variable name="requireViolationReviewComments" initializer="true">
+    <Description>
+      If true, requesters will be required to enter in comments if they
+      proceed with a request that will result in policy violations. This
+      is only relevant if policyScheme=interactive.
+    </Description>
+  </Variable>
+
+  <Variable name="project">
+    <Description>
+      ProvisioningProject which is just a compiled version of the ProvisioningPlan.
+    </Description>
+  </Variable>
+
+  <Variable name="policyViolations">
+    <Description>
+       List of policy violations that were found during our initial policy scan.
+       This list is passed into each work item so the approvers can see
+       pending violations.
+    </Description>
+  </Variable>
+
+  <Variable name="identityRequestId" output="true">
+    <Description>
+       The sequence id of the Identity request object which is stored in
+       the name field of the identity request and auto-incremented.
+    </Description>
+  </Variable>
+
+  <Variable name='violationReviewDecision'>
+     <Description>
+       Decision made by the user in the Policy Violation Review step.
+       This may be one of three choices:
+
+       -ignore:   User is ignoring the violations and letting the request continue. If
+                   requireViolationReviewComments=true the user will be required to enter
+                   comments indicating why they are allowing the violations.
+
+       -remediate: Indicates that the user removed the request items that were causing the
+                   violations
+
+       -cancel:   Indicates that the user decided to abandon the request, terminating the workflow.
+
+     </Description>
+   </Variable>
+
+  <Variable name="workItemComments">
+    <Description>
+      Global comments accumulated during the workflow which should be shared
+      with other approvals. When a new approval is created, the comments in this
+      list will be added to the work item.
+    </Description>
+  </Variable>
+
+  <Variable name="ticketManagementApplication" input="true">
+    <Description>
+      Name of the application that can handle ticket requests.
+      When non-null the Manage Ticket Steps will be visited to open
+      tickets during the workflow lifecycle.
+    </Description>
+  </Variable>
+
+  <Variable name="ticketId">
+    <Description>
+      The id of the ticket that is generated by the ticketingManagementApplication.
+      This is typically generated on the "open" call, and then used in subsequent
+      calls.  It is also stored on the IdentityRequest object under the
+      externalTicketId variable.
+    </Description>
+  </Variable>
+
+  <Variable name="managerElectronicSignature" input="true">
+    <Description>
+       The name of the electronic signature object that should be used when workitems
+       are completed by a manager.
+    </Description>
+  </Variable>
+
+  <Variable name="ownerElectronicSignature" input="true">
+    <Description>
+       The name of the electronic signature object that should be used when workitems
+       are completed by object owners.
+    </Description>
+  </Variable>
+
+  <Variable name="securityOfficerElectronicSignature" input="true">
+    <Description>
+       The name of the electronic signature object that should be used when workitems
+       are completed by the security officer.
+    </Description>
+  </Variable>
+
+  <Variable name="approvingIdentities" input="true">
+    <Description>
+      List of identities and/or workgroups names/ids that should be involved in the approval
+      process.
+    </Description>
+  </Variable>
+
+  <Variable name="identityElectronicSignature" input="true">
+    <Description>
+      The name of the electronic signature object that should be used when workitems
+      are completed by identities and/or workgroups.
+    </Description>
+  </Variable>
+
+  <Variable name="identityEmailTemplate" input="true">
+    <Description>
+      Name of the email template to use when notifying the identities/workgroups of pending approvals.
+    </Description>
+  </Variable>
+
+  <Variable name="filterRejects" input="true" initializer="true">
+    <Description>True to filter rejected items when running in Serial/SerialPoll mode.</Description>
+  </Variable>
+
+  <Variable name="setPreviousApprovalDecisions" input="true" initializer="false">
+    <Description>True to pre-populate approval decisions from previous approvals.</Description>
+  </Variable>
+
+  <Variable name="approvalSplitPoint">
+      <Description>
+          Variable to determine when to split into parallel processing.
+          This should map to a configured approvalScheme. We will process all schemes up until
+          the approvalSplitPoint in the Pre Split approvals, and the remaining schemes after
+          we split the items. If this is not specified, we will not split the Provisioning
+          project, and process the entire project as a whole.
+      </Description>
+  </Variable>
+
+  <Variable name="splitPlans">
+      <Description>
+          List of ProvisioningPlan that is generated from the splitPlans step if approvalSplitPoint is set.
+      </Description>
+  </Variable>
+
+  <Variable name="splitProjects">
+      <Description>
+          Variable to store the returns if approvalSplitPoint is set. This will contain a List&lt;ProvisioningProject&gt;
+      </Description>
+  </Variable>
+
+  <Variable name="splitApprovalSet">
+      <Description>
+          Variable to store the list of approvalSets returned from the split subprocess if approvalSplitPoint is set.
+      </Description>
+  </Variable>
+
+  <Variable name="splitWorkItemComments">
+      <Description>
+          Variable to store the list of WorkItem comments returned from the split subprocess if approvalSplitPoint is set.
+      </Description>
+  </Variable>
+
+  <Step icon="Start" name="Start" posX="25" posY="10">
+    <Transition to="File Upload Form"/>
+  </Step>
+
+  <Step name="File Upload Form" posX="79" posY="90">
+    <Approval mode="serial" name="File Upload Form" owner="ref:launcher" renderer="lcmFileUploadRenderer.xhtml" send="identityDisplayName">
+      <Arg name="launcher" value="ref:launcher"/>
+      <Arg name="workItemDescription" value="script:return &quot;Upload file attachment for &quot; + identityDisplayName;"/>
+      <Arg name="workItemRequester" value="$(launcher)"/>
+      <Arg name="workItemType" value="Generic"/>
+    </Approval>
+    <Transition to="Initialize"/>
+  </Step>
+
+  <Step icon="Task" name="Initialize" posX="134" posY="10">
+    <Description>
+      Call the standard subprocess to initialize the request, this includes
+      auditing, building the approvalset, compiling the plan into
+       project and checking policy violations.
+    </Description>
+    <WorkflowRef>
+      <Reference class='Workflow' name='Identity Request Initialize'/>
+    </WorkflowRef>
+    <Arg name='flow' value='ref:flow'/>
+    <Arg name='formTemplate' value='Identity Update'/>
+    <Arg name='identityName' value='ref:identityName'/>
+    <Arg name='identityDisplayName' value='ref:identityDisplayName'/>
+    <Arg name='launcher' value='ref:launcher'/>
+    <Arg name='optimisticProvisioning' value='ref:optimisticProvisioning'/>
+    <Arg name='plan' value='ref:plan'/>
+    <Arg name='priority' value='ref:workItemPriority'/>
+    <Arg name='policiesToCheck' value='ref:policiesToCheck'/>
+    <Arg name='policyScheme' value='ref:policyScheme'/>
+    <Arg name='source' value='ref:source'/>
+    <Arg name='trace' value='ref:trace'/>
+    <Arg name='requireViolationReviewComments' value='ref:requireViolationReviewComments'/>
+    <Arg name='allowRequestsWithViolations' value='ref:allowRequestsWithViolations'/>
+    <Arg name='enableRetryRequest' value='ref:enableRetryRequest'/>
+    <Arg name='batchRequestItemId' value='ref:batchRequestItemId'/>
+    <Arg name='endOnProvisioningForms' value='ref:endOnProvisioningForms'/>
+    <Arg name='endOnManualWorkItems' value='ref:endOnManualWorkItems'/>
+    <Return name='project' to='project'/>
+    <Return name='approvalSet' to='approvalSet'/>
+    <Return name='policyViolations' to='policyViolations'/>
+    <Return name='identityRequestId' to='identityRequestId'/>
+    <Return name='violationReviewDecision' to='violationReviewDecision'/>
+    <Return name='workItemComments' to='workItemComments' merge='true'/>
+    <Transition to="Exit On Manual Work Items" when="script:(isTrue(endOnManualWorkItems) &amp;&amp; (project.getUnmanagedPlan() != null))" />
+    <Transition to="Exit On Provisioning Form" when="script:(isTrue(endOnProvisioningForms) &amp;&amp; (project.hasQuestions()))" />
+    <Transition to="Exit On Policy Violation" when="script:(&quot;cancel&quot;.equals(violationReviewDecision) || ((size(policyViolations) > 0 ) &amp;&amp; (policyScheme.equals(&quot;fail&quot;))))"/>
+    <Transition to="Create Ticket"/>
+  </Step>
+
+  <Step name="Create Ticket" condition="script:(ticketManagementApplication != null)" icon="Task" posX="381" posY="6">
+     <Description>
+      Call a subprocess to create a ticket in the ticketManagementApplication is non-null.
+      You can specify a specific 'ticketDataGenerationRule' here or you can also specify
+      it on the application.  It'll be read from the argument first and fall back to the '
+      application config.
+    </Description>
+    <WorkflowRef>
+      <Reference class='Workflow' name='Manage Ticket'/>
+    </WorkflowRef>
+    <Arg name='action' value='open'/>
+    <Arg name='source' value='ref:source'/>
+    <Arg name='priority' value='ref:workItemPriority'/>
+    <Arg name='project' value='ref:project'/>
+    <Arg name='ticketManagementApplication' value='ref:ticketManagementApplication'/>
+    <Arg name='identityRequestId' value='ref:identityRequestId'/>
+    <Arg name='ticketDataGenerationRule' value=''/>
+    <Arg name='trace' value='ref:trace'/>
+    <Return name='ticketId' to='externalTicketId'/>
+    <Transition to="Pre Split Approve" when="script:(!isNull(approvalSplitPoint) &amp;&amp; csvToList(approvalScheme).contains(approvalSplitPoint))"/>
+    <Transition to="Approve and Provision"/>
+  </Step>
+
+  <Step name="Pre Split Approve" condition="script:((flow == null) ||  (!&quot;UnlockAccount&quot;.equals(flow)))" icon="Task" posX="518" posY="63">
+    <Description>
+      Call to our standard subprocess to handle the default approvals for
+      manager, owner and security officer.
+    </Description>
+    <WorkflowRef>
+      <Reference class='Workflow' name='Provisioning Approval Subprocess with Attachments'/>
+    </WorkflowRef>
+    <Arg name='approvalMode' value='ref:approvalMode'/>
+    <Arg name='approvalScheme' value='ref:approvalScheme'>
+      <Script>
+          <Source>
+              import java.util.List;
+              import java.util.ArrayList;
+              import java.util.Iterator;
+              import sailpoint.tools.Util;
+
+              List schemes = Util.csvToList(approvalScheme);
+              List preSchemes = new ArrayList&lt;String&gt;();
+              for (String s : Util.safeIterable(schemes)) {
+                if (s.equals(approvalSplitPoint)) {
+                    break;
+                } else {
+                    preSchemes.add(s);
+                }
+              }
+              return Util.listToCsv(preSchemes);
+          </Source>
+      </Script>
+    </Arg>
+    <Arg name='approvalSet' value='ref:approvalSet'/>
+    <Arg name='approvalAssignmentRule'/>
+    <Arg name='approvingIdentities' value="ref:approvingIdentities"/>
+    <Arg name='approvalSplitPoint' value='ref:approvalSplitPoint'/>
+    <Arg name='fallbackApprover' value='ref:fallbackApprover'/>
+    <Arg name='filterRejects' value='ref:filterRejects'/>
+    <Arg name='flow' value='ref:flow'/>
+    <Arg name='identityName' value='ref:identityName'/>
+    <Arg name='identityDisplayName' value='ref:identityDisplayName'/>
+    <Arg name='identityElectronicSignature' value='ref:identityElectronicSignature'/>
+    <Arg name='identityEmailTemplate' value='ref:identityEmailTemplate'/>
+    <Arg name='identityRequestId' value='ref:identityRequestId'/>
+    <Arg name='launcher' value='ref:launcher'/>
+    <Arg name='managerEmailTemplate' value='ref:approvalEmailTemplate'/>
+    <Arg name='managerElectronicSignature' value='ref:managerElectronicSignature'/>
+    <Arg name='ownerEmailTemplate' value='ref:approvalEmailTemplate'/>
+    <Arg name='ownerElectronicSignature' value='ref:ownerElectronicSignature'/>
+    <Arg name='project' value='ref:project'/>
+    <Arg name='plan' value='ref:plan'/>
+    <Arg name='policyViolations' value='ref:policyViolations'/>
+    <Arg name='priority' value='ref:workItemPriority'/>
+    <Arg name='securityOfficerName' value='ref:securityOfficerName'/>
+    <Arg name='securityOfficerEmailTemplate' value='ref:approvalEmailTemplate'/>
+    <Arg name='securityOfficerElectronicSignature' value='ref:securityOfficerElectronicSignature'/>
+    <Arg name='setPreviousApprovalDecisions' value='ref:setPreviousApprovalDecisions'/>
+    <Arg name='trace' value='ref:trace'/>
+    <Arg name='workItemReminderTemplate'/>
+    <Arg name='workItemHoursBetweenReminders'/>
+    <Arg name='workItemMaxReminders'/>
+    <Arg name='workItemEscalationTemplate'/>      
+    <Arg name='workItemHoursTillEscalation'/>
+    <Arg name='workItemEscalationRule'/>
+    <Arg name='workItemComments'/>
+    <Return name='approvalSet'/>
+    <Return name='workItemComments'/>
+    <Return name='project'/>
+    
+    <Transition to="Split Plan"/>
+  </Step>
+
+  <Step name="Split Plan" action="call:splitProvisioningPlan" icon="Task" posX="618" posY="63" resultVariable="splitPlans">
+      <Description>
+          Step to split the provisioning project into individual projects for each item requested.
+          This will only run if the approvalSplitPoint is configured.
+      </Description>
+      <Arg name='project' value='ref:project'/>
+
+      <Transition to="Approve and Provision Split"/>
+  </Step>
+
+  <Step name="Approve and Provision Split" icon="Task" posX="783" posY="63">
+      <Description>
+          Call the Approve and Provision Subprocess for each Provisioning Project generated in the Split Plan step.
+      </Description>
+      <Replicator items="splitPlans" arg="plan"/>
+      <WorkflowRef>
+          <Reference class='Workflow' name='Approve and Provision Subprocess with Attachments'/>
+      </WorkflowRef>
+
+      <Arg name="approvalMode" value="ref:approvalMode"/>
+      <Arg name="approvalScheme" value="ref:approvalScheme">
+        <Script>
+            <Source>
+              import java.util.List;
+              import java.util.Iterator;
+              import sailpoint.tools.Util;
+              List schemes = Util.csvToList(approvalScheme);
+              Iterator it = schemes.iterator();
+              while (it.hasNext()) {
+                String s = it.next();
+                if (!s.equals(approvalSplitPoint)) {
+                    it.remove();
+                } else {
+                    break;
+                }
+              }
+              return Util.listToCsv(schemes);
+            </Source>
+        </Script>
+      </Arg>
+      <Arg name="approvalSet" value="ref:approvalSet"/>
+      <Arg name='approvalSplitPoint' value='ref:approvalSplitPoint'/>
+      <Arg name="approvalAssignmentRule"/>
+      <Arg name="approvingIdentities" value='ref:approvingIdentities'/>
+      <Arg name="fallbackApprover" value="ref:fallbackApprover"/>
+      <Arg name="foregroundProvisioning" value="ref:foregroundProvisioning"/>
+      <Arg name="formTemplate" value="Identity Update"/>
+      <Arg name="filterRejects" value="ref:filterRejects"/>
+      <Arg name="flow" value="ref:flow"/>
+      <Arg name="identityName" value="ref:identityName"/>
+      <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+      <Arg name="identityElectronicSignature" value='ref:identityElectronicSignature'/>
+      <Arg name="identityEmailTemplate" value='ref:identityEmailTemplate'/>
+      <Arg name="identityName" value="ref:identityName"/>
+      <Arg name="identityRequestId" value="ref:identityRequestId"/>
+      <Arg name="launcher" value="ref:launcher"/>
+      <Arg name="managerEmailTemplate" value="ref:approvalEmailTemplate"/>
+      <Arg name="managerElectronicSignature" value="ref:managerElectronicSignature"/>
+      <Arg name="manualActionsEmailTemplate" value="Pending Manual Changes"/>
+      <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+      <Arg name="ownerEmailTemplate" value="ref:approvalEmailTemplate"/>
+      <Arg name="ownerElectronicSignature" value="ref:ownerElectronicSignature"/>
+      <Arg name="project" value="ref:project"/>
+      <Arg name="plan" value="ref:plan"/>
+      <Arg name="policyScheme" value="ref:policyScheme"/>
+      <Arg name="policyViolations" value="ref:policyViolations"/>
+      <Arg name="priority" value="ref:workItemPriority"/>
+      <Arg name="securityOfficerName" value="ref:securityOfficerName"/>
+      <Arg name="securityOfficerEmailTemplate" value="ref:approvalEmailTemplate"/>
+      <Arg name="securityOfficerElectronicSignature" value="ref:securityOfficerElectronicSignature"/>
+      <Arg name="setPreviousApprovalDecisions" value="ref:setPreviousApprovalDecisions"/>
+      <Arg name="splitProvisioning" value="true"/>
+      <Arg name="source" value="ref:source"/>
+      <Arg name="ticketManagementApplication" value="ref:ticketManagementApplication"/>
+      <Arg name="trace" value="ref:trace"/>
+      <Arg name="workItemReminderTemplate" value="ref:workItemReminderTemplate"/>
+      <Arg name="workItemHoursBetweenReminders" value="ref:workItemHoursBetweenReminders"/>
+      <Arg name="workItemMaxReminders" value="ref:workItemMaxReminders"/>
+      <Arg name="workItemEscalationTemplate" value="ref:workItemEscalationTemplate"/>
+      <Arg name="workItemHoursTillEscalation" value="ref:workItemHoursTillEscalation"/>
+      <Arg name="workItemEscalationRule" value="ref:workItemEscalationRule"/>
+      <Arg name="workItemComments" value="ref:workItemComments"/>
+
+      <Return to="splitProjects" name="project"/>
+      <Return to="splitWorkItemComments" name="workItemComments"/>
+      <Return to="splitApprovalSet" name="approvalSet"/>
+
+      <Transition to="Assimilate Splits"/>
+  </Step>
+
+  <Step action="call:joinLCMProvWorkflowSplits" name="Assimilate Splits" icon="Task" posX="914" posY="63">
+      <Description>
+          Assimilate all projects returned from the split into the global project.
+      </Description>
+      <Arg name="splitProjects" value="ref:splitProjects"/>
+      <Arg name="splitWorkItemComments" value="ref:splitWorkItemComments"/>
+      <Arg name="splitApprovalSet" value="ref:splitApprovalSet"/>
+
+      <Transition to="Refresh Identity"/>
+  </Step>
+
+  <Step name="Approve and Provision" icon="Task" posX="699" posY="7">
+      <Description>
+          Finish any remaining approvals and provision.
+      </Description>
+      <WorkflowRef>
+          <Reference class='Workflow' name='Approve and Provision Subprocess With Attachments'/>
+      </WorkflowRef>
+
+      <Arg name="approvalMode" value="ref:approvalMode"/>
+      <Arg name="approvalScheme" value="ref:approvalScheme"/>
+      <Arg name="approvalSet" value="ref:approvalSet"/>
+      <Arg name='approvalSplitPoint' value='ref:approvalSplitPoint'/>
+      <Arg name="approvalAssignmentRule"/>
+      <Arg name="approvingIdentities" value='ref:approvingIdentities'/>
+      <Arg name="fallbackApprover" value="ref:fallbackApprover"/>
+      <Arg name="foregroundProvisioning" value="ref:foregroundProvisioning"/>
+      <Arg name="formTemplate" value="Identity Update"/>
+      <Arg name="filterRejects" value="ref:filterRejects"/>
+      <Arg name="flow" value="ref:flow"/>
+      <Arg name="identityName" value="ref:identityName"/>
+      <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+      <Arg name="identityElectronicSignature" value='ref:identityElectronicSignature'/>
+      <Arg name="identityEmailTemplate" value='ref:identityEmailTemplate'/>
+      <Arg name="identityName" value="ref:identityName"/>
+      <Arg name="identityRequestId" value="ref:identityRequestId"/>
+      <Arg name="launcher" value="ref:launcher"/>
+      <Arg name="managerEmailTemplate" value="ref:approvalEmailTemplate"/>
+      <Arg name="managerElectronicSignature" value="ref:managerElectronicSignature"/>
+      <Arg name="manualActionsEmailTemplate" value="Pending Manual Changes"/>
+      <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+      <Arg name="ownerEmailTemplate" value="ref:approvalEmailTemplate"/>
+      <Arg name="ownerElectronicSignature" value="ref:ownerElectronicSignature"/>
+      <Arg name="project" value="ref:project"/>
+      <Arg name="plan" value="ref:plan"/>
+      <Arg name="policyScheme" value="ref:policyScheme"/>
+      <Arg name="policyViolations" value="ref:policyViolations"/>
+      <Arg name="priority" value="ref:workItemPriority"/>
+      <Arg name="securityOfficerName" value="ref:securityOfficerName"/>
+      <Arg name="securityOfficerEmailTemplate" value="ref:approvalEmailTemplate"/>
+      <Arg name="securityOfficerElectronicSignature" value="ref:securityOfficerElectronicSignature"/>
+      <Arg name="setPreviousApprovalDecisions" value="ref:setPreviousApprovalDecisions"/>
+      <Arg name="source" value="ref:source"/>
+      <Arg name="splitProvisioning" value="false"/>
+      <Arg name="ticketManagementApplication" value="ref:ticketManagementApplication"/>
+      <Arg name="trace" value="ref:trace"/>
+      <Arg name="workItemReminderTemplate" value="ref:workItemReminderTemplate"/>
+      <Arg name="workItemHoursBetweenReminders" value="ref:workItemHoursBetweenReminders"/>
+      <Arg name="workItemMaxReminders" value="ref:workItemMaxReminders"/>
+      <Arg name="workItemEscalationTemplate" value="ref:workItemEscalationTemplate"/>
+      <Arg name="workItemHoursTillEscalation" value="ref:workItemHoursTillEscalation"/>
+      <Arg name="workItemEscalationRule" value="ref:workItemEscalationRule"/>
+      <Arg name="workItemComments" value="ref:workItemComments"/>
+
+      <Return name="project" to="project"/>
+      <Return name="approvalSet" to="approvalSet"/>
+      <Return name="workItemComments" to="workItemComments"/>
+      <Transition to="Refresh Identity"/>
+  </Step>
+
+  <Step action="call:refreshIdentity" condition="ref:doRefresh" icon="Task" name="Refresh Identity" posX="1028" posY="7">
+    <Description>
+      Add arguments as necessary to enable refresh features.  Typically you
+      only want this to correlate roles.  Don't ask for provisioning  since that
+      can result in provisioning policies that need to be presented and it's
+      too late for that.  This is only to get role detection and exception
+      entitlements in the cube.
+    </Description>
+    <Arg name='identityName' value='ref:identityName'/>
+    <Arg name='correlateEntitlements' value='true'/>
+    <Transition to="Notify"/>
+  </Step>
+
+  <Step icon="Task" name="Notify" posX="1131" posY="7">
+    <Description>
+      Call the standard subprocess that will notify the various
+      actors based on notification scheme.
+    </Description>
+    <WorkflowRef>
+      <Reference class='Workflow' name='Identity Request Notify'/>
+    </WorkflowRef>
+    <Arg name='approvalScheme' value='ref:approvalScheme'/>    
+    <Arg name='approvalSet' value='ref:approvalSet'/>
+    <Arg name='flow' value='ref:flow'/>
+    <Arg name='identityDisplayName' value='ref:identityDisplayName'/>
+    <Arg name='identityName' value='ref:identityName'/>
+    <Arg name='launcher' value='ref:launcher'/>
+    <Arg name='notificationScheme' value='ref:notificationScheme'/>
+    <Arg name='userEmailTemplate' value='ref:userEmailTemplate'/>
+    <Arg name='requesterEmailTemplate' value='ref:requesterEmailTemplate'/>
+    <Arg name='managerEmailTemplate' value='ref:managerEmailTemplate'/>
+    <Arg name='plan' value='ref:plan'/>
+    <Arg name='policyViolations' value='ref:policyViolations'/>
+    <Arg name='priority' value='ref:workItemPriority'/>
+    <Arg name='securityOfficerEmailTemplate' value='ref:securityOfficerEmailTemplate'/>
+    <Arg name='securityOfficerName' value='ref:securityOfficerName'/>
+    <Arg name='trace' value='ref:trace'/>
+    <Arg name='source' value='ref:source'/>
+    <Transition to="end"/>
+  </Step>
+
+  <Step action="call:addMessage" name="Exit On Policy Violation" posX="201" posY="253">
+    <Arg name="message" value="Failed due to policy violation(s)"/>
+    <Arg name="type" value="Error" />
+    <Transition to="end"/>
+  </Step>
+
+  <Step action="call:addMessage" name="Exit On Manual Work Items" posX="364" posY="107">
+    <Arg name="message" value="Failed due to manual work item(s)"/>
+    <Arg name="type" value="Error" />
+    <Transition to="end"/>
+  </Step>
+
+  <Step action="call:addMessage" name="Exit On Provisioning Form" posX="280" posY="178">
+    <Arg name="message" value="Failed due to provisioning form"/>
+    <Arg name="type" value="Error" />
+    <Transition to="end"/>
+  </Step>
+
+  <Step catches="complete" icon="Catches" name="Finalize" posX="1058" posY="308">
+    <Description>
+      Call the standard subprocess that can audit/finalize the request.
+    </Description>
+    <WorkflowRef>
+      <Reference class='Workflow' name='Identity Request Finalize'/>
+    </WorkflowRef>
+    <Arg name='approvalSet' value='ref:approvalSet'/>
+    <Arg name='batchRequestItemId' value='ref:batchRequestItemId'/>
+    <Arg name='identityRequestId' value='ref:identityRequestId'/>
+    <Arg name='project' value='ref:project'/>
+    <Arg name='priority' value='ref:workItemPriority'/>
+    <Arg name='ticketManagementApplication' value='ref:ticketManagementApplication'/>
+    <Arg name='trace' value='ref:trace'/>
+  </Step>
+
+  <Step icon="Stop" name="end" posX="1131" posY="253"/>
+
+</Workflow>

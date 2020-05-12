@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="Sample Role Membership Certification Exclusion Set">
+  <Attributes>
+    <Map>
+      <entry key="entitySelectors">
+        <value>
+          <List>
+            <CompositeFilter operation="AND">
+              <Filter ignoreCase="true" operation="EQ" property="name" value="Gary.Stewart"/>
+              <Filter operation="EQ" property="class" value="Identity"/>
+            </CompositeFilter>
+            <CompositeFilter operation="AND">
+              <Filter ignoreCase="true" operation="EQ" property="name" value="Mary.Johnson"/>
+              <Filter operation="EQ" property="class" value="Identity"/>
+            </CompositeFilter>
+          </List>
+        </value>
+      </entry>
+      <entry key="itemSelectors">
+        <value>
+          <List>
+            <CompositeFilter operation="AND">
+              <Filter ignoreCase="true" operation="EQ" property="name" value="Benefits Clerk"/>
+              <Filter operation="EQ" property="class" value="Bundle"/>
+            </CompositeFilter>
+            <CompositeFilter operation="AND">
+              <Filter ignoreCase="true" matchMode="START" operation="LIKE" property="name" value="Accounts"/>
+              <Filter operation="EQ" property="class" value="Bundle"/>
+            </CompositeFilter>
+          </List>
+        </value>
+      </entry>
+      <entry key="mode" value="EXCLUDE"/>
+      <entry key="reason" value="Exclude identities and roles example"/>
+    </Map>
+  </Attributes>
+</Custom>

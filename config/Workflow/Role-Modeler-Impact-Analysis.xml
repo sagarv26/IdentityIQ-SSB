@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow libraries="Role" name="Role Modeler - Impact Analysis" type="RoleModeler" workItemRenderer="workflow.xhtml">
+  <Variable editable="true" name="doArchive" type="boolean">
+    <Description>Set to true to enable archiving role versions.</Description>
+    <Prompt>Enable Role Versioning</Prompt>
+  </Variable>
+  <Variable editable="true" initializer="true" name="doOverlapAnalysis" type="boolean">
+    <Description>Set to true to enable role overlap analysis.</Description>
+    <Prompt>Enable Overlap Enalysis</Prompt>
+  </Variable>
+  <Variable editable="true" initializer="1" name="overlapThreshold" type="int">
+    <Description>Minimum overlap percentage in any facet a role must have to be included in the result.</Description>
+    <Prompt>Minimum Overlap Percentage</Prompt>
+  </Variable>
+  <Variable input="true" name="approvalObject">
+    <Description>New version of role to approve</Description>
+  </Variable>
+  <Variable name="approvalType">
+    <Description>Set to "delete" when deleting roles. Set to "rollback" when restoring a role archive.  Otherwise null.</Description>
+  </Variable>
+  <Variable input="true" name="approvalSource">
+    <Description>
+       Where in the UI we are requesting the approval.
+       Values: modeler, directed, undirected, certification.
+     </Description>
+  </Variable>
+  <Variable input="true" name="impactAnalysisOwner">
+    <Description>Name of user to receive impact analysis result</Description>
+  </Variable>
+  <Variable initializer="call:getDisplayableRoleName" name="roleName">
+    <Description>Role name referenced by the email templates</Description>
+  </Variable>
+  <Variable editable="true" initializer="false" name="noRolePropagation" type="boolean">
+    <Description>Set to true to disable role change propagation.</Description>
+  </Variable>
+  <Step icon="Start" name="start">
+    <Transition to="Impact Analysis"/>
+  </Step>
+  <Step action="launchImpactAnalysis" condition="script:!(impactAnalysisOwner == unbound || impactAnalysisOwner == null)" icon="Analysis" name="Impact Analysis" posX="141" posY="17">
+    <Arg name="doOverlapAnalysis" value="ref:doOverlapAnalysis"/>
+    <Arg name="overlapThreshold" value="ref:overlapThreshold"/>
+    <Arg name="noApplicationTemplates" value="true"/>
+    <Transition to="Review Analysis"/>
+  </Step>
+  <Step condition="script:!(impactAnalysisOwner == unbound || impactAnalysisOwner == null)" icon="Email" name="Review Analysis" posX="258" posY="17">
+    <Approval owner="ref:impactAnalysisOwner">
+      <Arg name="workItemDescription" value="Review impact analysis of $(call:getObjectClass): $(call:getDisplayableRoleName)"/>
+      <WorkItemConfig escalationStyle="none">
+        <NotificationEmailTemplateRef>
+          <Reference class="sailpoint.object.EmailTemplate" name="Role Modeler - Impact Analysis Review"/>
+        </NotificationEmailTemplateRef>
+      </WorkItemConfig>
+    </Approval>
+    <Transition to="Commit"/>
+  </Step>
+  <Step action="commit" condition="script:(impactAnalysisOwner == unbound || impactAnalysisOwner == null) || approved" name="Commit" posX="375" posY="17">
+    <Arg name="archive" value="ref:doArchive"/>
+    <Transition to="stop"/>
+  </Step>
+  <Step icon="Stop" name="stop" posX="541" posY="17"/>
+</Workflow>
+</sailpoint>

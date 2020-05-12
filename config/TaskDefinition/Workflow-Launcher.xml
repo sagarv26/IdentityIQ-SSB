@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.WorkflowExecutor" hidden="true" name="Workflow Launcher" resultRenderer="workflow.xhtml" subType="task_item_type_workflow" type="Workflow">
+  <Description>Workflow Case</Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workflow" required="true" type="string">
+        <Prompt>task_in_workflow_launcher_workflow</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="case" type="complex"/>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

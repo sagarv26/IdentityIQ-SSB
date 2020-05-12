@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Provisioning Notification Step Form" type="WorkflowConfig">
+  <Attributes>
+    <Map>
+      <entry key="maxWidth" value="500"/>
+    </Map>
+  </Attributes>
+  <Section label="wf_config_provisioning_notification_section">
+    <Field displayName="wf_config_provisioning_notification_scheme" helpKey="help_wf_provisioning_notification_scheme" multi="true" name="notificationScheme" postBack="true" type="string">
+      <AllowedValuesDefinition>
+        <Script>
+          <Source>
+            
+              import sailpoint.tools.Util;
+
+              List values = new ArrayList();
+         
+              val = new ArrayList();
+              val.add("user");
+              val.add("wf_config_provisioning_notification_user");
+              values.add(val);
+
+              val = new ArrayList();
+              val.add("requester");
+              val.add("wf_config_provisioning_notification_requester");
+              values.add(val);
+
+              List val = new ArrayList();
+              val.add("manager");
+              val.add("wf_config_provisioning_notification_manager");
+              values.add(val);
+              
+              val = new ArrayList();
+              val.add("securityOfficer");
+              val.add("wf_config_provisioning_notification_security_officer");
+              values.add(val);
+
+              val = new ArrayList();
+              val.add("otherUsers");
+              val.add("wf_config_provisioning_notification_other_users");
+              values.add(val);
+
+              return values;
+                         
+          </Source>
+        </Script>
+      </AllowedValuesDefinition>
+      <Attributes>
+        <Map>
+          <entry key="anchorConfig" value="100%"/>
+          <entry key="ignoreWidth">
+            <value>
+              <Boolean>true</Boolean>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+      <Script>
+        <Source>
+          
+            import sailpoint.tools.Util;
+
+            List val = null;
+
+            // References are not supported in this form right now so initialize the value 
+            // to null if we get a reference
+            if ( notificationScheme != void &amp;&amp; notificationScheme != null &amp;&amp; !notificationScheme.startsWith("ref:")) {
+                val = Util.csvToList(notificationScheme);
+            }
+
+            return val;
+          
+        </Source>
+      </Script>
+    </Field>
+    <Field displayName="wf_config_provisioning_notification_other_users_names" dynamic="true" helpKey="help_wf_provisioning_other_users_names" multi="true" name="otherUsersToNotify" type="Identity">
+      <Attributes>
+        <Map>
+          <entry key="anchorConfig" value="100%"/>
+          <entry key="hidden" value="script: return !sailpoint.tools.Util.nullSafeContains(notificationScheme, &quot;otherUsers&quot;)"/>
+          <entry key="ignoreWidth">
+            <value>
+              <Boolean>true</Boolean>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="wf_config_provisioning_notification_security_officer_name" dynamic="true" helpKey="help_wf_provisioning_securityofficer_name" name="securityOfficerName" type="Identity">
+      <Attributes>
+        <Map>
+          <entry key="hidden" value="script: return !sailpoint.tools.Util.nullSafeContains(notificationScheme, &quot;securityOfficer&quot;)"/>
+        </Map>
+      </Attributes>
+    </Field>
+  </Section>
+  <Section label="wf_config_email_templates" name="Email Templates">
+    <Attributes>
+      <Map>
+        <entry key="hidden" value="script: return sailpoint.tools.Util.isEmpty(notificationScheme)"/>
+      </Map>
+    </Attributes>
+    <Field displayName="wf_config_provisioning_notification_user_email" dynamic="true" helpKey="help_wf_provisioning_user_template" name="userEmailTemplate" type="EmailTemplate">
+      <Attributes>
+        <Map>
+          <entry key="hidden" value="script: return !sailpoint.tools.Util.nullSafeContains(notificationScheme, &quot;user&quot;)"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="wf_config_provisioning_notification_requester_email" dynamic="true" helpKey="help_wf_provisioning_requester_template" name="requesterEmailTemplate" type="EmailTemplate">
+      <Attributes>
+        <Map>
+          <entry key="hidden" value="script: return !sailpoint.tools.Util.nullSafeContains(notificationScheme, &quot;requester&quot;)"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="wf_config_provisioning_notification_manager_email" dynamic="true" helpKey="help_wf_provisioning_manager_template" name="managerEmailTemplate" type="EmailTemplate">
+      <Attributes>
+        <Map>
+          <entry key="hidden" value="script: return !sailpoint.tools.Util.nullSafeContains(notificationScheme, &quot;manager&quot;)"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="wf_config_provisioning_notification_security_officer_email" dynamic="true" helpKey="help_wf_provisioning_securityofficer_template" name="securityOfficerEmailTemplate" type="EmailTemplate">
+      <Attributes>
+        <Map>
+          <entry key="hidden" value="script: return !sailpoint.tools.Util.nullSafeContains(notificationScheme, &quot;securityOfficer&quot;)"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="wf_config_provisioning_notification_other_users_email" dynamic="true" helpKey="help_wf_provisioning_other_users_template" name="otherUsersToNotifyEmailTemplate" type="EmailTemplate">
+      <Attributes>
+        <Map>
+          <entry key="hidden" value="script: return !sailpoint.tools.Util.nullSafeContains(notificationScheme, &quot;otherUsers&quot;)"/>
+        </Map>
+      </Attributes>
+    </Field>
+  </Section>
+</Form>
+</sailpoint>

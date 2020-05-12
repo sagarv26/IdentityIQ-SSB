@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="SST Unit Tester All Rule" 
+	resultAction="Rename" subType="task_item_type_generic" type="Generic">
+  <Attributes>
+    <Map>
+      <entry key="ruleConfig" value="sendReport,true,recipients,andy.dunfee@sailpoint.com,categories,Miscellaneous:LCM"/>
+      <entry key="ruleName" value="#ID#SSTUNITTESTALLRULE"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate" value="Task Status"/>
+    </Map>
+  </Attributes>
+  <Description>A task that can be used to run an arbitrary rule.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Run Rule"/>
+  </Parent>
+</TaskDefinition>

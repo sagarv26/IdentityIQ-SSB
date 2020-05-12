@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Batch Approval">
+  <Body>
+      
+$launcher is requesting approval to run in a batch request file.
+
+#if ( $approvalSet.items )
+#foreach ($item in $approvalSet.items)
+    Content Preview: $item.displayValue
+#end
+#end
+       
+    </Body>
+  <Description>
+      Email Template for notifying approvers when they need to approve a request made through LCM.
+      Note that in addition to the declared arguments, all workflow variables,
+      Step arguments, and Approval arguments defined in the Workflow are
+      also available.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workflow" type="Workflow">
+        <Description>The Workflow object being executed.</Description>
+      </Argument>
+      <Argument name="item" type="WorkItem">
+        <Description>The WorkItem representing the review.</Description>
+      </Argument>
+      <Argument name="approvalSet" type="ApprovalSet">
+        <Description>The ApprovalSet object contained in the work item.</Description>
+      </Argument>
+      <Argument name="launcher" type="string">
+        <Description>The name of the Identity that launched the workflow.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Changes requested to $identityDisplayName need approval </Subject>
+</EmailTemplate>
+</sailpoint>

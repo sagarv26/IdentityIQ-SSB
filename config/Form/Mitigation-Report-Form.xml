@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Mitigation Report Form" type="Report">
+  <Section columns="2" label="rept_miti_section_label" name="customProperties">
+    <Field displayName="rept_miti_filter_exp_date" helpKey="rept_input_mitigation_report_exp_dt" name="expirationDate" type="date" value="ref:expirationDate">
+      <Attributes>
+        <Map>
+          <entry key="endDate" value="true"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="rept_miti_filter_identities" helpKey="rept_input_mitigation_report_identities" multi="true" name="identities" type="Identity" value="ref:identities"/>
+    <Field displayName="rept_miti_filter_actors" helpKey="rept_input_mitigation_report_mgrs" multi="true" name="managers" type="Identity" value="ref:managers"/>
+    <Field displayName="rept_miti_filter_roles" helpKey="rept_input_mitigation_report_biz_roles" multi="true" name="roles" type="Bundle" value="ref:businessRoles"/>
+  </Section>
+</Form>
+</sailpoint>

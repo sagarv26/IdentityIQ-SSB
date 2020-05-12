@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="LCM Registration Approval">
+  <Body>
+      
+A user is attempting to register a new identity for '$identityDisplayName'.
+
+#if ( $approvalSet.items )
+#foreach ($approvalItem in $approvalSet.items)
+        Application: $approvalItem.applicationName
+#if ( $approvalItem.nativeIdentity )       
+           Account : $approvalItem.nativeIdentity
+#end           
+#if ( $approvalItem.instance ) 
+          Instance : $approvalItem.instance
+#end
+          Operation: $approvalItem.operation
+#if ( $approvalItem.displayName )          
+          Attribute: $approvalItem.displayName
+#elseif ( $approvalItem.name ) 
+          Attribute: $approvalItem.name
+#end          
+#if ( $approvalItem.displayValue )
+           Value(s): $approvalItem.displayValue
+#elseif ( $approvalItem.csv ) 
+           Value(s): $approvalItem.csv
+#end
+#if ( $item.level )
+           Priority: $item.level
+#else
+           Priority: Normal
+#end 
+#if ( $approvalItem.requesterComments )
+ Requester Comments: $approvalItem.requesterComments
+#end
+#end
+#end
+       
+    </Body>
+  <Description>
+      Email Template for notifying approvers when they need to approve a registration request.
+      Note that in addition to the declared arguments, all workflow variables,
+      Step arguments, and Approval arguments defined in the Workflow are
+      also available.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workflow" type="Workflow">
+        <Description>The Workflow object being executed.</Description>
+      </Argument>
+      <Argument name="item" type="WorkItem">
+        <Description>The WorkItem representing the review.</Description>
+      </Argument>
+      <Argument name="approvalSet" type="ApprovalSet">
+        <Description>The ApprovalSet object contained in the work item.</Description>
+      </Argument>
+      <Argument name="identityName" type="string">
+        <Description>The name of the Identity that is registering.</Description>
+      </Argument>
+      <Argument name="identityDisplayName" type="string">
+        <Description>The display name of the Identity that is registering.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Registration request for $identityDisplayName needs approval</Subject>
+</EmailTemplate>
+</sailpoint>

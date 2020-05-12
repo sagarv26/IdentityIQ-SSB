@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Work Item Assignment Removal">
+  <Body>#if ($requesterName) $requesterName #{else} The system #{end} has removed the following work item from your queue: $workItemName.
+    </Body>
+  <Description>
+      Email Template for notifying work item assignee that a workitem has been removed
+      from their queue.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="item" type="WorkItem">
+        <Description>The WorkItem that is being reassigned.</Description>
+      </Argument>
+      <Argument name="workItemName" type="string">
+        <Description>The description property of the WorkItem.</Description>
+      </Argument>
+      <Argument name="requesterName" type="string">
+        <Description>The display name of the Identity that requested the assignment.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Work item assignment removed: $workItemName</Subject>
+</EmailTemplate>
+</sailpoint>

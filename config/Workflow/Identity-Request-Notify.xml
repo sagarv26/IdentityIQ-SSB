@@ -1,0 +1,154 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow libraries="IdentityRequest" name="Identity Request Notify" type="Subprocess">
+  <Variable input="true" name="identityName" required="true">
+    <Description>
+      The name of the identity object being modified.
+    </Description>
+  </Variable>
+  <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>
+      The displayName of the identity being updated.
+      This may be passed in, if not the script queries for this
+      using a projection query and falls back to the name.
+    </Description>
+  </Variable>
+  <Variable initializer="user,requester" input="true" name="notificationScheme">
+    <Description>
+     A string that specifies who should be notified when the request has been complete.
+     The value can be null or a csv of one or more of the following options.
+
+     none or null
+       disable notifications
+
+     user
+       Identity that is being update will be notified.
+
+     manager
+       The manager of the Identity that is being updated will be notified.
+
+     requester
+       The person that has requested the update will be notified.
+
+     securityOfficer
+       The identity named in the securityOfficerNameVariable will be notified.
+    </Description>
+  </Variable>
+  <Variable input="true" name="securityOfficerName">
+    <Description>
+      The name of the security officer identity.
+    </Description>
+  </Variable>
+  <Variable input="true" name="policyViolations">
+    <Description>
+       List of policy violations that were found during our initial policy scan.
+       This list is passed into each work item so the approvers can see
+       pending violations.
+    </Description>
+  </Variable>
+  <Variable input="true" name="flow">
+    <Description>
+      The name of the LCM flow that launched this workflow.
+
+      This is one of these values:
+
+      AccountsRequest
+      EntitlementsRequest
+      RolesRequest
+      IdentityCreateRequest
+      IdentityEditRequest
+      ForgotPassword
+      ExpiredPassword
+      PasswordRequest
+
+    </Description>
+  </Variable>
+  <Variable input="true" name="trace">
+    <Description>
+      Used for debugging this subprocess and when set to true trace
+      statements will be sent to stdout.
+    </Description>
+  </Variable>
+  <Variable input="true" name="approvalScheme">
+    <Description>
+       A string that specifies how approvals should be generated for
+       this workflow.
+       
+       This is usefull for the notification subprocess incase
+       the template wants to render specific text in the email
+       when certain schemes are configured.
+    </Description>
+  </Variable>
+  <Variable input="true" name="approvalSet">
+    <Description>
+       This attributes is set during the "Build Approval Set" step,
+       which builds this list by going through the ProvisioningPlan
+       to build the line items that need to be approved,
+
+       This variable includes all ApprovalItems that are part of
+       the request process and is updated during the AfterScript
+       of the approval process by assimilating the decisions
+       and comments from the Approvals copy of the ApprovalItem.
+    </Description>
+  </Variable>
+  <Variable input="true" name="plan">
+    <Description>The provisioning plan for the request.</Description>
+  </Variable>
+  <Variable initializer="LCM User Notification" input="true" name="userEmailTemplate">
+    <Description>
+       Name of the email template to use when notifying the user.
+    </Description>
+  </Variable>
+  <Variable initializer="LCM Manager Notification" input="true" name="managerEmailTemplate">
+    <Description>
+       Name of the email template to use when notifying the manager.
+    </Description>
+  </Variable>
+  <Variable initializer="LCM Requester Notification" input="true" name="requesterEmailTemplate">
+    <Description>
+       Name of the email template to use when notifying the requester.
+    </Description>
+  </Variable>
+  <Variable initializer="LCM Manager Notification" input="true" name="securityOfficerEmailTemplate">
+    <Description>
+       Name of the email template to use when notifying the security officer.
+    </Description>
+  </Variable>
+  <Variable input="true" name="priority">
+    <Description>
+      String version of WorkItem.level that was used
+      to set the priority on the access request and
+      any workitems.
+    </Description>
+  </Variable>
+  <Step icon="Start" name="Start" posX="28" posY="10">
+    <Transition to="Notify User"/>
+  </Step>
+  <Step action="call:sendEmail" condition="script:Util.csvToList(notificationScheme).contains(&quot;user&quot;)" icon="Email" name="Notify User" posX="98" posY="10">
+    <Arg name="template" value="ref:userEmailTemplate"/>
+    <Arg name="to" value="script:getUserEmail(identityName, plan)"/>
+    <Arg name="approvalSet" value="call:prepareApprovalSetForNotification"/>
+    <Transition to="Notify Requester"/>
+  </Step>
+  <Step action="call:sendEmail" condition="script:Util.csvToList(notificationScheme).contains(&quot;requester&quot;)" icon="Email" name="Notify Requester" posX="216" posY="10">
+    <Arg name="template" value="ref:requesterEmailTemplate"/>
+    <Arg name="to" value="script:getEmail(launcher)"/>
+    <Arg name="approvalSet" value="call:prepareApprovalSetForNotification"/>
+    <Transition to="Notify Manager"/>
+  </Step>
+  <Step action="call:sendEmail" condition="script:Util.csvToList(notificationScheme).contains(&quot;manager&quot;)" icon="Email" name="Notify Manager" posX="351" posY="10">
+    <Arg name="template" value="ref:managerEmailTemplate"/>
+    <Arg name="to" value="script:getManagersEmail(identityName, plan)"/>
+    <Arg name="approvalSet" value="call:prepareApprovalSetForNotification"/>
+    <Transition to="Notify Security Officer"/>
+  </Step>
+  <Step action="call:sendEmail" condition="script:Util.csvToList(notificationScheme).contains(&quot;securityOfficer&quot;)" icon="Email" name="Notify Security Officer" posX="483" posY="10">
+    <Arg name="template" value="ref:securityOfficerEmailTemplate"/>
+    <Arg name="to" value="script:getEmail(securityOfficerName)"/>
+    <Arg name="approvalSet" value="call:prepareApprovalSetForNotification"/>
+    <Transition to="end"/>
+  </Step>
+  <Step icon="Stop" name="end" posX="602" posY="10"/>
+</Workflow>
+</sailpoint>

@@ -1,0 +1,206 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="Certification Activity by Application Live Report" progressMode="Percentage" resultAction="Rename" subType="Access Review and Certification Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="Certification Report">
+            <Chart category="type" groupBy="action.status,type" nullSeries="cert_action_open" series="action.status" title="rept_cert_chart_title" type="column" value="count(*)"/>
+            <DataSource dataSourceClass="sailpoint.reporting.datasource.CertificationLiveReportDataSource" objectType="CertificationItem" type="Java">
+              <QueryParameters>
+                <Parameter argument="phase" defaultValue="Staged" operation="NE" property="parent.certification.phase" valueClass="sailpoint.object.Certification$Phase"/>
+                <Parameter argument="type">
+                  <QueryScript>
+                    <Source>
+                            import sailpoint.object.*;
+                            queryOptions.addFilter(Filter.ne("parent.certification.type", Certification.Type.BusinessRoleComposition));
+                            queryOptions.addFilter(Filter.ne("parent.certification.type", Certification.Type.AccountGroupPermissions));
+                            return queryOptions;
+                          </Source>
+                  </QueryScript>
+                </Parameter>
+                <Parameter argument="tags" property="parent.certification.tags.id"/>
+                <Parameter argument="certificationGroups" property="parent.certification.certificationGroups.id"/>
+                <Parameter argument="applicationNames" property="applicationNames">
+                  <QueryScript>
+                    <Source>
+                            import sailpoint.object.*;
+                            import sailpoint.api.ObjectUtil;
+                            List appNames = new ArrayList();
+                            if (value != null){
+                              appNames = ObjectUtil.convertIdsToNames(context, Application.class, value);
+                            }
+
+                            if (appNames.size() != 0){
+                              queryOptions.addFilter(Filter.containsAll("applicationNames", appNames));
+                            }
+                            return queryOptions;
+                          </Source>
+                  </QueryScript>
+                </Parameter>
+                <Parameter argument="creationDate" property="parent.certification.created" valueClass="daterange"/>
+                <Parameter argument="signedDate" property="parent.certification.signed" valueClass="daterange"/>
+                <Parameter argument="expirationDate" property="parent.certification.expiration" valueClass="daterange"/>
+              </QueryParameters>
+            </DataSource>
+            <ReportForm>
+              <Reference class="sailpoint.object.Form" name="Certification Activity by Application Form"/>
+            </ReportForm>
+            <Columns>
+              <ReportColumnConfig field="nativeIdentity" header="rept_cert_col_account_id" property="exceptionEntitlements.nativeIdentity" sortable="true" width="110"/>
+              <ReportColumnConfig field="identity" header="rept_cert_col_identity" property="parent.identity" scriptArguments="parent.certification.type,targetName" width="110">
+                <RenderScript>
+                  <Source>
+                            
+                                import sailpoint.object.*;
+                                if (value == null || Certification.Type.DataOwner.equals(scriptArgs.get("parent.certification.type"))){
+                                  return scriptArgs.get("targetName");
+                                }
+
+                                return value;
+                            
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="manager" header="rept_cert_col_manager_name" property="parent" width="110">
+                <RenderScript>
+                  <Source>
+                          import sailpoint.reporting.*;
+                          return value != null ? ReportingLibrary.getCertificationItemManagerName(context, value) : null;
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="certName" header="rept_cert_col_cert_access_review" property="parent.certification.name" sortable="true" width="110"/>
+              <ReportColumnConfig field="certGroupName" header="rept_cert_col_cert_grp_name" property="parent.certification.certificationGroups.name" sortable="true" width="110"/>
+              <ReportColumnConfig field="tags" header="rept_cert_col_tags" property="parent.certification.tags.name" subQueryKey="id" width="110"/>
+              <ReportColumnConfig field="entitlementType" header="rept_cert_col_entitlement_type" property="type" sortable="true" width="110"/>
+              <ReportColumnConfig field="entitlement" header="rept_cert_col_entitlement_desc" property="exceptionEntitlements" scriptArguments="bundle,violationSummary,targetName" width="110">
+                <RenderScript>
+                  <Source>
+                          import sailpoint.reporting.*;
+                          return ReportingLibrary.describeCertificationEntitlement(value, scriptArgs.get("bundle"), scriptArgs.get("violationSummary"), scriptArgs.get("targetName"));
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="status" header="rept_cert_col_status" property="summaryStatus" sortable="true" width="110"/>
+              <ReportColumnConfig field="decision" header="rept_cert_col_decision" property="action.status" sortable="true" width="110"/>
+              <ReportColumnConfig field="newValue" header="rept_cert_col_newValue" property="action" width="110">
+                <RenderScript>
+                  <Source>
+                          import sailpoint.reporting.datasource.*;
+                          return DataSourceUtil.getRemediationModifiableNewValue(value);
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="remediationCompleted" header="rept_cert_col_revoke_completed" property="action" width="110">
+                <RenderScript>
+                  <Source>
+                          import sailpoint.reporting.ReportingLibrary;
+                          import sailpoint.tools.Util;
+                          import java.lang.String;
+                          String status = ReportingLibrary.getRemediationStatus(context, value);
+                          return Util.isNullOrEmpty(status) ? "" : status;
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="decisionMaker" header="rept_cert_col_decision_maker" property="action.actorName" sortable="true" width="110"/>
+              <ReportColumnConfig field="comments" header="rept_cert_col_decision_maker_comments" property="action" width="110">
+                <RenderScript>
+                  <Source>
+                          return value != null ? value.getComments() : null;
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="application" header="rept_certification_form_application" property="exceptionEntitlements.application" sortable="true" width="110"/>
+              <ReportColumnConfig field="exclusionExplanation" header="rept_cert_col_exclusion_explanation" property="parent.certification" width="110">
+                <RenderScript>
+                  <Source>
+                          
+                          if (value != null){
+                            List archivedEntities = value.fetchArchivedEntities(context);
+                            if (archivedEntities != null
+                                &amp;&amp; archivedEntities.size() &gt; 0
+                                &amp;&amp; archivedEntities.get(0) != null) {
+                              return archivedEntities.get(0).getExplanation();
+                            }
+                          }
+                          
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+            </Columns>
+            <InitializationRule>
+              <Reference class="sailpoint.object.Rule" name="Certification Report Customizer"/>
+            </InitializationRule>
+            <ReportSummary title="rept_cert_summary_title">
+              <DataSourceScript>
+                <Source>
+                        
+                        import java.util.*;
+                        import sailpoint.object.*;
+
+                        QueryOptions ops = baseQueryOptions;
+
+                        List fields = new ArrayList();
+                        fields.add("count(*)");
+                        fields.add("count(distinct parent.id)");
+                        fields.add("count(distinct parent.certification.id)");
+                        fields.add("count(distinct parent.certification.certificationGroups.id)");
+
+                        Iterator iter = context.search(CertificationItem.class, ops, fields);
+
+                        Map map = new HashMap();
+
+                        if (iter.hasNext()){
+                          Object[] results = iter.next();
+                          map.put("certifications", results[3]);
+                          map.put("accessReviews", results[2]);
+                          map.put("identities", results[1]);
+                          map.put("items", results[0]);
+                        }
+
+                        return map;
+                        
+                      </Source>
+              </DataSourceScript>
+              <Values>
+                <LiveReportSummaryValue label="reprt_cert_summary_total_certs" name="certifications"/>
+                <LiveReportSummaryValue label="reprt_cert_summary_total_access_reviews" name="accessReviews"/>
+                <LiveReportSummaryValue label="reprt_cert_summary_total_identities" name="identities"/>
+                <LiveReportSummaryValue label="reprt_cert_summary_total_items" name="items"/>
+              </Values>
+            </ReportSummary>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>Displays information about the activity on the certifications in the system in detailed format.</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessApplicationCentricCertificationReport"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument name="exclusions" type="boolean"/>
+      <Argument multi="true" name="certificationGroups" type="CertificationGroup"/>
+      <Argument multi="true" name="applicationNames" type="Application">
+        <Description>rept_input_app_centric_cert_report_app</Description>
+      </Argument>
+      <Argument name="creationDate" type="date">
+        <Description>rept_input_cert_report_create_dt</Description>
+      </Argument>
+      <Argument name="signedDate" type="date">
+        <Description>rept_input_cert_report_signed_date</Description>
+      </Argument>
+      <Argument name="expirationDate" type="date">
+        <Description>rept_input_cert_report_exp_dt</Description>
+      </Argument>
+      <Argument multi="true" name="tags" type="Tag">
+        <Description>rept_input_cert_report_tags</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

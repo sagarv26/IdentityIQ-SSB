@@ -1,0 +1,88 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="SST Unit Test Mappings">
+	<Attributes>
+		<Map>
+			<entry key="Categories">
+				<value>
+					<List>
+						<String>Miscellaneous</String>
+						<String>Lifecycle Manager</String>
+						<String>Lifecycle Event</String>
+						<String>Identity Attribute</String>
+						<String>Aggregation</String>
+						<String>Certification</String>
+						<String>Password Management</String>
+						<String>Report</String>
+					</List>
+				</value>
+			</entry>
+			<entry key="Rules">
+				<value>
+					<Attributes>
+						<Map>
+							
+		<!-- ****************************************************************************************
+			For each key, enter a rule name.  For reach rule, provide a list of arg files.  
+		**************************************************************************************** -->
+		
+							<entry key="SST Sample Unit Test Rule">
+								<value>
+									<Attributes>
+										<Map>
+											<entry key="Args">
+												<value>
+													<List>
+														<String>%%SST_UT_ARGS_PATH%%Sample%%FILE_SEPARATOR%%SST_SampleUnitTest_Args1.xml</String>
+														<String>%%SST_UT_ARGS_PATH%%Sample%%FILE_SEPARATOR%%SST_SampleUnitTest_Args2NOTEXISTS.xml</String>
+													</List>
+												</value>
+											</entry>
+											<entry key="Category" value="Miscellaneous" />
+											<entry key="Enabled" value="true" />
+										</Map>
+									</Attributes>
+								</value>
+							</entry>
+							<entry key="SST UT getFullName Rule">
+								<value>
+									<Attributes>
+										<Map>
+											<entry key="Args">
+												<value>
+													<List>
+														<String>%%SST_UT_ARGS_PATH%%Sample%%FILE_SEPARATOR%%SST_UT_getFullName_Args1.xml</String>
+														<String>%%SST_UT_ARGS_PATH%%Sample%%FILE_SEPARATOR%%SST_UT_getFullName_Args2.xml</String>
+													</List>
+												</value>
+											</entry>
+											<entry key="Category" value="Identity Attribute" />
+											<entry key="Enabled" value="true" />
+										</Map>
+									</Attributes>
+								</value>
+							</entry>
+							<entry key="NON-EXISTENT RULE ENTRY">
+								<value>
+									<Attributes>
+										<Map>
+											<entry key="Args">
+												<value>
+													<List>
+														<String>%%SST_UT_ARGS_PATH%%Sample%%FILE_SEPARATOR%%SST_SampleUnitTest_Args1.xml</String>
+													</List>
+												</value>
+											</entry>
+											<entry key="Category" value="Miscellaneous" />
+											<entry key="Enabled" value="true" />
+										</Map>
+									</Attributes>
+								</value>
+							</entry>
+						</Map>
+					</Attributes>
+				</value>
+			</entry>
+		</Map>
+	</Attributes>
+</Custom>

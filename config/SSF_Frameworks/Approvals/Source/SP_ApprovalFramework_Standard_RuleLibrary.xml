@@ -1,0 +1,995 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="SP Approval Framework Standard Rules Library" language="beanshell">
+	<Source>
+	<![CDATA[
+	import sailpoint.object.*;
+	import sailpoint.api.SailPointContext;
+	import java.util.*;
+	import java.text.*;
+   	import sailpoint.object.ProvisioningPlan;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+	import sailpoint.tools.Util;
+    import sailpoint.tools.Message;
+    import sailpoint.object.Workflow.Approval;
+    
+    import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	private Log logger = LogFactory.getLog("rule.SP.ApprovalFramwork.RulesLibrary");
+	
+	
+	/***********************************************************************************************
+		STEP RULES
+	************************************************************************************************/
+	public List stdGetApprovalTypesStepRule(SailPointContext context, Workflow workflow){
+		logger.trace("Enter stdGetApprovalTypesStepRule");
+		
+		String approvalScheme = (String)getMappingObjectEntry(context, "Approval Types Scheme");
+		logger.trace("in stdGetApprovalTypesStepRule, approvalSchem = " + approvalScheme);
+		if (approvalScheme.compareTo("Default")== 0){
+			logger.trace("Do Default ApprovalScheme");
+			
+			List approvalTypes = (List)getMappingObjectEntry(context, "Default Approval Types");
+			return approvalTypes;
+			
+		} else if (approvalScheme.compareTo("Map") == 0){
+			logger.trace("Do Mapping ApprovalScheme");
+			
+			Map appMap = (Map)getMappingObjectEntry(context, "Map Request Type Approval Types");
+			
+			String requestType = workflow.get("requestType");
+			
+			
+			List approvalTypes = (List)appMap.get(requestType);
+			return approvalTypes;
+			
+		} else if (approvalScheme.compareTo("Custom") == 0){
+			logger.trace("Do Custom ApprovalScheme");
+			
+			String rn = (String)getMappingObjectEntry(context, "Get Approval Types Custom Rule");
+			String ruleName = "SP CST Get Approval Types Step Rule";
+			
+			ruleName =  (rn == null) ? ruleName : rn;
+		
+			Map params = new HashMap();
+			params.put("workflow", workflow);
+			logger.trace("in getApprovalTypesStepRule and ruleName = " + ruleName);
+			return runApprovalWorkflowRule(context, ruleName, params);
+		} 
+		return null;
+	}
+	
+	
+	public String stdGetNextApprovalTypeStepRule(Workflow workflow, List approvalTypes){
+		logger.trace("Enter stdGetNextApprovalTypeStepRule");
+		
+		int ci = 0;
+  			
+		String currentIndex = workflow.get("currentIndex");
+		
+		if (currentIndex == null){
+			currentIndex = Integer.toString(ci);
+		} else {
+			ci = Integer.parseInt(currentIndex);
+			ci += 1;
+			currentIndex = Integer.toString(ci);
+		}
+		
+		workflow.put("currentIndex", currentIndex);
+		
+		String nextType = null;
+		if (ci < approvalTypes.size()){
+			nextType = approvalTypes.get(ci);
+		} else {
+			logger.trace("No more types");
+		}
+		
+		if (nextType != null){
+			addApprovalTypeObj(context, workflow, nextType);
+		}
+		
+		logger.trace("Exit stdGetNextApprovalTypeStepRule: " + nextType);
+		return nextType;
+	}
+	
+	private void addApprovalTypeObj(SailPointContext context, Workflow workflow, String approvalType){
+		logger.trace("Enter addApprovalTypeObj");
+		
+		Attributes approvalTypeObj = getApprovalTypeAttributes(context, approvalType);
+			
+		if (approvalTypeObj == null){
+			logger.error("No approval type object for: " + approvalType);
+			return;
+		}
+		
+		String linkTo = approvalTypeObj.get("linkType");
+		logger.trace("Link type = " + linkTo);
+		if (linkTo != null){
+			logger.trace("Get the approval type object based on the linkTo: " + linkTo);
+			approvalTypeObj = getApprovalTypeAttributes(context, linkTo);
+			
+			if (approvalTypeObj == null){
+				logger.error("No link to, no approval type obj for: " + linkTo);
+				return;
+			}
+		}
+		
+		String template = approvalTypeObj.get("template");
+		
+		if (template != null){
+			Attributes templateObj = getApprovalTypeAttributes(context, template);
+			
+			addRecursiveTemplates(approvalTypeObj, templateObj);
+		}
+		
+		workflow.put("approvalTypeObj", approvalTypeObj);
+		
+		pushApprovalAttributes(context, workflow, approvalTypeObj);
+		
+		
+		logger.trace("Exit addApprovalTypeObj");
+	}
+	
+	private void addRecursiveTemplates(Attributes approvalTypeObj, Attributes templateObj){
+		logger.trace("Enter addRecursiveTemplates");
+		
+		List keys = templateObj.getKeys();
+		
+		if (keys != null){
+			logger.trace("Loop the keys");
+			for (String key : keys){
+				if (!approvalTypeObj.containsKey(key)){
+					logger.trace("Add the template value for " + key);
+					approvalTypeObj.put(key,templateObj.get(key));
+				}
+			}
+		}
+		
+		String template = templateObj.get("template");
+		//logger.trace("Check for a recursive template: " + template);
+		if (template != null){
+			Attributes recTemplateObj = getApprovalTypeAttributes(context, template);
+			logger.trace("Call again");
+			addRecursiveTemplates(approvalTypeObj, recTemplateObj);
+		}
+		
+		
+		logger.trace("Exit addRecursiveTemplates");
+	}
+	
+	
+	public void pushApprovalAttributes(SailPointContext context, Workflow workflow, Attributes approvalTypeObj){
+		logger.trace("Enter pushApprovalAttributes");
+		
+		String notifyEmail = (String)approvalTypeObj.get("notifyEmailTemplate");
+		String approvalMode = (String)approvalTypeObj.get("approvalMode");
+		String useDefaultWIConfig = (String)approvalTypeObj.get("useDefaultWorkItemConfig");
+		
+		workflow.put("notifyEmailTemplate", notifyEmail);
+		workflow.put("approvalMode", approvalMode);
+		
+		Attributes wiConfig = null;
+		
+		if (useDefaultWIConfig != null && !Boolean.parseBoolean(useDefaultWIConfig)){
+			logger.trace("use the type work item config");
+			wiConfig = (Attributes)approvalTypeObj.get("workItemConfig");
+		} else {
+			logger.trace("use the default work item config");
+			wiConfig = (Attributes)getMappingObjectEntry(context, "Default WorkItem Config");
+		}
+		
+		String elecSig = null;
+		
+		logger.trace("Get electronic signature option");
+		if (approvalTypeObj.containsKey("electronicSignature")){
+			elecSig = (String)approvalTypeObj.get("electronicSignature");
+		}
+		
+		if (elecSig == null || elecSig.trim().equals("")){
+			elecSig = "No Electronic Signature Required";
+		}
+		
+		logger.trace("Set the electronic signature value: " + elecSig);
+		wiConfig.put("electronicSignature", elecSig);
+		
+		String defWIDesc = wiConfig.get("workItemDescription");
+		
+		logger.trace("Check if there's a default work item desc: " + defWIDesc);
+		
+		if (defWIDesc == null){
+			String identityDisplayName = workflow.get("identityDisplayName");
+			String appDisplayName = approvalTypeObj.get("displayName");
+			String wiDesc = appDisplayName + " Approval - Account Changes for User: " + identityDisplayName;
+			String wiDescRN = (String)approvalTypeObj.get("workItemDescriptionRule");
+			
+			if (wiDescRN != null){
+				Map params = new HashMap();
+				params.put("workflow", workflow);
+				logger.trace("getting work item description with ruleName = " + wiDescRN);
+				String tempDesc = runApprovalWorkflowRule(context, wiDescRN, params);
+				
+				if (tempDesc != null && !tempDesc.trim().equalsIgnoreCase("")){
+					wiDesc = tempDesc;
+				}
+			}
+			
+			wiConfig.put("workItemDescription", wiDesc);
+		
+		}
+		
+		String renderer = wiConfig.get("renderer");
+		
+		logger.trace("Have renderer from wiConfig: " + renderer);
+		
+		if (renderer == null || "".equals(renderer.trim())){
+			renderer = "lcmEditableWorkItemRenderer.xhtml";
+			
+			logger.trace("Put in the default renderer: " + renderer);
+			wiConfig.put("renderer", renderer);
+		}
+		
+		workflow.put("workItemRenderer", renderer);
+		
+		
+		workflow.put("workItemConfig", wiConfig);
+		
+		logger.trace("Exit pushApprovalAttributes");
+	}
+	
+	public boolean stdPreApprovalStepRule(SailPointContext context, Workflow workflow, String approvalType){
+		logger.trace("Enter stdPreApprovalStepRule");
+		
+		String ruleName = "SP CST Pre Approval " + approvalType + " Rule";
+
+		String rn = getApprovalTypeObjEntry(context, workflow, "preApprovalRule");
+		ruleName =  (rn == null) ? ruleName : rn;
+		
+		Map params = new HashMap();
+		params.put("workflow", workflow);
+		params.put("approvalType", approvalType);
+		
+		return runApprovalWorkflowRule(context, ruleName, params);
+	}
+	
+	public Object stdBuildCustomApprovalForm(SailPointContext context, Workflow workflow, String approvalType, String fallbackApprover){
+		logger.trace("Enter stdBuildCustomApprovalForm");
+		
+		String ruleName = "method:getCSTDefaultApprovalFormRule";
+
+		String useCustomForm = "false";
+		
+		logger.trace("Get the values from the custom mapping object.");
+		String uf = getApprovalTypeObjEntry(context, workflow, "useCustomApprovalForm");
+		String rn = getApprovalTypeObjEntry(context, workflow, "getApprovalFormRule");
+		
+		logger.trace("Check/set based on if null/present");
+		ruleName =  (rn == null) ? ruleName : rn;
+		useCustomForm =  (uf == null) ? useCustomForm : uf;
+		
+		logger.trace("Build params with workflow variable");
+		Map params = new HashMap();
+		params.put("workflow", workflow);
+		
+		logger.trace("Check if useCustomForm: " + useCustomForm);
+		if (!Boolean.getBoolean(useCustomForm) && !"true".equalsIgnoreCase(useCustomForm)) {
+			logger.trace("useCustomForm not true.  Return null.");
+			return null;
+		} 
+		
+		logger.trace("Get the form with ruleName: " + ruleName);
+		Object form = runApprovalWorkflowRule(context, ruleName, params);
+		
+		logger.trace("Have the Form: " + form);
+		
+		logger.trace("Exiting stdBuildCustomApprovalForm with: " + form);
+		return form;
+	}
+	
+	public Object stdGetApproversStepRule(SailPointContext context, Workflow workflow, String approvalType, String fallbackApprover){
+		logger.trace("Enter stdGetApproversStepRule");
+		
+		String ruleName = "SP CST Get Approvers " + approvalType + " Rule";
+
+		String rn = getApprovalTypeObjEntry(context, workflow, "getApprovalOwnersRule");
+		ruleName =  (rn == null) ? ruleName : rn;
+		
+		Map params = new HashMap();
+		params.put("workflow", workflow);
+		
+		Object approvers = runApprovalWorkflowRule(context, ruleName, params);
+		
+		logger.trace("Have the Approvers: " + approvers);
+		
+		if (approvers == null){
+			logger.trace("Skipping the fall back");
+			///approvers = fallbackApprover;
+		}
+		
+		logger.trace("Exiting stdGetApproversStepRule with: " + approvers);
+		return approvers;
+	}
+	
+	
+	public void stdApprovalAfterScriptStepRule(SailPointContext context, ApprovalSet approvalSet, ApprovalSet tempApprovalSetRem, String approvalType, Map identityModel, Workflow workflow){
+		logger.trace("Enter stdApprovalAfterScriptStepRule");
+		
+		String ruleName = "SP CST Approval After Script " + approvalType + " Rule";
+		
+		String rn = getApprovalTypeObjEntry(context, workflow, "approvalAfterScriptRule");
+		ruleName =  (rn == null) ? ruleName : rn;
+		
+		Map params = new HashMap();
+		params.put("approvalSet", approvalSet);
+		params.put("tempApprovalSetRem", tempApprovalSetRem);
+		params.put("currentApprovalType", approvalType);
+		params.put("approvalType", approvalType);
+		params.put("identityModel", identityModel);
+		params.put("workflow", workflow);
+		
+		runApprovalWorkflowRule(context, ruleName, params, true);	
+	}
+	
+	public Object stdApprovalValidatorScriptStepRule(SailPointContext context, ApprovalSet approvalSet, WorkItem item){
+		logger.trace("Enter stdApprovalValidatorScriptStepRule");
+		
+		String rn = getApprovalTypeObjEntry(context, workflow, "approvalValidatorScriptRule");
+		
+		if (rn == null){
+			logger.debug("no validator script rule.  return null.");
+			return null;
+		}
+		
+		Map params = new HashMap();
+		params.put("approvalSet", approvalSet);
+		params.put("item", item);
+		
+		return runApprovalWorkflowRule(context, rn, params);	
+	}
+	
+	/***********************************************************************************************
+		DEFAULT UTILITY RULES
+	************************************************************************************************/
+	
+	public void pushAutoApproveItems(Workflow workflow, List autoApproveItems, ApprovalSet approvalSet){
+		logger.trace("Enter pushAutoApproveItems");
+	
+		if (autoApproveItems != null && !autoApproveItems.isEmpty()){
+			ApprovalSet tempApprovalSetRem = new ApprovalSet();
+			tempApprovalSetRem.setItems(autoApproveItems);
+			
+			workflow.put("tempApprovalSetRem", tempApprovalSetRem);
+			
+			for (ApprovalItem item : autoApproveItems){	
+				approvalSet.remove(item);
+			}
+			
+			workflow.put("approvalSet", approvalSet);
+		}
+		
+		logger.trace("Exit pushAutoApproveItems");
+	}
+	
+	public void doAutoApprove(ApprovalSet approvalSet){
+		logger.trace("Enter doAutoApprove");
+		
+		if (approvalSet != null){
+			List items = approvalSet.getItems();
+			
+			
+			if (items != null && items.size() > 0){
+				for (ApprovalItem item : items){
+					item.approve();
+					item.add(new Comment("Auto approve item not requiring approval", "spadmin"));
+				}
+			}
+			
+			logger.debug("Approved set: " + approvalSet.toXml());
+		}
+		
+		
+		logger.trace("Exit doAutoApprove");
+	}
+	
+	public List defaultGetApprovalTypesUseExtended(SailPointContext context, 
+		ApprovalSet approvalSet, Workflow workflow){
+		String mName = "defaultGetApprovalTypesUseExtended";
+		logger.trace("Enter " + mName);
+		
+		List approvalTypes = new ArrayList();
+		List items = approvalSet.getItems();
+		
+		if (items == null || items.size() < 1){
+			logger.warn("No approval items.");
+			return new ArrayList();
+		}
+		
+		logger.trace("Loop items");
+		for (ApprovalItem item : items){
+			logger.trace("Have item: " + item.getName() + " = " + item.getValue());
+			
+			List types = getItemRequiredApprovals(context, item);
+			
+			if (types != null && types.size() > 0){
+				for (String type : types){
+				
+					// trying to do this link type resolution might prove to be too complex due to reverse lookups in other code
+					String t = type; //resolveLinkType(context, type);
+					
+					if (t != null && !approvalTypes.contains(t)){
+						logger.trace("Add type: " + t);
+						approvalTypes.add(t);
+					}
+				}
+			}
+		}
+		
+		logger.trace("Exit " + mName + ": " + approvalTypes);
+		return approvalTypes;
+	}
+	
+	
+	public String resolveLinkType(SailPointContext context, String type){
+		logger.trace("Enter resolveLinkType");
+		
+		Attributes approvalTypeObj = getApprovalTypeAttributes(context, type);
+			
+		if (approvalTypeObj == null){
+			logger.error("No approval type object for: " + type);
+			return null;
+		}
+		
+		String linkTo = approvalTypeObj.get("linkType");
+		String t = type;
+		
+		if (linkTo != null){
+			logger.trace("Get the approval type object based on the linkTo: " + linkTo);
+			approvalTypeObj = getApprovalTypeAttributes(context, linkTo);
+			
+			if (approvalTypeObj == null){
+				logger.error("No link to, no approval type obj for: " + linkTo);
+				return null;
+			} else {
+				logger.trace("Set the type to the linkTo: " + linkTo);
+				t = linkTo;
+			}
+		}
+		
+		logger.trace("Exit resolveLinkType: " + t);
+		return t;
+	}
+	
+	public boolean defaultPreApprovalSetSplitterUseExtended(SailPointContext context, 
+		ApprovalSet approvalSet, Workflow workflow, String approvalType){
+		String mName = "defaultPreApprovalSetSplitterUseExtended";
+		logger.trace("Enter " + mName);
+		boolean flag = false;
+		
+		List remItems = new ArrayList();
+		ApprovalSet tempApprovalSetRem = new ApprovalSet();
+		List items = approvalSet.getItems();
+		
+		if (items == null || items.size() < 1){
+			logger.warn("No approval items.");
+			return flag;
+		}
+		logger.trace("ApprovalType in defaultpreApproval: " + approvalType);
+		logger.trace("Loop items");
+		for (ApprovalItem item : items){
+			logger.trace("Have item: " + item.getName() + " = " + item.getValue());
+			
+			boolean requiresApproval = checkItemRequiresApproval(context, item, approvalType);
+			logger.trace("Have requires approval: " + requiresApproval);
+			
+			if (!requiresApproval){
+				remItems.add(item);
+			}
+		}
+		
+		if (remItems.size() > 0){
+			logger.trace("Loop the items to remove");
+			for (ApprovalItem item : remItems){
+				logger.trace("Remove item: " + item.getName() + " = " + item.getValue());
+				approvalSet.remove(item);
+				tempApprovalSetRem.add(item);
+			}
+			
+			workflow.put("approvalSet", approvalSet);
+			workflow.put("tempApprovalSetRem", tempApprovalSetRem);
+		} else {
+			workflow.put("tempApprovalSetRem", null);
+		}
+		
+		if (!approvalSet.isEmpty()){
+			flag = true;
+		}
+		
+		logger.trace("Exit " + mName + ": " + flag);
+		return flag;
+	}
+	
+	
+	public void defaultAfterScriptMergeSplit(SailPointContext context, ApprovalSet approvalSet, 
+		ApprovalSet tempApprovalSetRem, boolean autoApprove, String approvalType){
+		logger.trace("Enter defaultAfterScriptMergeSplit");
+		
+		logger.trace("Approval Set: " + approvalSet.toXml());
+		
+		if (tempApprovalSetRem == null){
+			logger.trace("No tempApprovalSetRem");
+			return;
+		}
+		
+		logger.trace("Temp Rem Set: " + tempApprovalSetRem.toXml());
+		
+		List items = tempApprovalSetRem.getItems();
+		
+		if (items != null && items.size() > 0){
+			logger.trace("Loop the items");
+			
+			for (ApprovalItem item : items){
+			
+				if (!item.isRejected()){
+					if (autoApprove){
+						item.approve();
+						item.add(new Comment(approvalType + " Approval auto approved, didn't require approval.", "spadmin"));
+						item.setApprover("spadmin");
+					} else {
+						item.add(new Comment(approvalType + " Approval skipped, didn't require approval.", "spadmin"));
+					}
+				}
+				
+				approvalSet.add(item);
+			}
+		}
+		
+		
+		
+		//tempApprovalSetRem = null;
+		logger.trace("Exit defaultAfterScriptMergeSplit");
+	}
+	
+	public List getPostApprovalEmailArgs(SailPointContext context, ApprovalSet approvalSet, Workflow workflow) {
+		logger.trace("Enter getPostApprovalEmailArgs");
+		
+		if (approvalSet == null){
+			logger.debug("No approval set");
+			return null;
+		}
+		
+		String approvedTo = workflow.get("approvedTo");
+		String rejectedTo = workflow.get("rejectedTo");
+		String approvedTemplate = workflow.get("approvedTemplate");
+		String rejectedTemplate = workflow.get("rejectedTemplate");
+		
+		List emailArgList = workflow.get("emailArgList");
+		
+		if (emailArgList == null){
+			emailArgList = new ArrayList();
+		}
+		
+		Identity identity = context.getObjectByName(Identity.class,workflow.get("identityName"));
+		
+		logger.trace("Add the identity attributes");
+		Attributes idAttrs = identity.getAttributes();	
+		
+		List approvedItems = approvalSet.getApproved();
+		List rejectedItems = approvalSet.getRejected();
+		
+		
+		if (approvedItems != null && approvedItems.size() > 0){
+			addApprovalItemsEmail(emailArgList, approvalSet, approvedTo, approvedTemplate, approvedItems, idAttrs, "Approved");
+		}
+		
+		if (rejectedItems != null && rejectedItems.size() > 0){
+			addApprovalItemsEmail(emailArgList, approvalSet, rejectedTo, rejectedTemplate, rejectedItems, idAttrs, "Rejected");
+		}
+		
+		context.decache(identity);
+		
+		logger.trace("Enter getPostApprovalEmailArgs: " + emailArgList);
+		return emailArgList;
+	}
+	
+	
+	private void addApprovalItemsEmail(List emailArgList, ApprovalSet approvalSet, 
+		String toAddress, String template, List items, Attributes idAttrs, String state){
+		
+		logger.trace("Enter addApprovalItemsEmail");
+		
+		HashMap emailArgs = new HashMap();
+		
+		emailArgs.put("state", state);
+		
+		if (idAttrs != null && idAttrs.size() > 0){
+			
+			List keys = idAttrs.getKeys();
+		
+			for (String key : keys){
+				emailArgs.put(key, idAttrs.get(key));
+			}
+		}
+		
+		Attributes vars = workflow.getVariables();	
+		if (vars != null && vars.size() > 0){
+			List skipVars = new ArrayList();
+			
+			skipVars.add("plan");
+			skipVars.add("project");
+			skipVars.add("approvalSet");
+			
+			List varKeys = vars.getKeys();
+		
+			for (String var : varKeys){
+				if (!skipVars.contains(var)){
+					emailArgs.put(var, vars.get(var));
+				}
+			}
+		}
+		
+		emailArgs.put("approvalSet", approvalSet);
+		
+		logger.debug("addApprovalItemsEmail. toEmail: " + toAddress);
+       	    		
+		emailArgs.put("postToEmail", toAddress);
+		emailArgs.put("to", toAddress);
+		
+		emailArgs.put("template", template);
+		emailArgs.put("emailTemplate", template);
+		emailArgs.put("approvalItems", items);
+		
+		emailArgList.add(emailArgs);
+		
+		logger.trace("Exit addApprovalItemsEmail");
+	}
+	
+	/***********************************************************************************************
+		LOW LEVEL UTILITY RULES
+	************************************************************************************************/
+	
+	public String determineItemType(SailPointContext context, ApprovalItem item){
+		logger.trace("Enter determineItemType");
+		String type = "Role";
+		
+		Attributes attrs = item.getAttributes();
+		
+		if (attrs != null){
+			String op = attrs.get("operation");
+			logger.trace("Have the operation attr: " + op);
+			
+			if (op != null){
+				if (op.indexOf("Entitlement") > -1){
+					type = "Entitlement";
+				}
+			}
+		}
+		
+		logger.trace("Exit determineItemType: " + type);
+		return type;
+	}
+	
+	
+	public boolean checkItemRequiresApproval(SailPointContext context, ApprovalItem item, String approvalType){
+		logger.trace("Enter checkItemRequiresApproval");
+		boolean requiresApproval = false;
+		
+		List requiredApprovals = getItemRequiredApprovals(context, item);
+		
+		
+		logger.trace("Have required approvals: " + requiredApprovals);
+		
+		if (requiredApprovals != null && !requiredApprovals.contains(approvalType)){
+			requiresApproval = true;
+		}
+		
+		
+		logger.trace("Exit checkItemRequiresApproval: " + requiresApproval);
+		return requiresApproval;
+	}
+	
+	
+	
+	public List getItemRequiredApprovals(SailPointContext context, ApprovalItem item){
+		logger.trace("Enter getItemRequiredApprovals");
+		List reqApprovals = null;
+		
+		String itemType = determineItemType(context, item);
+		logger.trace("getItemRequiredApprovals " + itemType);
+		
+		String approvalsString = null;
+		
+		if (itemType.compareTo("Entitlement")==0){
+			approvalsString = getEntRequiredApprovalsString(context, item);
+		} else {
+			approvalsString = getRoleRequiredApprovalsString(context, item);
+		}
+		
+		logger.trace("In getItemRequiredApprovals with approvalstring:  " + approvalsString);
+		if (approvalsString != null){
+			reqApprovals = getApprovalsStringList(approvalsString);
+		}
+		
+		logger.trace("reqApprovals = " + reqApprovals);
+		logger.trace("Exit getItemRequiredApprovals: " + approvalsString);
+		return reqApprovals;
+	}
+	
+	public String getEntRequiredApprovalsString(SailPointContext context, ApprovalItem item){
+		logger.trace("Enter getEntRequiredApprovalsString");
+		String approvalsString = "";
+		
+		String name = item.getName();
+		Object val = item.getValue();
+		String application = item.getApplication();
+		
+		
+		String lVal = "";
+		
+		if (val instanceof String){
+			lVal = (String)val;
+		}  else if (val instanceof List){
+			if (((List)val).size() > 1){
+				logger.warn("Has more than one item.  ");
+			}
+			
+			lVal = val.get(0);
+		}
+		
+		QueryOptions qo = new QueryOptions();
+		Filter f1 = Filter.eq("attribute", name);
+		Filter f2 = Filter.eq("value", lVal);
+		Filter f3 = Filter.eq("application.name", application);
+		qo.addFilter(f1);
+		qo.addFilter(f2);
+		qo.addFilter(f3);
+		
+		
+		/*
+		Iterator names = context.search(Identity.class, qo, name);
+		String name = (names != null && names.hasNext()) ? names.next()[0] : null;
+		*/
+		
+		/*
+		logger.trace("Search for attribute with qo: " + qo);
+		Iterator ids = context.search(ManagedAttribute.class, qo, name);
+		
+		if (ids != null && ids.hasNext()){
+		
+			while (ids.hasNext()){
+				String id = ids.next()[0];
+				ManagedAttribute ma = context.getObjectByName(ManagedAttribute.class, id);
+				approvalsString = ma.get("requiredApprovals");
+				context.decache(ma);
+			}
+		}
+		*/
+		
+		
+		
+		
+		List mas = context.getObjects(ManagedAttribute.class, qo);
+		
+		logger.trace("Have the mas: " + mas);
+		
+		if (mas != null && mas.size() > 0){
+			logger.trace("Get the first. ");
+			ManagedAttribute ma = mas.get(0);
+			
+			approvalsString = ma.get("requiredApprovals");
+		}
+		
+		context.decache();
+		
+		logger.trace("Exit getEntRequiredApprovalsString: " + approvalsString);
+		return approvalsString;
+	}
+	
+	public String getRoleRequiredApprovalsString(SailPointContext context, ApprovalItem item){
+		logger.trace("Enter getRoleRequiredApprovalsString");
+		String approvalsString = "";
+		
+		String name = item.getName();
+		logger.trace("Item name = " + name);
+		logger.trace("Item = " + item.toString());
+		Object v = item.getValue();
+		String val = "";
+		
+		if (v != null){
+			if (v instanceof List){
+			    val = v.get(0);
+			} else {
+			    val = v;
+			}
+		}
+
+		Bundle b = context.getObjectByName(Bundle.class, val);
+		logger.trace("ApprovalItem name = " + name);
+		logger.trace("ApprovalItem val = " + val);
+		if (b != null){
+			approvalsString = b.getAttribute("approvers");
+			logger.trace("approvalsString = " + approvalsString);
+		}
+		/*if(b != null){
+			//for now all SAP roles follow the same deal
+			approvalsString = "Request Access SAP Role";
+		}*/
+		context.decache(b);
+		
+		logger.trace("Exit getRoleRequiredApprovalsString: " + approvalsString);
+		return approvalsString;
+	}
+	
+	public List getApprovalsStringList(String reqApprovals){
+		logger.trace("Enter getApprovalsStringList");
+		logger.trace("Req approvals: " + reqApprovals);
+		
+		List rApps = null;
+		
+		if (reqApprovals == null || !(reqApprovals.trim().length() > 0)){
+			logger.trace("required app = " + reqApprovals + " trimed = " + reqApprovals.trim());
+			logger.warn("Approvals string is blank");
+		}
+			
+		if (reqApprovals.indexOf(",") > 0){
+			logger.trace("Split out required approvals");
+			String[] split = reqApprovals.split(",");
+			
+			rApps = Arrays.asList(split);
+			
+		} else {
+			logger.trace("Add single item");
+			rApps = new ArrayList();
+			rApps.add(reqApprovals);
+		}
+		
+		return rApps;
+	}
+	
+	
+	public Object runApprovalWorkflowRule(SailPointContext context, String ruleName, Map params){
+		logger.trace("Enter runApprovalWorkflowRule: " + ruleName);
+		return runApprovalWorkflowRule(context, ruleName, params, false);
+	}
+	
+	public Object runApprovalWorkflowRule(SailPointContext context, String ruleName, Map params, boolean isVoid){
+		logger.trace("Enter runApprovalWorkflowRule: " + ruleName);
+		Object retVal = null;
+		boolean runRule = true;
+		
+		if (ruleName.indexOf(":") > 0){
+			String[] split = ruleName.split(":");
+			
+			String pref = split[0];
+			
+			if ("method".equalsIgnoreCase(pref)){
+				runRule = false;
+			}
+			
+			if ("method".equalsIgnoreCase(pref)  || "rule".equalsIgnoreCase(pref)){
+				ruleName = split[1];
+			}
+		}
+		
+		
+		if (runRule){
+		
+			Rule rule = context.getObjectByName(Rule.class, ruleName);
+			
+			if (rule == null){
+				logger.trace("No rule object found for: " + ruleName);
+				return null;
+			}
+			
+			logger.trace("Run the rule");
+			if(params == null){
+				logger.trace("Params is null!");
+			}
+			else{
+				logger.trace("Params is not null!");
+				logger.trace("params = " + params.toString());
+			}
+	
+			retVal = context.runRule(rule, params);
+			if(retVal == null){
+				logger.trace("retVal is null.");
+			}
+	
+			context.decache(rule);
+		
+		}else {
+		
+			Object[] methodParams = {context, params};
+			
+			
+			try {
+				logger.trace("Dynamically invoke method: " + ruleName);
+				if (isVoid){
+					this.invokeMethod(ruleName, methodParams);
+					retVal = null;
+				} else {
+				retVal = this.invokeMethod(ruleName, methodParams);
+				}
+			} catch (Exception e){
+				logger.error("Exception with value of " + ruleName + ": " + e);
+				retVal = null;
+			}
+		}
+		
+		logger.trace("is retVal void: " + retVal);
+		if (retVal == void){
+			retVal = null;
+		}
+		
+		
+		logger.trace("Have the return value: " + retVal);
+		logger.trace("Exit runApprovalWorkflowRule: " + ruleName);
+		return retVal;
+	}
+	
+	public String getApprovalTypeObjEntry(SailPointContext context, Workflow workflow, String entry){
+		logger.trace("Enter getApprovalTypeObjEntry");
+		logger.trace("Entry: " + entry);
+		
+		String val = null;
+		
+		Attributes approvalTypeObj = workflow.get("approvalTypeObj");
+		
+		if (approvalTypeObj == null){
+			logger.warn("No approval type object found: ");
+			return null;
+		}
+		
+		val = (String)approvalTypeObj.get(entry);
+		
+		
+		logger.trace("Exit getApprovalTypeObjEntry: " + val);
+		return val;
+	
+	}
+	
+	public Attributes getApprovalTypeAttributes(SailPointContext context, String approvalType){
+		logger.trace("Enter getApprovalTypeAttributes");
+		Attributes retVal = null;
+		Attributes entryObj = getMappingObjectEntry(context,"Approval Types");
+		
+		if (entryObj == null){
+			logger.warn("No approval types entry");
+			return null;
+		}
+		
+		retVal = entryObj.get(approvalType);
+		
+		
+		logger.trace("Exit getApprovalTypeAttributes: " + retVal);
+		return retVal;
+	}
+	
+	public Object getMappingObjectEntry(SailPointContext context, String entry){
+		logger.trace("Enter getMappingObjectEntry");
+		
+		
+		Custom mappingObj = context.getObjectByName(Custom.class, "SPCONF Approval Object Mappings");
+		
+		if (mappingObj == null){
+			logger.error("SPCONF Approval Object Mappings Custom object does not exist.");
+			return null;
+		}
+		
+		Object entryObj = mappingObj.get(entry);
+		
+		if (entryObj== null){
+			logger.error(entry + " entry not defined in SPCONF Approval Object Mappings Custom object.");
+		}
+		
+		context.decache(mappingObj);
+		
+		logger.trace("Exit getMappingObjectEntry: " + entryObj);
+		return entryObj;
+	}
+	
+	
+	
+	]]>
+	</Source>
+</Rule>

@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.ActivateCertificationGroupTask" hidden="true" name="Activate Certification Group" progressMode="String" subType="task_item_type_certification" template="true" type="Certification">
+  <Description>
+            Template task for activating a staged certification group.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="certificationGroupId" required="true" type="String">
+        <Description>
+                        The id of the certification group to activate.
+                    </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

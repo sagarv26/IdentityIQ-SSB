@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Field PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Field displayName="sAMAccountName" 
+name="sAMAccountName" dynamic="true" type="string" 
+application="AD Common" hidden="true" template="Create">
+	        <RuleRef>
+	           <Reference class="sailpoint.object.Rule" name="SP Dynamic Field Value Rule"/>
+	         </RuleRef>
+      	
+      	
+   </Field>

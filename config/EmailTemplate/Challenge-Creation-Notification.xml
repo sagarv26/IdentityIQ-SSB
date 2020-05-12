@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Challenge Creation Notification">
+  <Body>It has been determined that your access to '$challengeItem' will be limited or removed
+completely.  You have $timeRemaining to challenge this decision.
+
+Click on this link to challenge the decision: http://localhost:8080/identityiq/user/challenge.jsf?id=$challengeId
+    </Body>
+  <Description>
+      Email Template for notifying a challenger that they can challenge a certification decision.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="certification" type="Certification">
+        <Description>The Certification object containing the item being challenged.</Description>
+      </Argument>
+      <Argument name="certificationName" type="string">
+        <Description>The name of the certification.</Description>
+      </Argument>
+      <Argument name="entityName" type="string">
+        <Description>The name of the item being challenged.</Description>
+      </Argument>
+      <Argument name="challengeItem" type="string">
+        <Description>A short description of the item being challenged.</Description>
+      </Argument>
+      <Argument name="timeRemaining" type="string">
+        <Description>The time remaining in the challenge period, formatted as a string.</Description>
+      </Argument>
+      <Argument name="challengeId" type="string">
+        <Description>The database id of the WorkItem representing the challenge.</Description>
+      </Argument>
+      <Argument name="certificationItem" type="CertificationItem">
+        <Description>The CertificationItem being challenged.</Description>
+      </Argument>
+      <Argument name="workItem" type="WorkItem">
+        <Description>The WorkItem for the challenge</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Access being removed or limited for '$challengeItem'</Subject>
+</EmailTemplate>
+</sailpoint>

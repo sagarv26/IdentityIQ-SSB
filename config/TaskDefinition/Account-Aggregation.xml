@@ -1,0 +1,165 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.ResourceIdentityScan" formPath="/monitor/tasks/accountAggregationTask.xhtml" name="Account Aggregation" progressInterval="5000" progressMode="String" subType="task_item_type_acct_aggregation" template="true" type="AccountAggregation">
+  <Description>
+            Task template for application account scanning.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="help_task_select_apps" multi="true" name="applications" required="true" type="Application">
+        <Prompt>task_in_account_aggregation_applications</Prompt>
+      </Argument>
+      <Argument filterString="type == Rule.Type.IdentityCreation" helpKey="help_task_identity_creation_rule" name="creationRule" type="Rule">
+        <Prompt>task_in_account_aggregation_creation_rule</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_refresh_roles" name="correlateEntitlements" type="boolean">
+        <Prompt>task_in_account_aggregation_correlate_entitlements</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_apply_active_policies" name="checkPolicies" type="boolean">
+        <Prompt>task_in_account_aggregation_check_policies</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_refresh_risk_scores" name="refreshScorecard" type="boolean">
+        <Prompt>task_in_account_aggregation_refresh_scorecard</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_maintain_history" name="checkHistory" type="boolean">
+        <Prompt>task_in_account_aggregation_check_history</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_delta_aggregation" name="deltaAggregation" type="boolean">
+        <Prompt>task_in_account_aggregation_delta</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_detect_deleted_accts" name="checkDeleted" type="boolean">
+        <Prompt>task_in_account_aggregation_check_deleted</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_refresh_scopes" name="correlateScope" type="boolean">
+        <Prompt>task_in_account_aggregation_correlate_scope</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_disable_scope_autocreate" name="noAutoCreateScopes" type="boolean">
+        <Prompt>task_in_account_aggregation_no_auto_create_scopes</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_no_needs_refresh" name="noNeedsRefresh" type="boolean">
+        <Prompt>task_in_account_aggregation_no_needs_refresh</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_included_actions" multi="true" name="logAllowedActions" type="string">
+        <Prompt>task_in_account_aggregation_log_allowed_actions</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_refresh_continuous_certs" name="refreshCertifications" type="boolean">
+        <Prompt>task_in_account_aggregation_refresh_certifications</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_no_optimize_reagg" name="noOptimizeReaggregation" type="boolean">
+        <Prompt>task_in_account_aggregation_no_optimize_reagg</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_promote_managed_entitlements" name="promoteManagedAttributes" type="boolean">
+        <Prompt>task_in_account_aggregation_promote_managed_attributes</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_no_autocreate_apps" name="noAutoCreateApplications" type="boolean">
+        <Prompt>task_in_account_aggregation_no_autocreate_apps</Prompt>
+      </Argument>
+      <Argument name="updateMultiplexedSchemas" type="boolean">
+        <Prompt>task_in_account_aggregation_update_schemas</Prompt>
+      </Argument>
+      <Argument helpKey="help_tasK_correlate_only" name="correlateOnly" type="boolean">
+        <Prompt>task_in_account_aggregation_correlate_only</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_account_agg_enable_partitioning" name="enablePartitioning" type="boolean">
+        <Prompt>task_in_account_aggregation_enable_partitioning</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_objects_per_partition" name="objectsPerPartition" type="int">
+        <Prompt>task_in_account_aggregation_objects_per_partition</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_account_agg_halt_on_max_error" name="haltOnMaxError" type="boolean">
+        <Prompt>task_in_account_aggregation_halt_on_max_error</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_account_agg_max_error_threshold" name="maxErrorThreshold" type="int">
+        <Prompt>task_in_account_aggregation_max_error_threshold</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_sequential" name="sequential" type="boolean">
+        <Prompt>task_in_account_aggregation_sequential</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_check_deleted_threshold" name="checkDeletedThreshold" type="string">
+        <Prompt>task_in_account_aggregation_check_deleted_threshold</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="applications" type="string">
+        <Prompt>task_out_account_aggregation_applications</Prompt>
+      </Argument>
+      <Argument name="total" type="int">
+        <Prompt>task_out_account_aggregation_total</Prompt>
+      </Argument>
+      <Argument name="ignored" type="int">
+        <Prompt>task_out_account_aggregation_ignored</Prompt>
+      </Argument>
+      <Argument name="optimized" type="int">
+        <Prompt>task_out_account_aggregation_optimized</Prompt>
+      </Argument>
+      <Argument name="created" type="int">
+        <Prompt>task_out_account_aggregation_created</Prompt>
+      </Argument>
+      <Argument name="updated" type="int">
+        <Prompt>task_out_account_aggregation_updated</Prompt>
+      </Argument>
+      <Argument name="deleted" type="int">
+        <Prompt>task_out_account_aggregation_deleted</Prompt>
+      </Argument>
+      <Argument name="managerChanges" type="int">
+        <Prompt>task_out_account_aggregation_manager_changes</Prompt>
+      </Argument>
+      <Argument name="detectedRoleChanges" type="int">
+        <Prompt>task_out_account_aggregation_business_role_changes</Prompt>
+      </Argument>
+      <Argument name="exceptionChanges" type="int">
+        <Prompt>task_out_account_aggregation_exception_changes</Prompt>
+      </Argument>
+      <Argument name="policies" type="string">
+        <Prompt>task_out_account_aggregation_policies</Prompt>
+      </Argument>
+      <Argument name="policyViolations" type="int">
+        <Prompt>task_out_account_aggregation_policy_violations</Prompt>
+      </Argument>
+      <Argument name="policyNotifications" type="int">
+        <Prompt>task_out_account_aggregation_policy_notifications</Prompt>
+      </Argument>
+      <Argument name="scoresChanged" type="int">
+        <Prompt>task_out_account_aggregation_scores_changed</Prompt>
+      </Argument>
+      <Argument name="snapshotsCreated" type="int">
+        <Prompt>task_out_account_aggregation_snapshots_created</Prompt>
+      </Argument>
+      <Argument name="scopesCreated" type="int">
+        <Prompt>task_out_account_aggregation_scopes_created</Prompt>
+      </Argument>
+      <Argument name="scopesCorrelated" type="int">
+        <Prompt>task_out_account_aggregation_scopes_correlated</Prompt>
+      </Argument>
+      <Argument name="scopesSelected" type="int">
+        <Prompt>task_out_account_aggregation_scopes_selected</Prompt>
+      </Argument>
+      <Argument name="scopesDormant" type="int">
+        <Prompt>task_out_account_aggregation_scopes_dormant</Prompt>
+      </Argument>
+      <Argument name="unscopedIdentities" type="int">
+        <Prompt>task_out_account_aggregation_unscoped_identities</Prompt>
+      </Argument>
+      <Argument name="certificationsCreated" type="int">
+        <Prompt>task_out_account_aggregation_certifications_created</Prompt>
+      </Argument>
+      <Argument name="certificationsDeleted" type="int">
+        <Prompt>task_out_account_aggregation_certifications_deleted</Prompt>
+      </Argument>
+      <Argument name="applicationsGenerated" type="int">
+        <Prompt>task_out_account_aggregation_applications_generated</Prompt>
+      </Argument>
+      <Argument name="managedAttributesCreated" type="int">
+        <Prompt>task_out_account_aggregation_managed_attributes_promoted</Prompt>
+      </Argument>
+      <Argument name="managedAttributesCreatedByApplication" type="string">
+        <Prompt>task_out_account_aggregation_managed_attributes_promoted_by_app</Prompt>
+      </Argument>
+      <Argument name="identityEntitlementsCreated" type="int">
+        <Prompt>task_out_account_aggregation_identityEntitlements_created</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

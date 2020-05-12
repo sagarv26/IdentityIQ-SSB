@@ -1,0 +1,653 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell"  
+          name="SP BeanShell MultiThreading Framework Rule"      
+          type="BuildMap" >
+  <Description>Multi-Threading Framework for Bean Shell rule code </Description>  
+  <Source>
+  <![CDATA[
+// Library inclusions for BeanShell
+import java.util.*;
+import java.lang.*;
+import java.text.*;
+
+import java.util.concurrent.LinkedBlockingQueue;  // Thread-safe queue for items.
+import java.util.concurrent.atomic.AtomicBoolean; // Flags for indicating status.
+import java.util.concurrent.atomic.AtomicInteger; // Counting records processed.
+import java.util.concurrent.ConcurrentHashMap;    // Data shared across threads.
+
+import sailpoint.api.*;
+import sailpoint.object.*;
+import sailpoint.tools.Util;
+import sailpoint.tools.Message;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
+// Keep a time stamp tracking when things got started.
+long startStamp = System.currentTimeMillis();
+
+Logger log = Logger.getLogger("sailpoint.services.BeanShellMultiThreading");
+// log.setLevel((Level) Level.DEBUG);  // TODO: Remove debug logging in real use.
+
+// Keep a flag around to identify whether this rule is being run inside a Task
+// context or whether it is being run stand-alone from the console ore Debug 
+// page.  For 6.3 and newer installs we can use the presence of the variable 
+// 'taskResult' to determine if we are running in task context.
+// We get the taskResult object's ID so that the worker threads can load it
+// so they can modify it on their own if necessary.
+String taskResultId = null;
+boolean inTaskContext = false;
+if ((void != taskResult) && (null != taskResult)) {   
+  inTaskContext = true;
+  taskResultId = taskResult.getId();    
+}
+
+// Specify the number of threads that will be used in parallel.  Default to
+// a function of the number of available cores.  Since much of the time is 
+// spent on DB transactions,  the number can be significantly higher that the 
+// number of cores available
+int numCpuCores = Runtime.getRuntime().availableProcessors(); 
+int numWorkerThreads = 2 * numCpuCores;
+
+// Configurable items: Specify the names of two Rule objects.  The first Rule
+// is the rule invoked once per each item to process.  Different copies of this
+// Rule will be invoked in parallel in their own separate Threads with their
+// own separate SailPointContext objects.  As far as the rule is concerned it
+// is simply being passed an item to work on off on its own.  It knows nothing 
+// about the other threads in flight at the same time.
+// The second rule is the rule that builds the queue of work item objects.
+// The queue is usually made of String objects, often IDs of some object to
+// process.  The entire queue should fit in RAM, do not fill it with large
+// CLOBs or with fully populated sailpoint.object.* items.  Each worker thread
+// is expected to load whatever data it needs to do its own work.
+static String perItemRuleName      = "BeanShell MultiThreading Example Item Rule";
+static String queueBuilderRuleName = "BeanShell MultiThreading Example Queue Builder";
+static String initializerRuleName  = "BeanShell MultiThreading Example Initialization Rule";
+static String cleanupRuleName      = "BeanShell MultiThreading Example Cleanup Rule";
+
+// If we are run from the UI/TaskDefintion that means we probably got rule 
+// information in from the "config" object.  Let's see what got passed in.
+if ((void != config) && (null != config)) {
+
+   queueBuilderRuleName = config.get("queueBuilderRuleName");
+   if ((null == queueBuilderRuleName) || (0 == queueBuilderRuleName.length())) {
+      return "Error: invalid or empty queueBuilderRuleName passed in.";
+   }
+   
+   perItemRuleName = config.get("perItemRuleName");
+   if ((null == perItemRuleName) || (0 == perItemRuleName.length())) {
+      return "Error: invalid or empty perItemRuleName passed in.";
+   }
+   
+   initializerRuleName = config.get("initializationRuleName");
+   if ((null == initializerRuleName) || (0 == initializerRuleName.length())) {
+      // no problem if not specified, this rule is optional.
+      log.warn("initializerRuleName is not specified, no init rule to run.");
+   }
+   
+   cleanupRuleName = config.get("cleanupRuleName");
+   if ((null == cleanupRuleName) || (0 == cleanupRuleName.length())) {
+      // no problem if not specified, this rule is optional.
+   } 
+   
+   // This one is totally optional.  The user does not need to specify # threads.
+   String numThreads = config.get("numThreadsConfig");   
+   if ((null != numThreads) && (0 != numThreads.length())) {
+      int tempInt = Integer.parseInt(numThreads);
+      if (0 < tempInt) {
+         // Only use the user-specified number if it is rational and makes sense.
+         numWorkerThreads = tempInt;
+         log.debug("Will allocate " + numWorkerThreads + " threads per TaskDefinition.");         
+      }      
+   }
+    
+}
+
+if (inTaskContext) {
+   String ntmsg = "Configured to use " + numWorkerThreads + " worker threads."; 
+   taskResult.addMessage(new Message(Message.Type.Info, ntmsg, null));
+   context.saveObject(taskResult);         
+} 
+
+// Sanity checks: make sure the Rule objects exist. Check by both name and id.
+Rule perItemRule = context.getObjectByName(Rule.class, perItemRuleName);
+if (null == perItemRule) {
+   perItemRule = context.getObjectById(Rule.class, perItemRuleName);
+}  
+if (null == perItemRuleName) {
+   String msg = "Could find load a Rule named: " + perItemRuleName; 
+   log.error(msg);
+   return "ERROR: " + msg;
+}
+Rule queueBuilderRule = context.getObjectByName(Rule.class, queueBuilderRuleName);
+if (null == queueBuilderRule) {
+   queueBuilderRule = context.getObjectById(Rule.class, queueBuilderRuleName);
+}   
+if (null == queueBuilderRule) {
+   String msg = "Could find load a Rule named: " + queueBuilderRuleName; 
+   log.error(msg);
+   return "ERROR: " + msg;
+}
+
+// A few concurrent-programming enabled variables coordinate traffic between
+// the parent (producer) thread and the worker threads.  
+// First we have a queue that contains the work items to process: 
+static LinkedBlockingQueue queue = new LinkedBlockingQueue();
+
+// Next we have a boolean that is set to true when/if a worker thread throws
+// an exception.  If this happens all of the worker threads cease processing
+// the queue items entirely and the process aborts/gives up.
+static AtomicBoolean workerExceptionFound = new AtomicBoolean(false);
+
+// We also have a boolean that is set to true when the queue builder rule
+// is completed executing. This is a flag to let the worker threads know that
+// the queue is full and complete and will not be receiving any more work 
+// items to proces.  If the queue is empty and the queue builder rule is 
+// complete then the worker threads know for certain that the they are done
+// and they can safely exit and free up their resources.
+static AtomicBoolean queueBuilderComplete = new AtomicBoolean(false);
+
+// A peg counter for how many items the worker threads have processed.
+static AtomicInteger itemsProcessed = new AtomicInteger(0);
+
+// A thread-safe hash map that can contain objects shared by all threads.
+// This allows the initializer rule to load lookups tables or cache data used
+// in the per-item rules ahead of time.  It defaults to an empty item map.
+static ConcurrentHashMap sharedThreadState = new ConcurrentHashMap();  
+
+
+//  *********************************************************
+//  *        Runable method for spawned threads             *
+//  *********************************************************
+// This this the method that is run by the threads when they are started
+// it pops the workItems off the queue and deletes them one by one.  It passes
+// the workItem strings to the item rule for processing.  It also keeps track
+// of the work queue and flags so that it knows when it is done serching for
+// work to process.
+void run () { 
+
+ try {
+  
+   Logger log = Logger.getLogger("sailpoint.services.BeanShellMultiThreading");
+   log.trace("enter run method");  
+   // Each worker thread gets its own independent context/connection to the
+   // database supporting IdentityIQ.  
+   SailPointContext myContext = SailPointFactory.createContext();
+   
+   // Make sure our per-item rule is available.
+   Rule perItemRuleObj = myContext.getObjectByName(Rule.class, perItemRuleName);
+   if (null == perItemRuleObj) {
+      perItemRuleObj = myContext.getObjectById(Rule.class, perItemRuleName);
+   }  
+   if (null == perItemRuleObj) {
+      log.error("Could not find a Rule named: " + perItemRuleName);
+      workerExceptionFound.set(true);
+   } else if (null == perItemRuleObj.getLanguage()) {
+      // Default to 'beanshell' language rules if language is not specified.
+      perItemRuleObj.setLanguage(sailpoint.object.Script.LANG_BEANSHELL);
+   }
+   
+   // Each worker thread gets its own independent thread-local cache to
+   // keep "load once, use many" types of configuration items.
+   // This is analogous to the "state" of the Customizaiton rule used
+   // during account aggregation. 
+   HashMap localThreadState = new HashMap();   
+
+   // Worker threads hang around blocked, waiting for an item in queue.
+   // Occasionally worker threads can pull items off of the queue faster than
+   // the prodcer can put them on.  In these cases the worker thread needs
+   // to patiently wait for more work to be put on the queue.
+   while (true) {
+  
+      String workItem = null;
+  
+      // See if another worker thread threw an exception indicating failure.
+      // if this happens then all worker threads give up and cease processing.
+      if (true == workerExceptionFound.get()) {          
+         log.debug("Another worker thread has failed, stopping processing.");
+         break; // break out of the while() loop to cleanup logic below.     
+      }
+     
+      // The queue could have been cleared and completed while this thread
+      // has been yielding or off processing other work.  Check for completion
+      // of the queue builder and if we are done then break to cleanup below.
+      if ( (0 == queue.size()) && (true == queueBuilderComplete.get()) ) {     
+         log.trace("queue is empty, builder is complete, time to cleanup.");
+         break;
+      }
+     
+      // If there is nothing in the queue and the queue builder / producer
+      // has not completed and is still running yield/wait for a small amount
+      // of time to allow the queue buidler to put more work on the queue. 
+      if ( (0 == queue.size()) && (false == queueBuilderComplete.get()) ) {     
+         log.trace("queue is empty, waiting for more work to arrive.");
+         Thread.sleep(1000);
+      }
+     
+      workItem = (String) queue.poll();
+      if (null == workItem) {
+          
+        // No work was found on the head of the queue.  It is possible that
+        // other threads adopted all of the work and the queue builder / producer
+        // is still working.  In this event do nothing for a very brief period
+        // of time by yielding and then going back to the start of the while().
+        Thread.sleep(1);
+            
+      } else {
+      
+          // A work item was found on the head of the queue!  
+         // We have a valid workItem string, pass it to the Rule.   
+              
+         HashMap ruleArgs = new HashMap();
+         ruleArgs.put("workItem", workItem);  // Pass in the thing to work on.
+         ruleArgs.put("log",      log);       // Pass in the local log object.
+         ruleArgs.put("localThreadState", localThreadState); // Thread state.
+         ruleArgs.put("sharedThreadState", sharedThreadState); // Global state.
+         
+         // This local context has to load the TaskResult in its own hibernate
+         // session.  So we load it by ID from string.
+         if ((inTaskContext) && (null != taskResultId)) {
+            //TaskResult myTaskResult = myContext.getObjectById(TaskResult.class, taskResultId);
+            ruleArgs.put("taskResultId", taskResultId); 
+            //taskResult = myTaskResult;
+         }  
+         
+         // Rules can explode, catch any exceptions and terminate the
+         // worker thread so the rule can stop and be debugged.  This is also
+         // used to tell the other worker threads to stop and give up.
+         try {         
+            
+            Object retObj = myContext.runRule(perItemRuleObj, ruleArgs, perItemRuleObj.getReferencedRules());
+            
+            // We successfully processed this item, increment the peg counter.
+            itemsProcessed.getAndIncrement();
+            
+         } catch (Exception e) {
+
+            // Set the workerExceptionFound flag to true so that other 
+            // worker threads cease their execution as well and stop processing.
+            workerExceptionFound.set(true);
+
+            // Upon an exception "scream and jump overvoard!".  Or politely
+            // log the exception that happned in the rule and cleanup our
+            // conext and exit gracefully.
+            log.error("Item rule threw an exception" ,e);
+            
+            // The taskResult object is shared with the parent thread and worker
+            // threads.  This means it has no native atomic/blocking protection.
+            // Allow only one worker thread to update the TaskResult at a time.
+            if (inTaskContext) synchronized (this) {
+               Map ops = new HashMap();
+               ops.put(context.LOCK_TYPE, context.LOCK_TYPE_TRANSACTION);
+               thisResult = context.lockObjectById(TaskResult.class,taskResultId,ops);        
+               thisResult.addException(e);
+               context.saveObject(thisResult);        
+               context.commitTransaction();  
+               context.unlockObject(thisResult);               
+            }
+            
+            // Cleanup the worker thread's SailPoint context.
+            myContext.rollbackTransaction();
+            myContext.decache();
+            myContext.close();
+            myContext = null;
+            
+            // Cleanup any locally allocated storage.
+            localThreadState.clear();
+            localThreadState = null;
+            
+            return;            
+         }         
+     
+     } // end else() when we have a valid workItem.
+  
+  } // end the while(true) loop polling for workItems to adopt.
+  
+  // The item rules are responsible for their own committing of data to the
+  // SailPointContext handle.  Any un-commited data left at this point is 
+  // purged out in the decache call.
+  try {
+    // Cleanup any locally allocated storage.
+    localThreadState.clear();
+    localThreadState = null;  
+  
+    myContext.decache();
+    myContext.close();
+    myContext = null;
+  } catch (Exception e){
+    log.error("Worker thread exception during cleanup",e);
+    myContext.rollbackTransaction();
+    myContext.decache();
+  }
+  
+ } catch (Exception e) {
+    log.error(e);
+    log.error(e.printStackTrace());
+ }
+ log.trace("exit run"); 
+ return;  
+}
+
+//*********************************************************
+//        Main logic of Framework Rule
+//*********************************************************
+
+// Start off by launching the initializer rule.  This rule sets up the any
+// shared data that the per-item rules need already loaded in memory and/or
+// does any one-time setup.  This is an optional rule; if not specified simply
+// do not execute it.
+
+if ((null == initializerRuleName) || (0 == initializerRuleName.length())) {
+
+   log.debug("Empty initializerRuleName passed, skipping init rule.");   
+
+} else {
+  /*SailPointContext myContext = SailPointFactory.createContext();
+  SailPointContext tempContext = context;
+  context = myContext;*/
+   log.trace("Launching init rule");
+   Rule initRule = context.getObjectByName(Rule.class, initializerRuleName);
+   if (null == initRule) {
+      initRule = context.getObjectById(Rule.class, initializerRuleName);   
+   }
+   
+   if (null == initRule) {
+      String m = "Could not find or load initialization rule: " + initializerRuleName; 
+      log.error(m);
+      if (inTaskContext) {
+        taskResult.setProgress(m);
+        taskResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+        context.saveObject(taskResult);        
+        context.commitTransaction();  
+      }
+      return "ERROR: " + m;         
+   }
+   
+   log.debug("Framework will run init rule: " + initRule.getName());
+   
+   try {
+   
+      HashMap ruleArgs = new HashMap();
+      ruleArgs.put("workQueue", queue); // Pass in reference to the work queue.
+      ruleArgs.put("log",       log); // Pass in the local log object.
+      ruleArgs.put("sharedThreadState", sharedThreadState); // Shared state.     
+      if (inTaskContext) ruleArgs.put("taskResult", taskResult); // IIQ 6.3+.
+   
+      Object retObj = context.runRule(initRule, ruleArgs, null);
+         
+   } catch (Exception e) {
+   
+      log.error("Initialization rule threw exception ", e);
+      
+      if (inTaskContext) {
+        taskResult.setProgress("Initialization rule threw exception");
+        taskResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+        context.saveObject(taskResult);        
+        context.commitTransaction();  
+      }
+      return "ERROR: Initialization rule threw exception";
+                        
+   } /*finally {
+       context = tempContext;       
+       myContext.decache();
+       myContext.close();
+       myContext = null;
+   }*/
+
+}
+
+// Proceed by launching the worker threads.  We do this first, that is we 
+// launch the worker threads so they are ready and waiting in the background
+// for the work to be added to the queue.  This allows the worker threads
+// to be doing work while the queue builder / producer is populating new
+// items in the queue.
+log.trace("Starting worker threads");
+ArrayList threadList = new ArrayList();
+int partNumber = 0;
+for (int i = 0; i < numWorkerThreads; i++){
+    Thread thread = new Thread (this, "BeanShellThread-"+i);
+    threadList.add(thread);
+    thread.start();              
+}
+
+log.trace("Calling queue rule");
+// Next proceed by running the queue builder rule.
+HashMap ruleArgs = new HashMap();
+ruleArgs.put("workQueue", queue);  // Pass in reference to the work queue.
+ruleArgs.put("log",       log);    // Pass in the local log object.
+ruleArgs.put("sharedThreadState", sharedThreadState); // Shared state.
+if (inTaskContext) ruleArgs.put("taskResult", taskResult); // IIQ 6.3+.
+         
+// Rules can explode, catch any exceptions and terminate the
+// worker thread so the rule can stop and be debugged.
+
+/*SailPointContext myContext = SailPointFactory.createContext();
+SailPointContext tempContext = context;
+context = myContext;
+*/
+
+long queueBuilderStartStamp = System.currentTimeMillis(); 
+try {         
+
+   Object retObj = context.runRule(queueBuilderRule, ruleArgs, null);
+   queueBuilderComplete.set(true);
+   
+} catch (Exception e) {
+
+   // If any workers are running we need them to stop ASAP.  Tell then both
+   // that the queue builder is complete and that there was a worker thread 
+   // problem.  This makes the worker threads stop on the next record.
+   queueBuilderComplete.set(true);
+   workerExceptionFound.set(true);
+   
+   // Give the worker threads a moment to shut themselves down.  They will
+   // be polling and see the workerExceptionFound flag and stop. 
+   Thread.sleep(1500);   
+
+   // Upon an exception politely log the exception that happned in the rule 
+   // and give up entirely.  No work queue means no work for the threads to do.
+   String msg = "Queue builder threw exception ";
+   log.error(msg, e);
+   if (inTaskContext) {
+      taskResult.setProgress(msg);
+      taskResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+      context.saveObject(taskResult);        
+      context.commitTransaction();  
+   }   
+   return;
+                  
+} /*finally {
+   context = tempContext;       
+   myContext.decache();
+   myContext.close();
+   myContext = null;
+} */
+log.trace("finished calling queueBuilder");
+
+long queueBuilderEndStamp = System.currentTimeMillis();
+
+try {
+  if (inTaskContext) {
+
+     long queueTime = queueBuilderEndStamp - queueBuilderStartStamp;
+     String qbmsg = "Queue builder ran for " + (queueTime / 1000) + " seconds.";
+     
+     Map ops = new HashMap();
+     ops.put(context.LOCK_TYPE, context.LOCK_TYPE_TRANSACTION);
+     thisResult = context.lockObjectById(TaskResult.class,taskResultId,ops);        
+     thisResult.addMessage(new Message(Message.Type.Info, qbmsg, null));
+     context.saveObject(thisResult);        
+     context.commitTransaction();  
+     context.unlockObject(thisResult);
+  }  
+} catch (Exception e){
+  log.error("Caught exception when updating taskresult after queueBuilder ran",e);
+}
+
+log.trace("Monitoring worker threads");
+// The queue is complete and populated.  Now we sit here and watch the 
+// worker threads to process the items in the queue.
+int wqSize = queue.size();
+try {  
+  while ( (0 != wqSize) && (false == workerExceptionFound.get()) ) {
+
+     if (true == workerExceptionFound.get()) {
+        String msg = "One or more worker threads experienced failure.";
+        log.error(msg);
+        if (inTaskContext) {
+           Map ops = new HashMap();
+           ops.put(context.LOCK_TYPE, context.LOCK_TYPE_TRANSACTION);
+           thisResult = context.lockObjectById(TaskResult.class,taskResultId,ops); 
+           thisResult.setProgress(msg);
+           thisResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+           thisResult.addMessage(new Message(Message.Type.Error, msg, null));
+           context.saveObject(thisResult);        
+           context.commitTransaction();  
+           context.unlockObject(thisResult);  
+        }
+        return "ERROR: " + msg;     
+     }
+
+     String msg = "Executing, workQueue contains " + wqSize + " items remaining."; 
+     log.debug(msg);
+     if (inTaskContext) {
+        Map ops = new HashMap();
+        ops.put(context.LOCK_TYPE, context.LOCK_TYPE_TRANSACTION);
+        thisResult = context.lockObjectById(TaskResult.class,taskResultId,ops);        
+        thisResult.setProgress(msg);
+        context.saveObject(thisResult);        
+        context.commitTransaction();  
+        context.unlockObject(thisResult);
+     }  
+     Thread.sleep(2500);
+     wqSize = queue.size();
+  }
+} catch (Exception e){
+  log.error("caught exception while monitoring queue",e);
+}
+
+// The worker threads are complete.  Close out the worker threads.
+for (Thread thisThread : threadList){
+    thisThread.join();
+}
+threadList = null;
+
+
+// Run a cleanup rule to release any shared resources used by the threads.
+if ((null != cleanupRuleName)  && (0 != cleanupRuleName.length())) {
+   log.trace("Launching cleanup rule");
+   Rule cleanupRule = context.getObjectByName(Rule.class, cleanupRuleName);
+   if (null == cleanupRule) {
+      cleanupRule = context.getObjectById(Rule.class, cleanupRuleName);   
+   }
+   
+   if (null == cleanupRule) {
+      String msg = "Could not find or load cleanup rule: " + cleanupRuleName; 
+      log.error(m);
+      if (inTaskContext) {
+           Map ops = new HashMap();
+           ops.put(context.LOCK_TYPE, context.LOCK_TYPE_TRANSACTION);
+           thisResult = context.lockObjectById(TaskResult.class,taskResultId,ops); 
+           thisResult.setProgress(msg);
+           thisResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+           thisResult.addMessage(new Message(Message.Type.Error, msg, null));
+           context.saveObject(thisResult);        
+           context.commitTransaction();  
+           context.unlockObject(thisResult);  
+      }
+      return "ERROR: " + m;         
+   }
+   
+   try {
+   
+      HashMap ruleArgs = new HashMap();
+      ruleArgs.put("log",       log); // Pass in the local log object.
+      ruleArgs.put("sharedThreadState", sharedThreadState); // Shared state.     
+      if (inTaskContext) ruleArgs.put("taskResult", taskResult); // IIQ 6.3+.
+   
+      Object retObj = context.runRule(cleanupRule, ruleArgs, null);
+         
+   } catch (Exception e) {
+   
+      log.error("Cleanup rule threw exception ", e);
+      
+      if (inTaskContext) {
+           String msg = "Cleanup rule threw exception";
+           Map ops = new HashMap();
+           ops.put(context.LOCK_TYPE, context.LOCK_TYPE_TRANSACTION);
+           thisResult = context.lockObjectById(TaskResult.class,taskResultId,ops); 
+           thisResult.setProgress(msg);
+           thisResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+           thisResult.addMessage(new Message(Message.Type.Error, msg, null));
+           context.saveObject(thisResult);        
+           context.commitTransaction();  
+           context.unlockObject(thisResult);   
+      }
+      return "ERROR: Cleanup rule threw exception";
+                        
+   }
+
+}
+
+// Time stamp for when all the work is officially done.
+long endStamp = System.currentTimeMillis();
+
+// Mark the taskResult accordingly if we had a worker thread fail in processing.
+if (true == workerExceptionFound.get()) {
+   String msg = "One or more worker threads experienced failure.";
+   log.error(msg);
+   if (inTaskContext) {
+           Map ops = new HashMap();
+           ops.put(context.LOCK_TYPE, context.LOCK_TYPE_TRANSACTION);
+           thisResult = context.lockObjectById(TaskResult.class,taskResultId,ops); 
+           thisResult.setProgress(msg);
+           thisResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+           thisResult.addMessage(new Message(Message.Type.Error, msg, null));
+           context.saveObject(thisResult);        
+           context.commitTransaction();  
+           context.unlockObject(thisResult);
+   }
+   return "ERROR: " + msg;     
+}
+
+// And we are done.
+log.debug("All " + numWorkerThreads + " worker threads completed and released.");
+
+if (inTaskContext) {
+   Map ops = new HashMap();
+   ops.put(context.LOCK_TYPE, context.LOCK_TYPE_TRANSACTION);
+   thisResult = context.lockObjectById(TaskResult.class,taskResultId,ops); 
+   
+   String msg = "Success, all worker threads completed.";
+   thisResult.setProgress(msg);
+   thisResult.setCompletionStatus(TaskResult.CompletionStatus.Success);
+   
+   String ipmsg = "Total number of items processed: " + itemsProcessed.get(); 
+   thisResult.addMessage(new Message(Message.Type.Info, ipmsg, null));
+   
+   long totalTime = endStamp - startStamp;
+   String ttmsg = "Total task ran for " + (totalTime / 1000) + " seconds.";
+   thisResult.addMessage(new Message(Message.Type.Info, ttmsg, null));
+   
+   String rpsmsg = "Total aggregate throughput was " + 
+      (itemsProcessed.get() / (totalTime / 1000)) + " records per second (r/s).";
+   thisResult.addMessage(new Message(Message.Type.Info, rpsmsg, null));
+   
+   String rstmsg = "By-thread throughput was " + 
+      (itemsProcessed.get() / (totalTime / 1000) / numWorkerThreads) + 
+      " records per second per thread (r/s/t).";
+   thisResult.addMessage(new Message(Message.Type.Info, rstmsg, null));     
+   
+   context.saveObject(thisResult);        
+   context.commitTransaction();  
+   context.unlockObject(thisResult);
+
+}  
+
+return "Success";
+   ]]>
+  </Source>
+</Rule>
+</sailpoint>

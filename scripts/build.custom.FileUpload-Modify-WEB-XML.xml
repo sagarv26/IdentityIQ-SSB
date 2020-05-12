@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="services.standard.build.custom.SSD-LCM-Attachments.xml">
+
+	<!-- Modifications to web.xml to support FileUploadServlet -->
+	<target name="SSD-LCM-Attachments"
+	   description="Make modifications to web.xml for LCM Attachments">
+    	<replace file="${build}/extract/WEB-INF/web.xml">
+          <replacetoken><![CDATA[</web-app>]]></replacetoken>
+          <replacevalue><![CDATA[    <!-- file attachment  -->
+    <servlet>
+       <description>File Upload Servlet</description>
+       <display-name>FileUploadServlet</display-name>
+       <servlet-name>FileUploadServlet</servlet-name>
+       <servlet-class>sailpoint.services.standard.lcmattachments.FileUploadServlet</servlet-class>
+    </servlet>
+            
+    <servlet-mapping>
+       <servlet-name>FileUploadServlet</servlet-name>
+       <url-pattern>/external/FileUploadServlet</url-pattern>
+    </servlet-mapping>
+</web-app>]]></replacevalue>
+		</replace>
+		<echo message="Patched file: ${build}/extract/WEB-INF/web.xml"/>	
+    </target>
+
+	<!-- The post expansion hook is called after war file is expanded to build/extract. -->
+    <target name="post.expansion.hook">
+		<echo message="Applying LCM Attachments changes to web.xml"/>
+		<antcall inheritall="true" target="SSD-LCM-Attachments"/>	
+    </target>
+
+    <target name="post.war.hook"/>
+
+    <target name="clean"/>
+
+</project>

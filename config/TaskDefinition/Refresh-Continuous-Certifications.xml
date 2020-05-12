@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition name="Refresh Continuous Certifications" subType="task_item_type_certification_refresh" type="CertificationRefresh">
+  <Description>
+            Refresh all continuous certifications to become up-to-date with
+            the current state of the identities in the system.
+        </Description>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Continuous Certification Refresh"/>
+  </Parent>
+</TaskDefinition>
+</sailpoint>

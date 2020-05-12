@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.arcsightDataExportExecutor" formPath="/monitor/tasks/arcsightDataExportInclude.xhtml" name="ArcSight Data Export" progressInterval="5000" progressMode="String" subType="task_item_type_generic" template="true" type="Generic">
+  <Description>
+      Template for creating a ArcSight data export task.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="help_task_arcsight_database" name="database" type="string">
+        <Prompt>task_in_arcsight_data_export_database</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_arcsight_username" name="username" type="string">
+        <Prompt>task_in_arcsight_data_export_database_uname</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_arcsight_password" name="password" type="secret">
+        <Prompt>task_in_arcsight_data_export_database_password</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_arcsight_driverclass" name="driverClass" type="string">
+        <Prompt>task_in_arcsight_data_export_database_driverClass</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_arcsight_dburl" name="dbUrl" type="string">
+        <Prompt>task_in_arcsight_data_export_database_url</Prompt>
+      </Argument>
+      <Argument name="exportIdentities" type="boolean">
+        <Prompt>task_in_arcsight_data_export_identities</Prompt>
+      </Argument>
+      <Argument name="identitiesExportMode" type="string">
+        <Prompt>task_in_arcsight_data_export_identities_mode</Prompt>
+      </Argument>
+      <Argument name="exportAudits" type="boolean">
+        <Prompt>task_in_arcsight_data_export_audits</Prompt>
+      </Argument>
+      <Argument name="auditsExportMode" type="string">
+        <Prompt>task_in_arcsight_data_export_audits_mode</Prompt>
+      </Argument>
+      <Argument name="promoteManagedAttributes" type="boolean">
+        <Prompt>task_in_identity_refresh_promote_managed_attributes</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="identitiesExported" type="int">
+        <Prompt>task_out_arcsight_data_export_identities</Prompt>
+      </Argument>
+      <Argument name="identitiesPruned" type="int">
+        <Prompt>task_out_arcsight_data_export_pruned_identities</Prompt>
+      </Argument>
+      <Argument name="auditsExported" type="int">
+        <Prompt>task_out_arcsight_data_export_audits</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Template_Transform">
+  <Description>
+  Transform Rule.
+  
+  Used to transform the input rows to ones used in the row rule so that 
+  logic in the row rule can be re-used wuithout change
+  	
+  </Description>
+
+  <Signature returnType="Attributes">
+    <Inputs>
+      <Argument name="log" type="org.apache.log4j.Logger">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context" type="sailpoint.api.SailPointContext">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="taskResult" type="sailpoint.object.TaskResult">
+        <Description>
+         	The current task's result object
+        </Description>
+      </Argument>
+      <Argument name="taskAttributes" type="sailpoint.object.Attributes">
+        <Description>
+          The list of task Attributes from the ask Definition
+        </Description>
+      </Argument>
+      <Argument name="row" type="sailpoint.object.Attributes">
+        <Description>
+         The row of data processed after being transformed.
+        </Description>
+      </Argument>
+      <Argument name="transform" type="sailpoint.object.Attributes">
+        <Description>
+          A new Attributes map which can be populated with the row attributes map.
+        </Description>
+      </Argument>
+    </Inputs> 
+  </Signature>
+  <Source><![CDATA[  
+  
+  	import sailpoint.services.standard.task.genericImport.Transmogrifier;
+  	import sailpoint.object.Attributes;
+  	
+  	// IIQDA hints.
+  	// Expect: sailpoint.object.Attributes transform
+  	// Expect: sailpoint.object.Attributes row
+  	// Expect: sailpoint.object.Attributes taskAttributes
+  	// Expect: sailpoint.object.TaskResult taskResult
+  	
+	// Transform Script
+	// Allows for manipulation of the schema before hitting the row rule.
+	// If the Row rule expects a different schema than the source, the row
+	// attribute map can be modified here to suit.
+
+	// Input the row attribute map
+	transform.put("new field name", row.get("old field name"));
+	
+	Object value = row.get("some other field name");
+	// do some transformation to the value
+	transform.put("another new fieldname", value);
+	
+	// Then return the transform.
+	// Returning null here means skip this record and don't run the Row rule.
+	
+	return transform;
+	]]></Source>
+</Rule>

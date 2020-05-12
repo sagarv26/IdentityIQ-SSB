@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# (c) Copyright 2008 SailPoint Technologies, Inc., All Rights Reserved.
+#
+# Run the SailPoint Services Standard Deployment (SSD) Deployer Tool.
+#
+# The script will run the command-line tool to setup components in the SSD
+# To run, type ./deploySSD
+# If doesn't have permission to run, type chmod +x deploySSD
+java -jar SSDDeployer.jar

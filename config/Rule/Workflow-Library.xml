@@ -1,0 +1,163 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Workflow Library">
+  <Source>
+    
+      import sailpoint.object.Filter;
+      import sailpoint.object.Identity;
+      import sailpoint.object.ProvisioningPlan;
+      import sailpoint.object.ProvisioningPlan.AccountRequest;
+      import sailpoint.object.ProvisioningPlan.AttributeRequest;
+      import sailpoint.object.QueryOptions;
+      import sailpoint.tools.Util;
+
+      boolean otob(Object o) { return Util.otob(o); }
+      boolean isTrue(Object o) {otob(o); } 
+      boolean isFalse(Object o) {!otob(o); }
+      boolean isNull(Object o) {o == null; } 
+      int size(Collection o) { return Util.size(o); }
+      String toString(Object o) {(o == null) ? "*null*" : o.toString(); }
+      void println(Object o) {System.out.println(o); }
+      void print(String str) { System.out.print(str); }
+      void printval(String n, Object o) {println(n + " = " + toString(o)); }
+
+
+      public List csvToList(String csv) {
+        return Util.csvToList(csv);
+      }
+
+      /** 
+       * resolve displayName by doing a projection query.
+       */ 
+      public String resolveDisplayName(String identityName) {
+          String displayName = getIdentityProperty(identityName, "displayName"); 
+          if ( displayName == null ) {
+              displayName = identityName;
+          }
+          return displayName;
+      }
+      
+      /** 
+       * If the identityDisplayName is null resolve it by doing
+       * a projection query.
+       */ 
+      public String resolveDisplayName(String identityName, String currentDisplayName) {
+          // allow it to be passed in to avoid the query
+          String displayName = null;
+          if ( currentDisplayName != void ) {
+              displayName = currentDisplayName;
+          }
+          if ( displayName == null ) {
+              displayName = resolveDisplayName(identityName);
+          }
+          return displayName;
+      }
+
+      /**
+       * Given an Identity's name, return the email address.
+       */
+      public String getEmail(String name) {
+          return getIdentityProperty(name, "email");
+      }
+
+      /**
+       * Given an Identity's name and a ProvisioningPlan, return the email address.
+       * This can be used for user notifications when a request to create an
+       * identity was rejected.  In this case there will not be an identity in
+       * the database, so we will try to extract the email address from the plan.
+       */
+      public String getUserEmail(String name, ProvisioningPlan plan) {
+          String email = getEmail(name);
+
+          if (null == email) {
+              email = getIIQCreateRequestValue(plan, "email");
+          }
+
+          return email;
+      }
+
+      /**
+       * Given an Identity's name, return the manager's email address.
+       */
+      public String getManagersEmail(String name) {
+          return getIdentityProperty(name, "manager.email"); 
+      }
+
+      /**
+       * Given an Identity's name, return the manager's email address.
+       * This can be used for user notifications when a request to create an
+       * identity was rejected.  In this case there will not be an identity in
+       * the database, so we will try to extract the manager from the plan to
+       * lookup the email address.
+       */
+      public String getManagersEmail(String name, ProvisioningPlan plan) {
+          String email = getManagersEmail(name);
+
+          if (null == email) {
+              String manager = getIIQCreateRequestValue(plan, "manager");
+              if (null != manager) {
+                  Identity identity = context.getObject(Identity.class, manager);
+                  if (null != identity) {
+                      email = identity.getEmail();
+                  }
+              }
+          }
+
+          return email;
+      }
+
+      /**
+       * Return the value for the requested attribute from the ProvisioningPlan
+       * if this is an identity creation request.
+       */
+      private String getIIQCreateRequestValue(ProvisioningPlan plan, String attr) {
+          String value = null;
+
+          if (null != plan) {
+              AccountRequest acctReq = plan.getIIQAccountRequest();
+              if ((null != acctReq) &amp;&amp;
+                  AccountRequest.Operation.Create.equals(acctReq.getOperation())) {
+                  AttributeRequest attrReq = acctReq.getAttributeRequest(attr);
+                  if (null != attrReq) {
+                      value = (String) attrReq.getValue();
+                  }
+              }
+          }
+
+          return value;
+      }
+
+      /** 
+       * Return a single string property value from an identity.
+       */
+      public String getIdentityProperty(String identity, String property) {
+          QueryOptions ops = new QueryOptions();
+          Filter nameFilter = Filter.eq("name", identity);
+          ops.add(new Filter[]{nameFilter});
+
+          String val = null; 
+          Iterator it = context.search(Identity.class, ops, property);
+          while ( it.hasNext() ) {
+              Object[] row = (Object[])it.next();
+              val = (String)row[0];
+              if ( it.hasNext() ) {
+                  // shouldn't happen but guard
+                  throw new GeneralException("More then one ["+property+"] value returned for ["+identity+"]");
+              }
+          } 
+          return val;
+      }
+
+      /**
+       * Return the value of a system configuration property.
+       * The value is always returned as a string.
+       */
+      public String getConfiguration(String name) {
+          return context.getConfiguration().getString(name);
+      }
+
+    
+  </Source>
+</Rule>
+</sailpoint>

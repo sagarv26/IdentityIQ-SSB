@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Configuration name="TargetCollectorRegistry">
+  <Attributes>
+    <Map>
+      <entry key="Lieberman Collector">
+        <value>
+          <Map>
+            <entry key="class" value="sailpoint.unstructured.lieberman.LiebermanTargetCollector"/>
+            <entry key="page" value="LiebermanCollectorConfig.xhtml"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="PE2 ACF2Collector">
+        <value>
+          <Map>
+            <entry key="class" value="sailpoint.unstructured.PE2TargetCollector"/>
+            <entry key="page" value="ACF2PE2UnstructuredConfig.xhtml"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="PE2 RACFCollector">
+        <value>
+          <Map>
+            <entry key="class" value="sailpoint.unstructured.PE2TargetCollector"/>
+            <entry key="page" value="RACFPE2UnstructuredConfig.xhtml"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="PE2 TSSCOLLECTOR">
+        <value>
+          <Map>
+            <entry key="class" value="sailpoint.unstructured.PE2TargetCollector"/>
+            <entry key="page" value="TSSPE2UnstructuredConfig.xhtml"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="STEALTHbits Collector">
+        <value>
+          <Map>
+            <entry key="class" value="sailpoint.unstructured.StealthbitTargetCollector"/>
+            <entry key="page" value="stealthbitCollectorConfig.xhtml"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="SecurityIQ Collector">
+        <value>
+          <Map>
+            <entry key="class" value="sailpoint.unstructured.SecurityIQTargetCollector"/>
+            <entry key="page" value="securityIQTargetCollectorConfig.xhtml"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="SharePoint Collector">
+        <value>
+          <Map>
+            <entry key="class" value="sailpoint.unstructured.SharePointRWTargetCollector"/>
+            <entry key="page" value="sharepointRWUnstructuredConfig.xhtml"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="SharePoint Online Collector">
+        <value>
+          <Map>
+            <entry key="class" value="sailpoint.unstructured.SharePointRWTargetCollector"/>
+            <entry key="page" value="SPOnlineUnstructuredConfig.xhtml"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="TAM Collector">
+        <value>
+          <Map>
+            <entry key="class" value="sailpoint.unstructured.TAMTargetCollector"/>
+            <entry key="page" value="TAMUnstructuredConfig.xhtml"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="Unix Collector">
+        <value>
+          <Map>
+            <entry key="class" value="sailpoint.unstructured.UnixRWTargetCollector"/>
+            <entry key="page" value="UnixRWUnstructuredConfig.xhtml"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="Windows FileShare Collector">
+        <value>
+          <Map>
+            <entry key="class" value="sailpoint.unstructured.WindowsTargetCollector"/>
+            <entry key="page" value="windowsSharesUnstructuredConfig.xhtml"/>
+          </Map>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+</Configuration>
+</sailpoint>

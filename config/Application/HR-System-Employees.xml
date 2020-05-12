@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Application authoritative="true" connector="sailpoint.connector.JDBCConnector" featuresString="DISCOVER_SCHEMA, PROVISIONING, SYNC_PROVISIONING, DIRECT_PERMISSIONS, SEARCH, ENABLE, UNLOCK" icon="databaseIcon" name="HR System Employees" profileClass="" type="JDBC">
+  <Attributes>
+    <Map>
+      <entry key="SQL" value="SELECT * FROM `hr_emp`"/>
+      <entry key="acctAggregationEnd">
+        <value>
+          <Date>1530701521937</Date>
+        </value>
+      </entry>
+      <entry key="acctAggregationStart">
+        <value>
+          <Date>1530701520046</Date>
+        </value>
+      </entry>
+      <entry key="afterProvisioningRule"/>
+      <entry key="aggregationMode">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="beforeProvisioningRule"/>
+      <entry key="compositeDefinition"/>
+      <entry key="deltaTable"/>
+      <entry key="driverClass" value="com.mysql.jdbc.Driver"/>
+      <entry key="getDeltaSQL"/>
+      <entry key="isPermissionEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="managerCorrelationFilter">
+        <value>
+          <Filter operation="EQ" property="employeeid" value="manager"/>
+        </value>
+      </entry>
+      <entry key="mergeRows">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="partitionMode">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="partitionStatements"/>
+      <entry key="password" value="1:cKTryvAN5XxRj4GTsDRn4g=="/>
+      <entry key="provisionRule" value="globalRule"/>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="JDBC Template"/>
+      <entry key="testConnSQL"/>
+      <entry key="url" value="jdbc:mysql://localhost:3306/test"/>
+      <entry key="useExecuteQuery">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="user" value="root"/>
+    </Map>
+  </Attributes>
+  <CreationRule>
+    <Reference class="sailpoint.object.Rule" name="Creation_SetPassword"/>
+  </CreationRule>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <Schemas>
+    <Schema displayAttribute="name" identityAttribute="EmployeeID" instanceAttribute="" nativeObjectType="account" objectType="account" permissionsRemediationModificationType="None">
+      <AttributeDefinition name="EmployeeID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="givenName" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="sn" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="name" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="manager" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="mail" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Department" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="city" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="office" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="employeenumber" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="enabled" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Description" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="title" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="info" type="string">
+        <Description/>
+      </AttributeDefinition>
+    </Schema>
+  </Schemas>
+  <ApplicationScorecard/>
+</Application>
+</sailpoint>

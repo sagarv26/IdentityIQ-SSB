@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="SP CST Approval Validator Script Default Rule">
+  <Signature>
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="approvalSet">
+        <Description>
+          Approval Set that was processed
+        </Description>
+       </Argument>
+       <Argument name="item">
+        <Description>
+          Any approvals that might have been set aside
+        </Description>
+       </Argument>
+       <Argument name="approvalType">
+        <Description>
+          The current approval type
+        </Description>
+       </Argument>
+    </Inputs>
+    <Returns>
+      <!--  No returns -->
+    </Returns>
+  </Signature>
+  
+  <Source>
+  <![CDATA[
+  	// Example:
+  	// return cstApprovalValidatorScriptExampleRule(context, approvalSet, item);
+  
+   	 return null;
+  ]]>
+</Source>
+</Rule>

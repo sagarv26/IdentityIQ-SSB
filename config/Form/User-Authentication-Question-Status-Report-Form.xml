@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="User Authentication Question Status Report Form" type="Report">
+  <Section columns="2" label="rept_users_auth_section_identity_props" name="Identity Attributes"/>
+  <Section columns="2" label="rept_users_auth_section_extended" name="Identity Extended Attributes"/>
+  <Section columns="2" label="rept_users_auth_section_identity_details" name="Additional Identity Properties">
+    <Field columnSpan="1" displayName="rept_users_auth_field_app" helpKey="rept_users_auth_help_app" multi="true" name="applications" type="Application" value="ref:applications"/>
+    <Field columnSpan="1" displayName="rept_users_auth_field_capability" helpKey="rept_users_auth_help_capability" multi="true" name="capabilities" type="Capability" value="ref:capabilities"/>
+    <Field columnSpan="1" displayName="rept_users_auth_field_roles" helpKey="rept_users_auth_help_roles" multi="true" name="businessRoles" type="Bundle" value="ref:businessRoles"/>
+    <Field columnSpan="1" displayName="rept_users_auth_field_group_def" helpKey="rept_users_auth_help_group_def" multi="true" name="groupDefinitions" type="GroupDefinition" value="ref:groupDefinitions"/>
+    <Field columnSpan="1" displayName="rept_users_auth_field_last_refresh_start" helpKey="rept_users_auth_help_last_refresh_start" name="lastRefreshStart" type="date" value="ref:lastRefreshStart"/>
+    <Field columnSpan="1" displayName="rept_users_auth_field_last_refresh_end" helpKey="rept_users_auth_help_last_refresh_end" name="lastRefreshEnd" type="date" value="ref:lastRefreshEnd">
+      <Attributes>
+        <Map>
+          <entry key="endDate" value="true"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field columnSpan="1" displayName="rept_users_auth_field_last_login_start" helpKey="rept_users_auth_help_last_login_start" name="lastLoginStart" type="date" value="ref:lastLoginStart"/>
+    <Field columnSpan="1" displayName="rept_users_auth_field_last_login_end" helpKey="rept_users_auth_help_last_login_end" name="lastLoginEnd" type="date" value="ref:lastLoginEnd">
+      <Attributes>
+        <Map>
+          <entry key="endDate" value="true"/>
+        </Map>
+      </Attributes>
+    </Field>
+  </Section>
+</Form>
+</sailpoint>

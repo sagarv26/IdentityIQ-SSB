@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition name="Refresh Risk Scores" subType="task_item_type_identity" type="Identity">
+  <Attributes>
+    <Map>
+      <entry key="refreshScorecard" value="true"/>
+    </Map>
+  </Attributes>
+  <Description>
+            Refresh the risk scores of all identities.
+        </Description>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Identity Refresh"/>
+  </Parent>
+</TaskDefinition>
+</sailpoint>

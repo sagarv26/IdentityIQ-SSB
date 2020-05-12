@@ -1,0 +1,362 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow libraries="Identity" name="Do Provisioning Forms" type="Subprocess">
+  <Variable input="true" name="identityName" required="true">
+    <Description>
+      The name of the identity object being modified.
+    </Description>
+  </Variable>
+  <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>
+      The displayName of the identity being updated.
+      This may be passed in, if not the script queries for this
+      using a projection query and falls back to the name.
+    </Description>
+  </Variable>
+  <Variable input="true" name="project" output="true" required="true">
+    <Description>
+      A ProvisioningProject object describing the modifications to the identity.
+      This may include a list of Question objects which will 
+      cause the generation of a Form and a WorkItem to solicit
+      additional information necessary for provisioning.
+    </Description>
+  </Variable>
+  <Variable input="true" name="formTemplate" required="true">
+    <Description>
+      The name of the Form object that will be the template for
+      generated forms.
+    </Description>
+  </Variable>
+  <Variable input="true" name="preferredOwner">
+    <Description>
+      Optional argument to buildProvisioningForm to pass in the name of
+      an identity we should try to process first when feeding
+      forms back to the workflow.  If there are no questions for that
+      identity and there are questions for other identities, a form for
+      one of the other identities is generated at random.  When set the
+      value is usually the same as "sessionOwner" a built-in system variable
+      containing the name of the user currently interacting with a 
+      workflow session.
+    </Description>
+  </Variable>
+  <Variable input="true" name="priority">
+    <Description>
+      String version of WorkItem.level that will be used
+      to set the priority of any generated workitems.
+    </Description>
+  </Variable>
+  <Variable input="true" name="requiredOwner">
+    <Description>
+      Optional argument to buildProvisioningForm to pass in the name of
+      an identity we should try to process first when feeding
+      forms back to the workflow.  If there are no questions for that
+      identity and there are questions for other identities, no form is 
+      returned and the workflow may terminate without answering all of the
+      questions in the project.
+
+      This variable should only be on if you want to generate provisioning
+      forms for the requester before approval. When called after approval (from Identity Request Provision),
+      we don't pass in this attribute and all the rest of the provisioning forms can be generated.
+    </Description>
+  </Variable>
+  <Variable input="true" name="fallbackOwner">
+    <Description>
+      Optional argument to specify a fallback identity to own Forms when nothing else is specified.
+    </Description>
+  </Variable>
+  <Variable input="true" name="accountSelectionOwner">
+    <Description>
+      Optional argument to buildAccountSelectionForm to specify identity that owns the Form.
+    </Description>
+  </Variable>
+  <Variable input="true" name="disableManualAccountSelection">
+    <Description>
+      When set to 'true' the system will not send out Account Selection Notification emails 
+      for users with more than one account on any one application and the system 
+      can't determine the provisioning account.
+      This is only passed in from Identity Refresh workflow.
+    </Description>
+  </Variable>
+  <Variable name="workItemForm">
+    <Description>
+      Holds the assembled provisioning form for this user. This is generated
+      dynamically and passed into a work item for presentation.  
+      During rendering the new field values are saved in the form fields.  
+      When the work item is assimilated, we copy the form from the work
+      item back to this variable for further processing.
+      
+      Note that this must be named workItemForm if you want to use it
+      in the "send" list of an Approval.  This is the name recognized
+      by WorkItemFormBean.  If you need to use a different name, or
+      have multiple forms then you will need to use an Arg in the Approval
+      to do the name translation.
+    </Description>
+  </Variable>
+  <Variable name="formOwnerError">
+    <Description>
+      Set to true if we ever have difficulty determining a form owner.
+      Used to break out of the provisioning loop.  This really shouldn't
+      be necessary but be safe.
+    </Description>
+  </Variable>
+  <Variable name="workItemComments">
+    <Description>
+     Global comments list which should be appended to the comments list ofr
+     each approval.
+    </Description>
+  </Variable>
+  <Variable name="accountSelectionForm">
+    <Description>
+      Dynamic account selection form generated when target account is ambiguous.
+    </Description>
+  </Variable>
+  <Variable name="calculatedAccountSelectionOwner">
+    <Description>
+      Calculated owner value for account selection form.
+    </Description>
+  </Variable>
+  <Step icon="Start" name="start" posX="33" posY="16">
+    <Transition to="Get Account Selection Owner"/>
+  </Step>
+  <Step action="call:getAccountSelectionOwner" condition="script:project != null &amp;&amp; !isTrue(disableManualAccountSelection) &amp;&amp; (project.hasUnansweredProvisioningTargets() || project.hasUnansweredAccountSelections())" name="Get Account Selection Owner" posX="372" posY="12" resultVariable="calculatedAccountSelectionOwner">
+    <Arg name="accountSelectionOwner" value="ref:accountSelectionOwner"/>
+    <Arg name="owner" value="ref:requiredOwner"/>
+    <Arg name="preferredOwner" value="ref:preferredOwner"/>
+    <Arg name="fallbackOwner" value="ref:fallbackOwner"/>
+    <Transition to="Build Account Selection Form"/>
+  </Step>
+  <Step action="call:buildAccountSelectionForm" condition="script:project != null &amp;&amp; !isTrue(disableManualAccountSelection) &amp;&amp; project.hasUnansweredProvisioningTargets()" name="Build Account Selection Form" posX="561" posY="12" resultVariable="accountSelectionForm">
+    <Arg name="project" value="ref:project"/>
+    <Arg name="owner" value="ref:calculatedAccountSelectionOwner"/>
+    <Description>
+      Call the standard handler method to build the account selection form.
+    </Description>
+    <Transition to="Present Account Selection Form"/>
+  </Step>
+  <Step condition="script:!isNull(accountSelectionForm)" name="Present Account Selection Form" posX="561" posY="12">
+    <Approval owner="script:accountSelectionForm.getTargetUser()" send="identityName,identityDisplayName,launcher">
+      <AfterScript>
+        <Source>
+          import sailpoint.object.Form;
+          import sailpoint.object.ProvisioningTarget;
+          import sailpoint.object.AccountSelection;
+          import sailpoint.object.Field;
+
+          Form accountSelectionForm = item.getForm();
+          
+          Iterator fieldIterator = accountSelectionForm.iterateFields();
+
+          List targets = project.getProvisioningTargets();
+          
+          //apply selected value to matching AccountSelection
+          //if accountSelectionId, then apply to the first unanswered AccountSelection
+          while (fieldIterator.hasNext()) {
+              Field fld = (Field)fieldIterator.next();
+              if (fld == null) 
+                continue;
+
+              Integer targetIndex = (Integer)fld.getAttribute("targetIndex");
+              Integer selectionIndex = (Integer)fld.getAttribute("selectionIndex");
+              
+              if (targetIndex == null || selectionIndex == null) continue;
+                            
+              ProvisioningTarget target = (ProvisioningTarget) targets.get(targetIndex.intValue());
+              
+              List selections = target.getAccountSelections();
+              AccountSelection selection = (AccountSelection) selections.get(selectionIndex.intValue()); 
+                 
+              if (selection.isAnswered()) continue;
+              
+              if (fld.getValue().equals("doCreateOpt")) {
+                selection.setDoCreate(true);
+              }
+              else {
+                selection.setSelection(fld.getValue());
+              }
+          }
+          
+        </Source>
+      </AfterScript>
+      <Arg name="workItemType" value="Form"/>
+      <Arg name="workItemDescription" value="Role Account Selection for $(identityDisplayName)"/>
+      <Arg name="workItemForm" value="ref:accountSelectionForm"/>
+      <Arg name="workItemDisableNotification">
+        <Script>
+          <Source>
+           
+            // If this is interactive then don't bother sending email notifications.
+            return (null != sessionOwner) &amp;&amp; !sessionOwner.equals("System") &amp;&amp; !sessionOwner.equals("Scheduler");
+            
+          </Source>
+        </Script>
+      </Arg>
+      <Arg name="workItemPriority" value="ref:priority"/>
+      <WorkItemConfig escalationStyle="none">
+        <NotificationEmailTemplateRef>
+          <Reference class="sailpoint.object.EmailTemplate" name="Account Selection Notification"/>
+        </NotificationEmailTemplateRef>
+      </WorkItemConfig>
+    </Approval>
+    <Description>
+      Present the account selection form and check to make sure all account selections were made.
+    </Description>
+    <Transition to="Handle Old Account Selections"/>
+  </Step>
+  <Step condition="script:project != null &amp;&amp; !isTrue(disableManualAccountSelection) &amp;&amp; project.hasUnansweredAccountSelections()" name="Handle Old Account Selections" posX="561" posY="12">
+    <Approval owner="ref:calculatedAccountSelectionOwner" renderer="accountSelectionRenderer.xhtml">
+      <AfterScript>
+        <Source>
+          import sailpoint.object.Attributes;
+          import sailpoint.api.Provisioner;
+
+          // Set the account selections back on the project.  Later these will
+          // be consulted when the native identities are resolved.
+          List accountSelections = approval.get("accountSelectionsFromWorkItem");
+          project.setAccountSelections(accountSelections);
+
+          // Recompile project so that selected native identities get put into
+          // provisioning plans.
+          Provisioner p = new Provisioner(wfcontext.getSailPointContext());
+          Attributes args = wfcontext.getStepArguments();
+          p.recompile(project, args);
+        </Source>
+      </AfterScript>
+      <Arg name="workItemRequester" value="$(launcher)"/>
+      <Arg name="workItemDescription" value="Account Selection for User: $(identityDisplayName)"/>
+      <Arg name="workItemDisableNotification">
+        <Script>
+          <Source>
+           
+            // If this is interactive then don't bother sending email notifications.
+            return (null != sessionOwner) &amp;&amp; !sessionOwner.equals("System") &amp;&amp; !sessionOwner.equals("Scheduler");
+            
+          </Source>
+        </Script>
+      </Arg>
+      <Arg name="workItemPriority" value="ref:priority"/>
+      <Arg name="accounts" value="script:project.getAccountSelections()"/>
+      <Arg name="expansionItems" value="script:project.getExpansionItems()"/>
+      <Arg name="identityDisplayName" value="$(identityDisplayName)"/>
+      <Arg name="identityName" value="$(identityName)"/>
+      <Return local="true" name="accounts" to="accountSelectionsFromWorkItem"/>
+      <ValidationScript>
+        <Source>
+          import sailpoint.object.AccountSelection;
+          import sailpoint.tools.Util;
+
+          // The return has not yet been processed since we're in the validator
+          // script.  Grab the account selections from the work item.
+          List accountSelections = item.getAttribute("accounts");
+
+          // Make sure that all account selections have decisions.
+          for (AccountSelection sel : accountSelections) {
+              if (Util.isEmpty(sel.getSelectedNativeIdentities())) {
+                  return "Please make a selection for each application.";
+              }
+          }
+          return null;
+        </Source>
+      </ValidationScript>
+      <WorkItemConfig escalationStyle="none">
+        <NotificationEmailTemplateRef>
+          <Reference class="sailpoint.object.EmailTemplate" name="Account Selection Notification"/>
+        </NotificationEmailTemplateRef>
+      </WorkItemConfig>
+    </Approval>
+    <Description>
+      There are two ways to model account selections.  Pre 6.3 workflows use a 
+      top-level List of AccountSelection objects on the project.  6.3 added a List
+      of ProvisioningTarget objects.  We need to handle both, but there will never
+      be a combination of them in the same workflow case.  This step handles
+      the old model.
+    </Description>
+    <Transition to="Recompile Provisioning Project"/>
+  </Step>
+  <Step action="call:recompileProject" name="Recompile Provisioning Project" posX="99" posY="112" resultVariable="project">
+    <Arg name="project" value="ref:project"/>
+    <Description>
+      Recompile the project.
+    </Description>
+    <Transition to="Build Provisioning Form"/>
+  </Step>
+  <Step action="call:buildProvisioningForm" name="Build Provisioning Form" posX="99" posY="112" resultVariable="workItemForm">
+    <Arg name="project" value="ref:project"/>
+    <Arg name="template" value="ref:formTemplate"/>
+    <Arg name="owner" value="ref:requiredOwner"/>
+    <Arg name="preferredOwner" value="ref:preferredOwner"/>
+    <Arg name="fallbackOwner" value="ref:fallbackOwner"/>
+    <Arg name="workItemComments" value="ref:workItemComments"/>
+    <Arg name="workItemPriority" value="ref:priority"/>
+    <Description>
+      Call the standard handler method to build the provisioning form
+      from the specified template and question list.
+    </Description>
+    <Transition to="Present Provisioning Form"/>
+  </Step>
+  <Step condition="script:!isNull(workItemForm)" name="Present Provisioning Form" posX="99" posY="252">
+    <Approval owner="script:workItemForm.getTargetUser()" return="workItemForm" send="identityName,identityDisplayName,workItemForm,launcher">
+      <Arg name="workItemType" value="Form"/>
+      <Arg name="workItemDescription" value="Complete provisioning form for $(identityDisplayName)"/>
+      <Arg name="workItemDisableNotification">
+        <Script>
+          <Source>
+            
+            // 
+            // If this is interactive then don't bother sending email
+            // notifications.
+            // 
+            // There is some subtle logic here. Basically requiredOwner
+            // is null most of the time except in the case of pre-approval
+            // forms. In that case we want to return the forms for the
+            // required owner so they can fill it in during the request
+            // process instead of waiting on a workitem.  
+            //
+            boolean disableEmail = false;
+            String owner = ( requiredOwner != null ) ? requiredOwner : sessionOwner;
+            if ( Util.nullSafeEq(owner, workItemForm.getTargetUser()) ) { 
+                disableEmail = true;
+            }
+            return disableEmail;
+            
+          </Source>
+        </Script>
+      </Arg>
+      <Arg name="workItemPriority" value="ref:priority"/>
+      <WorkItemConfig escalationStyle="none">
+        <NotificationEmailTemplateRef>
+          <Reference class="sailpoint.object.EmailTemplate" name="Provisioning Form Notification"/>
+        </NotificationEmailTemplateRef>
+      </WorkItemConfig>
+    </Approval>
+    <Description>
+      Present the form we calculated in the previous step.
+      TODO: Need something more formal to determine who the owner
+      of this should be.
+    </Description>
+    <Transition to="Assimilate Provisioning Form"/>
+  </Step>
+  <Step action="call:assimilateProvisioningForm" condition="script:!isNull(workItemForm)" name="Assimilate Provisioning Form" posX="314" posY="252" resultVariable="project">
+    <Arg name="project" value="ref:project"/>
+    <Arg name="form" value="ref:workItemForm"/>
+    <Description>
+      Assimilate the results of the provisining form back into the workflow.
+      This may result in the generation of another set of questions for
+      a different user.  Assimilation can also theoretically generate new
+      questions for the same user if some of the template fields had
+      conditional rendering.
+
+      You can pass things into the Template and Field scripts by
+      defining Args in this step.  You cannot change plan copmiler
+      options, those were specified in the call to compileProvisioningProject
+      and stored in the project for recompilation and execution.
+
+      A new project is returned, but actually it will always be the
+      same as the project passed in.
+    </Description>
+    <Transition to="Build Provisioning Form" when="(project != null &amp;&amp; project.hasQuestions()) &amp;&amp; !isNull(workItemForm)"/>
+    <Transition to="end"/>
+  </Step>
+  <Step icon="Stop" name="end" posX="853" posY="12"/>
+</Workflow>
+</sailpoint>

@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Application authoritative="true" connector="sailpoint.connector.DelimitedFileConnector" featuresString="DIRECT_PERMISSIONS, NO_RANDOM_ACCESS, DISCOVER_SCHEMA" icon="enterpriseIcon" name="Contractor System Employee" profileClass="" type="DelimitedFile">
+  <Attributes>
+    <Map>
+      <entry key="acctAggregationEnd">
+        <value>
+          <Date>1530701684878</Date>
+        </value>
+      </entry>
+      <entry key="acctAggregationStart">
+        <value>
+          <Date>1530701522035</Date>
+        </value>
+      </entry>
+      <entry key="afterProvisioningRule"/>
+      <entry key="beforeProvisioningRule"/>
+      <entry key="compositeDefinition"/>
+      <entry key="delimiter" value=","/>
+      <entry key="file" value="E:\Data\Contrator.csv"/>
+      <entry key="filetransport" value="local"/>
+      <entry key="filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="group.filetransport" value="local"/>
+      <entry key="group.filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="group.partitionMode" value="auto"/>
+      <entry key="hasHeader">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="isCaseInsensitiveMerge">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="isSortedByIndexColumn">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="managerCorrelationFilter">
+        <value>
+          <Filter operation="EQ" property=""/>
+        </value>
+      </entry>
+      <entry key="mergeRows">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="parseType" value="delimited"/>
+      <entry key="partitionMode" value="auto"/>
+      <entry key="stopIfLineHasWrongColumnLength">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="DelimitedFile Template"/>
+    </Map>
+  </Attributes>
+  <CreationRule>
+    <Reference class="sailpoint.object.Rule" name="Creation_SetPassword"/>
+  </CreationRule>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <Schemas>
+    <Schema displayAttribute="name" identityAttribute="EmployeeID" instanceAttribute="" nativeObjectType="account" objectType="account" permissionsRemediationModificationType="None">
+      <AttributeDefinition name="EmployeeID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="givenName" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="sn" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="name" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="manager" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="mail" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Department" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="city" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="office" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="employeenumber" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="enabled" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Description" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="title" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="info" type="string">
+        <Description/>
+      </AttributeDefinition>
+    </Schema>
+  </Schemas>
+  <ApplicationScorecard/>
+</Application>
+</sailpoint>

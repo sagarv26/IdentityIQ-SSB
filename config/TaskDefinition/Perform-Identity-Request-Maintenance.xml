@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition name="Perform Identity Request Maintenance" subType="task_item_type_system" type="System">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="856"/>
+      <entry key="TaskDefinition.runLengthTotal" value="119098"/>
+      <entry key="TaskDefinition.runs" value="139"/>
+      <entry key="maxAge" value="0"/>
+      <entry key="maxVerificationDays" value="7"/>
+      <entry key="scanRequests" value="true"/>
+    </Map>
+  </Attributes>
+  <Description>
+          Prune old identity request objects and scan unverified access requests to check for provisioning completeness.
+        </Description>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Identity Request Maintenance"/>
+  </Parent>
+</TaskDefinition>
+</sailpoint>

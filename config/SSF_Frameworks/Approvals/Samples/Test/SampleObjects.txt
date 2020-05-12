@@ -1,0 +1,318 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Application authoritative="true" connector="sailpoint.connector.DelimitedFileConnector" created="1367239870126" featuresString="DIRECT_PERMISSIONS, NO_RANDOM_ACCESS, DISCOVER_SCHEMA"  modified="1367345607349" name="TestApp" profileClass="" type="DelimitedFile">
+  <Attributes>
+    <Map>
+      <entry key="requiredForCreate" value="PRIMARY_GROUP" />
+      <entry key="acctAggregationEnd">
+        <value>
+          <Date>1367345607337</Date>
+        </value>
+      </entry>
+      <entry key="acctAggregationStart">
+        <value>
+          <Date>1367345607106</Date>
+        </value>
+      </entry>
+      <entry key="afterProvisioningRule"/>
+      <entry key="beforeProvisioningRule"/>
+      <entry key="compositeDefinition"/>
+      <entry key="delimiter" value=","/>
+      <entry key="file" value="/Users/andy.dunfee/Documents/myworkspace/SpiritAeroBeanstalkBranchOptimize/config/ApprovalFramework/Test/users.txt"/>
+      <entry key="filetransport" value="local"/>
+      <entry key="filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="group.file" value="c:/java/groups.csv"/>
+      <entry key="group.filetransport" value="local"/>
+      <entry key="group.filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="group.hasHeader">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="group.isSortedByIndexColumn">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="group.mergeRows">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="group.stopIfLineHasWrongColumnLength">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="hasHeader">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="isSortedByIndexColumn">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="mergeRows">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="parseType" value="delimited"/>
+      <entry key="stopIfLineHasWrongColumnLength">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="DelimitedFile Template"/>
+    </Map>
+  </Attributes>
+  <Description>[{"isDefault":"true","locale":"en_US","value":"","isCurrent":"true","displayName":"English (United States)"}]</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <Schemas>
+    <Schema created="1367345550997" displayAttribute="USER_ID" groupAttribute="OTHER_GROUPS_LIST" identityAttribute="USER_ID" instanceAttribute="" modified="1367345588466" nativeObjectType="account" objectType="account" permissionsRemediationModificationType="None">
+      <AttributeDefinition correlationKey="1" name="USER_ID" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="ECN" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="FIRSTNAME" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="LASTNAME" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="EMAIL" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" managed="true" multi="true" name="OTHER_GROUPS_LIST" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" managed="true" name="PRIMARY_GROUP" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+    </Schema>
+    <Schema created="1367345253484" displayAttribute="ENTITLEMENT_NAME"  identityAttribute="ENTITLEMENT_VALUE" instanceAttribute="" modified="1367345588466" nativeObjectType="group" objectType="group" permissionsRemediationModificationType="None">
+      <AttributeDefinition name="ENTITLEMENT_NAME" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="ENTITLEMENT_VALUE" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="DESCRIPTION" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+    </Schema>
+  </Schemas>
+  <Templates>
+    <Template name="TestApp Create Policy" usage="Create">
+      <Field name="PRIMARY_GROUP" required="true" type="string" value="GROUPA"/>
+    </Template>
+  </Templates>
+</Application>
+<Application authoritative="true" connector="sailpoint.connector.DelimitedFileConnector" created="1367239870126" featuresString="DIRECT_PERMISSIONS, NO_RANDOM_ACCESS, DISCOVER_SCHEMA"  modified="1367345607349" name="TestApp2" profileClass="" type="DelimitedFile">
+  <Attributes>
+    <Map>
+      <entry key="requiredForCreate" value="PRIMARY_GROUP" />
+      <entry key="acctAggregationEnd">
+        <value>
+          <Date>1367345607337</Date>
+        </value>
+      </entry>
+      <entry key="acctAggregationStart">
+        <value>
+          <Date>1367345607106</Date>
+        </value>
+      </entry>
+      <entry key="afterProvisioningRule"/>
+      <entry key="beforeProvisioningRule"/>
+      <entry key="compositeDefinition"/>
+      <entry key="delimiter" value=","/>
+      <entry key="file" value="/Users/andy.dunfee/Documents/myworkspace/SpiritAeroBeanstalkBranchOptimize/config/ApprovalFramework/users.txt"/>
+      <entry key="filetransport" value="local"/>
+      <entry key="filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="group.file" value="c:/java/groups.csv"/>
+      <entry key="group.filetransport" value="local"/>
+      <entry key="group.filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="group.hasHeader">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="group.isSortedByIndexColumn">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="group.mergeRows">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="group.stopIfLineHasWrongColumnLength">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="hasHeader">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="isSortedByIndexColumn">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="mergeRows">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="parseType" value="delimited"/>
+      <entry key="stopIfLineHasWrongColumnLength">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="DelimitedFile Template"/>
+    </Map>
+  </Attributes>
+  <Description>[{"isDefault":"true","locale":"en_US","value":"","isCurrent":"true","displayName":"English (United States)"}]</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <Schemas>
+    <Schema created="1367345550997" displayAttribute="USER_ID" groupAttribute="OTHER_GROUPS_LIST" identityAttribute="USER_ID" instanceAttribute="" modified="1367345588466" nativeObjectType="account" objectType="account" permissionsRemediationModificationType="None">
+      <AttributeDefinition correlationKey="1" name="USER_ID" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="ECN" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="FIRSTNAME" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="LASTNAME" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="EMAIL" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" managed="true" multi="true" name="OTHER_GROUPS_LIST" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" managed="true" name="PRIMARY_GROUP" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+    </Schema>
+    <Schema created="1367345253484" displayAttribute="ENTITLEMENT_NAME"  identityAttribute="ENTITLEMENT_VALUE" instanceAttribute="" modified="1367345588466" nativeObjectType="group" objectType="group" permissionsRemediationModificationType="None">
+      <AttributeDefinition name="ENTITLEMENT_NAME" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="ENTITLEMENT_VALUE" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="DESCRIPTION" remediationModificationType="None" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+    </Schema>
+  </Schemas>
+  <Templates>
+    <Template name="TestApp Create Policy" usage="Create">
+      <Field name="PRIMARY_GROUP" required="true" type="string" value="GROUPA"/>
+    </Template>
+  </Templates>
+</Application>
+
+<ManagedAttribute attribute="PRIMARY_GROUP" requestable="false" type="Entitlement" value="GROUPA">
+  <Attributes>
+    <Map>
+      <entry key="requiredApprovals" value="Manager,Owner"/>
+    </Map>
+  </Attributes>
+  
+  <ApplicationRef>
+    <Reference class="sailpoint.object.Application"  name="TestApp"/>
+  </ApplicationRef>
+</ManagedAttribute>
+
+<ManagedAttribute attribute="OTHER_GROUPS_LIST" group="true" requestable="true" type="Entitlement" value="GROUPB">
+  <Attributes>
+    <Map>
+      <entry key="requiredApprovals" value="Manager"/>
+    </Map>
+  </Attributes>
+   <Owner>
+    <Reference class="sailpoint.object.Identity" name="howner"/>
+  </Owner>
+  <ApplicationRef>
+    <Reference class="sailpoint.object.Application" name="TestApp"/>
+  </ApplicationRef>
+</ManagedAttribute>
+
+
+<ManagedAttribute attribute="PRIMARY_GROUP" requestable="false" type="Entitlement" value="2GROUPA">
+  <Attributes>
+    <Map>
+      <entry key="requiredApprovals" value="Owner"/>
+    </Map>
+  </Attributes>
+  
+  <ApplicationRef>
+    <Reference class="sailpoint.object.Application"  name="TestApp2"/>
+  </ApplicationRef>
+</ManagedAttribute>
+
+<ManagedAttribute attribute="OTHER_GROUPS_LIST" group="true" requestable="true" type="Entitlement" value="2GROUPB">
+  <Attributes>
+    <Map>
+      <entry key="requiredApprovals" value="Manager,Director"/>
+    </Map>
+  </Attributes>
+  
+   <Owner>
+    <Reference class="sailpoint.object.Identity" name="howner"/>
+  </Owner>
+  <ApplicationRef>
+    <Reference class="sailpoint.object.Application" name="TestApp2"/>
+  </ApplicationRef>
+</ManagedAttribute>
+</sailpoint>

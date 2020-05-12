@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="xmlChecks" >
+   
+	 <!-- 
+    snellepalli:Automatic Build Checks
+    Checks each XML file in SSB config for whether it adheres to naming convention.
+    The Naming Convention is specified in build.properties property codeCheck.namingConvention
+ -->
+	<target name="sp.services.runCodeChecks"   >
+	 <verifyNamingConvention configLocation="../config/" append="true" namingConvention="${codeCheck.namingConvention}" output="../build/buildChecks/buildCheckConvention.log" ignoreFolderList="SSF_Tools,SSF_Features,SSF_Frameworks,SSP_Tools"/>
+	</target>
+	
+</project>

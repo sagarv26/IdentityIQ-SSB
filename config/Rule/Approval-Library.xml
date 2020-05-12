@@ -1,0 +1,611 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Approval Library">
+  <Source>
+    
+
+    import sailpoint.api.ManagedAttributer;
+    import sailpoint.object.Application;
+    import sailpoint.object.ApprovalSet;
+    import sailpoint.object.ApprovalItem;
+    import sailpoint.object.AttributeDefinition;
+    import sailpoint.object.Attributes;
+    import sailpoint.object.Bundle;
+    import sailpoint.object.Identity;
+    import sailpoint.object.ManagedAttribute;
+    import sailpoint.object.ProvisioningPlan;
+    import sailpoint.object.ProvisioningPlan.AccountRequest;
+    import sailpoint.object.ProvisioningPlan.AttributeRequest;
+    import sailpoint.object.ProvisioningPlan.PermissionRequest;
+    import sailpoint.object.ProvisioningPlan.GenericRequest;
+    import sailpoint.object.ProvisioningProject;
+    import sailpoint.object.Scope;
+    import sailpoint.object.WorkItem;
+    import sailpoint.object.Workflow;
+    import sailpoint.object.Workflow.Approval;
+    import sailpoint.tools.Util;
+    import sailpoint.tools.xml.XMLObjectFactory;
+    
+    /** 
+    * Take a list of AttributeRequests and return a List of Attributes
+    * to store on the approval item so that we can get at the attributes of
+    * each attribute request in case we need information about that attribute request
+    */
+    public Attributes getAttributeRequestArguments(List attributeRequests) {
+      Attributes attributes = new Attributes();
+      for(AttributeRequest attr : attributeRequests) {
+        String key = attr.getName()+":"+attr.getValue();
+        Attributes arguments = attr.getArguments();
+        attributes.put(key, arguments);
+      }
+      return attributes;
+    }
+
+    /**
+     * Turn a list of AttributeRequests into simple
+     * name = 'value' format. Represent this as a list
+     * so we can display it neatly in the ui tier and
+     * still not mess with dn strings.
+     *
+     * A general utility method used both by rules and workflow
+     * scripts.  
+     */
+    public List flattenAttributeRequests(List attributeRequests) {
+        List flat = new ArrayList();
+        flattenAttributeRequests(attributeRequests, flat);
+        return flat;
+    }
+    
+    /**
+    *  Bug 15833, ensure requester comments make it into manual actions
+    */
+    public String getRequesterComments(List requests) {
+        String comment = "";
+        if(requests != null) {
+            for(GenericRequest request : requests) {
+                String innerComment = request.getComments();
+                if ( Util.getString(innerComment) != null ) {
+                    comment += innerComment;
+                }
+            }
+        }
+        return comment;
+    }
+        
+    public void flattenAttributeRequests(List attributeRequests, List flat) {
+        if ( Util.size(attributeRequests) &gt; 0 ) {
+            for (AttributeRequest attr : attributeRequests ) {
+                if( !attr.getName().equals(ProvisioningPlan.ATT_IIQ_PASSWORD) &amp;&amp;
+                    !attr.getBoolean(ProvisioningPlan.ARG_SECRET) &amp;&amp;
+                    !attr.getName().equals(Identity.PRF_USE_BY_DATE)) {
+                    if (attr.getDisplayValue() == null) {
+                        String displayName = attr.getName();
+                        List val = Util.asList(attr.getValue());
+                        if ( val != null ) {
+                            if ( attr.getName().equals("manager") ) { 
+                                String managerName = null;
+                                if ( Util.size(val) == 1 ) {
+                                    // For manager convert the name into a displayName so it looks 
+                                    // reasonable in the ui
+                                    managerName = (String)val.get(0);
+                                    if ( manager != null ) {
+                                        String displayName = getIdentityProperty(managerName, "displayName");
+                                        if ( displayName != null ) {
+                                            val = Util.csvToList(displayName);
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            String type = (String)attr.get(ProvisioningPlan.ARG_TYPE);
+                            if (type!=null &amp;&amp; type.equals(ProvisioningPlan.ARG_TYPE_DATE)) {
+                              Object obj = val.get(0);
+                              
+                              Date date = null;
+                              
+                              if(obj instanceof java.util.Date) {
+                                date = obj;
+                              } else {
+                                date = new Date((Long)obj);
+                              }
+                              val = new ArrayList();                         
+                              val.add(Util.dateToString(date, "M/d/y"));
+                            } else if (AttributeDefinition.TYPE_SCOPE.equals(type)) {
+                              val = getScopeNames(val);  
+                            }
+                            
+                        }
+                        if ( Util.size(val) &gt; 0 ) 
+                            flat.add(displayName+ " = '"+Util.listToCsv(val)+"'");
+                    } else {
+                        flat.add(attr.getDisplayValue());
+                    }
+                }
+            }
+        }
+    }
+    
+    /*
+     * Given a list of scope ids it will return a list of 
+     * scope names.
+     *
+     */
+    public List getScopeNames(List val) {
+        
+        if (val == null) {
+            return null;
+        }
+
+        List scopeNames = new ArrayList();
+        for (int i=0; i&lt;val.size(); ++i) {
+            scopeNames.add(fetchScopeName((String) val.get(i)));
+        }
+        
+        return scopeNames;
+    }
+
+    /**
+     * Fetches a scope name from scope id
+     *
+     */    
+    private String fetchScopeName(String id) {
+        
+        Scope scope =  context.getObjectById(Scope.class, id);
+        
+        if (scope == null) {
+            return null;
+        }
+        
+        return scope.getDisplayableName();
+    }
+
+    /**
+     * Convert a List&lt;PermissionRequests&gt; into a List&lt;String&gt;
+     * with each string formatted as "target='right,right,right'"
+     * This is similar to flattenAttributeRequests above but 
+     * kept distinct in case we need to change the rendering of permissions.
+     * Currently it's ambiguous whether this is an attribute or a permission
+     */
+    public void flattenPermissionRequests(List permRequests, List flat) {
+
+        if (permRequests != null) {
+            for (PermissionRequest perm : permRequests ) {
+
+              // we dont' have display names for targets, do we?
+              flat.add(perm.getTarget() + " = '" + perm.getRights() + "'");
+            }
+        }
+    }
+
+    /**
+     * Convert a Map&lt;String,ApprovalSet&gt; into Approval objects. 
+     * One Approval object for each of the keys in the map.
+     *
+     * Used only by rules that calculate approval structures such
+     * as LCM Build Owner Approvals.
+     *
+     * NOTE:
+     * As of 6.2 this rule has been deprecated and replaced with
+     * IdentityLibrary.buildXYZApproval methods.  Most of the
+     * logic here has been moved to 
+     * sailpoint.workflow.IdentityApprovalGenerator.
+     */
+    public List buildApprovalsFromMap(Map ownerToSet, String identityName, String launcher) {
+        List approvals = new ArrayList();
+        if ( ownerToSet == null ) 
+            return null;
+
+        Iterator keys = null;
+        Set keySet = ownerToSet.keySet();
+        if ( keySet != null )  
+            keys = keySet.iterator();
+
+        if ( keys != null ) {
+            while ( keys.hasNext() ) {
+                String key = (String)keys.next();
+                if ( key == null ) continue;
+                ApprovalSet set = ownerToSet.get(key);
+                if ( set != null ) {
+                    if ( log.isDebugEnabled() ) {
+                        log.debug("Owner["+key+"] " + set.toXml());
+                    }
+                    // djs: check here to make sure this isn't an auto-approved 
+                    // item because the approver is the launcher
+                    if ( !sailpoint.workflow.IdentityLibrary.isElectronicSignatureEnabled(wfcontext) &amp;&amp; 
+                         key.compareTo(launcher) == 0 &amp;&amp; 
+                         set.isAllApproved() ) {
+                        // self approved continue;
+                        continue;
+                    } else {
+                        Approval newApproval = new Approval();
+                        newApproval.setOwner("\"" + key + "\"");  // quote the owner in case the user name has a comma
+                        newApproval.setApprovalSet(set);
+                        newApproval.addArg(Workflow.ARG_WORK_ITEM_TARGET_CLASS, "sailpoint.object.Identity");
+                        newApproval.addArg(Workflow.ARG_WORK_ITEM_TARGET_NAME, identityName);
+                        approvals.add(newApproval);
+                    } 
+                }
+            }
+        }
+        if ( log.isDebugEnabled() ) {
+            if ( approvals != null )
+                log.debug("Approvals: " + XMLObjectFactory.getInstance().toXml(approvals));
+            else
+                log.debug("Approvals EMPTY.");
+        }
+        return approvals;
+    }
+
+    /**
+     * Build a Map&lt;String,ApprovalSet&gt; each key representing a unique owner.
+     * Use a Map here to allow us to easily merge any items for the same owner.
+     *
+     * Used by rules to build approval structures, normally followed by
+     * a call to buildApprovalsFromMap.
+     * 
+     * NOTE:
+     * As of 6.2 this rule has been deprecated and replaced with
+     * IdentityLibrary.buildXYZApproval methods.  Most of the
+     * logic here has been moved to 
+     * sailpoint.workflow.IdentityApprovalGenerator.
+     */
+    public Map buildOwnerMap(String scheme, ApprovalSet approvalSet, 
+                             ProvisioningPlan plan, String fallbackApprover, 
+                             String identity, boolean autoApprove) {
+
+        // djs: use a LinkedHashMap here to perserve the order of the
+        // approvers in the list.  This is important for manager transfer
+        // approvals.
+        Map ownerToSet = new LinkedHashMap();
+        List items = approvalSet.getItems();
+        for ( ApprovalItem item : items ) {
+            List approvers = getApproverNames(scheme, item, plan, identity);
+            if ( approvers != null &amp;&amp; approvers.size() == 0 &amp;&amp; fallbackApprover != null ) {
+                if ( log.isDebugEnabled() ) {
+                    log.debug("Approver could not be resolved using fallbackApprover '"+fallbackApprover+"'.");
+                }
+                approvers.add(fallbackApprover);
+            }
+            //
+            // Build an approval set or add an ApprovalItem 
+            // to an existing set
+            //
+            if ( Util.size(approvers) &gt; 0 ) {
+                for ( String approver : approvers ) {
+                    ApprovalSet set = (ApprovalSet)ownerToSet.get(approver);
+                    if ( set == null ) {
+                        set = new ApprovalSet();
+                    }
+
+                    // Make a copy of the item here so they are independent of the the
+                    // cart's item.  
+                    ApprovalItem itemCopy = XMLObjectFactory.getInstance().clone(item, context);
+                    set.add(itemCopy);
+                    ownerToSet.put(approver, set);
+                    if ( autoApprove ) {
+                        // djs: when we come across the launcher who is also the approver
+                        // auto approve the item, this will allow us to audit/report on
+                        // the request but not force an approval.  We won't create an 
+                        // Approval object if all of the items are acccepted
+                        if ( approver.equals(launcher) ) {
+                            itemCopy.setState(WorkItem.State.Finished);
+                            if ( log.isDebugEnabled() ) {
+                                log.debug("Launcher was also approver and was removed.");
+                            }
+                            // If there is just one approver AND we are marking this 
+                            // Auto-Approved also mark the master approvalSets item 
+                            // finished
+                            if ( approvers.size() == 1 ) {
+                                item.setState(WorkItem.State.Finished);
+                            }
+                        }
+                    }
+                }
+                //
+                // Update the "cart" representation
+                //
+                // set the item's owner so we have an update
+                // version in the "registry"
+                // Should we store a csv Multiple approvers ?
+                item.setOwner(approvers.get(0));
+            }
+        }
+        if ( log.isDebugEnabled() ) {
+            if ( ownerToSet != null )
+                log.debug("OwnerSetMap: " + XMLObjectFactory.getInstance().toXml(ownerToSet));
+            else
+                log.debug("OwnerSetMap EMPTY.");
+        }
+        return ownerToSet;
+    }
+
+    /**
+     * Return a list of names that represent the names of the Identities that should
+     * approve the item.  We need the Plan during manager transfers when we need to figure
+     * out what the new value is for the manager attribute.
+     *
+     * Only time the returned list is null is when we have "none"
+     * approval scheme.
+     *
+     * NOTE:
+     * As of 6.2 this rule has been deprecated and replaced with
+     * IdentityLibrary.buildXYZApproval methods.  Most of the
+     * logic here has been moved to 
+     * sailpoint.workflow.IdentityApprovalGenerator.
+     */
+    public List getApproverNames(String scheme, ApprovalItem item, ProvisioningPlan plan, String identity) {
+        return getApproverNames(scheme, item, plan, identity, null);
+    }
+
+    /**
+     * Return a list of names that represent the names of the Identities that should
+     * approve the item.  We need the Plan during manager transfers when we need to figure
+     * out what the new value is for the manager attribute.
+     *
+     * Only time the returned list is null is when we have "none"
+     * approval scheme.
+     *
+     * NOTE:
+     * As of 6.2 this rule has been deprecated and replaced with
+     * IdentityLibrary.buildXYZApproval methods.  Most of the
+     * logic here has been moved to 
+     * sailpoint.workflow.IdentityApprovalGenerator.
+     */
+    public List getApproverNames(String scheme, ApprovalItem item, ProvisioningPlan plan,
+                                 String identity, String securityOfficerName) { 
+
+        List owners = new ArrayList();
+        String schemeToUse = scheme;
+        if ( schemeToUse == null ) {
+            schemeToUse = "manager";
+            log.warn("Approval Scheme was not defined defaulting to manager.");
+        }
+        List schemes = Util.csvToList(schemeToUse);
+
+        // None will short-circuit and cause no approvals.
+        if ( schemes.contains("none") ) {
+            return null;
+        } 
+
+        if ( ( schemes.contains("manager") ) || ( schemes.contains("newManager") ) ) {
+            List managers = getManagers(schemes, plan, identity);
+            if ( null != managers ) { 
+                owners.addAll(managers);
+            } 
+        }
+
+        if ( schemes.contains("owner") ) {
+            String app = item.getApplication(); 
+            String op = item.getOperation();
+            if ( ProvisioningPlan.APP_IIQ.compareTo(app) == 0 ) { 
+                if ( ( ProvisioningPlan.Operation.Add.toString().equals(op) ) || 
+                     ( ProvisioningPlan.Operation.Remove.toString().equals(op) ) ) {
+                    // this is a role requst, entitlement request or identity update
+                    if ( ( ProvisioningPlan.ATT_IIQ_DETECTED_ROLES.equals(item.getName()) ) ||
+                         ( ProvisioningPlan.ATT_IIQ_ASSIGNED_ROLES.equals(item.getName()) ) ) {
+                        String owner = resolveRoleOwner(item);
+                        if ( owner != null ) owners.add(owner);
+                    } 
+                }
+           } else {
+               String owner = resolveAppRequestOwner(item);
+               if ( owner != null ) 
+                  owners.add(owner);
+           }
+        }
+
+        if ( schemes.contains("securityOfficer") ) {
+            if (null == securityOfficerName) {
+                log.warn("Security officer approval is configured but securityOfficerName is not defined.");
+            }
+            else {
+                // Only use the security officer if it is a real identity.
+                Identity officer = context.getObjectByName(Identity.class, securityOfficerName);
+                if (null == officer) {
+                    log.warn("Could not find securityOfficer: " + securityOfficerName);
+                }
+                else {
+                    owners.add(securityOfficerName);
+                }
+            }
+        }
+
+        return owners;
+    }
+
+    /**
+     * Helper for getApproverNames.
+     * From the item figure out the owner that should be assigned
+     * to this application request.
+     *
+     * NOTE:
+     * As of 6.2 this rule has been deprecated and replaced with
+     * IdentityLibrary.buildXYZApproval methods.  Most of the
+     * logic here has been moved to 
+     * sailpoint.workflow.IdentityApprovalGenerator.
+     */
+    private String resolveAppRequestOwner(ApprovalItem item) {
+        String approverName = null;
+
+        String appName = item.getApplication();
+        if ( appName == null ) return null;
+
+        Application application = context.getObjectByName(Application.class, appName);
+        if ( application == null ) 
+            throw new Exception("Couldn't find application ["+appName+"]");
+
+        Identity owner = application.getOwner();
+        if ( owner != null ) {
+            approverName = owner.getName();
+        } else {
+            // unable to find owner for application foo...
+            log.debug("Unable to find owner for application ["+appName+"]");
+        }
+
+        // Check the attributeName and value and check to see if we are dealing with 
+        // a ManagedAttribute 
+        String attrName = item.getName();
+        List vals = item.getValueList();
+        if ( ( attrName != null ) &amp;&amp; ( Util.size(vals) &gt; 0 ) ) {
+            // there should just be one value in each record... 
+            // log something
+            String val = (String)vals.get(0);
+            String maOwner = getManagedAttributeOwner(application, attrName, val);
+            if ( maOwner == null) {
+                log.debug("Managed Attribute owner not found.. falling back to app owner.");
+            } else {
+                approverName = maOwner;
+            }
+        }
+        return approverName;
+    }
+
+    /**
+     * Helper for resolveAppRequestOwner.
+     * Use the ManagedAttributer to find the managed attribute and get the
+     * owner from the ManagedAttribute.
+     *
+     * NOTE:
+     * As of 6.2 this rule has been deprecated and replaced with
+     * IdentityLibrary.buildXYZApproval methods.  Most of the
+     * logic here has been moved to 
+     * sailpoint.workflow.IdentityApprovalGenerator.
+     */
+    private String getManagedAttributeOwner(Application app, String name, String value ) {
+        String owner = null;
+        ManagedAttribute ma = ManagedAttributer.get(context, app.getId(), name, value);
+        if ( ma != null ) {
+            Identity maOwner = ma.getOwner();
+            if ( maOwner != null ) 
+                owner = maOwner.getName();
+        }
+        return owner;
+    }
+
+    /**
+     * Helper for getApproverNames.
+     * If its a role request look up the role by name and get the owner
+     * from the Role object.  
+     *
+     * TODO: should I walk up the hierarchy here if ther isn't 
+     * one on the Bundle?
+     *
+     * NOTE:
+     * As of 6.2 this rule has been deprecated and replaced with
+     * IdentityLibrary.buildXYZApproval methods.  Most of the
+     * logic here has been moved to 
+     * sailpoint.workflow.IdentityApprovalGenerator.
+     */
+    private String resolveRoleOwner(ApprovalItem item) {
+        String approverName = null;
+        List values = item.getValueList();
+        if ( Util.size(values) &gt; 0 ) {
+            if ( Util.size(values) != 1 ) 
+                throw new Exception("More then one value found in an approval item");
+
+            String roleName = (String)values.get(0);
+            if ( roleName != null ) {
+                Bundle b = context.getObjectByName(Bundle.class, roleName);
+                if ( b != null ) {
+                    Identity id = b.getOwner();
+                    if ( id != null ) {
+                        approverName = id.getName();
+                    }
+                }
+            }
+        }
+        return approverName;
+    }
+
+    /**
+     * Helper for getApproverNames.
+     * Get the value for manager or other by resolving the identity
+     * and computing the manager, or validating the value
+     * in the approvalScheme variable;
+     *
+     * NOTE:
+     * As of 6.2 this rule has been deprecated and replaced with
+     * IdentityLibrary.buildXYZApproval methods.  Most of the
+     * logic here has been moved to 
+     * sailpoint.workflow.IdentityApprovalGenerator.
+     */
+    private List getManagers(List schemes, ProvisioningPlan plan, String identity) {
+        //  
+        //  During Identity Creates the Identity object does not exist
+        //    In this case we have to look at the plan and see if one is assigned
+        //    if not assigned default to the fallbackApprover
+        // 
+        //  During Updates there could be one or two managers in play
+        //    1) Newly assigned manager (which is still in the plan)
+        //    2) Currently assigned manager ( assigned to the identity )
+        //    
+        List approverNames = new ArrayList();
+
+        String currentManager = null;
+        // Use the identities manager to resolve the approval
+        Identity identityObject = context.getObject(Identity.class, identity);
+        if ( identityObject != null ) {
+            Identity manager = identityObject.getManager();
+            if ( manager != null ) {
+                currentManager = manager.getName();
+            } else {
+                log.debug("Manager not found for ["+identityObject.getName()+"] while computing approval");
+            }
+        }
+
+        String planManager = resolveManagerFromPlan(plan);
+        if ( ( currentManager == null ) &amp;&amp; ( planManager != null ) ) {
+            // likely Identity Create case
+            approverNames.add(planManager);
+        } else
+            if ( ( currentManager != null ) &amp;&amp; ( planManager == null ) ) {
+                // normal case
+                approverNames.add(currentManager);
+            } else
+                if ( ( currentManager != null ) &amp;&amp; ( planManager != null ) ) {
+                    // Manager Transfer
+                    if ( schemes.contains("manager") ){
+                        approverNames.add(currentManager);
+                    }
+                    if ( schemes.contains("newManager") ){
+                        approverNames.add(planManager);
+                    } 
+                }
+        return ( approverNames.size() &gt; 0 ) ? approverNames : null;
+    }
+
+    /**
+     * Helper for getManagers.
+     * Dig into the plan and find the manager attribute for the IIQ
+     * app if present. This is used during manager transfers
+     * where we need to know the new manager so they can be 
+     * part of the approval process.
+     *
+     * NOTE:
+     * As of 6.2 this rule has been deprecated and replaced with
+     * IdentityLibrary.buildXYZApproval methods.  Most of the
+     * logic here has been moved to 
+     * sailpoint.workflow.IdentityApprovalGenerator.
+     */
+    private String resolveManagerFromPlan(ProvisioningPlan plan )  {
+        String managerName = null;
+        if ( plan != null ) {
+            AccountRequest iiq = plan.getAccountRequest(ProvisioningPlan.APP_IIQ);
+            if ( iiq != null ) {
+                AttributeRequest manager = iiq.getAttributeRequest("manager");
+                if ( manager != null ) {
+                    Object obj = manager.getValue();
+                    if ( obj != null ) {
+                        managerName = Util.getString(obj.toString());
+                    }
+                }
+            }
+        }
+        return managerName;
+    }
+
+    
+  </Source>
+</Rule>
+</sailpoint>

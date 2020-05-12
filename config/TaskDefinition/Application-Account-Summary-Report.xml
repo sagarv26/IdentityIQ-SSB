@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="Application Account Summary Report" progressMode="Percentage" resultAction="Rename" subType="Identity and User Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="Application Account Summary Report">
+            <DataSource objectType="Application" type="Filter">
+              <QueryParameters>
+                <Parameter argument="applications" property="id"/>
+              </QueryParameters>
+            </DataSource>
+            <Columns>
+              <ReportColumnConfig field="application" header="rept_app_account_summary_col_app" property="name" sortable="true" width="110"/>
+              <ReportColumnConfig field="totalAccounts" header="rept_app_account_summary_col_total_accounts" property="id" width="110">
+                <RenderScript>
+                  <Source>
+                          import sailpoint.object.*;
+                          QueryOptions ops = new QueryOptions();
+                          ops.addFilter(Filter.eq("application.id", value));
+                          return context.countObjects(Link.class, ops);
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="distinctIdentities" header="rept_app_account_summary_col_identities_with_accounts" property="id" width="110">
+                <RenderScript>
+                  <Source>
+                          import sailpoint.object.*;
+                          QueryOptions ops = new QueryOptions();
+                          ops.addFilter(Filter.eq("links.application.id", value));
+                          ops.setDistinct(true);
+                          return context.countObjects(Identity.class, ops);
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="multipleAccounts" header="rept_app_account_summary_col_identities_with_mult_accounts" property="id" width="110">
+                <RenderScript>
+                  <Source>
+                            import sailpoint.object.*;
+                            Map queryArgs = new HashMap();
+                            queryArgs.put("application", value);
+
+                            int multipleLinksCount = 0;
+                            String hql = "select count(distinct identityAlias.id) from sailpoint.object.Identity identityAlias where (select count(*) from sailpoint.object.Link links2 where links2.identity.id = identityAlias.id and links2.application.id = (:application)) &gt; 1";
+                            Iterator it = context.search(hql, queryArgs, null);
+                            while (it.hasNext()) {
+                                Object o = it.next();
+                                if(o!=null) {
+                                    multipleLinksCount = ((Long)o).intValue();
+                                }
+                            }
+                          return multipleLinksCount;
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+            </Columns>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>Displays a summary of the accounts on each application.</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessApplicationUserReport"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument multi="true" name="applications" type="Application">
+        <Description>rept_input_app_accounts_report_apps</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

@@ -1,0 +1,1375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="dev">
+
+    <!--
+    **********************************************************
+    Targets to make your dev life easier
+    **********************************************************
+     -->
+    <condition property="is-windows">
+		<os family="windows" />
+	</condition>
+
+	<condition property='is-linux'>
+		<os family='unix' name='Linux' />
+	</condition>
+
+    <macrodef name="iiq.sql">
+        <attribute name="sql.file"/>
+        <sequential>
+            <echo>Executing @{sql.file} via iiq.sql macrodef</echo>
+            <sql
+                    driver="${db.driver}"
+                    url="${db.url}"
+                    userid="${db.userid}"
+                    password="${db.password}"
+                    src="@{sql.file}"
+                    print="yes"
+                    keepformat="true"
+                    escapeprocessing="false"
+                    expandproperties="false"
+                    autocommit="true"
+                    showwarnings="true"
+                    >
+                <classpath>
+                    <pathelement path="${classpath}"/>
+                    <fileset dir="${build.iiqBinaryExtract}/WEB-INF/lib">
+                        <include name="**/*.jar"/>
+                    </fileset>
+                </classpath>
+            </sql>
+        </sequential>
+    </macrodef>
+
+    <!-- 
+    we have onerror as acceptable for the upgrade macrodef because there may be some known 
+    error/warning conditions that are ok
+    -->
+    <macrodef name="iiq.sql.upgrade">
+        <attribute name="sql.file"/>
+        <sequential>
+            <echo>Executing @{sql.file} via iiq.sql.upgrade macrodef</echo>
+            <sql
+                    driver="${db.driver}"
+                    url="${db.url}"
+                    userid="${db.userid}"
+                    password="${db.password}"
+                    src="@{sql.file}"
+                    print="yes"
+                    keepformat="true"
+                    escapeprocessing="false"
+                    expandproperties="false"
+                    onerror="continue"
+                    autocommit="true"
+                    showwarnings="true"
+                    >
+                <classpath>
+                    <pathelement path="${classpath}"/>
+                    <fileset dir="${build.iiqBinaryExtract}/WEB-INF/lib">
+                        <include name="**/*.jar"/>
+                    </fileset>
+                </classpath>
+            </sql>
+        </sequential>
+    </macrodef>
+
+    <!-- 
+    intending this to be applicable for ad-hoc queries.
+    e.g. db prescence/absence, direct drop of db, etc.
+
+    e.g. for SQL Server a db exists query might be: 
+        if db_id('DB_NAME') is not null print 'true';
+    
+    we've got goofy defaults below to account for properties NOT passed
+    in (thus we escape the defaults passed from runSql, which are un-set properties).
+     -->
+    <macrodef name="sql.generic">
+        <!-- any available sql file with commands -->
+        <attribute name="sql.input.file" default="$${sql.input.file}"/>
+        <!-- any writable area - overwrites the content -->
+        <attribute name="sql.output.file" default="$${sql.output.file}"/>
+        <!-- should be "continue", "stop", or "abort" with default as "abort"-->
+        <attribute name="sql.error.action" default="$${sql.error.action}"/>
+
+        <sequential>
+            <if>
+                <equals arg1="@{sql.error.action}" arg2="$${sql.error.action}"/>
+                <then>
+                    <!-- we need to override and set a "real value here" -->
+                    <property name="real.sql.error.action" value="abort"/>
+                    <echo>defaulting to sql.error.action: @{sql.error.action}</echo>
+                </then>
+                <else>
+                    <property name="real.sql.error.action" value="@{sql.error.action}"/>
+                    <echo>passed-in sql.error.action: @{sql.error.action}</echo>
+                </else>
+            </if>
+
+            <available file="@{sql.input.file}" property="sql.input.file.present"/>
+            <if>
+                <not><equals arg1="${sql.input.file.present}" arg2="true"/></not>
+                <then>
+                    <fail message="unable to find sql input file @{sql.input.file}" />
+                </then>
+            </if>
+
+            <echo>Executing @{sql.input.file} via sql.generic macrodef</echo>
+            <echo>sql error action setting is: @{sql.error.action}</echo>
+            <!-- if we don't have an output file to work it, just print results to screen -->
+            <if>
+                <equals arg1="@{sql.output.file}" arg2="$${sql.output.file}"/>
+                <then>
+                    <echo>Putting output to stdout since we don't have an output file</echo>
+                    <sql
+                        driver="${db.driver}"
+                        url="${db.url}"
+                        userid="${db.userid}"
+                        password="${db.password}"
+                        src="@{sql.input.file}"
+                        print="yes"
+                        keepformat="true"
+                        escapeprocessing="false"
+                        expandproperties="true"
+                        autocommit="true"
+                        showwarnings="true"
+                        onerror="${real.sql.error.action}"
+                        >
+                    <classpath>
+                        <pathelement path="${classpath}"/>
+                            <fileset dir="${build.iiqBinaryExtract}/WEB-INF/lib">
+                                <include name="**/*.jar"/>
+                            </fileset>
+                        </classpath>
+                    </sql>
+                </then>
+                <else>
+                    <available file="@{sql.output.file}" property="sql.output.file.present"/>
+                    <if>
+                        <not><equals arg1="${sql.output.file.present}" arg2="true"/></not>
+                        <then>
+                            <fail message="unable to find sql output file @{sql.output.file}"/>
+                        </then>
+                    </if>
+
+                    <echo>Putting output into @{sql.output.file}</echo>
+                    <sql
+                        driver="${db.driver}"
+                        url="${db.url}"
+                        userid="${db.userid}"
+                        password="${db.password}"
+                        src="@{sql.input.file}"
+                        print="yes"
+                        keepformat="true"
+                        escapeprocessing="false"
+                        expandproperties="true"
+                        autocommit="true"
+                        output="@{sql.output.file}"
+                        showwarnings="true"
+                        onerror="${real.sql.error.action}"
+                        >
+                        <classpath>
+                            <pathelement path="${classpath}"/>
+                            <fileset dir="${build.iiqBinaryExtract}/WEB-INF/lib">
+                                <include name="**/*.jar"/>
+                            </fileset>
+                        </classpath>
+                    </sql>
+                    <echo>Remember that output is in @{sql.output.file}</echo>
+                </else>
+            </if>
+            <echo>Done executing @{sql.input.file} via sql.generic macrodef</echo>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="iiq.start.stop">
+        <attribute name="action"/>
+        <sequential>
+            <if>
+                <equals arg1="@{action}" arg2="stop"/>
+                <then>
+                    <if>
+                        <isset property="is-windows"/>
+                        <then>
+                            <echo>Shutting down app server..</echo>
+                            <exec executable="cmd.exe">
+                                <env key="CATALINA_HOME" path="${tomcat.home}"/>
+                                <arg value="/c"/>
+                                <arg value="${application.server.stop}"/>
+                            </exec>
+                        </then>
+                        <else>
+                            <exec executable="${application.server.stop}">
+                                <!--<arg value="/c"/>-->
+                            </exec>
+                        </else>
+                    </if>
+                </then>
+                <else>
+                    <if>
+                        <isset property="is-windows"/>
+                        <then>
+                            <echo>Starting app server..</echo>
+                            <exec executable="cmd.exe">
+                                <env key="CATALINA_HOME" path="${tomcat.home}"/>
+                                <!-- trys to start the app server in debug mode -->
+                                <!--<env key="JAVA_OPTS" value="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"/>-->
+                                <arg value="/c"/>
+                                <arg value="${application.server.start}"/>
+                                <!--<arg value="run"/>-->
+                            </exec>
+                            <waitfor>
+                                <and>
+                                    <socket server="${application.server.host}" port="${application.server.port}"/>
+                                    <http url="http://${application.server.host}:${application.server.port}/${iiq.path}"/>
+                                </and>
+                            </waitfor>
+                        </then>
+                        <else>
+                            <exec executable="${application.server.start}">
+                                <!--<arg value="/c"/>-->
+                            </exec>
+                        </else>
+                    </if>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <target name="up" depends="init-properties">
+        <iiq.start.stop action="start"/>
+    </target>
+
+    <target name="down" depends="init-properties">
+        <iiq.start.stop action="stop"/>
+    </target>
+
+    <!-- 
+    added to support database targets and new plugin db - here we assume plugin db is beyond 7.1.
+    at this time of writing, 7.1 is latest IIQ version.
+    could be used for other items in the future.
+     -->
+    <target name="-init-db-properties" depends="init-properties">
+		<echo>attempting to set a couple properties via javascript for db targets</echo>
+		
+		<!-- used for handling string-to-number conversions for making decisions later -->
+	    <script language="javascript">
+	    	<![CDATA[
+	    	var version = parseFloat(project.getProperty('IIQVersion'));
+	        project.setProperty('hasPluginDb', version >= 7.1);
+	    	]]>
+	    </script>
+
+		<echo>hasPluginDb: ${hasPluginDb}</echo>
+		<echo>done setting properties via javascript</echo>
+	</target>
+
+    <!-- 
+    runs arbitrary sql scripts you pass in.
+    e.g. build runSql -Dsql.input.file=C:\blah-input.sql -Dsql.output.file=C:\blah-output.sql -Dsql.error.action=continue
+    You can also skip passing in an output.file and results only print to screen.
+    error.action can be "abort" (default if none specified), "continue", or "stop".
+    -->
+    <target name="runSql" depends="init-properties" 
+        description="Runs arbitrary sql script against the iiq db. pass in input.file, output.file, error.action.">
+        <echo>sql.input.file="${input.file}" sql.output.file="${output.file}" sql.error.action="${error.action}"</echo>
+        <sql.generic sql.input.file="${sql.input.file}" sql.output.file="${sql.output.file}" sql.error.action="${sql.error.action}"/>
+    </target>
+
+    <target name="createdb" depends="-init-db-properties" 
+        description="creates the iiq tables for the specified product version, takes patch level into account">
+
+        <!-- 
+        if we have the plugin DB (at this time, iiq 7.1), we need to adjust the script - we need to do this first to make
+        string replacement work. 
+        in several spots, we include additional leading or trailing whitespace for the replacement values - this is by design
+        to avoid replacing the wrong strings.
+        -->
+
+        <copy overwrite="true" file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}"
+              tofile="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"/>
+
+        <!-- Start oracle section -->
+        <!-- For Oracle, we need to option to create the tablespace and user, which is commented out in the DB scripts-->
+        <if>
+            <and>
+                <isset property="db.type"/>
+                <equals arg1="${db.type}" arg2="oracle"/>
+                <isset property="db.oracle.createTableSpace"/>
+                <equals arg1="${db.oracle.createTableSpace}" arg2="true"/>
+                <isset property="db.oracle.tableSpacePath"/>
+                <isset property="db.oracle.tableSpaceName"/>
+            </and>                
+            <then>
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="-- CREATE BIGFILE TABLESPACE identityiq_ts"
+                    value="CREATE BIGFILE TABLESPACE ${db.oracle.tableSpaceName}"
+                />
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="-- DATAFILE '/usr/local/oradata/identityiq.dbf' SIZE 1G"
+                    value="DATAFILE '${db.oracle.tableSpacePath}' SIZE 1G"
+                />
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="--    AUTOEXTEND ON NEXT 512M MAXSIZE UNLIMITED"
+                    value="AUTOEXTEND ON NEXT 512M MAXSIZE UNLIMITED"
+                />
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="--    EXTENT MANAGEMENT LOCAL;"
+                    value="EXTENT MANAGEMENT LOCAL;"
+                />
+            </then>
+        </if>        
+
+        <!-- For Oracle, we need the option to create the DB user, which is normally commented out in the OOTB script-->
+        <if>
+            <and>
+                <isset property="db.type"/>
+                <equals arg1="${db.type}" arg2="oracle"/>
+                <isset property="db.oracle.createUser"/>
+                <equals arg1="${db.oracle.createUser}" arg2="true"/>
+                <isset property="db.name"/>
+                <isset property="db.userPassword"/>
+                <isset property="db.oracle.tableSpaceName"/>
+            </and>                
+            <then>
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="-- CREATE USER identityiq IDENTIFIED BY identityiq"
+                    value="CREATE USER ${db.name} IDENTIFIED BY ${db.userPassword}"
+                />
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="--     DEFAULT TABLESPACE identityiq_ts"
+                    value="DEFAULT TABLESPACE ${db.oracle.tableSpaceName}"
+                />
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="--     QUOTA UNLIMITED ON identityiq_ts;"
+                    value="QUOTA UNLIMITED ON ${db.oracle.tableSpaceName};"
+                />
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="-- GRANT CREATE SESSION to identityiq;"
+                    value="GRANT CREATE SESSION to ${db.name};"
+                />
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="-- GRANT CREATE TABLE to identityiq;"
+                    value="GRANT CREATE TABLE to ${db.name};"
+                />
+                <!-- if we are using JavaMelody, we need the following line to gather SQL statistics in Oracle -->
+                <if>
+                    <and>
+                        <isset property="installJavaMelody"/>
+                        <equals arg1="${installJavaMelody}" arg2="true"/>
+                    </and>
+                    <then>
+                        <concat destfile="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced" append="true">GRANT SELECT ANY DICTIONARY to ${db.name};
+                        </concat>
+                    </then>
+                </if>
+            </then>
+        </if>
+        <!-- end oracle section -->
+
+        <!-- start mysql section -->
+        <if>
+            <and>
+                <isset property="db.type"/>
+                <equals arg1="${db.type}" arg2="mysql"/>
+            </and>
+            <then>
+                <if>
+                    <!-- plugin db decision -->
+                    <equals arg1="${hasPluginDb}" arg2="true"/>
+                    <then>
+                        <!-- # First swap out the passwords:-->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="BY 'identityiqPlugin'"
+                            value="BY '${plugin.db.userPassword}'"
+                        />
+                        
+                        <!-- # Next swap out the USE statement - no plugin db change here -->
+                        
+                        <!-- # Next swap database create statement for plugin DB. -->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="EXISTS identityiqPlugin"
+                            value="EXISTS  ${plugin.db.name}"
+                        />
+
+                        <!-- # Next swap out the permissions statements -->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="TO 'identityiqPlugin'"
+                            value="TO '${plugin.db.userName}'"
+                        />
+                    </then>
+                </if>
+
+                <!-- regular db items -->
+
+                <!-- # First swap out the passwords:-->
+            	<replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="BY 'identityiq'"
+                    value="BY '${db.userPassword}'"
+                />
+                <!-- # Next swap out the USE statement -->
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="USE identityiq;"
+                    value="USE ${db.name};"
+                />
+                <!-- # Next swap database create statement -->                
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="EXISTS identityiq"
+                    value="EXISTS ${db.name}"
+                />
+                <!-- # Next swap out the permissions statements -->
+            	<replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="TO 'identityiq'"
+                    value="TO '${db.userName}'"
+                />
+            </then>
+        </if>
+        <!-- end mysql section -->
+
+        <!-- Start sqlserver section -->
+        <if>
+            <and>
+                <isset property="db.type"/>
+                <equals arg1="${db.type}" arg2="sqlserver"/>
+            </and>
+            <then>
+                
+                <if>
+                    <!-- plugin db decision -->
+                    <equals arg1="${hasPluginDb}" arg2="true"/>
+                    <then>
+                        <!-- Swap database create statement: -->
+                        <replace
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="DATABASE identityiqPlugin"
+                            value="DATABASE  ${plugin.db.name}"
+                        />
+                        <!-- Swap out the db login name:-->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="[identityiqPlugin]"
+                            value="[${plugin.db.sqlserver.loginName}]"
+                        />
+                        <!-- Swap out the passwords:-->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="PASSWORD='identityiqPlugin'"
+                            value="PASSWORD='${plugin.db.userPassword}'"
+                        />
+                        <!-- 
+                        Swap out the default db.
+                        CHECK_POLICY...SQL Server 2008 and up...applies only to sql auth logins...this is a flag whether to obey
+                        windows password policy for sql logins...
+                        -->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="DEFAULT_DATABASE=identityiqPlugin"
+                            value="DEFAULT_DATABASE = ${plugin.db.name} , CHECK_POLICY=${db.sqlserver.checkpolicy}"
+                        />
+                        <!-- swap out the USE statement: -->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="USE identityiqPlugin"
+                            value="USE  ${plugin.db.name}"
+                        />
+                        <!-- swap out the CREATE USER statement: -->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="CREATE USER identityiqPlugin FOR LOGIN identityiqPlugin WITH DEFAULT_SCHEMA ="
+                            value="CREATE USER ${plugin.db.userName} FOR LOGIN ${plugin.db.sqlserver.loginName} WITH DEFAULT_SCHEMA ="
+                        />
+                        <replaceregexp
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            match="identityiqPlugin\n"
+                            replace="${plugin.db.name}${line.separator}"
+                        />
+                        <!--  swap the schema create statement -->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="CREATE SCHEMA identityiqPlugin AUTHORIZATION identityiqPlugin"
+                            value="CREATE SCHEMA ${plugin.db.name} AUTHORIZATION ${plugin.db.userName}"
+                        />
+                        <!-- swap out the permissions statements: -->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token=" to identityiqPlugin"
+                            value=" to  ${plugin.db.userName}"
+                        />
+                        <!-- swap out the EXEC statement: -->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="EXEC sp_addrolemember 'db_owner', 'identityiqPlugin'"
+                            value="EXEC sp_addrolemember 'db_owner', '${plugin.db.userName}'"
+                        />
+                    </then>
+                </if>
+
+
+                <!-- regular db -->
+
+                <!-- Swap database create statement: -->
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="DATABASE identityiq"
+                    value="DATABASE ${db.name}"
+                />
+            	
+                <!-- Swap out the db login name:-->
+            	<replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="[identityiq]"
+                    value="[${db.sqlserver.loginName}]"
+                /> 
+            	
+                <!-- Swap out the passwords:-->
+            	<replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="PASSWORD='identityiq'"
+                    value="PASSWORD='${db.userPassword}'"
+                />
+            	
+                <!-- 
+                Swap out the default db.
+                CHECK_POLICY...SQL Server 2008 and up...applies only to sql auth logins...this is a flag whether to obey
+                windows password policy for sql logins...
+                -->
+            	<replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="DEFAULT_DATABASE=identityiq"
+                    value="DEFAULT_DATABASE=${db.name} , CHECK_POLICY=${db.sqlserver.checkpolicy}"
+                />
+            	
+                <!-- swap out the USE statement: -->
+            	<replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="USE identityiq"
+                    value="USE ${db.name}"
+                />
+            	
+                <!-- swap out the CREATE USER statement: -->
+            	<replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="CREATE USER identityiq FOR LOGIN identityiq WITH DEFAULT_SCHEMA ="
+                    value="CREATE USER ${db.userName} FOR LOGIN ${db.sqlserver.loginName} WITH DEFAULT_SCHEMA ="
+                />
+                <replaceregexp
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    match="identityiq\n"
+                    replace="${db.name}${line.separator}"
+                />
+            	
+                <!-- swap the schema create statement -->
+            	<replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="CREATE SCHEMA identityiq AUTHORIZATION identityiq"
+                    value="CREATE SCHEMA ${db.name} AUTHORIZATION ${db.userName}"
+                />
+            	
+                <!-- swap out the permissions statements: -->
+            	<replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token=" to identityiq"
+                    value=" to ${db.userName}"  
+                />
+            	
+                <!-- # swap out the EXEC statement: -->
+            	<replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="EXEC sp_addrolemember 'db_owner', 'identityiq'"
+                    value="EXEC sp_addrolemember 'db_owner', '${db.userName}'"
+                />
+
+
+            	<!-- get rid of "go" as it doesn't work -->
+            	<replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="GO"
+                    value=";"
+            		casesensitive="true"
+                />
+            </then>
+            <!-- end sqlserver section -->
+        </if>
+
+        <!-- Start db2 section -->
+        <if>
+            <and>
+                <isset property="db.type"/>
+                <equals arg1="${db.type}" arg2="db2"/>
+            </and>
+            <then>
+                <!-- swap the db create statement -->
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="CREATE DATABASE IIQ"
+                    value="CREATE DATABASE ${db.db2.databaseName}"
+                />
+                <!-- swap the connect statement -->
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="CONNECT TO iiq;"
+                    value="CONNECT TO ${db.db2.databaseName};"
+                />
+                <!-- swap the schema statement -->
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="CREATE SCHEMA identityiq AUTHORIZATION identityiq;"
+                    value="CREATE SCHEMA ${db.userName} AUTHORIZATION ${db.userPassword};"
+                />
+                <!-- swap the bufferpool statement -->
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="CREATE BUFFERPOOL identityiq_bp"
+                    value="CREATE BUFFERPOOL ${db.db2.bufferpool}"
+                />
+                <!-- swap the tablespace statement -->
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="CREATE TABLESPACE identityiq_ts"
+                    value="CREATE TABLESPACE ${db.db2.tableSpaceName}"
+                />
+                <!-- switch the referal in the tablespace statement -->
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="BUFFERPOOL identityiq_bp;"
+                    value="BUFFERPOOL ${db.db2.bufferpool};"
+                />
+                <!-- switch the permission statement -->
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="GRANT DBADM ON DATABASE TO USER identityiq;"
+                    value="GRANT DBADM ON DATABASE TO USER ${db.userName};"
+                />
+            </then>
+        </if>
+        <!-- end db2 section -->
+
+        <!-- Replacing ootb behavior to remove chance of multiple incorrect substitution. These will only swap out the table and index prefixes -->
+        <replace 
+            file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+            casesensitive="false"
+            token=" identityiq."
+            value=" ${db.name}."/>
+        <iiq.sql 
+            sql.file="${build.iiqBinaryExtract}/WEB-INF/database/create_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"/>
+
+        <echo>since you just ran createdb, you may want to consider running patchdb or extenddb, as createdb just creates a plain, unpatched DB.</echo>
+    </target>
+
+    <!-- 
+    this used to be part of createdb, but now is a separate target.
+    runUpgrade should be run after this.
+    -->
+    <target name="patchdb" depends="init-properties" description="applies version-specific upgrade_identityiq_tables sql scripts to the iiq db">
+        <echo>enter patchdb</echo>
+        <if>
+            <and>
+                <isset property="IIQPatchLevel"/>
+                <length string="${IIQPatchLevel}" when="greater" length="1"/>
+            </and>
+            <then>
+                <echo>patchdb needs to run for patch level ${IIQPatchLevel}</echo>
+
+                <!-- make our tokenReplaced file -->
+                <copy 
+                    overwrite="true" 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/upgrade_identityiq_tables-${IIQVersion}${IIQPatchLevel}.${db.type}"
+                    tofile="${build.iiqBinaryExtract}/WEB-INF/database/upgrade_identityiq_tables-${IIQVersion}${IIQPatchLevel}.${db.type}.tokenReplaced"/>
+                
+                <!-- replace default db name with custom name -->
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/upgrade_identityiq_tables-${IIQVersion}${IIQPatchLevel}.${db.type}.tokenReplaced"    
+                    casesensitive="false"
+                    token="identityiq"
+                    value="${db.name}"/>
+
+                <!-- fix trailing white space which causes syntax errors -->
+                <replaceregexp
+                        file="${build.iiqBinaryExtract}/WEB-INF/database/upgrade_identityiq_tables-${IIQVersion}${IIQPatchLevel}.${db.type}.tokenReplaced"
+                        match="\s*$"
+                        replace=""
+                        byline="true"/>
+                
+                <!-- run the actual sql script -->
+                <iiq.sql.upgrade
+                        sql.file="${build.iiqBinaryExtract}/WEB-INF/database/upgrade_identityiq_tables-${IIQVersion}${IIQPatchLevel}.${db.type}.tokenReplaced"/>
+            </then>
+            <else>
+                <echo>patchdb does not need to run</echo>
+            </else>
+        </if>
+        <echo>enter patchdb</echo>
+    </target>
+
+    <target name="dropdb" depends="-init-db-properties" description="drops the database and iiq user - USE WITH CARE!!">
+        <if>
+            <equals arg1="${override.safety.prompts}" arg2="false"/>
+            <then>
+                <input
+                        message="Are you sure you want to drop your db and all of your data? continue (y/n)?"
+                        validargs="y,n"
+                        addproperty="do.delete"
+                        />
+                <condition property="do.abort">
+                    <equals arg1="n" arg2="${do.delete}"/>
+                </condition>
+                <fail if="do.abort">Build aborted by user.</fail>
+            </then>
+        </if>
+        <copy overwrite="true" file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}"
+              tofile="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"/>
+
+        <!-- For Oracle, if we are creating the tablespace, we should remove it. That requires uncommenting and substitution -->
+        <if>
+            <and>
+                <isset property="db.type"/>
+                <equals arg1="${db.type}" arg2="oracle"/>
+                <isset property="db.oracle.createTableSpace"/>
+                <equals arg1="${db.oracle.createTableSpace}" arg2="true"/>
+                <isset property="db.oracle.tableSpacePath"/>
+                <isset property="db.oracle.tableSpaceName"/>
+            </and>                
+            <then>
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="-- DROP TABLESPACE identityiq_ts INCLUDING CONTENTS;"
+                    value="DROP TABLESPACE ${db.oracle.tableSpaceName} INCLUDING CONTENTS AND DATAFILES;"
+                />                
+            </then>
+        </if>
+
+        <!-- For Oracle, if we are going to create the DB user, we should uncomment the line that drops them, and put in the right name-->
+        <if>
+            <and>
+                <isset property="db.type"/>
+                <equals arg1="${db.type}" arg2="oracle"/>
+                <isset property="db.oracle.createUser"/>
+                <equals arg1="${db.oracle.createUser}" arg2="true"/>
+                <isset property="db.name"/>
+                <isset property="db.userPassword"/>
+                <isset property="db.oracle.tableSpaceName"/>
+            </and>                
+            <then>
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="-- DROP USER identityiq CASCADE;"
+                    value="DROP USER ${db.name} CASCADE;"
+                />                
+            </then>
+        </if>
+
+        <!-- regardless of the options, Oracle needs to have this line removed. -->
+        <if>
+            <and>
+                <isset property="db.type"/>
+                <equals arg1="${db.type}" arg2="oracle"/>
+            </and>                
+            <then>                
+                <replace 
+                    file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                    token="-- HOST rm /usr/local/oradata/identityiq.dbf"
+                    value=""
+                />                                              
+            </then>
+        </if>
+        
+        <if>
+            <and>
+                <isset property="db.type"/>
+                <equals arg1="${db.type}" arg2="oracle"/>
+                <isset property="db.oracle.useFastDropScript"/>
+                <equals arg1="${db.oracle.useFastDropScript}" arg2="true"/>
+                <isset property="db.name"/>                
+                <isset property="db.oracle.tableSpaceName"/>
+            </and> 
+            <then>
+                <concat destfile="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-ssb-fast.sql" append="false">
+                    drop user ${db.name} cascade;
+                </concat>
+                <concat destfile="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-ssb-fast.sql" append="true">
+                    drop tablespace ${db.oracle.tableSpaceName} including contents and datafiles;
+                </concat>
+                <iiq.sql sql.file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-ssb-fast.sql"/>
+            </then>
+            <else>
+                <!-- Each DB has different syntax for removing the user and db-->
+                <!-- mysql section -->
+                <if>                    
+                    <and>
+                        <isset property="db.type"/>
+                        <equals arg1="${db.type}" arg2="mysql"/>
+                    </and>
+                    <then>
+                        <if>
+                            <!-- if we have the plugin DB (at this time, iiq 7.1), we need to adjust the script -->
+                            <equals arg1="${hasPluginDb}" arg2="true"/>
+                            
+                            <then>
+                                <echo>handling plugin DB items</echo>
+                                <!-- adding a space here deliberately as well to avoid duplicate replacements -->
+                                <replace
+                                    file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                                    token="EXISTS identityiqPlugin;"
+                                    value="EXISTS  ${plugin.db.name};"
+                                />
+                                <replace
+                                    file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                                    token="user='identityiqPlugin';"
+                                    value="user = '${plugin.db.userName}';"
+                                />
+                            </then>
+                            <else>
+                                <echo>no plugin DB to handle</echo>
+                            </else>
+                        </if>
+
+                        <!-- regular db stuff -->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="USE identityiq;"
+                            value="USE  ${db.name};"
+                        /> 
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="user='identityiq';"
+                            value="user = '${db.userName}';"
+                        /> 
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="EXISTS identityiq;"
+                            value="EXISTS  ${db.name};"
+                        />                                               
+                    </then>                                        
+                </if>
+                <!-- end mysql section -->
+
+                <!-- sqlserver section -->
+                <if>                    
+                    <and>
+                        <isset property="db.type"/>
+                        <equals arg1="${db.type}" arg2="sqlserver"/>
+                    </and>
+                    <then>
+                        <if>
+                            <!-- if we have the plugin DB (at this time, iiq 7.1), we need to adjust the script -->
+                            <equals arg1="${hasPluginDb}" arg2="true"/>
+                            
+                            <then>
+                                <echo>handling plugin DB items</echo>
+                                <!-- adding a space here deliberately as well to avoid duplicate replacements -->
+                                <replace
+                                    file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                                    token="drop database identityiqPlugin"
+                                    value="drop database  ${plugin.db.name}"
+                                />
+                                <replace
+                                    file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                                    token="sp_droplogin identityiqPlugin"
+                                    value="sp_droplogin  ${plugin.db.sqlserver.loginName}"
+                                />
+
+                            </then>
+                            <else>
+                                <echo>no plugin DB to handle</echo>
+                            </else>
+                        </if>
+
+                        <!-- normal DB stuff -->
+                        <replace
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="USE identityiq"
+                            value="USE ${db.name}"
+                        /> 
+                        <replace
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="drop database identityiq"
+                            value="drop database ${db.name}"
+                        />
+                        <replace
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="sp_droplogin identityiq"
+                            value="sp_droplogin ${db.sqlserver.loginName}"
+                        />
+
+                        <!-- get rid of "go" as it doesn't work - "go" is used for SQL Server mgmt studio, but not for this type of stuff. -->
+                    	<replace
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="GO"
+                            value=";"
+                    		casesensitive="true"
+                        />
+                    </then>                                        
+                </if>
+                <!-- end sqlserver section -->
+
+                <!-- db2 section -->
+                <if>                    
+                    <and>
+                        <isset property="db.type"/>
+                        <equals arg1="${db.type}" arg2="db2"/>
+                    </and>
+                    <then>
+                        <!-- connect to the db -->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="CONNECT TO IIQ;"
+                            value="CONNECT TO ${db.db2.databaseName};"
+                        />
+                        <!-- drop the tablespace -->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="DROP TABLESPACE identityiq_ts;"
+                            value="DROP TABLESPACE ${db.db2.tableSpaceName};"
+                        />
+                        <!-- drop the bufferpool -->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="DROP BUFFERPOOL identityiq_bp;"
+                            value="DROP BUFFERPOOL ${db.db2.bufferpool};"
+                        />
+                        <!-- drop the schema -->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="DROP SCHEMA identityiq RESTRICT;"
+                            value="DROP SCHEMA ${db.userName} RESTRICT;"
+                        />
+                        <!-- disconnect -->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="Disconnect iiq;"
+                            value="Disconnect ${db.db2.databaseName};"
+                        />
+                        <!-- drop the db -->
+                        <replace 
+                            file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"
+                            token="DROP DATABASE iiq;"
+                            value="DROP DATABASE ${db.db2.databaseName};"
+                        />
+                    </then>
+                </if>
+                <!-- end db2 section -->
+
+                <!-- fix to properly substitute in the right schema name in the drop script -->
+                <replace file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced" casesensitive="false"
+                         token="identityiq." value="${db.name}."/>
+                <iiq.sql sql.file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}.tokenReplaced"/>
+            </else>
+        </if>
+        <!--<iiq.sql sql.file="${build.iiqBinaryExtract}/WEB-INF/database/drop_identityiq_tables-${IIQVersion}.${db.type}"/>-->
+    </target>
+
+    <target name="extenddb" depends="-init-db-properties" description="extends the DB schema per hbm customizations. requires alignment with objectConfig.">
+        <if>
+            <equals arg1="${usingDbSchemaExtensions}" arg2="true"/>
+            <then>
+                <echo>extending db schema via "iiq extendedSchema"</echo>
+                <if>
+                    <isset property="is-windows"/>
+                    <then>
+                        <echo>running windows flavor</echo>
+                        <exec executable="cmd.exe" dir="${build.iiqBinaryExtract}/WEB-INF/bin">
+                            <arg value="/c"/>
+                            <arg value="iiq.bat"/>
+                            <arg value="extendedSchema"/>
+                        </exec>
+                    </then>
+                    <else>
+                        <echo>running *nix flavor</echo>
+                        <property name="iiq.script.nix.perms" value="ug+rx"/>
+                        <echo>setting execute permissions on "iiq" script to ${iiq.script.nix.perms} first</echo>
+                        <chmod file="${build.iiqBinaryExtract}/WEB-INF/bin/iiq" perm="${iiq.script.nix.perms}"/>
+                        <exec executable="iiq" dir="${build.iiqBinaryExtract}/WEB-INF/bin">
+                            <arg value="extendedSchema"/>
+                        </exec>
+                    </else>
+                </if>
+
+                <property name="schemaExtensionFile.default" value="${build.iiqBinaryExtract}/WEB-INF/database/add_identityiq_extensions.${db.type}"/>
+                <property name="schemaExtensionFile.tokenReplaced" value="${schemaExtensionFile.default}.tokenReplaced"/>
+                <echo>created all flavors of extentions files, but our concern is: ${schemaExtensionFile.default}</echo>
+
+                <!-- create our copy to actually edit -->
+                <copy 
+                    overwrite="true"
+                    file="${schemaExtensionFile.default}"
+                    tofile="${schemaExtensionFile.tokenReplaced}"/>
+
+                <!-- do the DB file hacking -->
+                <if>
+                    <equals arg1="${db.type}" arg2="mysql"/>
+                    <then>
+                        <!-- mess with the alter table stmts - whitespace is relevant here! -->
+                        <replace 
+                            file="${schemaExtensionFile.tokenReplaced}"
+                            casesensitive="false"
+                            token=" table identityiq."
+                            value=" table  ${db.name}."/>
+                        <!-- mess with index stmts - whitespace is relevant here!-->
+                        <replace 
+                            file="${schemaExtensionFile.tokenReplaced}"
+                            casesensitive="false"
+                            token=" on identityiq."
+                            value=" on  ${db.name}."/>
+                        <!-- mess with use stmt -->
+                        <replace 
+                            file="${schemaExtensionFile.tokenReplaced}"
+                            casesensitive="false"
+                            token="USE identityiq;"
+                            value="USE  ${db.name};"/>
+                        <!-- inject a comment at end so we tatoo our target in SSB did this -->
+                        <concat destfile="${schemaExtensionFile.tokenReplaced}" append="true">
+                            -- created this DDL file with extenddb SSB target
+                        </concat>
+                    </then>
+                </if>
+
+                <if>
+                    <equals arg1="${db.type}" arg2="sqlserver"/>
+                    <then>
+                        <!-- mess with the alter table stmts - whitespace is relevant here! -->
+                        <replace 
+                            file="${schemaExtensionFile.tokenReplaced}"
+                            casesensitive="false"
+                            token=" table identityiq."
+                            value=" table  ${db.name}."/>
+                        <!-- mess with index stmts - whitespace is relevant here!-->
+                        <replace 
+                            file="${schemaExtensionFile.tokenReplaced}"
+                            casesensitive="false"
+                            token=" on identityiq."
+                            value=" on  ${db.name}."/>
+                        <!-- mess with use stmt - whitespace is relevant here! -->
+                        <replace 
+                            file="${schemaExtensionFile.tokenReplaced}"
+                            casesensitive="false"
+                            token="USE identityiq"
+                            value="USE  ${db.name}"/>
+                        <!-- get rid of "go" as it doesn't work - "go" is used for SQL Server mgmt studio, but not for this type of stuff. -->
+                    	<replace
+                            file="${schemaExtensionFile.tokenReplaced}"
+                            token="GO"
+                            value=";"
+                    		casesensitive="true"/>
+                        <!-- inject a comment at end so we tatoo our target in SSB did this -->
+                        <concat destfile="${schemaExtensionFile.tokenReplaced}" append="true">
+                            -- created this DDL file with extenddb SSB target
+                        </concat>
+                    </then>
+                </if>
+
+                <!-- need to work in oracle and db2 later -->
+                <if>
+                    <equals arg1="${db.type}" arg2="oracle"/>
+                    <then>
+                        <echo>${db.type} not handled here at this time!</echo>
+                        <fail></fail>
+                    </then>
+                </if>
+
+                <if>
+                    <equals arg1="${db.type}" arg2="db2"/>
+                    <then>
+                        <echo>${db.type} not handled here at this time!</echo>
+                        <fail></fail>
+                    </then>
+                </if>
+
+                <!-- regardless of db type section here -->
+                <echo>our edited file will be: ${schemaExtensionFile.tokenReplaced}</echo>
+
+                <!-- run the actual sql script -->
+                <iiq.sql.upgrade sql.file="${schemaExtensionFile.tokenReplaced}"/>
+            </then>
+            <else>
+                <echo>usingDbSchemaExtensions is false - ignoring extenddb target</echo>
+            </else>
+        </if>    
+    </target>
+
+    <target name="importcycle" depends="main,dist,import-custom,cycle" description="imports all customizations (XML,classes, static web content) and cycles your app server">
+
+    </target>
+
+    <target name="importjava" depends="main,dist,cycle" description="imports some customizations (classes, static web content) and cycles your app server">
+
+    </target>
+
+    <target name="importdynamic" depends="main,dist,import-custom" description="imports dynamic content that does not require a cycle, (XML static web content etc)">
+
+    </target>
+
+    <target name="concurd" description="Takes a sql query that returns a list of SailPointObject IDs, number of threads
+     to spawn and deletes the IDs concurrently">
+
+    </target>
+
+    <target name="cycle" depends="init-properties" description="requires the application.server.start and stop properties to be set. Cycles app server">
+        <!-- stop the server -->
+        <if>
+            <http url="http://${application.server.host}:${application.server.port}/${iiq.path}"/>
+            <then>
+                <iiq.start.stop action="stop"/>
+                <waitfor>
+                    <not>
+                        <socket server="${application.server.host}" port="${application.server.port}"/>
+                    </not>
+                </waitfor>
+                <iiq.start.stop action="start"/>
+            </then>
+            <else>
+                <iiq.start.stop action="start"/>
+            </else>
+        </if>
+    </target>
+    
+    <target name='exportSingleObject' depends="init-properties">
+        <mkdir dir="${build}/export/"/>
+        <java classname="sailpoint.launch.Launcher" fork="true" failonerror="true" output="${build}/export/sailpoint.dtd">
+            <arg line="sailpoint.tools.xml.DTDGenerator"/>
+            <classpath>
+                <pathelement path="${IIQHome}/WEB-INF/classes"/>
+                <pathelement location="${IIQHome}/WEB-INF/lib/identityiq.jar"/>
+            </classpath>
+        </java>
+        <mkdir dir="${build}/export/${objectType}/"/>
+        <copy file="${build}/export/sailpoint.dtd" tofile="${build}/export/${objectType}/sailpoint.dtd"/>
+        <echo message="Exporting ${objectName} of type ${objectType}"/>     
+        <var name="consoleCommand" value='console iiqBeans -f ${build}/export/${objectType}/consoleCommandFile.txt'/>
+        <propertyregex property="objectName"
+                         input="${objectName}"
+                         override="true"
+                         regexp='"'
+                         replace="" global="true" />
+                 <propertyregex property="objectName"
+                         input="${objectName}"
+                         override="true"
+                         regexp='comma'
+                         replace="," global="true" />
+        <var name='consolePredicate' value='get ${objectType} &quot;${objectName}&quot;'/>
+        <echo message='Console Command is: ${consoleCommand} Console Predicate is: ${consolePredicate}'/>
+        <echo message='${consolePredicate}' file='${build}/export/${objectType}/consoleCommandFile.txt'/>
+        <propertyregex property="objectName"
+                       input="${objectName}"
+                       override="true"
+                       regexp ="[\s/]"
+                       replace="_" global="true" />
+        <java classname="sailpoint.launch.Launcher" fork="true" failonerror="true" output="${build}/export/${objectType}/${objectType}-${objectName}.xml">
+            <arg line="${consoleCommand}"/>
+            <classpath>
+                <pathelement path="${IIQHome}/WEB-INF/classes"/>
+                <pathelement location="${IIQHome}/WEB-INF/lib/identityiq.jar"/>
+            </classpath>
+        </java>
+        <delete file='${build}/export/${objectType}/consoleCommandFile.txt'/>
+        <antcall target="cleanExportFiles"/>
+    </target>
+    
+    <target name="createExportFile" depends="init-properties">
+        <replaceregexp file="scripts/Rule-OutputCustomObjectFile.xml" match="%%INSTALL_DATE%%" replace="${installDate}" flags="g" />
+        <java classname="sailpoint.launch.Launcher" fork="true" failonerror="true">
+            <arg line="console iiqBeans -c &quot;import scripts/Rule-OutputCustomObjectFile.xml&quot;"/>
+            <classpath>
+                <pathelement path="${IIQHome}/WEB-INF/classes"/>
+                <pathelement location="${IIQHome}/WEB-INF/lib/identityiq.jar"/>
+            </classpath>
+        </java>
+        <java classname="sailpoint.launch.Launcher" fork="true" failonerror="true" output="scripts/objectsToExport.properties">
+            <arg line="console iiqBeans -c &quot;rule OutputCustomObjectFile&quot;"/>
+            <classpath>
+                <pathelement path="${IIQHome}/WEB-INF/classes"/>
+                <pathelement location="${IIQHome}/WEB-INF/lib/identityiq.jar"/>
+            </classpath>
+        </java>
+    </target>
+    
+    <!--                                                            -->
+    <!-- Target: export                      -->
+    <!-- export objects from the repository       -->
+    <target name="exportObjectsAfterInstallDate" depends="init-properties,createExportFile">
+        <property file="scripts/objectsToExport.properties"/>
+        <echo message="objectType=${ObjectTypes}"/>
+        <echo message="Generating objects from repository ..."/>
+        <mkdir dir="${build}/export/"/>
+        <java classname="sailpoint.launch.Launcher" fork="true" failonerror="true" output="${build}/export/sailpoint.dtd">
+            <arg line="sailpoint.tools.xml.DTDGenerator"/>
+            <classpath>
+                <pathelement path="${IIQHome}/WEB-INF/classes"/>
+                <pathelement location="${IIQHome}/WEB-INF/lib/identityiq.jar"/>
+            </classpath>
+        </java>
+        <foreach list="${ObjectTypes}" param="objectType" target="objectFileGenerator"/>
+        <antcall target="cleanExportFiles"/>
+    </target>
+    
+    <!--                                                            -->
+    <!-- Target: export                      -->
+    <!-- export objects from the repository       -->
+    <target name="export" depends="init-properties">
+        <property file="scripts/objectsToExport.properties"/>
+        <echo message="objectType=${ObjectTypes}"/>
+        <echo message="Generating objects from repository ..."/>
+        <mkdir dir="${build}/export/"/>
+        <java classname="sailpoint.launch.Launcher" fork="true" failonerror="true" output="${build}/export/sailpoint.dtd">
+            <arg line="sailpoint.tools.xml.DTDGenerator"/>
+            <classpath>
+                <pathelement path="${IIQHome}/WEB-INF/classes"/>
+                <pathelement location="${IIQHome}/WEB-INF/lib/identityiq.jar"/>
+            </classpath>
+        </java>
+        <foreach list="${ObjectTypes}" param="objectType" target="objectFileGenerator"/>
+        <antcall target="cleanExportFiles"/>
+    </target>
+
+     <target name="cleanExportFiles" depends="init-properties">
+        <condition property="rulesPresent"> 
+             <available file="${build}/export/Rule" type="dir"/> 
+        </condition>
+        <replaceregexp flags="g">
+            <regexp pattern="\s(id|created|modified)=[&quot;']\w+[&quot;']"/>
+            <substitution expression=""/>
+            <fileset dir="${build}/export/">
+                <include name="**/*.xml"/>
+                <exclude name="**/${init-file}"/>
+            </fileset>
+        </replaceregexp>
+        <antcall target="cleanRuleFiles"/>
+     </target>
+     
+     <target name="cleanRuleFiles" depends="init-properties" if="rulesPresent">
+         <replaceregexp flags="g">
+             <regexp pattern="(&lt;Source&gt;)"/>
+             <substitution expression="&lt;Source&gt;&lt;![CDATA["/>
+             <fileset dir="${build}/export/Rule">
+                 <include name="**/*.xml"/>
+                 <exclude name="**/${init-file}"/>
+             </fileset>
+         </replaceregexp>
+         <replaceregexp flags="g">
+             <regexp pattern="(&lt;/Source&gt;)"/>
+             <substitution expression="\]\]&gt;&lt;/Source&gt;"/>
+             <fileset dir="${build}/export/Rule">
+                 <include name="**/*.xml"/>
+                 <exclude name="**/${init-file}"/>
+             </fileset>
+         </replaceregexp>
+         <replaceregexp flags="g">
+             <regexp pattern="(&amp;amp;)"/>
+             <substitution expression="&amp;"/>
+             <fileset dir="${build}/export/Rule">
+                 <include name="**/*.xml"/>
+                 <exclude name="**/${init-file}"/>
+             </fileset>
+         </replaceregexp>
+         <replaceregexp flags="g">
+             <regexp pattern="(&amp;lt;)"/>
+             <substitution expression="&lt;"/>
+             <fileset dir="${build}/export/Rule">
+                 <include name="**/*.xml"/>
+                 <exclude name="**/${init-file}"/>
+             </fileset>
+         </replaceregexp>
+         <replaceregexp flags="g">
+             <regexp pattern="(&amp;gt;)"/>
+             <substitution expression="&gt;"/>
+             <fileset dir="${build}/export/Rule">
+                 <include name="**/*.xml"/>
+                 <exclude name="**/${init-file}"/>
+             </fileset>
+         </replaceregexp>
+         <replaceregexp flags="g">
+             <regexp pattern="(&amp;amp;&amp;amp;)"/>
+             <substitution expression="&amp;&amp;"/>
+             <fileset dir="${build}/export/Rule">
+                 <include name="**/*.xml"/>
+                 <exclude name="**/${init-file}"/>
+             </fileset>
+        </replaceregexp>
+     </target>
+
+    <target name="objectFileGenerator" depends="init-properties">
+        <property file="scripts/objectsToExport.properties"/>
+        <propertycopy name="objectNames" from="${objectType}"/>
+        <mkdir dir="${build}/export/${objectType}/"/>
+        <copy file="${build}/export/sailpoint.dtd" tofile="${build}/export/${objectType}/sailpoint.dtd"/>
+        <foreach list="${objectNames}" param="objectName" inheritrefs="true" target="createObjectFile"/>
+    </target>
+    
+    <target name="createObjectFile" depends="init-properties">
+        <echo message="Exporting ${objectName} of type ${objectType}"/>     
+        <var name="consoleCommand" value='console iiqBeans -f ${build}/export/${objectType}/consoleCommandFile.txt'/>
+        <propertyregex property="objectName"
+                         input="${objectName}"
+                         override="true"
+                         regexp='"'
+                         replace="" global="true" />
+        <propertyregex property="objectName"
+                         input="${objectName}"
+                         override="true"
+                         regexp='comma'
+                         replace="," global="true" />
+        <var name='consolePredicate' value='get ${objectType} &quot;${objectName}&quot;'/>
+        <echo message='Console Command is: ${consoleCommand} Console Predicate is: ${consolePredicate}'/>
+        <echo message='${consolePredicate}' file='${build}/export/${objectType}/consoleCommandFile.txt'/>
+        <propertyregex property="objectName"
+                       input="${objectName}"
+                       override="true"
+                       regexp="[\s/]"
+                       replace="_" global="true" />
+        <java classname="sailpoint.launch.Launcher" fork="true" failonerror="true" output="${build}/export/${objectType}/${objectType}-${objectName}.xml">
+            <arg line="${consoleCommand}"/>
+            <classpath>
+                <pathelement path="${IIQHome}/WEB-INF/classes"/>
+                <pathelement location="${IIQHome}/WEB-INF/lib/identityiq.jar"/>
+            </classpath>
+        </java>
+        <delete file='${build}/export/${objectType}/consoleCommandFile.txt'/>
+    </target>
+
+    <!--                                                            -->
+    <!-- Target: importManagedAttributes                            -->
+    <!-- Import managedAttributes into the repository                  -->
+    <!--                                                            -->
+    <target name="importManagedAttributes" depends="init-properties">
+        <foreach list="${managedAttributeApplications}" param="application" target="importSingleAttributeFile"/>
+    </target>
+    
+    <target name="importSingleAttributeFile">
+        <echo message="Importing entitlements into the repository for ${application}..."/>
+        <propertycopy name="entitlementFile" from="${application}"/>
+        <java classname="sailpoint.launch.Launcher" fork="true">
+            <arg line="console iiqBeans -c &quot;importExplanations ${application} default ${entitlementLocation}/${entitlementFile}&quot;"/>
+            <classpath>
+                <pathelement path="${IIQHome}/WEB-INF/classes"/>
+                <pathelement location="${IIQHome}/WEB-INF/lib/identityiq.jar"/>
+            </classpath>
+        </java>
+    </target>
+    
+    <target name="encryptString" depends="init-properties" description="Returns the encrypted version of the passed in string. Use '-DstringToEncrypt=yourString' on the command line.">
+    	<echo message="Encrypting string ${stringToEncrypt}"/>
+		<java classname="sailpoint.launch.Launcher" fork="true">
+			<arg line="console iiqBeans -c &quot;encrypt ${stringToEncrypt}&quot;"/>
+			<classpath>
+                <pathelement path="${IIQHome}/WEB-INF/classes"/>
+                <pathelement location="${IIQHome}/WEB-INF/lib/identityiq.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+
+</project>

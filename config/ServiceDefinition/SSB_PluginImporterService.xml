@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE ServiceDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<ServiceDefinition hosts="global" interval="86400" executor="sailpoint.services.standard.pluginimporter.PluginImporterService" name="PluginImporter">
+  <Description>
+      Service definition for the SSB plugin importer service.
+    </Description>
+</ServiceDefinition>

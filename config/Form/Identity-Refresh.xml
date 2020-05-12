@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form name="Identity Refresh" type="Workflow">
+  <Attributes>
+    <Map>
+      <entry key="pageTitle" value="Automatic provisioning form for $(identityName)"/>
+    </Map>
+  </Attributes>
+  <Section type="text">
+    <Field value="&#xa;          During identity refresh, missing entitlements were detected&#xa;          for one or more assigned roles.  Provisioning these entitlements&#xa;          requires the creation of new accounts on one or more applications.&#xa;          Please supply initial values for account attributes in the forms below.&#xa;        "/>
+  </Section>
+  <Section label="Target Identity" type="datatable">
+    <Attributes>
+      <Map>
+        <entry key="hideNulls" value="true"/>
+      </Map>
+    </Attributes>
+    <Field displayName="Account ID" value="script:identity.getName()"/>
+    <Field displayName="First Name" value="script:identity.getFirstname()"/>
+    <Field displayName="Last Name" value="script:identity.getLastname()"/>
+    <Field displayName="Assigned Roles">
+      <Script>
+        <Source>
+          import sailpoint.api.ObjectUtil;
+          import sailpoint.tools.Util;
+          List names = ObjectUtil.getObjectNames(identity.getAssignedRoles());
+          return Util.listToCsv(names);
+      </Source>
+      </Script>
+    </Field>
+  </Section>
+  <Button action="next" label="Ok"/>
+  <Button action="cancel" label="Cancel"/>
+  <Button action="cancel" label="Return" readOnly="true"/>
+</Form>
+</sailpoint>

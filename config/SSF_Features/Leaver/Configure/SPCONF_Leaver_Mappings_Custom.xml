@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="SPCONF Leaver Mappings Custom">
+	<Attributes>
+		<Map>
+		
+			<!--  Enter the Trigger Type.  
+					Options Include:
+						- Selector:  Will dynamically re-evaluate all target attributes and update as necessary.
+						- Custom Rule:  Will call isLeaverCustomTriggerRule in SPCONF Leaver Rules Library.  
+			-->
+			<entry key="Trigger Type" value="Selector" />
+			
+			<!-- Create the Selector to determine whether to kick off the Leaver -->
+			<entry key="Trigger Field Selector">
+				<value>
+					<IdentitySelector>
+					
+						<MatchExpression and="true">
+							<MatchTerm name="userStatus" value="Terminated" />
+							<MatchTerm container="true">
+								<MatchTerm name="inactive" value="false" />
+								<MatchTerm name="inactive" />
+							</MatchTerm>
+						</MatchExpression>
+						
+					</IdentitySelector>
+				</value>
+			</entry>
+			
+			<!-- Enter the Birthright Assignment Type. Options Include: - 
+			Disable All: Will dynamically disable all accounts. - 
+			Delete All: Will dynamically delete all accounts. - 
+			Selective Lists: Will disable all in the Default Disables 
+				list and Delete all in the Default Deletes list
+			Custom Rule: Will call buildCustomLeaverPlan SPCONF Leaver Rules Library-->
+			<entry key="Leaver Build Plan Type" value="Disable All" />
+
+			<!-- Used if Leaver Build Plan Type is Selective Lists -->
+			<entry key="Default Disables">
+				<value>
+					<List>
+						<!-- Enter the names of the Applications for automatic disablement -->
+						<String>Active Directory</String>
+						<String>Enterprise LDAP</String>
+
+					</List>
+				</value>
+			</entry>
+
+			<!-- Used if Leaver Build Plan Type is Selective Lists -->
+			<entry key="Default Deletes">
+				<value>
+					<List>
+						<!-- Enter the names of the Applications for automatic deletion -->
+						<String>Active Directory</String>
+						<String>Enterprise LDAP</String>
+
+					</List>
+				</value>
+			</entry>
+
+		</Map>
+	</Attributes>
+</Custom>

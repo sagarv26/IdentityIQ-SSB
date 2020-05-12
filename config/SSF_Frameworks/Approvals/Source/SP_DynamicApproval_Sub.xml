@@ -1,0 +1,523 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow  name="SP Dynamic Approval Sub" type="Subprocess">
+  <Variable input="true" name="identityName" required="true">
+    <Description>
+      The name of the identity object being modified.
+    </Description>
+  </Variable>
+  <Variable input="true" name="batchRequestId">
+    <Description>
+      Batch request id.
+    </Description>
+  </Variable>
+  <Variable name="requestor" input="true" />
+  <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>
+      The displayName of the identity being updated.
+      This may be passed in, if not the script queries for this
+      using a projection query and falls back to the name.
+    </Description>
+  </Variable>
+  <Variable name="project" input="true" />
+  <Variable initializer="script:getIdentityProperty(identityName, &quot;id&quot;)" input="true" name="identityId">
+    <Description>
+      The id of the identity being updated.
+    </Description>
+  </Variable>
+  <Variable name='identityRequestId' output='true' input='true' />
+  <Variable initializer="parallel" input="true" name="approvalMode">
+    <Description>
+     A string that specifies how we should handle the approvals.  
+
+     By default this is serial since most of these request with
+     the exception of manager transfers will have only one approver.
+
+     parallel
+       Approvals are processed concurrently and there must be consensus,
+       we wait for all approvers to approve.  The first approver that
+       rejects terminates the entire approval.
+ 
+     parallelPoll 
+       Approvals are processed concurrently but consensus is not required.
+       All approvals will be process, we don't stop if there any
+       rejections.  
+
+     serial
+       Approvals are processed one at a time and there must be consensus.
+       The first approver that rejects terminates the entire approval.
+
+     serialPoll
+       Approvals are processed in order but consensus is not required.
+       All approvals will be processed, we don't stop if there are any
+       rejections.  In effect we are "taking a poll" of the approvers.
+
+     any
+      Approvals are processed concurrently, the first approver to 
+      respond makes the decision for the group.
+    </Description>
+  </Variable>
+  <Variable input="true" name="fallbackApprover" required="true">
+    <Description>
+      A String that specifies the name of the Identity that will 
+      be assigned any approvals where the owner of the approver 
+      can't be resolved. Example if the scheme is "owner" and the 
+      application doesn't specify and owner.
+    </Description>
+  </Variable>
+  <Variable initializer="false" input="true" name="includeRejectedItemsInApprovalChain">
+    <Description>
+       When using multi approvalSchemes a flag to indicate if new
+       approvals in the chain will include rejected items.
+    </Description>
+  </Variable>
+  <Variable input="true" name="policyViolations">
+    <Description> 
+       List of policy violations that were found during our initial policy scan.
+       This list is passed into each work item so the approvers can see 
+       pending violations.
+    </Description>
+  </Variable>
+  <Variable input="true" name="flow">
+    <Description>
+      The name of the LCM flow that launched this workflow.
+
+      This is one of these values:
+
+      AccountsRequest
+      EntitlementsRequest
+      RolesRequest
+      IdentityCreateRequest
+      IdentityEditRequest
+      ForgotPassword
+      ExpiredPassword
+      PasswordRequest
+
+    </Description>
+  </Variable>
+  <Variable input="true" name="trace">
+    <Description>
+      Used for debugging this subprocess and when set to true trace
+      statements will be sent to stdout.
+    </Description>
+  </Variable>
+  <Variable name="tmpApprovalSet">
+    <Description>
+       Temporary and transient  ApprovalSet used to hold filtered
+       approval sets as we transition through the approval chain.
+    </Description>
+  </Variable>
+  <Variable input="true" name="approvalSet" output="true">
+    <Description>
+       This attributes is set during the "Build Approval Set" step,
+       which builds this list by going through the ProvisioningPlan
+       to build the line items that need to be approved,
+
+       This variable includes all ApprovalItems that are part of 
+       the request process and is updated during the AfterScript
+       of the approval process by assimilating the decisions 
+       and comments from the Approvals copy of the ApprovalItem.
+    </Description>
+  </Variable>
+  <Variable initializer="LCM Identity Update Approval" input="true" name="notifyEmailTemplate">
+    <Description>
+       Name of the email template to use when manager of pending approvals.
+    </Description>
+  </Variable>
+  
+  <Variable input="true" name="workItemComments">
+    <Description>
+       List of global workflow comments to be appended to the approval workitem.
+    </Description>
+  </Variable>
+  
+  <!-- Custom variables -->
+  <Variable name="approvalTypes" />
+  <Variable name="currentApprovalType" />
+  <Variable name="hasItems" />
+  <Variable name="tempApprovalSetRem" />
+  <Variable name="currentIndex" />
+  <Variable name="requestType"  input="true"/>
+  <Variable name="approvalTypeObj" />
+  <Variable name="workItemConfig" />
+  <Variable name="emailArgList" input="true" />
+  <Variable name="updateStandardPostApproveEmails" input="true" />
+  
+  <!-- **************************************************************************
+  TempVal - Specified in workflows to distinguish between regular account provisioning request
+  i.e. LCE initiated, and an account provisioning request from the dashboard that may need
+  additional information from the requester (Service accounts is an example)
+ **************************************************************************-->
+  <Variable name="tempVal" input="true"/>
+  <Variable name="approvedTo" input='true' />
+  <Variable name="rejectedTo" input='true' />
+  <Variable name="approvedTemplate" input='true' />
+  <Variable name="rejectedTemplate" input='true' />	
+  
+  <!-- New variable to be a generic container of attributes that can be set at highest level
+  	workflow and then referenced in various rules -->
+  <Variable name="spExtAttrs" input='true' />	
+  <Variable name="approvalForm" />
+  <Variable name="workItemRenderer" initializer="lcmWorkItemRenderer.xhtml" />
+  <Variable name="identityModel" input="true" />
+  
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Approval Library"/>
+    <Reference class="sailpoint.object.Rule" name="LCM Workflow Library"/>
+    <Reference class="sailpoint.object.Rule" name="SP Approval Framework Standard Rules Library"/>
+    <Reference class="sailpoint.object.Rule" name="SPCONF Approval Framework Rules Library"/>
+  </RuleLibraries>
+  
+  <Step icon="Start" name="Start">
+    <Transition to="Get Approval Types"/>
+  </Step>
+  
+  <Step name="Get Approval Types" resultVariable="approvalTypes">
+    <Arg name="tempVal" value="ref:tempVal"/>
+  	<Script>
+  		<Source>
+  			return stdGetApprovalTypesStepRule(context, workflow);
+  		</Source>
+  	</Script>
+  	<Transition to="Get Next Approval Type" when="script:approvalTypes != null &amp;&amp; approvalTypes.size() > 0" />
+  	<Transition to="Auto Approve" />
+  </Step>
+  
+  <Step name="Get Next Approval Type" resultVariable="currentApprovalType">
+    <Arg name="tempVal" value="ref:tempVal"/>
+  	<Script>
+  		<Source>
+  			return stdGetNextApprovalTypeStepRule(workflow, approvalTypes);
+  		</Source>
+  	</Script>
+  	<Transition to="Do Pre Approval" when="script:currentApprovalType != null" />
+  	<Transition to="Cleanup" />
+  </Step>
+  
+  <Step name="Do Pre Approval" resultVariable="hasItems">
+    <Arg name="tempVal" value="ref:tempVal"/>
+  	<Script>
+  		<Source>
+  			return stdPreApprovalStepRule(context, workflow, currentApprovalType);
+  		</Source>
+  	</Script>
+  	<Transition to="Filter ApprovalSet" when="script:hasItems == true"/>
+  	<Transition to="Get Next Approval Type" when="script:approvalTypes != null" />
+  	<Transition to="Cleanup" />
+  </Step>
+  
+    
+  <Step name="Filter ApprovalSet" action="script:filterApprovalSet(approvalSet,includeRejectedItemsInApprovalChain,false)" icon="Task"  resultVariable="tmpApprovalSet">
+    
+    <!-- TODO:  CHANGE TRANSITION TO BUILD FORM -->
+    <!--  
+    <Transition to="Set Up Custom Approval Form" when="script:!tmpApprovalSet.isEmpty()"/>
+    -->
+    <Transition to="Set Up Custom Approval Form" when="script:!tmpApprovalSet.isEmpty()"/>
+    <Transition to="Get Next Approval Type" when="script:approvalTypes != null" />
+  	<Transition to="Cleanup" />
+  </Step>
+  
+  <Step icon="Default" name="Set Up Custom Approval Form" resultVariable="approvalForm">
+    <Script>
+      <Source>
+		return stdBuildCustomApprovalForm(context, workflow, currentApprovalType, fallbackApprover);</Source>
+    </Script>
+    <Transition to="Do Approval Work Item Renderer" when="script:workItemRenderer.equals(&quot;workItemForm.xhtml&quot;)"/>
+    <Transition to="Do Approval"/>
+  </Step>
+  
+  <Step icon="Approval" name="Do Approval">
+    
+    <!-- renderer="lcmEditableWorkItemRenderer.xhtml" -->
+    <Approval mode="ref:approvalMode" renderer="lcmEditableWorkItemRenderer.xhtml"
+    		send="currentApprovalType, tempApprovalSetRem,identityDisplayName,
+    		identityName,policyViolations,identityModel" 
+    		return="identityModel">
+      <OwnerScript>
+      	<Source>
+      		  import sailpoint.workflow.IdentityRequestLibrary;
+			  import sailpoint.object.*;
+			  import sailpoint.tools.Util;
+			  import sailpoint.workflow.WorkflowContext;
+			  
+			  Object owner = stdGetApproversStepRule(context, workflow, currentApprovalType, fallbackApprover);
+      	
+      		if (owner == null){
+      			System.out.println("Auto approve since there's no owner");
+      			doAutoApprove(approvalSet);
+      			try {
+		          	Attributes args = wfcontext.getArguments();
+		          	String irId = Util.getString(args,"identityRequestId");
+		          	//System.out.println("First try: " + irId);
+			        if ( irId == null ) {
+			            WorkflowContext top = wfcontext.getRootContext();
+			            irId = (String)top.getVariable("identityRequestId");
+			            System.out.println("Second try: " + irId);
+			        }
+		          
+		          } catch (Exception){
+		          	System.out.println("Exception: " + e.toString());
+		          }
+	          
+	          IdentityRequestLibrary.assimilateWorkItemApprovalSetToIdentityRequest(wfcontext, approvalSet);
+      		}
+      	
+      		return owner;
+      	</Source>
+      </OwnerScript>
+      <AfterScript>
+        <Source>
+        
+          import sailpoint.workflow.IdentityRequestLibrary;
+		  import sailpoint.object.*;
+		  import sailpoint.tools.Util;
+		  import sailpoint.workflow.WorkflowContext;
+		  
+		  import org.apache.commons.logging.Log;
+		  import org.apache.commons.logging.LogFactory;
+	
+		  private Log logger = LogFactory.getLog("rule.SP.ApprovalFramework.RulesLibrary");
+          
+          assimilateWorkItemApprovalSet(wfcontext, item, approvalSet);
+          
+		  try {
+		  	stdApprovalAfterScriptStepRule(context, approvalSet, tempApprovalSetRem, currentApprovalType, identityModel, workflow);
+          } catch (Exception e){
+          	logger.error("Exception doing after script rule: " + e.toString());
+          }
+          
+          
+          
+          //System.out.println("In approval.  debug get identityRequestId");
+          try {
+          	Attributes args = wfcontext.getArguments();
+          	String irId = Util.getString(args,"identityRequestId");
+          	logger.trace("First try: " + irId);
+	        if ( irId == null ) {
+	            WorkflowContext top = wfcontext.getRootContext();
+	            irId = (String)top.getVariable("identityRequestId");
+	            logger.trace("Second try: " + irId);
+	        }
+          
+          } catch (Exception){
+          	logger.error("Exception: " + e.toString());
+          }
+          
+          IdentityRequestLibrary.assimilateWorkItemApprovalSetToIdentityRequest(wfcontext, approvalSet);
+          auditDecisions(item);
+        </Source>
+      </AfterScript>
+      <ValidatorScript>
+      	<Source>
+      		import sailpoint.object.*;
+      		ApprovalSet approvalSet = (ApprovalSet) item.getAttribute("approvalSet");
+      		return stdApprovalValidatorScriptStepRule(context, approvalSet, item);
+      	</Source>
+      </ValidatorScript>
+      <Arg name="workItemRequester" value="script:(requestor != null) ? requestor : launcher"/>
+      <Arg name="approvalSet" value="ref:tmpApprovalSet"/>
+      <Arg name="tempVal" value="ref:tempVal"/>
+      <Arg name="workItemType" value="Approval" />
+      <Arg name="workItemDescription" value="$(workItemConfig.workItemDescription) "/>
+      <Arg name="workItemElectronicSignature" value="$(workItemConfig.electronicSignature)"/>
+      <Arg name="workItemNotificationTemplate" value="ref:notifyEmailTemplate"/>
+      <Arg name="workItemTargetClass" value="sailpoint.object.Identity"/>
+      <Arg name="workItemForm" value="ref:approvalForm"/>
+      <Arg name="workItemFormBasePath" value="identityModel"/>
+      <Arg name="renderer" value="ref:workItemRenderer" />
+      <!-- 
+      <Arg name="workItemTargetName" value="$(identityName)"/>
+      <Arg name="workItemTargetId" value="$(identityId)"/> -->
+      <WorkItemConfig escalationStyle="$(workItemConfig.escalationType)" hoursBetweenReminders="$(workItemConfig.hoursBetweenReminders)" 
+      	hoursTillEscalation="$(workItemConfig.hoursTillEscalation)" maxReminders="$(workItemConfig.maxReminders)">
+        <ReminderEmailTemplateRef>
+          <Reference class="sailpoint.object.EmailTemplate" name="ref:workItemConfig.reminderEmailTemplate"/>
+        </ReminderEmailTemplateRef>
+        <EscalationEmailTemplateRef>
+          <Reference class="sailpoint.object.EmailTemplate" name="ref:workItemConfig.escalationEmailTemplate"/>
+        </EscalationEmailTemplateRef>
+        <EscalationRuleRef>
+          <Reference class="sailpoint.object.Rule" name="ref:workItemConfig.escalationRule"/>
+        </EscalationRuleRef>
+      </WorkItemConfig>
+    </Approval>
+    <Description>
+      If approvalScheme contains manager, send an approval for all 
+      requested items in the request. This approval will get the entire       
+      approvalSet as part of the workitem.
+    </Description>
+    <Transition to="Get Next Approval Type" when="script:approvalTypes != null"/>
+    <Transition to="Cleanup"/>
+  </Step>
+  
+  <Step icon="Approval" name="Do Approval Work Item Renderer">
+    
+    <!-- renderer="lcmEditableWorkItemRenderer.xhtml" -->
+    <Approval mode="ref:approvalMode" renderer="workItemForm.xhtml"
+    		send="currentApprovalType, tempApprovalSetRem,identityDisplayName,
+    		identityName,policyViolations,identityModel" 
+    		return="identityModel">
+      <OwnerScript>
+      	<Source>
+      		  import sailpoint.workflow.IdentityRequestLibrary;
+			  import sailpoint.object.*;
+			  import sailpoint.tools.Util;
+			  import sailpoint.workflow.WorkflowContext;
+			  
+			  Object owner = stdGetApproversStepRule(context, workflow, currentApprovalType, fallbackApprover);
+      	
+      		if (owner == null){
+      			System.out.println("Auto approve since there's no owner");
+      			doAutoApprove(approvalSet);
+      			try {
+		          	Attributes args = wfcontext.getArguments();
+		          	String irId = Util.getString(args,"identityRequestId");
+		          	//System.out.println("First try: " + irId);
+			        if ( irId == null ) {
+			            WorkflowContext top = wfcontext.getRootContext();
+			            irId = (String)top.getVariable("identityRequestId");
+			            System.out.println("Second try: " + irId);
+			        }
+		          
+		          } catch (Exception){
+		          	System.out.println("Exception: " + e.toString());
+		          }
+	          
+	          IdentityRequestLibrary.assimilateWorkItemApprovalSetToIdentityRequest(wfcontext, approvalSet);
+      		}
+      	
+      		return owner;
+      	</Source>
+      </OwnerScript>
+      <AfterScript>
+        <Source>
+          import sailpoint.workflow.IdentityRequestLibrary;
+		  import sailpoint.object.*;
+		  import sailpoint.tools.Util;
+		  import sailpoint.workflow.WorkflowContext;
+		  
+          
+          assimilateWorkItemApprovalSet(wfcontext, item, approvalSet);
+		  stdApprovalAfterScriptStepRule(context, approvalSet, tempApprovalSetRem, currentApprovalType, identityModel, workflow);
+          
+          
+          
+          //System.out.println("In approval.  debug get identityRequestId");
+          try {
+          	Attributes args = wfcontext.getArguments();
+          	String irId = Util.getString(args,"identityRequestId");
+          	System.out.println("First try: " + irId);
+	        if ( irId == null ) {
+	            WorkflowContext top = wfcontext.getRootContext();
+	            irId = (String)top.getVariable("identityRequestId");
+	            System.out.println("Second try: " + irId);
+	        }
+          
+          } catch (Exception){
+          	System.out.println("Exception: " + e.toString());
+          }
+          
+          IdentityRequestLibrary.assimilateWorkItemApprovalSetToIdentityRequest(wfcontext, approvalSet);
+          auditDecisions(item);
+        </Source>
+      </AfterScript>
+      <ValidatorScript>
+      	<Source>
+      		import sailpoint.object.*;
+      		ApprovalSet approvalSet = (ApprovalSet) item.getAttribute("approvalSet");
+      		return stdApprovalValidatorScriptStepRule(context, approvalSet, item);
+      	</Source>
+      </ValidatorScript>
+      <Arg name="workItemRequester" value="script:(requestor != null) ? requestor : launcher"/>
+      <Arg name="approvalSet" value="ref:tmpApprovalSet"/>
+      <Arg name="tempVal" value="ref:tempVal"/>
+      <Arg name="workItemType" value="Approval" />
+      <Arg name="workItemDescription" value="$(workItemConfig.workItemDescription) "/>
+      <Arg name="workItemElectronicSignature" value="$(workItemConfig.electronicSignature)"/>
+      <Arg name="workItemNotificationTemplate" value="ref:notifyEmailTemplate"/>
+      <Arg name="workItemTargetClass" value="sailpoint.object.Identity"/>
+      <Arg name="workItemForm" value="ref:approvalForm"/>
+      <Arg name="workItemFormBasePath" value="identityModel"/>
+      <Arg name="renderer" value="ref:workItemRenderer" />
+      <!-- 
+      <Arg name="workItemTargetName" value="$(identityName)"/>
+      <Arg name="workItemTargetId" value="$(identityId)"/> -->
+      <WorkItemConfig escalationStyle="$(workItemConfig.escalationType)" hoursBetweenReminders="$(workItemConfig.hoursBetweenReminders)" 
+      	hoursTillEscalation="$(workItemConfig.hoursTillEscalation)" maxReminders="$(workItemConfig.maxReminders)">
+        <ReminderEmailTemplateRef>
+          <Reference class="sailpoint.object.EmailTemplate" name="ref:workItemConfig.reminderEmailTemplate"/>
+        </ReminderEmailTemplateRef>
+        <EscalationEmailTemplateRef>
+          <Reference class="sailpoint.object.EmailTemplate" name="ref:workItemConfig.escalationEmailTemplate"/>
+        </EscalationEmailTemplateRef>
+        <EscalationRuleRef>
+          <Reference class="sailpoint.object.Rule" name="ref:workItemConfig.escalationRule"/>
+        </EscalationRuleRef>
+      </WorkItemConfig>
+    </Approval>
+    <Description>
+      If approvalScheme contains manager, send an approval for all 
+      requested items in the request. This approval will get the entire       
+      approvalSet as part of the workitem.
+    </Description>
+    <Transition to="Get Next Approval Type" when="script:approvalTypes != null"/>
+    <Transition to="Cleanup"/>
+  </Step>
+  
+  <Step name="Auto Approve">
+  	<Script>
+  		<Source>
+  			import sailpoint.workflow.IdentityRequestLibrary;
+		  	import sailpoint.object.*;
+		  	
+  			doAutoApprove(approvalSet);
+  			
+  			
+  			//System.out.println("In approval.  debug get identityRequestId");
+	          try {
+	          	Attributes args = wfcontext.getArguments();
+	          	String irId = Util.getString(args,"identityRequestId");
+	          	//System.out.println("First try: " + irId);
+		        if ( irId == null ) {
+		            WorkflowContext top = wfcontext.getRootContext();
+		            irId = (String)top.getVariable("identityRequestId");
+		            //System.out.println("Second try: " + irId);
+		        }
+	          
+	          } catch (Exception){
+	          	//System.out.println("Exception: " + e.toString());
+	          }
+	          
+  			IdentityRequestLibrary.assimilateWorkItemApprovalSetToIdentityRequest(wfcontext, approvalSet);
+  		</Source>
+  	</Script>
+  	<Transition to="Cleanup"/>
+  </Step>
+  <Step name="Cleanup">
+  	<Script>
+  		<Source>
+  			//approvalTypes = null;
+  			workflow.put("approvalTypes", null);
+  			//approvalTypesIter = null;
+  			//workflow.put("approvalTypesIter", null);
+  			workflow.put("approvalTypeObj", null);
+  			workflow.put("workItemConfig", null);
+  		</Source>
+  		
+  	</Script>
+  	<Transition to="Build Email Args" when="script:(isTrue(updateStandardPostApproveEmails))"/>
+  	<Transition to="end"/>
+  </Step>
+  
+  <Step name="Build Email Args" resultVariable="emailArgList">
+  	<Script>
+  		<Source>
+  			return getPostApprovalEmailArgs(context, approvalSet, workflow);
+  		</Source>
+  	</Script>
+  	<Transition to="end"/>
+  </Step>
+  
+  <Step icon="Stop" name="end"/>
+</Workflow>

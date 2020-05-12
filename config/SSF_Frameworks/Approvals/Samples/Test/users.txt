@@ -1,0 +1,5 @@
+USER_ID, ECN, FIRSTNAME, LASTNAME, EMAIL, OTHER_GROUPS_LIST, PRIMARY_GROUP
+jmanager,1234,John,Manager,j.manager@mail.com, GroupA, GroupB
+howner,13589,House,Owner,h.owner@email.com,GroupA,GroupB
+directordude,1888,Director,Dude,d.dude@mail.com,GroupA,GroupB
+testuser1,39393,Test,User,t.user@mail.com,GroupA,GroupB

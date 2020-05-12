@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="Sample Role Composition Certification Exclusion Set">
+  <Attributes>
+    <Map>
+      <entry key="entitySelectors">
+        <value>
+          <List>
+            <CompositeFilter operation="AND">
+              <Filter ignoreCase="true" operation="EQ" property="name" value="Accounts Payable Approver"/>
+              <Filter operation="EQ" property="class" value="Bundle"/>
+            </CompositeFilter>
+          </List>
+        </value>
+      </entry>
+      <entry key="itemSelectors">
+        <value>
+          <List>
+            <CompositeFilter operation="AND">
+              <Filter ignoreCase="true" operation="EQ" property="name" value="Employment Manager - IT"/>
+              <Filter operation="EQ" property="class" value="Bundle"/>
+            </CompositeFilter>
+            <CompositeFilter operation="AND">
+              <Filter ignoreCase="true" operation="EQ" property="application.name" value="Active_Directory"/>
+              <Filter operation="EQ" property="class" value="Profile"/>
+            </CompositeFilter>
+          </List>
+        </value>
+      </entry>
+      <entry key="mode" value="EXCLUDE"/>
+      <entry key="reason" value="Exclude an entity roles and item roles and profiles example"/>
+    </Map>
+  </Attributes>
+</Custom>

@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.CertificationRefreshExecutor" name="Continuous Certification Refresh" progressInterval="5000" progressMode="Percentage" subType="task_item_type_certification_refresh" template="true" type="CertificationRefresh">
+  <Description>
+            Refreshes all continuous certifications to bring them up-to-date with the current state of the identities in the system.
+        </Description>
+  <Signature>
+    <Returns>
+      <Argument name="certificationsCreated" type="int">
+        <Prompt>task_out_cert_refresh_certs_created</Prompt>
+      </Argument>
+      <Argument name="certificationsDeleted" type="int">
+        <Prompt>task_out_cert_refresh_certs_deleted</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="SPCONF Mover Mappings Custom">
+	<Attributes>
+		<Map>
+		
+			<!--  Enter the Trigger Type.  
+					Options Include:
+						- Selector:  Will dynamically re-evaluate all target attributes and update as necessary.
+						- Compare Links:  Will review the links defined in the Compare Links entry below.  If any schema attributes
+							have changed from the previous to the new identity, the workflow will launch.   
+						- Custom Rule:  Will call isMoverCustomTriggerRule in SPCONF Mover Rules Library.  
+			-->
+			<entry key="Trigger Type" value="Compare Links" />		
+			
+			<!--  Create the Selector to determine whether to kick off the Mover -->
+			<entry key="Trigger Field Selector">
+				<value>
+					    <IdentitySelector>
+					      <MatchExpression and="true">
+					        <MatchTerm name="personStatus" value="A"/>
+					        <MatchTerm name="joinerDate" value="NULL"/>
+					      </MatchExpression>
+					    </IdentitySelector>
+				</value>
+			</entry>
+			
+			<!-- Per link that is being compared, specify the schema attributes that should be compared.
+					This mechanism is used in case it is desired not to launch if a user has only been
+					terminated or rehired, meaning it will only check to see if other significant attributes have changed.
+					 -->
+			<entry key="Trigger Compare Links Schemas">
+				<value>
+					<Attributes>
+						<Map>
+							<entry key="HR">
+								<value>
+									<List>
+										<String>DEPARTMENT_ID</String>
+										<String>MGR_ID</String>
+									</List>
+								</value>
+							</entry>
+						</Map>
+					</Attributes>
+				</value>
+			</entry>
+			
+			<!-- Specify the links to compare -->
+			<entry key="Trigger Compare Links">
+				<value>
+					<List>
+						<String>HR</String>
+					</List>
+				</value>
+			</entry>
+			
+			<!--  Enter the Plan Construction Types.  More than one can be selected.  
+				The order processed is always:  Dynamic Roles, Attribute Synch, Custom Rule.  
+					Options Include:
+						- Dynamic Roles:  Will dynamically assign roles found in the organizational role
+							defined by the %%SP_BIRTHRIGHT_ROLES_ORGANIZATION_ROLE%%. 
+							See the role assignment framework.  
+						- Attribute Synch:  Use the attribute synch framework to extend the plan with target
+							attribute updates
+						- Custom Rule:  Will call buildCustomMoverPlan in SPCONF Mover Rules Library.  
+			-->
+			<entry key="Plan Construction Types" >
+				<value>
+					<List>
+						<String>Dynamic Roles</String>
+						<String>Attribute Synch</String>
+						<String>Custom Rule</String>
+					</List>
+				</value>
+			</entry>		
+			
+			<!--  Set to true to launch a certification -->
+			<entry key="Launch Manager Cert" value="false" />
+			
+			
+		</Map>
+	</Attributes>
+</Custom>

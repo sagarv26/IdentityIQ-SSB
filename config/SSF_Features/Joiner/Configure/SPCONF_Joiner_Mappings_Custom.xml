@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="SPCONF Joiner Mappings Custom">
+	<Attributes>
+		<Map>
+		
+			<!--  Enter the Trigger Type.  
+					Options Include:
+						- Selector:  Will dynamically re-evaluate all target attributes and update as necessary.
+						- Custom Rule:  Will call isJoinerCustomTriggerRule in SP CONF Joiner Rules Library .  
+			-->
+			<entry key="Trigger Type" value="Selector" />	
+		
+			<!--  Create the Selector to determine whether to kick off the Joiner -->
+			<entry key="Trigger Field Selector">
+				<value>
+					    <IdentitySelector>
+					      <MatchExpression and="true">
+					        <MatchTerm name="personStatus" value="A"/>
+					        <MatchTerm name="joinerDate" value="NULL"/>
+					      </MatchExpression>
+					    </IdentitySelector>
+				</value>
+			</entry>
+			
+			<!--  Enter the Birthright Assignment Type.  
+					Options Include:
+						- Dynamic Roles:  Will dynamically assign roles found in the organizational role
+							defined by the %%SP_BIRTHRIGHT_ROLES_ORGANIZATION_ROLE%%. 
+							See the role assignment framework.  
+						- Default Roles:  Will assign all roles listed in the Default Assignments entry below
+						- Default Apps:  Will assign all apps listed in the Default Assignments entry below.
+							NOTE: REQUIRES A FIELD VALUE RULE TO GENERATE THE NATIVE ID ON THE 
+							FIELD WHOSE NAME IS THE SAME AS THE ACCOUNT SCHEMA'S IDENTITY ATTRIBUTE.
+							FOR EXAMPLE, if the LDAP identityAttribute is dn, then the dn
+							must use a field value rule to set this value.  
+						- Custom Rule:  Will call buildCustomJoinerPlan in SP CONF Joiner Rules Library.  
+			-->
+			<entry key="Birthright Assignment Type" value="Dynamic Roles" />		
+			
+			
+			<!--  Used if Birthright Assignment Types is either Default Roles or Default Apps -->
+			<entry key="Default Assignments">
+				<value>
+					<List>
+						<!-- Enter the names of the Bundles or Applications for automatic
+							assignment -->
+						<!--  Examples if roles: -->
+						<String>Finance Role 1</String>
+						
+						
+						<!-- Examples if apps: -->
+						<String>Active Directory</String>
+						<String>Enterprise LDAP</String>
+						
+					</List>
+				</value>
+			</entry>
+			
+		</Map>
+	</Attributes>
+</Custom>

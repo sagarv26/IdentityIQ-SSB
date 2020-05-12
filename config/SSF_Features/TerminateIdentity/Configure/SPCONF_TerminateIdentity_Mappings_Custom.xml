@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="SPCONF Terminate Identity Mappings Custom">
+	<Attributes>
+		<Map>
+		
+			<entry key="Use Custom Entry Form" value="true" />
+			<entry key="Entry Form Name" value="SP Terminate Identity Entry Form" />
+			<entry key="Confirm Form Name" value="SP Terminate Identity Confirm Form" />
+			
+			<!--  Enter the Plan Construction Types.  More than one can be selected.  
+				The order processed is always:  Dynamic Roles, Attribute Synch, Custom Rule.  
+					Options Include:
+						- Disable Accounts:  will dynamically disable accounts tied to the cube, based on the list of
+							applications in the Disable Accounts Applications entry
+						- Delete Accounts:  will dynamically delete accounts tied to the cube, based on the list of
+							applications in the Delete Accounts Applications entry
+						- Custom Rule:  Will call out to the rule defined in the 
+							Plan Construction Custom Rule entry below.  Rule will receive an Identity object.
+							Rule must return a ProvisioningPlan.  
+			-->
+			<entry key="Plan Construction Types" >
+				<value>
+					<List>
+						<String>Disable Accounts</String>
+						<String>Delete Accounts</String>
+						<String>Custom Rule</String>
+					</List>
+				</value>
+			</entry>		
+			
+			<!-- Used if Plan Construction Type is Custom Rule -->
+			<entry key="Plan Construction Custom Rule" value="method:buildCustomTerminateIdentityPlan" />
+			
+			<!-- Used if Plan Construction Types contains Disable Accounts.  List the
+				application names that should be disabled -->
+			<entry key="Disable Accounts Applications">
+				<value>
+					<List>
+						<String>Active Directory - Main</String>
+					</List>
+				</value>
+			</entry>
+			
+			<!-- Used if Plan Construction Types contains Delete Accounts.  List the
+				application names that should be deleted -->
+			<entry key="Delete Accounts Applications">
+				<value>
+					<List>
+						<String>Active Directory - Main</String>
+					</List>
+				</value>
+			</entry>
+			
+			<!-- NOTE:  IF AN APP IS ADDED TO BOTH THE DISABLE AND DELETE LISTS, DELETES WILL 
+				TAKE PRIORITY AS THEY ARE MORE STRINGENT -->
+		</Map>
+	</Attributes>
+</Custom>

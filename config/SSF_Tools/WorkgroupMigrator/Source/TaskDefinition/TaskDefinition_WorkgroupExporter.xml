@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition executor="sailpoint.services.standard.task.WorkgroupExporter" name="Workgroup Exporter" progressInterval="5000" progressMode="String" resultAction="Delete" subType="task_item_type_generic" template="true" type="Generic">
+  <Description>Export workgroups and their memberships</Description>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="Full path of the CSV file where the workgroup data will be exported to" name="exportFile" required="true" type="string">
+        <Prompt>Export file</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="totalExported" type="string">
+        <Prompt>Workgroups exported</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>

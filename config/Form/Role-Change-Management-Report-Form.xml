@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Role Change Management Report Form" type="Report">
+  <Section columns="2" label="report_role_profiles_comp_section_role_props" name="customProperties">
+    <Field columnSpan="1" displayName="rept_change_mgmt_field_change_date_start" helpKey="rept_change_mgmt_help_change_date_start" name="createStart" type="date" value="ref:createStart"/>
+    <Field columnSpan="1" displayName="rept_change_mgmt_field_change_date_end" helpKey="rept_change_mgmt_help_change_date_end" name="createEnd" type="date" value="ref:createEnd">
+      <Attributes>
+        <Map>
+          <entry key="endDate" value="true"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="rept_change_mgmt_label_status" helpKey="rept_change_mgmt_help_status" name="disabled" type="string" value="ref:disabled">
+      <AllowedValues>
+        <List>
+          <String>null</String>
+          <String>rept_change_mgmt_option_status_all</String>
+        </List>
+        <List>
+          <String>true</String>
+          <String>rept_change_mgmt_option_status_disabled</String>
+        </List>
+        <List>
+          <String>false</String>
+          <String>rept_change_mgmt_option_status_enabled</String>
+        </List>
+      </AllowedValues>
+    </Field>
+    <Field displayName="rept_change_mgmt_label_type" helpKey="rept_change_mgmt_help_type" multi="true" name="type" type="Bundle" value="ref:type">
+      <Attributes>
+        <Map>
+          <entry key="objectColumn" value="type"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="rept_change_mgmt_label_apps" helpKey="rept_change_mgmt_help_apps" multi="true" name="applications" type="Application" value="ref:applications"/>
+    <Field displayName="rept_change_mgmt_label_owners" helpKey="rept_change_mgmt_help_owners" multi="true" name="owners" type="Identity" value="ref:owners">
+      <Attributes>
+        <Map>
+          <entry key="identitySuggestFilter" value="Owner"/>
+        </Map>
+      </Attributes>
+    </Field>
+  </Section>
+</Form>
+</sailpoint>

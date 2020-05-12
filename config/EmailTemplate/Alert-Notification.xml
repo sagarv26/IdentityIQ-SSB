@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Alert Notification">
+  <Body>Alert '$alert.name'#if ($alert.displayName != null) ['$alert.displayName']#{end}  has been received#if ($alert.targetType != null ) for '$alert.targetType' '$alert.targetDisplayName'#{end}.
+  </Body>
+  <Description>
+    Email Template for notifying configured user(s) when an Alert has been acted upon.
+  </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="alert" type="Alert">
+        <Description>The alert object being acted upon.</Description>
+      </Argument>
+      <Argument name="alertDefinitionName" type="string">
+        <Description>Name of the Alert Definition triggering the action.</Description>
+      </Argument>
+      <Argument name="errorMessage" type="string">
+        <Description>Optional message containing more meaningful insight upon error</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Alert Notification</Subject>
+</EmailTemplate>
+</sailpoint>

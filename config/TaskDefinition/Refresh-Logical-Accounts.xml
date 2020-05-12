@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.CompositeAccountRefreshExecutor" name="Refresh Logical Accounts" subType="task_item_type_identity" template="true" type="Identity">
+  <Attributes>
+    <Map>
+      <entry key="refreshCompositeApplications" value="true"/>
+    </Map>
+  </Attributes>
+  <Description>
+            Perform a full refresh of all the identities.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument inputTemplate="/monitor/tasks/argTemplates/compositeAppSelect.xhtml" multi="true" name="applications" required="true" type="Application">
+        <Prompt>task_in_refresh_composite_accts_apps</Prompt>
+      </Argument>
+      <Argument name="thresholdDate" type="date">
+        <Prompt>task_in_identity_refresh_threshold</Prompt>
+      </Argument>
+      <Argument name="promoteAttributes" type="boolean">
+        <Description>
+                        When true, the identity attributes will be recalculated from the
+                        application attributes.
+                    </Description>
+        <Prompt>task_in_identity_refresh_promote_attributes</Prompt>
+      </Argument>
+      <Argument name="refreshManagerStatus" type="boolean">
+        <Description>
+                        When true, the manager status for the identities will be refreshed.
+                        The manager status is true for an identity if there is any
+                        other identity that references the first identity as a manager.
+                    </Description>
+        <Prompt>task_in_identity_refresh_refresh_manager_status</Prompt>
+      </Argument>
+      <Argument name="refreshScorecard" type="boolean">
+        <Prompt>task_in_identity_refresh_refresh_scorecard</Prompt>
+      </Argument>
+      <Argument name="checkHistory" type="boolean">
+        <Prompt>task_in_identity_refresh_check_history</Prompt>
+      </Argument>
+      <Argument name="refreshGroups" type="boolean">
+        <Prompt>task_in_identity_refresh_refresh_groups</Prompt>
+      </Argument>
+      <Argument name="checkPolicies" type="boolean">
+        <Prompt>task_in_identity_refresh_check_policies</Prompt>
+      </Argument>
+      <Argument name="policies" type="string">
+        <Prompt>task_in_identity_refresh_policies</Prompt>
+      </Argument>
+      <Argument name="refreshCertifications" type="boolean">
+        <Prompt>task_in_identity_refresh_refresh_certifications</Prompt>
+      </Argument>
+      <Argument name="refreshThreads" type="int">
+        <Prompt>task_in_identity_refresh_threads</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="total" type="int">
+        <Prompt>task_out_identity_refresh_total</Prompt>
+      </Argument>
+      <Argument name="linksRefreshed" type="int">
+        <Prompt>task_out_identity_refresh_links_refreshed</Prompt>
+      </Argument>
+      <Argument name="linksRemoved" type="int">
+        <Prompt>task_out_identity_refresh_links_removed</Prompt>
+      </Argument>
+      <Argument name="linksUnavailable" type="int">
+        <Prompt>task_out_identity_refresh_links_unavailable</Prompt>
+      </Argument>
+      <Argument name="identitiesPruned" type="int">
+        <Prompt>task_out_identity_refresh_identities_pruned</Prompt>
+      </Argument>
+      <Argument name="managers" type="int">
+        <Prompt>task_out_identity_refresh_managers</Prompt>
+      </Argument>
+      <Argument name="detectedRoleChanges" type="int">
+        <Prompt>task_out_identity_refresh_business_role_changes</Prompt>
+      </Argument>
+      <Argument name="exceptionChanges" type="int">
+        <Prompt>task_out_identity_refresh_exception_changes</Prompt>
+      </Argument>
+      <Argument name="provisioningRequests" type="int">
+        <Prompt>task_out_identity_refresh_provisioning_requests</Prompt>
+      </Argument>
+      <Argument name="provisioningErrors" type="int">
+        <Prompt>task_out_identity_refresh_provisioning_errors</Prompt>
+      </Argument>
+      <Argument name="policies" type="string">
+        <Prompt>task_out_identity_refresh_policies</Prompt>
+      </Argument>
+      <Argument name="policyViolations" type="int">
+        <Prompt>task_out_identity_refresh_policy_violations</Prompt>
+      </Argument>
+      <Argument name="policyNotifications" type="int">
+        <Prompt>task_out_identity_refresh_policy_notifications</Prompt>
+      </Argument>
+      <Argument name="scoresChanged" type="int">
+        <Prompt>task_out_identity_refresh_scores_changed</Prompt>
+      </Argument>
+      <Argument name="snapshotsCreated" type="int">
+        <Prompt>task_out_identity_refresh_snapshots_created</Prompt>
+      </Argument>
+      <Argument name="groupDefinitions" type="string">
+        <Prompt>task_out_identity_refresh_group_definitions</Prompt>
+      </Argument>
+      <Argument name="groupIndexes" type="int">
+        <Prompt>task_out_identity_refresh_group_indexes</Prompt>
+      </Argument>
+      <Argument name="unscopedIdentities" type="int">
+        <Prompt>task_out_identity_refresh_unscoped_identities</Prompt>
+      </Argument>
+      <Argument name="certificationsCreated" type="int">
+        <Prompt>task_out_identity_refresh_certifications_created</Prompt>
+      </Argument>
+      <Argument name="certificationsDeleted" type="int">
+        <Prompt>task_out_identity_refresh_certifications_deleted</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

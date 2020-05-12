@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="IdentityNowSAML" type="SAMLCorrelation">
+  <Signature>
+    <Inputs>
+      <Argument name="log">
+        <Description>
+                    Logger to take care of logging.
+                </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+                    SailPointContext
+                </Description>
+      </Argument>
+      <Argument name="assertionAttributes">
+        <Description>
+                    Map of attributes taken from the SAML assertion
+                </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="ident">
+        <Description>
+                    Matching identity based on the nameId taken from assertionAttributes
+                </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+        
+            // Imports
+            import sailpoint.object.Identity;
+
+            // Making a BIG assumption here that the nameid-format is unspecified/persitent
+
+            // Get the nameId from the assertionAttributes
+            String nameId = (String)assertionAttributes.get("nameId");
+
+            Identity ident;
+
+            if(nameId != null) {
+                // Lookup the identity based on nameId
+                ident = context.getObject(Identity.class, nameId);
+            }
+
+            return ident;
+
+        
+    </Source>
+</Rule>
+</sailpoint>

@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Policy Violation">
+  <Body>A violation of policy '$policyName' rule '$constraintName' was detected on user '$identityName'.
+    </Body>
+  <Description>
+      Email Template for notifying policy owners of violations.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="identity" type="Identity">
+        <Description>The Identity object that has the violation.</Description>
+      </Argument>
+      <Argument name="policy" type="Policy">
+        <Description>The Policy object containing the constraint that was violated.</Description>
+      </Argument>
+      <Argument name="constraint" type="BaseConstraint">
+        <Description>A subclass of BaseConstraint representing the policy rule that was violated.</Description>
+      </Argument>
+      <Argument name="violation" type="PolicyViolation">
+        <Description>The PolicyViolation object created to represent the violation.</Description>
+      </Argument>
+      <Argument name="identityName" type="string">
+        <Description>The name of the Identity object that has the violation.</Description>
+      </Argument>
+      <Argument name="policyName" type="string">
+        <Description>The name of the Policy object.</Description>
+      </Argument>
+      <Argument name="constraintName" type="string">
+        <Description>The name of the constraint (aka rule) within the policy.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Policy violation by $identityName</Subject>
+</EmailTemplate>
+</sailpoint>

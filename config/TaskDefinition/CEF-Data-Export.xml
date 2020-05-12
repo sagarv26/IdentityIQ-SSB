@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition deprecated="true" executor="sailpoint.task.CEFDataExportExecutor" formPath="/monitor/tasks/cefDataExportInclude.xhtml" name="CEF Data Export" progressInterval="5000" progressMode="String" subType="task_item_type_generic" template="true" type="Generic">
+  <Description>
+            Template for creating a CEF data export task.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="help_task_cef_database" name="database" type="string">
+        <Prompt>task_in_cef_data_export_database</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_cef_username" name="username" type="string">
+        <Prompt>task_in_cef_data_export_database_uname</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_cef_password" name="password" type="secret">
+        <Prompt>task_in_cef_data_export_database_password</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_cef_driverclass" name="driverClass" type="string">
+        <Prompt>task_in_cef_data_export_database_driverClass</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_cef_dburl" name="dbUrl" type="string">
+        <Prompt>task_in_cef_data_export_database_url</Prompt>
+      </Argument>
+      <Argument name="exportIdentities" type="boolean">
+        <Prompt>task_in_cef_data_export_identities</Prompt>
+      </Argument>
+      <Argument name="exportIdentitiesRiskScores" type="boolean">
+        <Prompt>task_in_cef_data_export_identities_risk_scores</Prompt>
+      </Argument>
+      <Argument name="exportAccounts" type="boolean">
+        <Prompt>task_in_cef_data_export_accounts</Prompt>
+      </Argument>
+      <Argument name="exportAudits" type="boolean">
+        <Prompt>task_in_cef_data_export_audits</Prompt>
+      </Argument>
+      <Argument name="exportSysLogs" type="boolean">
+        <Prompt>task_in_cef_data_export_syslogs</Prompt>
+      </Argument>
+      <Argument name="identitiesExportMode" type="string">
+        <Prompt>task_in_cef_data_export_identities_mode</Prompt>
+      </Argument>
+      <Argument name="accountsExportMode" type="string">
+        <Prompt>task_in_cef_data_export_accounts_mode</Prompt>
+      </Argument>
+      <Argument name="auditsExportMode" type="string">
+        <Prompt>task_in_cef_data_export_audits_mode</Prompt>
+      </Argument>
+      <Argument name="syslogsExportMode" type="string">
+        <Prompt>task_in_cef_data_export_syslogs_mode</Prompt>
+      </Argument>
+      <Argument name="identitiesExportFilter" type="string">
+        <Prompt>task_in_cef_data_export_identities_filter</Prompt>
+      </Argument>
+      <Argument name="accountsExportFilter" type="string">
+        <Prompt>task_in_cef_data_export_accounts_filter</Prompt>
+      </Argument>
+      <Argument name="auditsExportFilter" type="string">
+        <Prompt>task_in_cef_data_export_audits_filter</Prompt>
+      </Argument>
+      <Argument name="syslogsExportFilter" type="string">
+        <Prompt>task_in_cef_data_export_syslogs_filter</Prompt>
+      </Argument>
+      <Argument name="promoteManagedAttributes" type="boolean">
+        <Prompt>task_in_identity_refresh_promote_managed_attributes</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="identitiesExported" type="int">
+        <Prompt>task_out_cef_data_export_identities</Prompt>
+      </Argument>
+      <Argument name="accountsExported" type="int">
+        <Prompt>task_out_cef_data_export_accounts</Prompt>
+      </Argument>
+      <Argument name="auditsExported" type="int">
+        <Prompt>task_out_cef_data_export_audits</Prompt>
+      </Argument>
+      <Argument name="syslogsExported" type="int">
+        <Prompt>task_out_cef_data_export_syslogs</Prompt>
+      </Argument>
+      <Argument name="identitiesPruned" type="int">
+        <Prompt>task_out_cef_data_export_pruned_identities</Prompt>
+      </Argument>
+      <Argument name="accountsPruned" type="int">
+        <Prompt>task_out_cef_data_export_pruned_accounts</Prompt>
+      </Argument>
+      <Argument name="auditsPruned" type="int">
+        <Prompt>task_out_cef_data_export_pruned_audits</Prompt>
+      </Argument>
+      <Argument name="syslogsPruned" type="int">
+        <Prompt>task_out_cef_data_export_pruned_syslogs</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

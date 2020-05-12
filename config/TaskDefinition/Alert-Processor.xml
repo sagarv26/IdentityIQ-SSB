@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.ActivityAlertProcessorExecutor" name="Alert Processor" progressMode="String" resultAction="Delete" subType="task_item_type_activity_alerts" template="true" type="ActivityAlert">
+  <Description>
+      Process Alerts previously aggregated from Alert Aggregation.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="help_task_alert_processor_alert_filter" name="alertFilterString" type="string">
+        <Prompt>task_in_alert_processing_alert_filter</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_alert_processor_alert_unprocessed" name="unprocessedAlerts" type="boolean">
+        <Prompt>task_in_alert_processing_alert_unprocessed</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_alert_processor_alert_def_filter" name="alertDefFilterString" type="string">
+        <Prompt>task_in_alert_processing_alert_def_filter</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_alert_processor_partitioning" name="enablePartitioning" type="boolean">
+        <Prompt>task_in_alert_processing_partitioning</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="totalProcessed" type="int">
+        <Prompt>task_out_alert_processing_total_processed</Prompt>
+      </Argument>
+      <Argument name="actionsCreated" type="int">
+        <Prompt>task_out_alert_agg_actions_created</Prompt>
+      </Argument>
+      <Argument name="matchedAlerts" type="int">
+        <Prompt>task_out_alert_processing_matched_alerts</Prompt>
+      </Argument>
+      <Argument name="unmatchedAlerts" type="int">
+        <Prompt>task_out_alert_processing_unmatched_alerts</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

@@ -1,0 +1,387 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="LCM Workflow Library">
+  <Source>
+    
+      import sailpoint.api.Provisioner;
+      import sailpoint.api.SailPointFactory;
+      import sailpoint.api.SailPointContext;
+      import sailpoint.object.ApprovalSet;
+      import sailpoint.object.ApprovalItem;
+      import sailpoint.object.AuditEvent;
+      import sailpoint.object.Comment;
+      import sailpoint.object.Field;
+      import sailpoint.object.Form;
+      import sailpoint.object.Filter;
+      import sailpoint.object.Identity;
+      import sailpoint.object.ProvisioningPlan;
+      import sailpoint.object.ProvisioningPlan.AccountRequest;
+      import sailpoint.object.ProvisioningPlan.AttributeRequest;
+      import sailpoint.object.ProvisioningProject;
+      import sailpoint.object.QueryOptions;
+      import sailpoint.object.SignOffHistory;
+      import sailpoint.object.Source;
+      import sailpoint.object.Workflow;
+      import sailpoint.object.Workflow.Approval;
+      import sailpoint.object.WorkItem;
+      import sailpoint.object.WorkItem.OwnerHistory;
+      import sailpoint.server.Auditor;
+      import sailpoint.tools.Util;
+      import sailpoint.workflow.IdentityLibrary;
+      import sailpoint.workflow.WorkflowContext;
+
+      /**
+       * Build an event per forward so there is a record 
+       * that the owner changed from the original 
+       * owner.
+       */
+      public void auditWorkItemOwnerHistory(WorkItem item) {
+          List ownerHistories = item.getOwnerHistory();
+          if ( Util.size(ownerHistories) &gt; 0 ) {
+              String action = "Forward";
+              if ( Auditor.isEnabled(action) ) {
+                  for ( OwnerHistory history : ownerHistories ) {
+                      AuditEvent event = new AuditEvent();
+                      event.setTrackingId(wfcontext.getWorkflow().getProcessLogId());
+                      event.setAction(action);
+                      event.setTarget(item.getTargetName());
+                      event.setAttribute("workitem", item.getName());
+                      String oldOwner = history.getOldOwner();
+                      if ( oldOwner != null ) 
+                          event.setAttribute("oldOwner", oldOwner);
+                      String source = history.getEffectiveSource();
+                      event.setSource(source);
+                      String comment = history.getComment();
+                      if ( comment != null ) 
+                          event.setAttribute("comment", comment);
+                      String newOwner = history.getNewOwner();
+                      if ( newOwner != null ) 
+                          event.setAttribute("newOwner", newOwner);
+
+                      // djs: for now set this in both places to avoid needing
+                      // to upgrade.  Once we have ui support for "interface"
+                      // we can remove the map version
+                      event.setAttribute("interface", Source.LCM.toString());
+                      event.setInterface(Source.LCM.toString());
+
+                      Auditor.log(event);
+                  }
+              }
+          }
+      }
+
+      /**
+       * Build a single "comment" event for all of the comments
+       * that were entered during a workitems lifecycle.
+       */
+      public void auditWorkItemComments(WorkItem item) {
+          List comments = item.getComments();
+          if ( Util.size(comments) &gt; 0 ) {
+              String action = "Comment";
+              if ( Auditor.isEnabled(action) ) {
+                  AuditEvent event = new AuditEvent();
+                  event.setTrackingId(wfcontext.getWorkflow().getProcessLogId());
+                  event.setAction(action);
+                  event.setTarget(item.getTargetName());
+                  event.setAttribute("workitem", item.getName());
+
+                  List commentStrings = new ArrayList();
+                  for ( Comment comment : comments ) {
+                      commentStrings.add(comment.toString());
+                  }
+                  event.setAttribute("comments", commentStrings);
+                  // djs: for now set this in both places to avoid needing
+                  // to upgrade.  Once we have ui support for "interface"
+                  // we can remove the map version
+                  event.setAttribute("interface", Source.LCM.toString());
+                  event.setInterface(Source.LCM.toString());
+                  Auditor.log(event);
+              }
+          }
+      }
+
+      /**
+       * Determine the name to use as the "source" of an LCM work item
+       * completion audit.  This should be the name of the identity that
+       * closed the item.  This will be different than the item owner if the
+       * owner is a work group.
+       */
+     public String getAuditSource(WorkItem item) {
+
+         String actor = context.getUserName();
+         Identity ident = context.getObjectByName(Identity.class, actor);
+         if (ident != null)
+             actor = ident.getDisplayName();
+         else {
+             // must be in the background with a pseudo system name
+             // fall back to item owner
+             ident = item.getOwner();
+             if (ident != null)
+                 actor = ident.getDisplayName();
+             else 
+                 actor = launcher;
+         }
+
+         return actor;
+     }
+
+      public void auditDecisions(WorkItem item) {
+          if ( item == null )  return; 
+
+          // there is only one Signoff, duplicated for each approval item
+          SignOffHistory signoff = null;
+          List signoffs = item.getSignOffs();
+          if (signoffs != null &amp;&amp; signoffs.size() &gt; 0)
+              signoff = (SignOffHistory)signoffs.get(0);
+
+          ApprovalSet approvalSet = (ApprovalSet)item.get("approvalSet");
+          if ( ( approvalSet != null ) &amp;&amp; ( !approvalSet.isEmpty() ) ) {
+              for ( ApprovalItem it : approvalSet.getItems() ) {
+
+                  /** Assimilate the form field changes back into the attribute requests before
+                  * creating the audit event so that the correct data is stored in the audit event. **/
+                  List attrs = it.getIIQAttributes();
+                  Form form = (Form)item.get("workItemForm");
+                  if(attrs!=null &amp;&amp; form!=null) {
+                    for(AttributeRequest attr : attrs) {
+                      
+                      Field field = form.getField(it.getApplication()+":"+attr.getName());
+                      if(field!=null) {
+                        attr.setValue(field.getValue());
+                      }
+                    }
+                    it.setValue(flattenAttributeRequests(attrs));                 
+                  }
+                                    
+                  AuditEvent event = new AuditEvent();
+                  event.setAction(AuditEvent.ActionApproveLineItem);
+                  event.setSource(getAuditSource(item));
+                  event.setTarget(identityName);
+
+                  event.setApplication(it.getApplication());
+                  event.setAccountName(it.getNativeIdentity());
+                  event.setInstance(it.getInstance());
+                  event.setAttributeName(it.getName());
+                  event.setAttributeValue(it.getCsv());                  
+                  
+                  // electronic signature
+                  if (signoff != null) {
+                     String meaning = signoff.getText();
+                     if (meaning != null) {
+                         event.setAttribute("esignatureSigner", 
+                                            signoff.getSignerDisplayableName());
+                         event.setAttribute("esignatureText", meaning);
+                         // what else, date?
+                     }
+                 }
+
+                  Date start = it.getStartDate();
+                  if ( start != null ) 
+                      event.setAttribute("startDate", start);
+                  Date end = it.getEndDate();
+                  if ( end != null ) 
+                      event.setAttribute("endDate", end);
+
+                  event.setAttribute("currentStep", wfcontext.getStep().getName());
+
+                  // group them by a generatedId
+                  event.setTrackingId(wfcontext.getWorkflow().getProcessLogId());
+                  String interfaceName = wfcontext.getString("interface");
+                  if ( interfaceName == null)
+                      interfaceName = Source.LCM.toString();
+
+                  // djs: for now set this in both places to avoid needing
+                  // to upgrade.  Once we have ui support for "interface"
+                  // we can remove the map version
+                  event.setAttribute("interface", interfaceName);
+                  event.setInterface(interfaceName);
+
+                  event.setAttribute("operation", it.getOperation());
+                  event.setAttribute("requester", launcher);
+
+                  List comments = it.getComments();
+                  if ( Util.size(comments) &gt; 0 ) {
+                      event.setAttribute("completionComments", comments);
+                  }
+
+                  String requesterComments = it.getRequesterComments();
+                  if ( Util.getString(requesterComments) != null )
+                      event.setAttribute("requesterComments", requesterComments);
+
+                  String taskResultId = wfcontext.getString(Workflow.VAR_TASK_RESULT);
+                  if ( taskResultId != null ) {
+                      event.setAttribute(Workflow.VAR_TASK_RESULT, taskResultId);
+                  }
+
+                  if ( !it.isApproved() ) {
+                      event.setAction(AuditEvent.ActionRejectLineItem);
+                  }
+
+                  if ( Auditor.isEnabled(event.getAction()) ) {
+                      Auditor.log(event);
+                      wfcontext.getSailPointContext().commitTransaction();
+                  }
+              }
+          }
+      }
+
+      public void auditManualAction(WorkItem item) {
+          if ( Auditor.isEnabled(AuditEvent.ManualChange) ) {
+              ApprovalSet set = (ApprovalSet)item.get("approvalSet");
+              if ( set != null ) {
+                  List items = set.getItems();
+                  if ( Util.size(items) &gt; 0 ) {
+                      int num = 0 ;
+                      for ( ApprovalItem it : items  ) { 
+                          num++;
+                          AuditEvent event = IdentityLibrary.buildBaseEvent(wfcontext, it);
+                          event.setSource(getAuditSource(item));
+                          event.setAction(AuditEvent.ManualChange);
+                          event.setAttribute("requester", wfcontext.getString("launcher"));
+                          event.setAttribute("op", it.getOperation());
+                          List comments = it.getComments();
+                          if ( Util.size(comments) &gt; 0 ) {
+                              event.setAttribute("completionComments", comments);
+                          }
+                          Auditor.log(event);
+                      }
+                      if ( num &gt; 0 ) 
+                          wfcontext.getSailPointContext().commitTransaction();
+                  }
+              } else {
+                  throw new GeneralException("ApprovalSet not found in the afterscript.");
+              }
+          } 
+      }
+
+      /**
+       * After an approval has been made apply the changes from the workitem back into the
+       * cart. (approvalSet)
+       */
+      public void assimilateWorkItemApprovalSet(WorkflowContext wfcontext, WorkItem item, ApprovalSet approvalSet) {
+         if (item == null) {
+              // must not be a leaf approval...
+              return;
+          }
+          // Assimilate all of the approvalItem changes into our gloval
+          // approval set
+          // 
+          // Also audit the comments and forwarding thats happend
+          ApprovalSet set = (ApprovalSet)item.get("approvalSet");
+          if ( set != null ) {
+              // Global completion comments will apply to each of the items
+              // If there are completion comments append them
+              // to any other completion comments, but typically its 
+              // one or the other
+              String completionComments = item.getCompletionComments();
+              String ownerName = null;
+              Identity id = item.getOwner();
+              if ( id != null ) {
+                  ownerName = id.getName();
+              }
+              approvalSet.assimilate(set, ownerName, completionComments, true);
+          } else {
+              throw new GeneralException("ApprovalSet not found in the afterscript.");
+          }
+          auditWorkItemOwnerHistory(item);
+          auditWorkItemComments(item);
+          wfcontext.getSailPointContext().commitTransaction();
+      }
+
+      /**
+       * Convert the approvalScheme to csv and check for the approvalType.
+       */
+      public boolean isApprovalEnabled(String approvalScheme, String approvalType) {
+          if ( approvalScheme != null )  {
+              List schemes = Util.csvToList(approvalScheme);
+              if ( Util.size(schemes) &gt; 0 ) {
+                  if ( schemes.contains(approvalType) ) {
+                      return true;
+                  }
+              }
+          }
+          return false;
+      }
+
+      public String getManagerName(String identityName, String launcher, String fallbackApprover) {
+          String managerName = getIdentityProperty(identityName, "manager.name");
+          if ( managerName != null ) {
+              if ( managerName.compareTo(launcher) == 0 ) {
+                  managerName = null;
+              } 
+          } else {
+             managerName = fallbackApprover;
+          }
+          return managerName;
+      }
+
+      /**
+       * Take an ApprovalSet and allow filtering of rejected items and 
+       * allow clearing decisions. If includeRejected is false, only non rejected 
+       * items will be copied into the new approvalSet.   If forceDecision is
+       * true all of the previous decisions will be cleared forcing the new
+       * approver to make a decision on all items.
+       */
+      public ApprovalSet filterApprovalSet(ApprovalSet masterSet, String includeRejected, 
+                                           boolean forceDecision) {
+          ApprovalSet filtered = new ApprovalSet();
+          if ( masterSet != null ) {
+              List items = masterSet.getItems();
+              if ( !Util.otob(includeRejected) ) {
+                  items = new ArrayList();
+                  for ( ApprovalItem item : masterSet.getItems() ) {
+                      if ( !item.isRejected() ) {
+                          items.add(item);
+                      }
+                  }
+              }
+ 
+              if ( Util.size(items) &gt; 0 )  {
+                  for ( ApprovalItem item : items ) {
+                      if ( forceDecision ) { 
+                          item.setState(null);
+                      }
+                      filtered.add(item); 
+                  } 
+              } 
+          }
+          return filtered;
+      }
+
+      //Filter items from the currentSet that are rejected in the masterSet
+      public void filterRejectsFromApprovalSet(ApprovalSet masterSet, ApprovalSet currentSet) {
+        if (currentSet != null &amp;&amp; !Util.isEmpty(currentSet.getItems())) {
+            Iterator it = currentSet.getItems().iterator();
+            while(it.hasNext()) {
+                ApprovalItem currentItem = (ApprovalItem)it.next();
+                //Find the item in the global ApprovalSet
+                ApprovalItem globalItem = masterSet.find(currentItem);
+                if (globalItem != null &amp;&amp; globalItem.isRejected()) {
+                    //remove from the current approval
+                    it.remove();
+                }
+            }
+        }
+
+      }
+
+      //Set decisions on the currentSet to those in the masterSet
+      public void setPreviousDecisionsOnApprovalSet(ApprovalSet masterSet, ApprovalSet currentSet) {
+        if (currentSet != null &amp;&amp; !Util.isEmpty(currentSet.getItems())) {
+            Iterator it = currentSet.getItems().iterator();
+            while(it.hasNext()) {
+                ApprovalItem currentItem = (ApprovalItem)it.next();
+                //Find the item in the global ApprovalSet
+                ApprovalItem globalItem = masterSet.find(currentItem);
+                if (globalItem != null) {
+                    currentItem.setState(globalItem.getState());
+                }
+            }
+        }
+      }
+
+    
+  </Source>
+</Rule>
+</sailpoint>

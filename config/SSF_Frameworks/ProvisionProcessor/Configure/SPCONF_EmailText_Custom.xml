@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="SPCONF Email Text Mappings Custom">
+  <Attributes>
+    <Map>
+    	<entry key="SAMPLE APP">
+    		<value>
+    			<Attributes>
+    				<Map>
+    					<entry key="Create">
+    						<value>
+    							<String>
+    								&lt;p&gt;ENTER CUSTOM INSTRUCTIONS TO SEND WHEN AN ACCOUNT IS CREATED
+    							&lt;/p&gt;
+    							</String>
+    						</value>
+    					</entry>
+    				</Map>
+    			</Attributes>
+    		</value>
+    	</entry>
+    </Map>
+   </Attributes>
+</Custom>

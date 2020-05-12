@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.CertificationDetailReport" formPath="/analyze/reports/certificationReportArgs.xhtml" name="Access Review Decision Report" progressMode="Percentage" resultAction="Rename" subType="Access Review and Certification Reports" template="true" type="Report">
+  <Attributes>
+    <Map>
+      <entry key="handlerPageSize" value="25"/>
+      <entry key="jasperTemplate" value="CertificationDetailReport"/>
+    </Map>
+  </Attributes>
+  <Description>
+            Displays information on current certifications in the systems and the decisions made by system users in detailed format.
+        </Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessCertificationDecisionReport"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument multi="true" name="applications" type="Application">
+        <Description>rept_input_cert_report_apps</Description>
+      </Argument>
+      <Argument multi="true" name="managers" type="Identity">
+        <Description>rept_input_cert_report_mgrs</Description>
+      </Argument>
+      <Argument multi="true" name="creationDateStartUse" type="boolean">
+        <Description>rept_input_cert_report_create_dt_start_use</Description>
+      </Argument>
+      <Argument name="creationDateStart" type="date">
+        <Description>rept_input_cert_report_create_dt_start</Description>
+      </Argument>
+      <Argument multi="true" name="creationDateEndUse" type="boolean">
+        <Description>rept_input_cert_report_create_dt_end_use</Description>
+      </Argument>
+      <Argument name="creationDateEnd" type="date">
+        <Description>rept_input_cert_report_create_dt_end</Description>
+      </Argument>
+      <Argument multi="true" name="signedDateStartUse" type="boolean">
+        <Description>rept_input_cert_report_signed_date_start_use</Description>
+      </Argument>
+      <Argument name="signedDateStart" type="date">
+        <Description>rept_input_cert_report_signed_date_start</Description>
+      </Argument>
+      <Argument multi="true" name="signedDateEndUse" type="boolean">
+        <Description>rept_input_cert_report_signed_date_end_use</Description>
+      </Argument>
+      <Argument name="signedDateEnd" type="date">
+        <Description>rept_input_cert_report_signed_date_end</Description>
+      </Argument>
+      <Argument multi="true" name="expirationDateStartUse" type="boolean">
+        <Description>rept_input_cert_report_exp_dt_start_use</Description>
+      </Argument>
+      <Argument name="expirationDateStart" type="date">
+        <Description>rept_input_cert_report_exp_dt_start</Description>
+      </Argument>
+      <Argument multi="true" name="expirationDateEndUse" type="boolean">
+        <Description>rept_input_cert_report_exp_dt_end_use</Description>
+      </Argument>
+      <Argument name="expirationDateEnd" type="date">
+        <Description>rept_input_cert_report_exp_dt_end</Description>
+      </Argument>
+      <Argument multi="true" name="tags" type="Tag">
+        <Description>rept_input_cert_report_tags</Description>
+      </Argument>
+      <Argument name="resultScope" type="Scope">
+        <Description>rept_input_result_scope</Description>
+      </Argument>
+      <Argument multi="true" name="emailIdentities" type="Identity">
+        <Description>rept_input_email_recips</Description>
+      </Argument>
+      <Argument name="REPORT_MAX_COUNT" type="int">
+        <Description>rept_input_max_rows</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

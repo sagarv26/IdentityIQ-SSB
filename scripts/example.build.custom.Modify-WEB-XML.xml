@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="services.standard.build.custom.ACME-rest.xml">
+
+	<!-- Example Custom steps to support modification of the web.xml file
+	     in an upgrade-safe fashion.  The web.xml file gets patched during IIQ
+		 patches and upgrades so we need to make modifications to it in a 
+		 patching fashion where they don't risk overwriting new lines in the 
+		 file or minimize the risk of doing so. 
+		 We do this to support ACME's REST services.
+		 -->
+	<target name="ACME-rest-config"
+	   description="Make modifications to web.xml to add ACME's REST class.">
+    	<replace file="${build}/extract/WEB-INF/web.xml">
+          <replacetoken><![CDATA[<param-value>sailpoint.rest.SailPointRestApplication</param-value>]]></replacetoken>
+          <replacevalue><![CDATA[<!-- Modified to support ACME's REST services.  See build.xml 
+		   of services standard build and build.custom.ACME-rest.xml for more details. Removed: 
+		   <param-value> sailpoint.rest.SailPointRestApplication </param-value>
+		   Added: -->  
+		   <param-value>sailpoint.rest.ACMERestExtensions</param-value>]]></replacevalue>
+		</replace>
+		<echo message="Patched file: ${build}/extract/WEB-INF/web.xml"/>	
+    </target>
+
+	<!-- The post expansion hook is called after war file is expanded to build/extract. -->
+    <target name="post.expansion.hook">
+		<!-- apply ACME's settings to web.xml for REST serv\ices -->
+		<echo message="Applying REST extensions from sailpoint.rest.ACMERestExtensions"/>
+		<antcall inheritall="true" target="ACME-rest-config"/>	
+    </target>
+
+    <target name="post.war.hook"/>
+
+    <target name="clean"/>
+
+</project>

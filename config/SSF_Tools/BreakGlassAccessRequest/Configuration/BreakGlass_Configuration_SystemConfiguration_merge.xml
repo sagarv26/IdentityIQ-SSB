@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<ImportAction name="merge">
+<Configuration name="SystemConfiguration">
+  <Attributes>
+    <Map>
+      <entry key="workflowLCMAccessRequest" value="Break Glass Provisioning"/>
+    </Map>
+  </Attributes>
+</Configuration>
+</ImportAction>
+</sailpoint>

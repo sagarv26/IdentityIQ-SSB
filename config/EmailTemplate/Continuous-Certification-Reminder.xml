@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Continuous Certification Reminder">
+  <Body>#if ($item.remindersSent &gt; 0)This is a reminder that #{end}"$itemName" in "$item.certification.name" is due for certification.  It must be completed by $spTools.formatDate($item.overdueDate,3,1).
+
+Please login to IdentityIQ and view your work item inbox to resolve this at your earliest convenience.
+    </Body>
+  <Description>
+      Email Template for the "certification required" state for continuous certifications.
+      Note that the "This is a reminder" text is not displayed on the first notification.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="item" type="CertificationItem">
+        <Description>The CertificationItem object.</Description>
+      </Argument>
+      <Argument name="itemName" type="string">
+        <Description>The name of the CertificationItem.</Description>
+      </Argument>
+      <Argument name="certification" type="Certification">
+        <Description>The Certification object.</Description>
+      </Argument>
+      <Argument name="certificationName" type="string">
+        <Description>The name of the Certification.</Description>
+      </Argument>
+      <Argument name="ownerName" type="string">
+        <Description>The name of the Identity that owns the item.</Description>
+      </Argument>
+      <Argument name="requester" type="Identity">
+        <Description>The identity object that was the scheduler of the certification.</Description>
+      </Argument>
+      <Argument name="ordinalNumReminders" type="string">
+        <Description>The number of this reminder, starting from 1.  Passed as a String.</Description>
+      </Argument>
+      <Argument name="remindersRemaining" type="string">
+        <Description>The number of reminders remaining after this one.  Passed as a String.</Description>
+      </Argument>
+      <Argument name="oldDueDate" type="date">
+        <Description>The former due date, passed as a java.util.Date.</Description>
+      </Argument>
+      <Argument name="newDueDate" type="date">
+        <Description>The new due date, passed as a java.util.Date.</Description>
+      </Argument>
+      <Argument name="nowDate" type="date">
+        <Description>The current date, passed as a java.util.Date.</Description>
+      </Argument>
+      <Argument name="created" type="date">
+        <Description>The date the item was created, passed as a java.util.Date.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Certification due for item: $itemName</Subject>
+</EmailTemplate>
+</sailpoint>

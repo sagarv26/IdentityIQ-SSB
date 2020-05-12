@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.IdentityRefreshExecutor" name="Policy Scan" subType="task_item_type_identity" template="true" type="Identity">
+  <Attributes>
+    <Map>
+      <entry key="correlateEntitlements" value="true"/>
+    </Map>
+  </Attributes>
+  <Description>
+            Template for policy scanning.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="filter" type="string">
+        <Prompt>task_in_policy_scan_filter</Prompt>
+      </Argument>
+      <Argument name="filterGroups" type="string">
+        <Prompt>task_in_identity_refresh_filter_groups</Prompt>
+      </Argument>
+      <Argument name="checkPolicies" type="boolean">
+        <Prompt>task_in_policy_scan_check_policies</Prompt>
+      </Argument>
+      <Argument name="policies" type="string">
+        <Prompt>task_in_policy_scan_policies</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="total" type="int">
+        <Prompt>task_out_policy_scan_total</Prompt>
+      </Argument>
+      <Argument name="policies" type="string">
+        <Prompt>task_out_policy_scan_policies</Prompt>
+      </Argument>
+      <Argument name="policyViolations" type="int">
+        <Prompt>task_out_policy_scan_policy_violations</Prompt>
+      </Argument>
+      <Argument name="policyNotifications" type="int">
+        <Prompt>task_out_policy_scan_policy_notifications</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

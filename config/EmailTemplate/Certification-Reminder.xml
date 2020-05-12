@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Certification Reminder">
+  <Body>$recipient.displayableName,
+
+The certification "$certification.name" is still open and needs to be completed.#if ($certification.expiration)  This certification must be finished by $spTools.formatDate($certification.expiration,3,1).#{end}  Please login to IdentityIQ to complete your work.
+
+Sincerely,
+$sender.displayableName</Body>
+  <Description>
+      Email Template for reminding a certification owner that they have a
+      certification waiting for them to complete.
+      This is an "instant" email sent on demand from the certification dashboard components.
+      See EmailBean and Emailer.compileOpenCertEmail for context.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="certification" type="Certification">
+        <Description>The Certification object we are reminding someone about.</Description>
+      </Argument>
+      <Argument name="recipient" type="Identity">
+        <Description>The Identity object of the user being reminded.</Description>
+      </Argument>
+      <Argument name="sender" type="Identity">
+        <Description>The Identity object of the user doing the reminding.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Reminder: Certification needs your attention</Subject>
+</EmailTemplate>
+</sailpoint>

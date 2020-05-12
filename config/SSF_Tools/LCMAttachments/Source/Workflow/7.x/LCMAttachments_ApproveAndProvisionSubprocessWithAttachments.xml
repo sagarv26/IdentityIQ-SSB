@@ -1,0 +1,440 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+
+<!-- **********************************************************************
+  -
+  - Modified version of Approve and Provision Subprocess to work with the 
+  - Access Request Attachments SSD component.  This will not work with 
+  - versions of IdentityIQ earlier than 7.0.  See the documentation included 
+  - with the SSD for instructions on configuring for earlier versions.
+  -
+  ********************************************************************** -->
+
+<Workflow explicitTransitions="true" name="Approve and Provision Subprocess with Attachments" type="Subprocess">
+    <Variable input="true" name="identityName">
+        <Description>The name of the identity being updated.</Description>
+    </Variable>
+    <Variable initializer="false" input="true" name="endOnManualWorkItems">
+        <Description>Option to skip requests with manual work items.</Description>
+    </Variable>
+    <Variable initializer="false" input="true" name="endOnProvisioningForms">
+        <Description>Option to skip requests with provisioning forms.</Description>
+    </Variable>
+    <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+        <Description>
+            The displayName of the identity being updated.
+            Query for this using a projection query and fall back to the name.
+        </Description>
+    </Variable>
+    <Variable input="true" name="plan">
+        <Description>The provisioning plan ready to execute.</Description>
+    </Variable>
+    <Variable input="true" name="flow">
+        <Description>
+            The name of the LCM flow that launched this workflow.
+
+            This is one of these three values:
+
+            AccountsRequest
+            EntitlementsRequest
+            RolesRequest
+        </Description>
+    </Variable>
+    <Variable editable="true" initializer="false" name="optimisticProvisioning">
+        <Description>
+            Set to true to enable optimistic provisioning.  This will cause
+            changes to the entitlements compiled from role assignments to be
+            applied immediately to the identity cube rather than waiting
+            for the next refresh/reaggregation after the provisioning system
+            completes the request.
+        </Description>
+    </Variable>
+    <Variable editable="true" initializer="true" name="foregroundProvisioning">
+        <Description>
+            Normally provisioning is done in a step that uses the "background"
+            option to force the workflow to be suspend and be resumed in a
+            background task thread.  This prevents the browser session from
+            hanging since provision can sometimes take a long time.  For demos
+            and testing it can be better to do this in the foreground so that
+            provisioning will have been performed when control is returned to the
+            user.  This prevents having to run the Perform Maintenance task to
+            see the results of the request.
+        </Description>
+    </Variable>
+    <Variable input="true" name="batchRequestItemId">
+        <Description>
+            Used by the batch interface to record back individual request item status. The specific item id for the individual request in the batch file.
+        </Description>
+    </Variable>
+    <Variable initializer="LCM User Notification" input="true" name="userEmailTemplate">
+        <Description>
+            The email template to use for user notification.
+        </Description>
+    </Variable>
+    <Variable initializer="LCM Requester Notification" input="true" name="requesterEmailTemplate">
+        <Description>
+            The email template to use for requester notification.
+        </Description>
+    </Variable>
+    <Variable initializer="LCM Manager Notification" input="true" name="managerEmailTemplate">
+        <Description>
+            The email template to use for manager notification.
+        </Description>
+    </Variable>
+    <Variable input="true" name="securityOfficerEmailTemplate">
+        <Description>
+            The email template to use for security officer notification.
+        </Description>
+    </Variable>
+    <Variable initializer="parallel" input="true" name="approvalMode">
+        <Description>
+            A string that specifies how we should handle the approvals.
+
+            By default this is serial since most of these request with
+            the exception of manager transfers will have only one approver.
+
+            parallel
+            Approvals are processed concurrently and there must be consensus,
+            we wait for all approvers to approve.  The first approver that
+            rejects terminates the entire approval.
+
+            parallelPoll
+            Approvals are processed concurrently but consensus is not required.
+            All approvals will be processed, we don't stop if there are any
+            rejections.
+
+            serial
+            Approvals are processed one at a time and there must be consensus.
+            The first approver that rejects terminates the entire approval.
+
+            serialPoll
+            Approvals are processed in order but consensus is not required.
+            All approvals will be processed, we don't stop if there are any
+            rejections.  In effect we are "taking a poll" of the approvers.
+
+            any
+            Approvals are processed concurrently, the first approver to
+            respond makes the decision for the group.
+        </Description>
+    </Variable>
+    <Variable initializer="owner" input="true" name="approvalScheme">
+        <Description>
+            A csv string that specifies how approval items should be generated
+            for the incoming request.
+
+            The value can be "none", in which case approvals are disabled.
+
+            The value can also be a combination of any of the values below
+            in any order, separated by commas. The order in which they are
+            specified is the order in which they are processed:
+
+            owner
+            The object owner gets the approval item.
+            For Role approvals this is the Role object owner.
+            For Entitlement approvals this is the Entitlement object owner.
+
+            manager
+            The manager gets the approval item.
+
+            securityOfficer
+            The identity in the variable securityOfficerName gets the approval item.
+
+            identity
+            The identities/workgroups in the variable approvingIdentities get the approval item.
+        </Description>
+    </Variable>
+    <Variable initializer="LCM Identity Update Approval" input="true" name="approvalEmailTemplate">
+        <Description>
+            The email template to use for approval notifications.
+        </Description>
+    </Variable>
+    <Variable initializer="Normal" input="true" name="workItemPriority">
+        <Description>
+            The String version of a WorkItem.Priority. This variable is
+            used to set the priority on all of the workitems generated
+            as part of this workflow and also set on the IdentityRequest
+            object.
+        </Description>
+    </Variable>
+    <Variable input="true" name="securityOfficerName">
+        <Description>
+            The name of the identity that will be sent approvals
+            during security officer approvals.
+        </Description>
+    </Variable>
+    <Variable initializer="spadmin" input="true" name="fallbackApprover">
+        <Description>
+            A String that specifies the name of the Identity that will
+            be assigned any approvals where the owner of the approver
+            can't be resolved. Example if the scheme is "owner" and the
+            application doesn't specify and owner.
+        </Description>
+    </Variable>
+    <Variable initializer="false" input="true" name="enableRetryRequest">
+        <Description>
+            When set to true it will disable the workflow retry loop and let the
+            Provision step launch requests to handle the retries.  Enabling
+            this flag will enable some older functionality.
+        </Description>
+    </Variable>
+    <Variable initializer="LCM" input="true" name="source">
+        <Description>
+            String version of sailpoint.object.Source to indicate
+            where the request originated.  Defaults to LCM.
+        </Description>
+    </Variable>
+    <Variable initializer="false" name="trace">
+        <Description>
+            Used for debugging this workflow and when set to true trace
+            will be sent to stdout.
+        </Description>
+    </Variable>
+    <Variable name="approvalSet">
+        <Description>
+            This attributes is set during the "Build Approval Set" step,
+            which builds this list by going through the ProvisioningPlan
+            to build the line items that need to be approved,
+
+            This variable includes all ApprovalItems that are part of
+            the request process and is updated during the AfterScript
+            of the approval process by assimilating the decisions
+            and comments from the Approvals copy of the ApprovalItem.
+        </Description>
+    </Variable>
+    <Variable name="approvalAssignmentRule" input="true">
+    </Variable>
+    <Variable name="project">
+        <Description>
+            ProvisioningProject which is just a compiled version of the ProvisioningPlan.
+        </Description>
+    </Variable>
+    <Variable name="policyViolations">
+        <Description>
+            List of policy violations that were found during our initial policy scan.
+            This list is passed into each work item so the approvers can see
+            pending violations.
+        </Description>
+    </Variable>
+    <Variable name="identityRequestId" output="true">
+        <Description>
+            The sequence id of the Identity request object which is stored in
+            the name field of the identity request and auto-incremented.
+        </Description>
+    </Variable>
+    <Variable name="workItemComments">
+        <Description>
+            Global comments accumulated during the workflow which should be shared
+            with other approvals. When a new approval is created, the comments in this
+            list will be added to the work item.
+        </Description>
+    </Variable>
+    <Variable input="true" name="ticketManagementApplication">
+        <Description>
+            Name of the application that can handle ticket requests.
+            When non-null the Manage Ticket Steps will be visited to open
+            tickets during the workflow lifecycle.
+        </Description>
+    </Variable>
+    <Variable input="true" name="managerElectronicSignature">
+        <Description>
+            The name of the electronic signature object that should be used when workitems
+            are completed by a manager.
+        </Description>
+    </Variable>
+    <Variable input="true" name="ownerElectronicSignature">
+        <Description>
+            The name of the electronic signature object that should be used when workitems
+            are completed by object owners.
+        </Description>
+    </Variable>
+    <Variable input="true" name="securityOfficerElectronicSignature">
+        <Description>
+            The name of the electronic signature object that should be used when workitems
+            are completed by the security officer.
+        </Description>
+    </Variable>
+    <Variable initializer="true" input="true" name="filterRejects">
+        <Description>True to filter rejected items when running in Serial/SerialPoll mode.</Description>
+    </Variable>
+    <Variable initializer="false" input="true" name="setPreviousApprovalDecisions">
+        <Description>True to pre-populate approval decisions from previous approvals.</Description>
+    </Variable>
+    <Variable input="true" name="approvalSplitPoint">
+        <Description>Approval Scheme to split on.</Description>
+    </Variable>
+    <Variable input="true" name="clearApprovalDecisions">
+        <Description>
+            True to clear any decisions on approvals built with buildCommonApprovals
+        </Description>
+    </Variable>
+    <Variable name="approvingIdentities" input="true">
+        <Description>
+            List of identities and/or workgroups names/ids that should be involved in the approval
+            process.
+        </Description>
+    </Variable>
+    <Variable input="true" name="formTemplate"/>
+    <Variable input="true" name="manualActionsEmailTemplate"/>
+    <Variable name="ownerEmailTemplate" initializer="LCM Identity Update Approval" input="true">
+        <Description>
+            Name of the email template to use when notifying the owner of pending approvals.
+        </Description>
+    </Variable>
+    <Variable input="true" initializer="false" name="splitProvisioning">
+        <Description>
+            True to tell IdentityRequest Provisioning subprocess that this is a subset of the initial provisioning plan
+        </Description>
+    </Variable>
+    <Description>Subprocess to approve and provision immediately. This is used after splitting an ApprovalSet into individual items to run in parallel.</Description>
+    <RuleLibraries>
+        <Reference class="sailpoint.object.Rule" name="LCM Workflow Library"/>
+    </RuleLibraries>
+    <Step icon="Start" name="Start" posX="20" posY="20">
+        <Transition to="Compile Project"/>
+    </Step>
+    <Step action="call:compileProvisioningProject" condition="script:(!isNull(approvalSplitPoint))" icon="Task" name="Compile Project" posX="120" posY="20" resultVariable="project">
+        <Arg name="identityName" value="ref:identityName"/>
+        <Arg name="plan" value="ref:plan"/>
+        <Arg name="requester" value="ref:launcher"/>
+        <Arg name="source" value="ref:source"/>
+        <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+        <Arg name="noApplicationTemplates">
+            <Script>
+                <Source>
+                    boolean ignoreForms = false;
+                    if ("ForgotPassword".equals(flow) || "ExpirePassword".equals(flow)) {
+                    ignoreForms = true;
+                    }
+                    return ignoreForms;
+                </Source>
+            </Script>
+        </Arg>
+        <Transition to="Build Approval Set"/>
+    </Step>
+    <Step action="call:buildSplitApprovalSet" condition="script:(!isNull(approvalSplitPoint))" icon="Task" name="Build Approval Set" posX="220" posY="20" resultVariable="approvalSet">
+        <Arg name='plan' value='ref:plan'/>
+        <Return name='approvalSet' to='approvalSet'/>
+        <Transition to="Approve"/>
+    </Step>
+    <Step condition="script:((flow == null) ||  (!&quot;UnlockAccount&quot;.equals(flow)))" icon="Approval" name="Approve" posX="320" posY="20" configForm='Provisioning Approval Step Form'>
+        <Arg name="approvalMode" value="ref:approvalMode"/>
+        <Arg name="approvalScheme" value="ref:approvalScheme"/>
+        <Arg name="approvalSet" value="ref:approvalSet"/>
+        <Arg name="approvalSplitPoint" value="ref:approvalSplitPoint"/>
+        <Arg name="approvalAssignmentRule"/>
+        <Arg name="approvingIdentities"/>
+        <Arg name="fallbackApprover" value="ref:fallbackApprover"/>
+        <Arg name="filterRejects" value="ref:filterRejects"/>
+        <Arg name="flow" value="ref:flow"/>
+        <Arg name="identityName" value="ref:identityName"/>
+        <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+        <Arg name="identityElectronicSignature"/>
+        <Arg name="identityEmailTemplate"/>
+        <Arg name="identityRequestId" value="ref:identityRequestId"/>
+        <Arg name="launcher" value="ref:launcher"/>
+        <Arg name="managerEmailTemplate" value="ref:approvalEmailTemplate"/>
+        <Arg name="managerElectronicSignature" value="ref:managerElectronicSignature"/>
+        <Arg name="ownerEmailTemplate" value="ref:approvalEmailTemplate"/>
+        <Arg name="ownerElectronicSignature" value="ref:ownerElectronicSignature"/>
+        <Arg name="project" value="ref:project"/>
+        <Arg name="plan" value="ref:plan"/>
+        <Arg name="policyViolations" value="ref:policyViolations"/>
+        <Arg name="priority" value="ref:workItemPriority"/>
+        <Arg name="securityOfficerName" value="ref:securityOfficerName"/>
+        <Arg name="securityOfficerEmailTemplate" value="ref:approvalEmailTemplate"/>
+        <Arg name="securityOfficerElectronicSignature" value="ref:securityOfficerElectronicSignature"/>
+        <Arg name="setPreviousApprovalDecisions" value="ref:setPreviousApprovalDecisions"/>
+        <Arg name="trace" value="ref:trace"/>
+        <Arg name="workItemReminderTemplate"/>
+        <Arg name="workItemHoursBetweenReminders"/>
+        <Arg name="workItemMaxReminders"/>
+        <Arg name="workItemEscalationTemplate"/>
+        <Arg name="workItemHoursTillEscalation"/>
+        <Arg name="workItemEscalationRule"/>
+        <Arg name="workItemComments"/>
+        <Arg name="clearApprovalDecisions" value="script:(!isNull(approvalSplitPoint) &amp;&amp; csvToList(approvalScheme).contains(approvalSplitPoint))"/>
+        <Return name="approvalSet"/>
+        <Return name="workItemComments"/>
+        <Return name="project"/>
+        <WorkflowRef>
+            <Reference class="sailpoint.object.Workflow" name="Provisioning Approval Subprocess with Attachments"/>
+        </WorkflowRef>
+
+        <Transition to="Update Ticket Post Approval"/>
+    </Step>
+    <Step condition="script:(ticketManagementApplication != null)" icon="Task" name="Update Ticket Post Approval" posX="470" posY="20">
+        <Arg name="action" value="postApproval"/>
+        <Arg name="priority" value="ref:workItemPriority"/>
+        <Arg name="project" value="ref:project"/>
+        <Arg name="source" value="ref:source"/>
+        <Arg name="ticketManagementApplication" value="ref:ticketManagementApplication"/>
+        <Arg name="identityRequestId" value="ref:identityRequestId"/>
+        <Arg name="ticketDataGenerationRule" value=""/>
+        <Arg name="trace" value="ref:trace"/>
+        <Description>
+            Call a subprocess to update the ticket in the ticketManagementApplication is non-null.
+
+            You can specify a specific 'ticketDataGenerationRule' here or you can also specify
+            it on the application.  It'll be read from the argument first and fall back to the '
+            application config.
+
+        </Description>
+        <WorkflowRef>
+            <Reference class="sailpoint.object.Workflow" name="Manage Ticket"/>
+        </WorkflowRef>
+        <Transition to="Provision"/>
+    </Step>
+    <Step icon="Provision" name="Provision" posX="600" posY="20">
+        <Arg name="approvalScheme" value="ref:approvalScheme"/>
+        <Arg name="approvalSet" value="ref:approvalSet"/>
+        <Arg name="fallbackApprover" value="ref:fallbackApprover"/>
+        <Arg name="foregroundProvisioning" value="ref:foregroundProvisioning"/>
+        <Arg name="formTemplate" value="Identity Update"/>
+        <Arg name="flow" value="ref:flow"/>
+        <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+        <Arg name="identityName" value="ref:identityName"/>
+        <Arg name="identityRequestId" value="ref:identityRequestId"/>
+        <Arg name="launcher" value="ref:launcher"/>
+        <Arg name="manualActionsEmailTemplate" value="Pending Manual Changes"/>
+        <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+        <Arg name="policyViolations" value="ref:policyViolations"/>
+        <Arg name="project" value="ref:project"/>
+        <Arg name="policyScheme" value="ref:policyScheme"/>
+        <Arg name="priority" value="ref:workItemPriority"/>
+        <Arg name="trace" value="ref:trace"/>
+        <Arg name="workItemComments" value="ref:workItemComments"/>
+        <Arg name="splitProvisioning" value="ref:splitProvisioning"/>
+        <Description>
+            Call the standard subprocess that will process the
+            approval decisions and do provisioning.  This
+            includes calling any configured provisioning
+            connectors and building manual actions.
+        </Description>
+        <Return name="project" to="project"/>
+        <WorkflowRef>
+            <Reference class="sailpoint.object.Workflow" name="Identity Request Provision"/>
+        </WorkflowRef>
+        <Transition to="Update Ticket Post Provision"/>
+    </Step>
+    <Step condition="script:(ticketManagementApplication != null)" icon="Task" name="Update Ticket Post Provision" posX="700" posY="20">
+        <Arg name="action" value="postProvisioning"/>
+        <Arg name="source" value="ref:source"/>
+        <Arg name="priority" value="ref:workItemPriority"/>
+        <Arg name="project" value="ref:project"/>
+        <Arg name="ticketManagementApplication" value="ref:ticketManagementApplication"/>
+        <Arg name="identityRequestId" value="ref:identityRequestId"/>
+        <Arg name="ticketDataGenerationRule" value=""/>
+        <Arg name="trace" value="ref:trace"/>
+        <Description>
+            Call a subprocess to update the ticket in the ticketManagementApplication is non-null.
+
+            You can specify a specific 'ticketDataGenerationRule' here or you can also specify
+            it on the application.  It'll be read from the argument first and fall back to the '
+            application config.
+
+        </Description>
+        <WorkflowRef>
+            <Reference class="sailpoint.object.Workflow" name="Manage Ticket"/>
+        </WorkflowRef>
+    </Step>
+</Workflow>

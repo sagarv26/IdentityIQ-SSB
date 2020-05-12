@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow libraries="Identity" name="Do Manual Actions" type="Subprocess">
+  <Variable input="true" name="identityName" required="true">
+    <Description>
+      The name of the identity object being modified.
+    </Description>
+  </Variable>
+  <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>
+      The displayName of the identity being updated.
+      This may be passed in, if not the script queries for this
+      using a projection query and falls back to the name.
+    </Description>
+  </Variable>
+  <Variable input="true" name="project" output="true" required="true">
+    <Description>
+      A ProvisioningProject object describing the modifications to the identity.
+    </Description>
+  </Variable>
+  <Variable input="true" name="priority">
+    <Description>
+      String version of WorkItem.level that will be used
+      to set the priority any generated workitems.
+    </Description>
+  </Variable>
+  <Variable initializer="spadmin" input="true" name="fallbackApprover">
+    <Description>
+      A String that specifies the name of the Identity that will 
+      be assigned any approvals where the owner of the approver 
+      can't be resolved. Example if the scheme is "owner" and the 
+      application doesn't specify and owner.
+    </Description>
+  </Variable>
+  <Variable input="true" name="doAudit">
+    <Description>
+      When true we will audit the completion of manual action work items.
+    </Description>
+  </Variable>
+  <Description>
+     Preset the unmanaged portion of a provisioning project as work items
+     to be processed manually.  This is used by the Identity Update and
+     Identity Refresh workflows.  LCM has a similar step but it audits
+     differently. Need to reconsider this and see if we can share the
+     same subprocess.
+   </Description>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Approval Library"/>
+  </RuleLibraries>
+  <Step icon="Approval" name="Manual Actions">
+    <Approval mode="parallelPoll" owner="rule:Build Manual Action Approvals" renderer="lcmManualActionsRenderer.xhtml" send="identityDisplayName,identityName">
+      <AfterScript>
+        <Source>
+          // Mark all items finished, LCM workflows do this for the dashboard
+          // widget that tracks provisioning completion (the closed loop).
+          // I'm not sure if we need that here, depends on which TaskResults
+          // the scanner looks at, but be consistent.
+
+          import sailpoint.object.ApprovalSet;
+          import sailpoint.object.ApprovalItem;
+          import sailpoint.object.WorkItem;
+
+          // must be a leaf approval
+          if (item != null) {
+            ApprovalSet set = (ApprovalSet)item.get("approvalSet");
+            if ( set != null ) {
+                List approvalItems = set.getItems();
+                for ( ApprovalItem approvalItem : approvalItems ) {
+                    approvalItem.setState(WorkItem.State.Finished);
+                }
+            }
+
+            // Audit the manual change
+            // this is in LCM Workflow Library, if we think we need the
+            // same level of auditing this will have to be brought over
+            // to IdentityLibrary
+            // if (doAudit)
+            //   auditManualAction(item);
+          }
+        </Source>
+      </AfterScript>
+      <Arg name="workItemRequester" value="$(launcher)"/>
+      <Arg name="workItemDescription" value="Manual Changes requested for User: $(identityDisplayName)"/>
+      <Arg name="workItemPriority" value="ref:priority"/>
+      <Arg name="workItemType" value="ManualAction"/>
+      <WorkItemConfig escalationStyle="none">
+        <NotificationEmailTemplateRef>
+          <Reference class="sailpoint.object.EmailTemplate" name="Pending Manual Changes"/>
+        </NotificationEmailTemplateRef>
+      </WorkItemConfig>
+    </Approval>
+    <Description>
+      Build an Approval structure for the unmanaged plan in the provisioning project.
+      The construtor is in the rule "Build Manual Action Approvals" that expects
+      to be passed launcher, project, identityName, and fallbackApprover.
+    </Description>
+  </Step>
+</Workflow>
+</sailpoint>

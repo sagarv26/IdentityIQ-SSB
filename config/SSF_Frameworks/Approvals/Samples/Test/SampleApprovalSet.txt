@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE ApprovalSet PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<ApprovalSet>
+  <ApprovalItem application="TestApp2" approver="spadmin" id="24ef7a4a82164d25a5e195c0f6be7594" name="OTHER_GROUPS_LIST" nativeIdentity="spadmin" operation="Add" owner="spadmin" state="Finished" value="2GROUPB">
+    <Attributes>
+      <Map>
+        <entry key="action" value="Add"/>
+        <entry key="attribute" value="OTHER_GROUPS_LIST"/>
+        <entry key="description"/>
+        <entry key="displayableName" value="2GROUPB"/>
+        <entry key="flow" value="AccessRequest"/>
+        <entry key="interface" value="LCM"/>
+        <entry key="name" value="2GROUPB"/>
+        <entry key="operation" value="EntitlementAdd"/>
+        <entry key="owner"/>
+      </Map>
+    </Attributes>
+  </ApprovalItem>
+  <ApprovalItem application="TestApp" approver="spadmin" id="461d622b54724d11bf5daaca607fa289" name="OTHER_GROUPS_LIST" nativeIdentity="spadmin" operation="Add" owner="spadmin" state="Finished" value="GROUPB">
+    <Attributes>
+      <Map>
+        <entry key="action" value="Add"/>
+        <entry key="attribute" value="OTHER_GROUPS_LIST"/>
+        <entry key="description"/>
+        <entry key="displayableName" value="GROUPB"/>
+        <entry key="flow" value="AccessRequest"/>
+        <entry key="interface" value="LCM"/>
+        <entry key="name" value="GROUPB"/>
+        <entry key="operation" value="EntitlementAdd"/>
+        <entry key="owner"/>
+      </Map>
+    </Attributes>
+  </ApprovalItem>
+  <ApprovalItem application="TestApp2" approver="spadmin" id="d9f3350e03a245beb12ef58c93b1ee58" name="PRIMARY_GROUP" nativeIdentity="spadmin" operation="Add" owner="spadmin" state="Finished" value="2GROUPA">
+    <Attributes>
+      <Map>
+        <entry key="action" value="Add"/>
+        <entry key="attribute" value="PRIMARY_GROUP"/>
+        <entry key="flow" value="AccessRequest"/>
+        <entry key="interface" value="LCM"/>
+        <entry key="name" value="2GROUPA"/>
+        <entry key="operation" value="EntitlementAdd"/>
+      </Map>
+    </Attributes>
+  </ApprovalItem>
+  <ApprovalItem application="TestApp" approver="spadmin" id="0bc8d9557f8042dbb2b3e5b82d86e743" name="PRIMARY_GROUP" nativeIdentity="spadmin" operation="Add" owner="spadmin" state="Rejected" value="GROUPA">
+    <Attributes>
+      <Map>
+        <entry key="action" value="Add"/>
+        <entry key="attribute" value="PRIMARY_GROUP"/>
+        <entry key="flow" value="AccessRequest"/>
+        <entry key="interface" value="LCM"/>
+        <entry key="name" value="GROUPA"/>
+        <entry key="operation" value="EntitlementAdd"/>
+      </Map>
+    </Attributes>
+  </ApprovalItem>
+</ApprovalSet>

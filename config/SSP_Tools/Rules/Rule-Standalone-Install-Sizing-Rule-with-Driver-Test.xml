@@ -1,0 +1,1389 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Sailpoint Sizing Rule">
+  <Source>       
+<![CDATA[
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.bsf.BSFException;
+
+import java.util.*;
+import java.sql.*;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+
+
+
+import sailpoint.object.*;
+import sailpoint.tools.GeneralException;
+import sailpoint.tools.Message;
+import sailpoint.api.SailPointContext;
+import sailpoint.api.Scheduler;
+import sailpoint.api.PersistenceManager;
+import sailpoint.scheduler.QuartzPersistenceManager;
+import sailpoint.Version;
+import sailpoint.server.Environment;
+import sailpoint.tools.Util;
+import sailpoint.persistence.ClassPersistenceManager;
+import sailpoint.persistence.HibernatePersistenceManager;
+
+import org.hibernate.dialect.Dialect;
+
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+
+import org.json.JSONObject;
+
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SchedulerMetaData;
+import org.quartz.impl.StdSchedulerFactory;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
+static String driverRuleName = "Detect OOTB JDBC Drivers";
+
+    
+String ruleVersion = "version 20150528";
+
+String iiqVersion = sailpoint.Version.getFullVersion();
+
+// We need to support both newer and older IIQ versions.  The Meter API changed
+// with the 6.2 release of IdentityIQ to have a more thread vs. global control. 
+// also the Util.flushIterator() method did not appear until v6.1 of IIQ.
+boolean usingIiq61OrNewer = true;
+boolean usingIiq62OrNewer = true;
+boolean usingiiq55OrNewer = true;
+if ( (iiqVersion.startsWith("3."))  ||
+     (iiqVersion.startsWith("4."))  ||
+     (iiqVersion.startsWith("5."))  ||
+     (iiqVersion.startsWith("6.0"))    ) {
+   usingIiq61OrNewer = false;
+}  
+if ( (iiqVersion.startsWith("3."))  ||
+     (iiqVersion.startsWith("4."))  ||
+     (iiqVersion.startsWith("5."))  ||
+     (iiqVersion.startsWith("6.0")) ||
+     (iiqVersion.startsWith("6.1"))    ) {
+   usingIiq62OrNewer = false;
+} 
+if ( (iiqVersion.startsWith("3."))  ||
+     (iiqVersion.startsWith("4."))  ||
+     (iiqVersion.startsWith("5.0"))  ||
+     (iiqVersion.startsWith("5.1")) ||
+     (iiqVersion.startsWith("5.2"))    ) {
+   usingIiq55OrNewer = false;
+}  
+
+
+    public String sizingRule(SailPointContext context, TaskResult taskResult){
+    
+        //Log logger = LogFactory.getLog("com.sailpoint.performance.sizingrule");
+        Logger logger = Logger.getLogger("sailpoint.performance.sizingrule");
+        HashMap jsonOutputHash = new HashMap();
+               
+        // Set up output files
+        File tempJSONfile = File.createTempFile("identityIQ-sizing-rule-output", ".json"); 
+        File tempOutputFile = File.createTempFile("identityIQ-sizing-rule-output", ".txt");
+        tempJSONfile.deleteOnExit();
+        tempOutputFile.deleteOnExit();      
+       
+        StringBuffer buffOut = new StringBuffer();
+        PrintWriter fileOut = null;
+        PrintWriter jsonFileOut = null;
+
+        try{
+            fileOut = new PrintWriter(tempOutputFile);
+            jsonFileOut = new PrintWriter(tempJSONfile);
+        } catch (FileNotFoundException e) {
+            logger.error("FileNotFoundException in SailPoint Sizing Rule",e);
+            return null;
+        }
+
+        buffOut.append("\nExecuting SailPoint Sizing Rule: " + ruleVersion + "\n");
+
+        DatabaseVersion dbv = context.getObject(DatabaseVersion.class, "main");
+
+        String systemVersion = "";
+        String schemaVersion = "";
+        String dbinfo = "";
+
+        if (dbv != null){          
+            try{
+              systemVersion = dbv.getSystemVersion();
+              if (usingiiq55OrNewer){
+                schemaVersion = dbv.getSchemaVersion();
+              }
+            } catch (Exception e){
+               logger.warn("Caught exception when checking DB Version. May be expected in older IdentityIQ version\n",e);
+            }
+        }
+
+        Connection con = null;
+        DatabaseMetaData dm = null;
+
+        try {
+            Class.forName("sailpoint.api.Scheduler");
+            con = context.getConnection();
+        } catch (ClassNotFoundException e){
+            con = context.getJdbcConnection();
+        }
+        if (con != null) {
+            dm = con.getMetaData();
+            if (dm != null)
+                dbinfo = dm.getURL();
+        }
+
+        String dbType = dm.getDatabaseProductName();
+
+        Object[] argArray = new Object[3];
+
+        // create Query objects
+
+        Filter filter = null;
+        QueryOptions qo = new QueryOptions();
+
+        // generate our numbers
+        try {
+            int count = 0;
+            Map resultMap = null;
+            int cacheCounter = 0;
+
+            buffOut.append("\n\nIIQ Installation Statistics\n");
+            buffOut.append("***************************\n");
+
+            
+            
+
+            //***********************************   IDENTITIES   **************************************
+            buffOut.append("Identity Statistics:\n");
+
+            // get total identities
+            count = countObj("sailpoint.object.Identity",null, context, logger);
+            packArgs(argArray, "  Total Identities:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("identities", count);           
+            
+
+            // get count of active identities
+            filter = Filter.eq("inactive", false);
+            count = countObj("sailpoint.object.Identity",filter, context, logger);
+            packArgs(argArray, "  Active Identities:", count);            
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("activeIdentites", count);
+
+            // get a count of inactive identities
+            filter = Filter.eq("inactive", true);
+            count = countObj("sailpoint.object.Identity",filter, context, logger);            
+            packArgs(argArray, "  Inactive Identities:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("inactiveIdentities", count);
+
+            // get a count of uncorrelated identities
+            filter = Filter.eq("correlated", false);
+            count = countObj("sailpoint.object.Identity",filter, context, logger);            
+            packArgs(argArray, "  Uncorrelated Identities:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("uncorrelatedIdentities", count);
+
+            //get a count of identity snapshots
+            count = countObj("sailpoint.object.IdentitySnapshot",null, context, logger);            
+            packArgs(argArray, "  Identity Snapshots:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("identitySnapshots", count);
+            
+            // get a count of Active and Correlated (License-applicable) Identities
+            filter = Filter.and(Filter.eq("correlated", true), Filter.eq("inactive", false));
+            count = countObj("sailpoint.object.Identity",filter, context, logger);            
+            packArgs(argArray, "  License Identities (active+correlated):", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("licenseIdentities", count);    
+
+            //******************************** IDENTITY ENTITLMENTS ****************************      
+            buffOut.append("\nIdentity Entitlements\n");
+
+            //Total IdentityEntitlements in the system
+            count = countObj("sailpoint.object.IdentityEntitlement",null, context, logger);
+            packArgs(argArray, "  Total IdentityEntitlements:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("identityEntitlement", count);      
+
+            //Get the identities with the largest number of entitlements
+            try{
+                String hqlQuery = 
+                  "select ident.name,count(ent.id) AS numEntitlements from Identity ident "
+                  + "inner join ident.identityEntitlements ent group by ident.name order by 2 desc";
+
+                QueryOptions qo = new QueryOptions();
+                qo.setOrderBy("2");
+                qo.setOrderAscending(false);  
+                qo.setResultLimit(5);
+                
+                Iterator it = context.search(hqlQuery, null, qo);
+                while (it.hasNext()) {
+                   Object [] results = it.next();
+                   String identityName = (String) results[0];
+                   String numEntitlements  = "" + results[1];     // string cast
+                   packArgs(argArray, "  Top 5 entitlement count Identity:", 
+                            identityName +": " + numEntitlements);
+                   buffOut.append(String.format("%-50s %20s%n", argArray));
+                   jsonOutputHash.put("manyLinks-" + identityName, count);                        
+                   // System.out.println(" id:" + identityName + "  links:" + numAccounts);
+                }
+               
+                    if (usingIiq61OrNewer) Util.flushIterator(it);
+            } catch (Exception e){
+                //this did not exist in older versions of IIQ
+            }           
+
+            //***********************************  APPLICATIONS  *************************************
+            buffOut.append("\nApplication statistics:\n");
+
+            // get a count of applications
+            count = countObj("sailpoint.object.Application",null, context, logger);            
+            packArgs(argArray, "  Total Applications:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("applications", count);
+
+            // get a count of applications by connector type
+            buffOut.append("  Application number by connector type:" + "\n");
+            appendHQLQuery("select type,count(*) from Application group by type", buffOut, context, logger);
+            // TODO: maybe include apps by connector type in the JSON output.
+            // TODO: address HQL output formatting
+            
+            //QueryOptions opts = new QueryOptions();
+            ArrayList composites = new ArrayList();
+            composites.add("COMPOSITE");
+            Filter isComposite = Filter.in("featuresString", composites);
+            //opts.addFilter(isComposite);
+            count = countObj("sailpoint.object.Application", isComposite, context, logger);            
+            packArgs(argArray, "  Composite Applications:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("logicalapplications", count);
+                       
+            
+
+            //***********************************  LINKS  ********************************************
+            buffOut.append("\nLink statistics:\n");
+
+            // get total links
+            count = countObj("sailpoint.object.Link",null, context, logger);            
+            packArgs(argArray, "  Links:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("accounts", count);
+            
+            // Find the Identities that have the highest numbers of Link objects.
+            // Identities with more than 50 to 100 links might cause performance
+            // issues.  Those with more than 1000 links will cause performance
+            // issues.
+            /*
+            String sql =
+               "sql:SELECT idt.name name, count(link.id) numAccounts " + 
+               "      FROM spt_link link JOIN spt_identity idt " +
+               "        ON link.identity_id = idt.id " + 
+               "     GROUP BY identity_id " +
+               "     ORDER BY numAccounts DESC, name ASC";
+             */
+             
+            String hqlQuery = 
+              "SELECT idt.name, count(link.id) AS numAccounts" +
+              "  FROM Identity AS idt JOIN idt.links AS link " +
+              " GROUP BY idt.name " +  
+              " ORDER BY 2 DESC";
+            
+            QueryOptions qo = new QueryOptions();
+            qo.setOrderBy("2");
+            qo.setOrderAscending(false);  
+            qo.setResultLimit(5);
+            
+            Iterator it = context.search(hqlQuery, null, qo);
+            while (it.hasNext()) {
+               Object [] results = it.next();
+               String identityName = (String) results[0];
+               String numAccounts  = "" + results[1];     // string cast
+               packArgs(argArray, "  Top 5 link count Identity:", 
+                        identityName +": " + numAccounts);
+               buffOut.append(String.format("%-50s %20s%n", argArray));
+               jsonOutputHash.put("manyLinks-" + identityName, count);                        
+               // System.out.println(" id:" + identityName + "  links:" + numAccounts);
+            }
+            try{
+                if (usingIiq61OrNewer) Util.flushIterator(it);
+            } catch (Exception e){
+                //this did not exist in older versions of IIQ
+            }
+
+            //***********************************  WORKITEMS  ********************************************
+            buffOut.append("\nWorkitem statistics:\n");
+
+            // get total links
+            count = countObj("sailpoint.object.WorkItem",null, context, logger);            
+            packArgs(argArray, "  WorkItems:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("workitems", count);
+            
+            // Find the Identities that have the highest numbers of workitem objects.
+                                     
+            String hqlQuery = "select work.owner.name,count(work.id) from WorkItem as work " 
+                + "group by work.owner.name order by 2 desc";
+            
+            QueryOptions qo = new QueryOptions();
+            qo.setOrderBy("2");
+            qo.setOrderAscending(false);  
+            qo.setResultLimit(5);
+            buffOut.append("\n Top 5 workitem count Identity (include workgroups):\n");
+            Iterator it = context.search(hqlQuery, null, qo);
+            while (it.hasNext()) {
+               Object [] results = it.next();
+               String identityName = (String) results[0];
+               String numItems  = "" + results[1];     // string cast
+               packArgs(argArray, "  Top 5 workitem count Identity:", 
+                        identityName +": " + numItems);
+               buffOut.append(String.format("%-50s %20s%n", argArray));
+               jsonOutputHash.put("manyItems-" + identityName, numItems);                        
+               // System.out.println(" id:" + identityName + "  links:" + numAccounts);
+            }
+            try{
+                if (usingIiq61OrNewer) Util.flushIterator(it);
+            } catch (Exception e){
+                //this did not exist in older versions of IIQ
+            }
+
+             //Find the Identities that have the highest numbers of workitem objects - exlude workgroups.
+                                     
+            String hqlQuery = "select work.owner.name,count(work.id) from WorkItem as work " 
+                + " where work.owner.workgroup=false group by work.owner.name order by 2 desc";
+            
+            QueryOptions qo = new QueryOptions();
+            qo.setOrderBy("2");
+            qo.setOrderAscending(false);  
+            qo.setResultLimit(5);
+
+            buffOut.append("\n Top 5 workitem count Identity (exclude workgroups):\n");
+            Iterator it = context.search(hqlQuery, null, qo);
+            while (it.hasNext()) {
+               Object [] results = it.next();
+               String identityName = (String) results[0];
+               String numItems  = "" + results[1];     // string cast
+               packArgs(argArray, "  Top 5 workitem count Identity:", 
+                        identityName +": " + numItems);
+               buffOut.append(String.format("%-50s %20s%n", argArray));
+               jsonOutputHash.put("manyItems-" + identityName, numItems);                        
+               // System.out.println(" id:" + identityName + "  links:" + numAccounts);
+            }
+            try{
+                if (usingIiq61OrNewer) Util.flushIterator(it);
+            } catch (Exception e){
+                //this did not exist in older versions of IIQ
+            }
+
+            //************************* IDENTITY REQUESTS****************************************
+            buffOut.append("\nIdentity Requests:\n");
+
+             // get total ldentityRequest
+            count = countObj("sailpoint.object.IdentityRequest",null, context, logger);            
+            packArgs(argArray, "  IdentityRequest:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("identityRequest", count);
+
+             // get total ldentityRequestItem
+            count = countObj("sailpoint.object.IdentityRequestItem",null, context, logger);            
+            packArgs(argArray, "  IdentityRequestItem:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("identityRequest", count);
+
+
+            //Find the Identities that have the largest Identity Requests.  
+            //for Oracle we need to use a sql query directly
+            String hqlQuery = null;
+            if (dbType.equalsIgnoreCase("Oracle")){
+              buffOut.append ("Oracle found");
+              hqlQuery = "sql: select req.target_display_name,count(item.id) from spt_identity_request" 
+                + " req inner join spt_identity_request_item item on req.id=identity_request_id group by " 
+                + " req.target_display_name order by count(item.id) desc";
+            } else {                                   
+              buffOut.append ("Oracle not found");
+              hqlQuery = "select req.targetDisplayName,count(item.id) from IdentityRequest " 
+                + "req inner join req.items item group by req.targetDisplayName order by 2 desc";
+            }
+            
+            QueryOptions qo = new QueryOptions();
+            qo.setOrderBy("2");
+            qo.setOrderAscending(false);  
+            qo.setResultLimit(5);
+
+            buffOut.append("\n Top 5 identity request size by number of request items:\n");
+            Iterator it = context.search(hqlQuery, null, qo);
+            while (it.hasNext()) {
+               Object [] results = it.next();
+               String identityDisplayName = (String) results[0];
+               String numItems  = "" + results[1];     // string cast
+               packArgs(argArray, "  Top 5 identity requests:", 
+                        identityDisplayName +": " + numItems);
+               buffOut.append(String.format("%-50s %20s%n", argArray));
+               jsonOutputHash.put("largeRequests-" + identityDisplayName, numItems);                        
+               // System.out.println(" id:" + identityName + "  links:" + numAccounts);
+            }
+            try{
+                if (usingIiq61OrNewer) Util.flushIterator(it);
+            } catch (Exception e){
+                //this did not exist in older versions of IIQ
+            }
+
+            //*******************************  WORKGROUPS  ***************************************
+            buffOut.append("\nWorkgroup statistics:\n");
+
+            //get total certification groups
+            count = countObj("sailpoint.object.Identity",Filter.eq("workgroup",true), context, logger);            
+            packArgs(argArray, "  Workgroups:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("workgroups", count);
+   
+   
+            //*******************************  CERTIFICATIONS  ***************************************
+            buffOut.append("\nCertification statistics:\n");
+
+            //get total certification groups
+            count = countObj("sailpoint.object.CertificationGroup",null, context, logger);            
+            packArgs(argArray, "  CertificationGroups:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("certificationGroups", count);
+          
+
+            //get total certification items
+            count = countObj("sailpoint.object.CertificationItem",null, context, logger);            
+            packArgs(argArray, "  CertificationItems:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("certificationItems", count);
+            
+
+            try{
+
+
+                //get certification schedule names and frequencies
+                List taskList = context.getObjects(TaskSchedule.class, null);
+                buffOut.append("\nTaskSchedule stats:\n");
+                Iterator taskItr = taskList.iterator();
+                TaskSchedule taskSchedule = null;
+                int certCount = 0;
+                int accountAggCount = 0;
+                int accountGroupAggCount = 0;
+                int sequentialCount = 0;
+                buffOut.append("  Scheduled Items:\n");
+                while (taskItr.hasNext()){
+                    Object temp = taskItr.next();
+                    boolean found = false;
+                    
+                    if (temp instanceof TaskSchedule){
+                        taskSchedule = (TaskSchedule) temp;
+                        String arg = taskSchedule.getArgument("executor");
+                        String taskDefID = taskSchedule.getDefinitionId();
+                        //TaskDefinition taskDef = (TaskDefinition) context.getObjectById(TaskDefinition.class,taskDefID);
+                        List cronList = taskSchedule.getCronExpressions();
+                        TaskDefinition executor = (TaskDefinition) context.getObject(TaskDefinition.class,arg);
+
+                        if (cronList != null){
+
+                            if (executor != null){
+
+                                if (executor.getType() == TaskItemDefinition.Type.Certification){
+                                    buffOut.append("    Certification: " + taskSchedule.getName());
+                                    buffOut.append("\n");
+                                    found = true;
+                                    certCount++;
+                                }                                    
+                                    
+                                if ((executor.getType() == TaskItemDefinition.Type.Generic) && (executor.getArguments().containsKey("taskList"))){
+                                    buffOut.append("    Sequential Task: " + taskSchedule.getName());
+                                    buffOut.append("\n");
+                                    found = true;
+                                    sequentialCount++;
+                                }
+                                else if (executor.getType() == TaskItemDefinition.Type.AccountAggregation){
+                                    buffOut.append("    Account Aggregation: " + taskSchedule.getName());
+                                    buffOut.append("\n");
+                                    found = true;
+                                    accountAggCount++;
+                                }
+                                else if (executor.getType() == TaskItemDefinition.Type.AccountGroupAggregation){
+                                    buffOut.append("    Account Group Aggregation: " + taskSchedule.getName());
+                                    buffOut.append("\n");
+                                    found = true;
+                                    accountGroupAggCount++;
+                                }
+                            }
+
+                            if (found){
+                                buffOut.append("      Cron: ");
+                                buffOut.append(cronList.toString());
+                                buffOut.append("\n");
+                            }
+                        }
+                    }
+                }
+                
+                buffOut.append("\n");
+                packArgs(argArray, "  Total Scheduled Certifications:", certCount);
+                buffOut.append(String.format("%-50s %20s%n", argArray));
+
+                packArgs(argArray, "  Total Scheduled Account Aggregations:", accountAggCount);
+                buffOut.append(String.format("%-50s %20s%n", argArray));
+                
+                packArgs(argArray, "  Total Scheduled Account Group Aggregations:", accountGroupAggCount);
+                buffOut.append(String.format("%-50s %20s%n", argArray));
+                
+                packArgs(argArray, "  Total Scheduled Sequential Tasks:", sequentialCount);
+                buffOut.append(String.format("%-50s %20s%n", argArray));
+                
+                jsonOutputHash.put("scheduledCertifications", certCount);
+                jsonOutputHash.put("accountAggCount", accountAggCount);
+                jsonOutputHash.put("accountGroupAggCount", accountGroupAggCount);
+                jsonOutputHash.put("sequentialCount", sequentialCount);
+            }
+
+
+            catch(Exception e){
+                logger.error("Error in TaskSchedule Section",e);                
+            }
+            
+            
+
+            //***********************************  ROLES  ******************************************
+            buffOut.append("\nRole statistics:\n");
+
+            //get total roles
+            count = countObj("sailpoint.object.Bundle",null, context, logger);            
+            packArgs(argArray, "  Role number:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("totalRoles", count);
+
+            //get roles broken out by type
+            buffOut.append("  Role number by role type:" + "\n");
+            appendHQLQuery("select type,count(*) from Bundle group by type", buffOut, context, logger);
+
+            //get role types and if they are requestable
+            ArrayList assignableTypes = new ArrayList();
+            buffOut.append("  Role types and if they are requestable:\n");
+            ObjectConfig bundleConfig = ObjectConfig.getObjectConfig(Bundle.class);
+            Map bundleTypeMap = bundleConfig.getRoleTypesMap();
+            for (Object key  : bundleTypeMap.keySet()){
+                RoleTypeDefinition def = (RoleTypeDefinition) bundleTypeMap.get(key);                
+                packArgs(argArray,"    " + def.getName(), def.isAssignable());
+                buffOut.append(String.format("%-50s %20s%n", argArray));
+                if (def.isAssignable()) assignableTypes.add(def.getName());
+            }
+            
+            // For the purposes of exporting to the sizing calculator anythign that is assignable
+            // we will call a "structuralrole" to match the calculator's input.  Anything that 
+            // has entitlements like an IT role we will call an "entitlementrole", again to match
+            // the calculator's input.
+            // TO Populate: structuralroles, entitlementroles 
+            if (assignableTypes.size() > 0){
+	            qo = new QueryOptions();
+	            Filter onlyAssignables = Filter.in("type", assignableTypes);
+	            qo.addFilter(onlyAssignables);
+	            int assignableCount = context.countObjects(Bundle.class, qo);            
+	            packArgs(argArray, "  Assignable Roles:", assignableCount);
+	            buffOut.append(String.format("%-50s %20s%n", argArray));
+	            jsonOutputHash.put("structuralroles", assignableCount);
+	            
+	            qo = new QueryOptions();
+	            Filter onlyNonAssignables = Filter.not(Filter.in("type", assignableTypes));
+	            qo.addFilter(onlyNonAssignables);
+	            int nonAssignableCount = context.countObjects(Bundle.class, qo);            
+	            packArgs(argArray, "  Non-Assignable Roles:", nonAssignableCount);
+	            buffOut.append(String.format("%-50s %20s%n", argArray));
+	            jsonOutputHash.put("entitlementroles", nonAssignableCount);
+            } else {
+            	buffOut.append("  No Assignable Role types found");
+            }
+            
+            //********************************* POLICIES ************************************************
+            buffOut.append("\nPolicy statistics:\n");
+            
+            count = countObj("sailpoint.object.Policy",null, context, logger);            
+            packArgs(argArray, "  Policy number:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("totalPolicies", count);
+            
+            Filter isActive = Filter.eq("state", "Active");
+            count = countObj("sailpoint.object.Policy", isActive, context, logger);            
+            packArgs(argArray, "  Active policies:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("activePolicies", count);
+            
+            Filter isInActive = Filter.not(Filter.eq("state", "Active"));
+            count = countObj("sailpoint.object.Policy", isInActive, context, logger);            
+            packArgs(argArray, "  Inactive policies:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("inactivePolicies", count);
+            
+            ArrayList policyTypes = new ArrayList();
+            policyTypes.add("SOD");
+            policyTypes.add("Account");
+            policyTypes.add("Activity");
+            policyTypes.add("Advanced"); 
+            policyTypes.add("EntitlementSOD");
+            
+            for (String policyType : policyTypes) {
+            
+               Filter polType = Filter.eq("type", policyType);
+               count = countObj("sailpoint.object.Policy", polType, context, logger);            
+               packArgs(argArray, "  " + policyType + " policies:", count);
+               buffOut.append(String.format("%-50s %20s%n", argArray));
+               jsonOutputHash.put(policyType + "Policies", count);
+            
+            }
+
+            //********************************* LCM *****************************************************
+            buffOut.append("\nLCM statistics:\n");
+
+            //get total number of Requests
+            buffOut.append("  Requests: \n");
+            appendHQLQuery("select definition.name,count(*) from Request group by definition.name",buffOut, context, logger);
+
+            // get a count of Requests          
+            count = countObj("sailpoint.object.Request",null, context, logger);            
+            packArgs(argArray, "  Total Requests:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("requests", count);            
+
+            // get a count of IdentityRequest
+            count = countObj("sailpoint.object.IdentityRequest",null, context, logger);            
+            packArgs(argArray, "  IdentityRequest:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("identityRequests", count);
+            
+            
+
+            //******************************* Entitlement Catalog ************************************
+            buffOut.append("\nEntitlement Catalog statistics:\n");
+
+            //get count of items in entitlement catalog
+            count = countObj("sailpoint.object.ManagedAttribute",null, context, logger);            
+            packArgs(argArray, "  Entitlement Catalog entries:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("entitlementCatalogItems", count);
+
+
+            //************************** System Configuration ***********************************************
+            buffOut.append("\nSystem Configuration statistics:\n");
+            
+            // Check the ObjectConfig for Identity objects for duplicate extended nubmers.
+            // This happens from time to time when an adminsitrator manually edits the 
+            // configuration file and does not take care to make certain extended 
+            // numbers end up unique.
+            ObjectConfig ocId = context.getObject(ObjectConfig.class, "Identity");
+            HashMap seenExtendedNums = new HashMap();
+            List objAttrs = ocId.getObjectAttributes();
+            for (ObjectAttribute oAttrib : objAttrs) {
+                
+                String oaName = oAttrib.getName();
+                String oaType = oAttrib.getType();
+                
+                int extendedNumber = oAttrib.getExtendedNumber();
+                if (0 == extendedNumber) {
+                   // This extended attribute is not stored in an numbered 
+                   // extended column.  Skip it for the puroposes of analysis here.
+                   continue;
+                }
+                
+                String key = oaType + "-" + extendedNumber;
+                String val = "" + oaName;
+                if (null == seenExtendedNums.get(key)) {
+                   // This is fine, this is the first time we've seen this 
+                   // particular key.  Put it in the map of keys we've seen.
+                   seenExtendedNums.put(key, val);                   
+                } else {
+                   // Oops, we've seen this one before!  That's bad. This means
+                   // two extended attributes try to share a column number. 
+                   String prev = (String) seenExtendedNums.get(key);
+                   String newv = prev + ", " + val;
+                   seenExtendedNums.put(key, newv);
+                   
+                   packArgs(argArray, "WARN: IdentityAttributes share extended # " + key, newv);
+                   buffOut.append(String.format("%-50s %20s%n", argArray));
+                   jsonOutputHash.put("misconfiguredIdentityAttribs", newv);                   
+                }
+               
+            }
+            
+
+            //get system configuration then output the relevant attributes
+            Configuration sysConfig = context.getObject(Configuration.class,"SystemConfiguration");
+            if (sysConfig != null){
+                Attributes attr = sysConfig.getAttributes();
+                String idSnapInt = attr.getString("identitySnapshotInterval");
+                if (idSnapInt != null){
+                    Integer idSnapIntSec = Integer.parseInt(idSnapInt);                    
+                    packArgs(argArray, "  identitySnapshotInterval:", idSnapInt + " seconds");
+                    buffOut.append(String.format("%-50s %20s%n", argArray));
+                    //convert to days for JSON output
+                    jsonOutputHash.put("snapshotfrequency",idSnapIntSec/86400);
+                }
+                                
+                packArgs(argArray, "  identitySnapshotMaxAge:", attr.getString("identitySnapshotMaxAge"));
+                buffOut.append(String.format("%-50s %20s%n", argArray));
+                jsonOutputHash.put("snapshotretention",attr.getString("identitySnapshotMaxAge"));
+                
+                packArgs(argArray, "  taskResultMaxAge:", attr.getString("taskResultMaxAge"));
+                buffOut.append(String.format("%-50s %20s%n", argArray));
+                jsonOutputHash.put("resultretention",attr.getString("taskResultMaxAge"));
+                
+                packArgs(argArray, "  identityIndexGranule:", attr.getString("identityIndexGranule"));
+                buffOut.append(String.format("%-50s %20s%n", argArray));
+                jsonOutputHash.put("idhistorygranularity",attr.getString("identityIndexGranule"));
+                
+                packArgs(argArray, "  groupIndexGranule:", attr.getString("groupIndexGranule"));
+                buffOut.append(String.format("%-50s %20s%n", argArray));
+                jsonOutputHash.put("grouphistorygranularity",attr.getString("groupIndexGranule"));
+                
+                packArgs(argArray, "  certificationArchiveMaxAge:", attr.getString("certificationArchiveMaxAge"));
+                buffOut.append(String.format("%-50s %20s%n", argArray));
+                jsonOutputHash.put("certarchivedeletion",attr.getString("certificationArchiveMaxAge"));
+
+                packArgs(argArray, "  certificationMaxAge:", attr.getString("certificationMaxAge"));
+                buffOut.append(String.format("%-50s %20s%n", argArray));
+                jsonOutputHash.put("certretention",attr.getString("certificationMaxAge"));
+                
+                packArgs(argArray, "  lcmEnabled:", attr.getString("lcmEnabled"));
+                buffOut.append(String.format("%-50s %20s%n", argArray));
+            }
+
+            
+            
+
+            //*************************** Extended Attributes  *********************************************
+            buffOut.append("\nExtended attribute statistics:\n");
+
+            //output the extended attribute count for each of the objects            
+            packArgs(argArray, "  Extended Identity Attributes:", getExtendedAttributeCount(Identity.class));
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+
+            packArgs(argArray, "  Extended Bundle Attributes:", getExtendedAttributeCount(Bundle.class));
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+
+            packArgs(argArray, "  Extended Link Attributes:", getExtendedAttributeCount(Link.class));
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+
+            packArgs(argArray, "  Extended Application Attributes:", getExtendedAttributeCount(Application.class));
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+
+            packArgs(argArray, "  Extended ManagedAttribute Attributes:", getExtendedAttributeCount(ManagedAttribute.class));
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            
+
+            //************************** Archived Items **********************************************
+            buffOut.append("\nArchived Item Counts:\n");
+
+            //get counts of various archived items related to certifications
+            count = countObj("sailpoint.object.ArchivedCertificationEntity",null, context, logger);            
+            packArgs(argArray, "  Archived Certification Entities:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("ArchivedCertificationEntity", count);
+
+            count = countObj("sailpoint.object.ArchivedCertificationItem",null, context, logger);            
+            packArgs(argArray, "  Archived Certification Items:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("ArchivedCertificationItem", count);
+
+            count = countObj("sailpoint.object.CertificationArchive",null, context, logger);            
+            packArgs(argArray, "  Certification Archives:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("CertificationArchive", count);
+
+            //************************** Scopes ******************************************
+            buffOut.append("\nScope Counts:\n");
+
+            count = countObj("sailpoint.object.Scope",null, context, logger);            
+            packArgs(argArray, "  Scopes:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("Scope", count);
+
+
+            // Find the Identities that have the highest numbers of controlled Scope objects.
+            String hqlQuery = 
+              "select ident.name,count(sc.id) from Identity ident inner join " 
+              + "ident.controlledScopes sc group by ident.name order by 2 desc";
+            
+            QueryOptions qo = new QueryOptions();
+            qo.setOrderBy("2");
+            qo.setOrderAscending(false);  
+            qo.setResultLimit(5);
+            
+            Iterator it = context.search(hqlQuery, null, qo);
+            while (it.hasNext()) {
+               Object [] results = it.next();
+               String identityName = (String) results[0];
+               String numEvents  = "" + results[1];     // string cast
+               packArgs(argArray, "  Top 5 controlled scope count Identity:", 
+                        identityName +": " + numEvents);
+               buffOut.append(String.format("%-50s %20s%n", argArray));
+               jsonOutputHash.put("manyScopes-" + identityName, numEvents);                        
+               // System.out.println(" id:" + identityName + "  links:" + numAccounts);
+            }
+            try{
+                if (usingIiq61OrNewer) Util.flushIterator(it);
+            } catch (Exception e){
+                //this did not exist in older versions of IIQ
+            }
+
+
+            //************************* Audit Logs ***************************************
+            buffOut.append("\nAudit Counts:\n");
+
+            count = countObj("sailpoint.object.AuditEvent",null, context, logger);            
+            packArgs(argArray, "  Audit Events:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("AuditEvent", count);
+
+            // Find the Identities that have the highest numbers of AuditEvent objects.    
+            
+             
+            String hqlQuery = 
+              "select audit.source,count(audit.id) from AuditEvent as audit group by audit.source order by 2 desc";
+            
+            QueryOptions qo = new QueryOptions();
+            qo.setOrderBy("2");
+            qo.setOrderAscending(false);  
+            qo.setResultLimit(5);
+            
+            Iterator it = context.search(hqlQuery, null, qo);
+            while (it.hasNext()) {
+               Object [] results = it.next();
+               String identityName = (String) results[0];
+               String numEvents  = "" + results[1];     // string cast
+               packArgs(argArray, "  Top 5 AuditEvent count Identity:", 
+                        identityName +": " + numEvents);
+               buffOut.append(String.format("%-50s %20s%n", argArray));
+               jsonOutputHash.put("manyEvents-" + identityName, numEvents);                        
+               // System.out.println(" id:" + identityName + "  links:" + numAccounts);
+            }
+            try{
+                if (usingIiq61OrNewer) Util.flushIterator(it);
+            } catch (Exception e){
+                //this did not exist in older versions of IIQ
+            }
+
+            //************************ SysLog ********************************************
+            buffOut.append("\nSyslog Counts:\n");
+
+            count = countObj("sailpoint.object.SyslogEvent",null, context, logger);            
+            packArgs(argArray, "  Syslog Events:", count);
+            buffOut.append(String.format("%-50s %20s%n", argArray));
+            jsonOutputHash.put("SyslogEvent", count);
+
+            //*********************** About **********************************************
+            buffOut.append("\nAbout command:\n");
+
+            // we have to mimic the about command from iiq console since we already have a context
+
+            
+
+            //moving DB connection stuff up higher in the rule. This is necessary since we need to check if the system is Oracle
+            //and alter some queries in that case
+
+            buffOut.append("               Version: " + Version.getFullVersion() + "\n");
+            buffOut.append("        System Version: " + systemVersion + "\n");
+            buffOut.append("        Schema Version: " + schemaVersion + "\n");
+            buffOut.append("       Source Revision: " + Version.getRevision() + "\n");
+            buffOut.append("  Source Repo Location: " + Version.getRepoLocation() + "\n");
+            buffOut.append("               Builder: " + Version.getBuilder() + "\n");
+            buffOut.append("            Build Date: " + Version.getBuildDate() + "\n");
+            buffOut.append("      Application Home: " + Util.getApplicationHome() + "\n");
+            buffOut.append("              Database: " + dbinfo + "\n");
+            buffOut.append("\n");
+            buffOut.append("                  Host: " + Util.getHostName() + "\n");
+            buffOut.append("           Free Memory: " +
+                           Util.memoryFormat(Runtime.getRuntime().freeMemory()) + "\n");
+            buffOut.append("          Total Memory: " +
+                           Util.memoryFormat(Runtime.getRuntime().totalMemory()) + "\n");
+            buffOut.append("            Max Memory: " +
+                           Util.memoryFormat(Runtime.getRuntime().maxMemory()) + "\n");
+            buffOut.append("\n");
+            buffOut.append("  Available processors: " + 
+                                      Runtime.getRuntime().availableProcessors() + "\n");
+
+            Environment env = Environment.getEnvironment();
+
+            // have to change this method to handle pre 6.2 vs. post
+            getSchedulerStatus(env,buffOut);
+
+            RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
+            List arguments = runtimeMxBean.getInputArguments();
+            Map sysProps = runtimeMxBean.getSystemProperties();
+
+            buffOut.append("\nJVM arguments:\n");
+            for (String line : arguments){
+              buffOut.append("            " + line + "\n");
+            }
+
+            buffOut.append("\nSystem Properties:\n");
+            for (String prop : sysProps.keySet()){
+              buffOut.append("            " + prop + "=" + sysProps.get(prop) + "\n");
+            }
+
+
+            //******************* Hibernate Info **********************************************
+
+            buffOut.append("\nHibernate info:");
+
+            try{
+                PersistenceManager pMgr = context.getPersistenceManager();
+                HibernatePersistenceManager hibPMgr = null;
+
+                if (pMgr instanceof ClassPersistenceManager) {
+                   pMgr = pMgr.getManager(Class.forName("sailpoint.object.Identity"));
+                   hibPMgr = (HibernatePersistenceManager) pMgr;
+                } else if (pMgr instanceof HibernatePersistenceManager) {
+                   hibPMgr = (HibernatePersistenceManager) pMgr;
+                } else {
+                   log.error("pMgr is not a hibernate persistence manager.");
+                   log.error("pMgr:" + pMgr.getClass().toString());                   
+                }
+
+                Dialect dialect = hibPMgr.getDialect();
+                String dialectName = dialect.toString();
+
+                buffOut.append("  Hibernate dialect: " + dialectName + "\n");
+                jsonOutputHash.put("hibernateDialect",dialectName);
+
+            } catch (Exception e){
+                log.error("Caught exception when getting hibernate info", e);
+            }
+
+            //******************* Database Info **********************************************
+
+            buffOut.append("\nDatabase Info:\n");
+            buffOut.append("  Database type: " + dm.getDatabaseProductName() + "\n");
+            buffOut.append("  Database version: " + dm.getDatabaseProductVersion() + "\n");
+            buffOut.append("  Driver name: " + dm.getDriverName() + "\n");
+            buffOut.append("  Driver version: " + dm.getDriverVersion() + "\n");
+
+            //************************** Quartz Config *************************************************
+            try {
+                buffOut.append("\nQuartz Configuration Information:\n");
+                Scheduler scheduler = QuartzPersistenceManager.getGlobalScheduler();
+                SchedulerMetaData qmd = scheduler.getMetaData();                
+                buffOut.append("  Quartz summary: " + qmd.getSummary() + "\n");
+
+            } catch (SchedulerException e){
+                logger.error("Unable to get quartz scheduler",e);
+            }
+
+
+            //******************* JDBC Driver rule *******************************************
+            Rule driverRule = context.getObjectByName(Rule.class,driverRuleName);
+            if (driverRule != null){
+                String driverRuleResult = context.runRule(driverRule,null);
+
+                buffOut.append("\nJDBC Driver Information:\n");
+                buffOut.append(driverRuleResult + "\n");
+            }            
+
+            //************************* Convert and Output Results ***************************
+            
+            org.json.JSONObject jsonObj = new org.json.JSONObject ( jsonOutputHash );
+            
+            buffOut.append("\n\nSaving json file as: " + tempJSONfile.getAbsolutePath() + "\n");
+            buffOut.append("Saving output file as: " + tempOutputFile.getAbsolutePath() + "\n");  
+
+            String hostName = java.net.InetAddress.getLocalHost().getHostName();
+            java.util.Date nowDate = new java.util.Date();
+            String nowTimeStamp = (new java.sql.Timestamp(nowDate.getTime())).toString();     
+
+            buffOut.append("On host: " + hostName + " At time: " + nowTimeStamp + "\n"); 
+
+            //write out to the files
+            fileOut.print(buffOut.toString());
+            fileOut.flush();
+            fileOut.close();
+
+            jsonFileOut.print(jsonObj.toString());
+            jsonFileOut.flush();
+            jsonFileOut.close();
+
+            if ((void != taskResult) && (null != taskResult)) { 
+            	   String replaced = buffOut.toString().replace('\n','|');
+            	   taskResult.addMessage(new Message(Message.Type.Info, replaced, null)); 
+            	   /*String[] lineArray = buffOut.toString().split("\n");
+            	   for (int line = 0; line < lineArray.length; line++){
+                	taskResult.addMessage(new Message(Message.Type.Info, lineArray[line], null)); 
+                } */               
+            }
+
+            logger.trace(buffOut.toString());
+
+            return buffOut.toString();
+
+
+        } catch (Exception e) {
+            logger.error("Sailpoint Sizing Rule caught an exception",e);
+            fileOut.println(buffOut.toString());
+            fileOut.flush();
+            fileOut.close();
+            return buffOut.toString();
+        }
+    }
+
+    // getExtendedAttributeCount takes a class that has an ObjectConfig, retrieves it and counts the extended attributes
+    public int getExtendedAttributeCount(java.lang.Class aclass) {
+        int extCount = 0;
+        ObjectConfig config = ObjectConfig.getObjectConfig(aclass);
+        if (config == null)
+            return 0;
+        List objAttrList = config.getObjectAttributes();
+        if (objAttrList == null)
+            return 0;
+        for (Object objAttr : objAttrList){
+            if (objAttr instanceof ObjectAttribute){
+                objAttr = (ObjectAttribute) objAttr;
+                if (((ObjectAttribute) objAttr).isExtended())
+                    extCount++;
+            }
+
+        }
+        return extCount;
+    }
+
+
+    //appendHQLQuery performs an HQL query, parses the result and appends it to the provided buffer
+    public void appendHQLQuery(String query, StringBuffer buffOut, SailPointContext context, Logger logger) {
+        try{
+            Iterator it = context.search(query,null,null);
+            while(it != null && it.hasNext()) {
+                Object current = it.next();
+                if (current instanceof Object[]) {
+                    /*buffOut.append("    ");
+                    Object[] array = (Object[]) current;
+                    for (Object o : array) {
+                        if (o != null)
+                            buffOut.append(o.toString() + "\t");
+                    }
+                    buffOut.append("\n");*/
+                    buffOut.append(String.format("    %-46s %20s", current));
+                    buffOut.append("\n");
+                }
+            }
+            try{
+                if (usingIiq61OrNewer) Util.flushIterator(it);
+            } catch (Exception e){
+                //this did not exist in older versions of IIQ
+            }
+        }
+        catch (GeneralException e) {
+            logger.warn("Sailpoint Sizing Rule caught an exception in countObj method, this may be caused by an older version of IdentityIQ not having objects added to later versions: ", e);
+            return;
+        }
+    }
+
+    //Send in a filter and an class and get a count of the number of those objects that satisfy the filter
+    public int countObj(String className, Filter filter, SailPointContext context, Logger logger) {
+        try {
+            Class aClass = Class.forName(className);
+            if (filter == null)
+                return context.countObjects(aClass, new QueryOptions());
+            else{
+                QueryOptions qo = new QueryOptions();
+                qo.addFilter(filter);
+                return context.countObjects(aClass, qo);
+            }
+        }
+        catch (org.apache.bsf.BSFException e){
+            logger.error("Sailpoint Sizing Rule caught an exception in countObj method: ", e);
+            return -1;
+        }
+        catch (ClassNotFoundException e){
+            logger.warn("Sailpoint Sizing rule, countObj method, caught a ClassNotFoundException. This may be expected in some versions of IdentityIQ", e);
+            return -1;
+        }
+        catch (GeneralException e) {
+            logger.error("Sailpoint Sizing Rule caught an exception in countObj method: ", e);
+            return -1;
+        }
+    }
+
+    public void packArgs(Object[] argArray, Object arg1, Object arg2 ){
+        argArray[0]=arg1;
+        argArray[1]=arg2;
+        argArray[2]="\n";
+    }
+
+    void getSchedulerStatus(Environment env, StringBuffer buffOut) {
+
+        try {
+            Class.forName("sailpoint.api.Scheduler");
+
+            import sailpoint.api.Scheduler;
+
+            Scheduler taskSched = env.getTaskScheduler();
+            Scheduler requestSched = env.getRequestScheduler();
+
+            String taskStatus = "missing";  
+            if (taskSched != null) {
+                if (taskSched.isSchedulerRunning())
+                    taskStatus = "running";
+                else
+                    taskStatus = "stopped";
+            }
+
+            String requestStatus = "missing";  
+            if (taskSched != null) {
+                if (taskSched.isSchedulerRunning())
+                    requestStatus = "running";
+                else
+                    requestStatus = "stopped";
+            }
+
+            buffOut.append("        Task Scheduler: " + taskStatus + "\n");
+            buffOut.append("     Request Processor: " + requestStatus + "\n");
+
+        } catch (ClassNotFoundException e) {
+            import sailpoint.server.HeartbeatService;
+            import sailpoint.server.Service;
+
+            Service taskService = env.getTaskService();
+            Service requestService = env.getRequestService();
+
+            String taskStatus = "Missing";
+            if (taskService != null){
+                taskStatus = taskService.getStatusString();
+            }
+
+            String requestStatus = "Missing";
+            if (taskService != null){
+                requestStatus = requestService.getStatusString();
+            }
+
+            buffOut.append("        Task Scheduler: " + taskStatus + "\n");
+            buffOut.append("     Request Processor: " + requestStatus + "\n");
+            buffOut.append("          Task Threads: " + HeartbeatService.getQuartzThreads() + "\n");
+            buffOut.append("       Request Threads: " + HeartbeatService.getRequestProcessorThreads() + "\n");
+
+        }        
+    }
+
+
+if (void != taskResult && null != taskResult){	
+	return sizingRule(context,taskResult);
+} else {
+	return sizingRule(context,null);
+}
+]]>
+    </Source>
+</Rule>
+
+
+<Rule name='Detect OOTB JDBC Drivers' language='beanshell'>
+  <Description>
+A rule to detect if an IdentityIQ installation is still running the factory 
+default JDBC drivers.  It also checks for certain JDBC driver versions with
+known errata.  If any of these JDBC driver versions are found an error 
+message is presented back to the user.  This is both logged and returned
+as a string to the caller so it can be run via the user interface.
+
+Note: SailPoint no longer ships DB2 database drivers so they are not checked. 
+  </Description>
+  <Signature returnType='Identity'>
+    <Inputs>
+      <Argument name='context'>
+        <Description>A sailpoint.api.SailPointContext object that can be used to access the database.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>
+    <![CDATA[
+import java.io.*;
+import java.util.*;
+import java.lang.reflect.*;
+import java.util.jar.Manifest;
+import java.util.jar.Attributes;
+import org.apache.commons.io.*;
+import org.apache.commons.io.FileUtils;
+  
+import sailpoint.object.Application;
+import sailpoint.object.ResourceObject;
+import sailpoint.object.Rule;
+import sailpoint.object.TaskResult;
+import sailpoint.connector.Connector;
+import sailpoint.api.Aggregator;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
+// Force ourselves into INFO level logging.
+Logger log = Logger.getLogger("sailpoint.rule.Detect-OOTB-JDBC-Drivers");
+log.setLevel(Level.INFO);
+
+String returnString = "";
+
+// Build a small in-memory table of the OOTB and Known-Bad versions.
+// Each JDBC driver has a version that we know we shipped out of the box.
+// Each JDBC driver has a List of versions that are known to be bad.
+// The values of the hash maps are in "fileSize-md5Sum" format.
+// This way we can compare both size and md5 for a proper match.  
+HashMap knownBadVersions = new HashMap();
+HashMap ootbVersions = new HashMap();
+ootbVersions.put("com.microsoft.sqlserver.jdbc.SQLServerDriver", "583186-002761a1a50ae52dcbc8d1fe713d1965");
+ootbVersions.put("com.mysql.jdbc.Driver",                        "848401-24a6d6cab39d9fd970e0ee00bd2f9e7c");
+ootbVersions.put("oracle.jdbc.driver.OracleDriver",              "1536554-df40bba7fa52ac4c77b0c2652172fb71");
+
+// Put the known-bad versions in here.  Each JDBC driver may have known-buggy
+// or bad versions that were found as a result of support tickets.
+// TODO: Add more known bad JDBC driver versions here. 
+ArrayList badOraVers = new ArrayList();
+ArrayList badSqlVers = new ArrayList();
+ArrayList badMysVers = new ArrayList();
+badOraVers.add("2111220-fc074b0027bc6f77a67a4c4aac2f490d"); // Bad Oracle driver found at NT in May 2013.
+
+
+knownBadVersions.put("com.microsoft.sqlserver.jdbc.SQLServerDriver", badSqlVers);
+knownBadVersions.put("com.mysql.jdbc.Driver",                        badMysVers);
+knownBadVersions.put("oracle.jdbc.driver.OracleDriver",              badOraVers);
+
+ArrayList driverClasses = new ArrayList();
+driverClasses.add("com.mysql.jdbc.Driver");
+driverClasses.add("oracle.jdbc.driver.OracleDriver");
+driverClasses.add("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+// driverClasses.add("com.microsoft.sqlserver.jdbc.SQLServerDriverZZZ"); // was test case of bad class.
+
+for (String driverClass : driverClasses) {
+
+   System.out.println();
+   log.info("Examining JDBC driver: " + driverClass);
+   boolean foundOOTB = false;
+   boolean foundKnownBad = false;
+   
+   try {
+   
+   Class clazz  = Class.forName(driverClass);       
+       
+   String className = clazz.getSimpleName() + ".class";
+   String classPath = clazz.getResource(className).toString();
+   
+   if (!classPath.startsWith("jar")) {
+      // Class not from JAR file.  It must be comeing from elsewhere.  Punt.
+      log.warn("Class not from a jar: " + className);
+      continue; // go to the next iteration of the for() loop.
+   }
+   
+   System.out.println("classPath: " + classPath);
+   // classPath looks like: jar:file:/Users/adam.hampton/apache-tomcat-6.0.36/webapps/iiq61lab/WEB-INF/lib/sqljdbc-1.2.jar!/com/microsoft/sqlserver/jdbc/SQLServerDriver.class
+   String pathLhs = classPath.split("!")[0];
+   String pathRhs = pathLhs.split(":file:")[1];
+   String jarPath = pathRhs;
+   log.info("jarPath: " + jarPath);
+   
+   // Read the size and calculate the MD5 sum for the file.
+   File jarFile = new File(jarPath);
+   long fileSize = jarFile.length();
+   
+   import org.apache.commons.io.IOUtils;
+   FileInputStream fis = new FileInputStream(jarFile);
+   String md5 = org.apache.commons.codec.digest.DigestUtils.md5Hex(IOUtils.toByteArray(fis));  
+   md5 = md5.toLowerCase();
+            
+   log.info("file: " + jarFile);
+   log.info("size: " + fileSize + " md5: " + md5);
+   
+   // Check for comparison with OOTB versions of the JDBC driver.
+   String keyString = "" + fileSize + "-" + md5;
+   
+   String ootbVersion = ootbVersions.get(driverClass);
+   if ((null != ootbVersion) && (keyString.equals(ootbVersion))) {
+      // We have an OOTB version of the JDBC driver that needs to be replaced.
+      String msg = "WARNING: demonstration version found for " + driverClass +
+                   " please upgrade/replace JDBC driver. \n" + 
+                   "Driver file path: " + jarPath + " \n" + 
+                   "Demo driver size and md5 hash: " + keyString;
+      System.out.println(msg);
+      log.warn(msg);
+      returnString += msg + "\n";
+      foundOOTB = true;
+   }
+   
+   // Check for comparison with known bad versions of the JDBC driver.
+   List knownBads = knownBadVersions.get(driverClass);
+   if (null != knownBads) {
+      if (knownBads.contains(keyString)) {
+         // We have known bad version of the JDBC driver that needs to be replaced.
+         String msg = "WARNING: known faulty found for " + driverClass +
+                      " please upgrade/replace JDBC driver. \n" + 
+                      "Driver file path: " + jarPath + " \n" +
+                      "Known faulty size and md5 hash: " + keyString;
+         System.out.println(msg);
+         log.warn(msg);
+         returnString += msg + "\n";   
+         foundKnownBad = true;    
+      }   
+   }
+   
+   // In this case we have some upgraded .jar file in place.
+   if ((!foundOOTB) && (!foundKnownBad)) {
+     String msg = "Upgraded driver in place for " + driverClass + 
+                  "\n   md5 hash: " + keyString;
+     returnString += msg + "\n";           
+   }
+   
+   /* 
+   
+   Dormant / commented out code to dig into a Manifest file.  There is some
+   neat information in the manifest files but it turns out to be useless and
+   non deterministic for determing JDBC driver versions.
+       
+   // A class file might have different cases of manifest file name.  Sloppy, I know.
+   // We can thank the older versions of SQL Server's JDBC drivers for this mess.
+   List manifestsList = new ArrayList();
+   String classBase = classPath.substring(0, classPath.lastIndexOf("!") + 1);
+   manifestsList.add(classBase + "/META-INF/MANIFEST.MF");
+   manifestsList.add(classBase + "/META-INF/manifest.mf");
+   manifestsList.add(classBase + "/META-INF/Manifest.MF");
+   manifestsList.add(classBase + "/META-INF/Manifest.mf");
+
+   Manifest manifest = null;
+   Attributes attr = null;
+
+   // Search for the manfiest file.
+   for (String manifestPath : manifestsList) {
+      try {        
+         manifest = new Manifest(new URL(manifestPath).openStream());
+      } catch (java.io.FileNotFoundException ex) {
+         // Fall through and try the next manifest path.
+         // System.out.println("Manifest not found: " + manifestPath);
+      }
+   }
+
+   // If we found the manifest file, then do somehting useful with it.
+   if (null != manifest) {
+   
+      attr = manifest.getMainAttributes();
+      
+      for (Object key : attr.keySet()) {
+         String val = attr.getValue(key);
+         if (null != val) val = val.trim();
+         // System.out.println(" - manifest key: [" + key.toString() + "] = ["+ val + "]");
+      }        
+            
+  
+   } else {
+     System.out.println("No 'MANFIEST.MF' file found for: " + driverClass);
+   } 
+   
+   */
+                
+   } catch (ClassNotFoundException e) {
+      log.info("No JDBC driver found for: " + driverClass);
+   }
+
+}
+        
+return returnString;
+// ---
+    ]]>
+  </Source>
+</Rule>
+</sailpoint>

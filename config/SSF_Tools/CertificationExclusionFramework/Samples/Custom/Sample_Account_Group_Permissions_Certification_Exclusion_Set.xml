@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="Sample Account Group Permissions Certification Exclusion Set">
+  <Attributes>
+    <Map>
+      <entry key="entitySelectors">
+        <value>
+          <List>
+            <CompositeFilter operation="AND">
+              <Filter ignoreCase="true" operation="EQ" property="application" value="Active_Directory"/>
+              <Filter ignoreCase="true" operation="EQ" property="value" value="AccountingGeneral"/>
+              <Filter operation="EQ" property="class" value="ManagedAttribute"/>
+            </CompositeFilter>
+          </List>
+        </value>
+      </entry>
+      <entry key="itemSelectors">
+        <value>
+          <List>
+            <CompositeFilter operation="AND">
+              <Filter ignoreCase="true" operation="EQ" property="application" value="Active_Directory"/>
+              <Filter ignoreCase="true" operation="EQ" property="class" value="EntitlementGroup"/>
+              <Filter ignoreCase="true" operation="EQ" property="nativeIdentity" value="ProcureAnalysis"/>
+            </CompositeFilter>
+          </List>
+        </value>
+      </entry>
+      <entry key="mode" value="EXCLUDE"/>
+      <entry key="reason" value="Exclude groups example"/>
+    </Map>
+  </Attributes>
+</Custom>

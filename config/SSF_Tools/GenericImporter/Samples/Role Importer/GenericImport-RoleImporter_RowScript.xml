@@ -1,0 +1,533 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="RoleImporter_RowRule">
+  <Description>After the row has been transfored, this rule will execute on with the transformed row attrbutes map</Description>
+  <Signature returnType="void">
+  	<Inputs>
+    <Argument name="log" type="org.apache.log4j.Logger">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context" type="sailpoint.api.SailPointContext">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="taskResult" type="sailpoint.object.TaskResult">
+        <Description>
+         	The current task's result object
+        </Description>
+      </Argument>
+      <Argument name="taskAttributes" type="sailpoint.object.Attributes">
+        <Description>
+          The list of task Attributes from the ask Definition
+        </Description>
+      </Argument>
+      <Argument name="row" type="sailpoint.object.Attributes">
+        <Description>
+         The row of data processed after being transformed.
+        </Description>
+      </Argument>
+      <Argument name="transmorgifier" type="sailpoint.services.standard.task.genericImport.Transmogrifier">
+        <Description>
+          Object transformation utility
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source><![CDATA[
+  	// IIQDA hints.
+  	// Expect: sailpoint.object.Attributes row
+  	// Expect: sailpoint.object.Attributes taskAttributes
+  	// Expect: sailpoint.object.TaskResult taskResult
+  	
+  	
+  	import sailpoint.services.standard.task.genericImport.ImporterUtil;
+	import sailpoint.api.Provisioner;
+	import sailpoint.api.ManagedAttributer;
+	import sailpoint.api.ObjectUtil;
+    import sailpoint.object.Filter;
+	import sailpoint.object.Filter.LeafFilter;
+	import sailpoint.object.Filter.CompositeFilter;
+	import sailpoint.object.Filter.LogicalOperation;
+	import sailpoint.object.ProvisioningPlan.ObjectRequest;
+	import sailpoint.object.ProvisioningPlan.Operation;
+	import sailpoint.object.ProvisioningPlan.AbstractRequest;
+	import sailpoint.object.ProvisioningPlan.ObjectOperation;
+	import sailpoint.object.ManagedAttribute;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.ProvisioningPlan;
+	import sailpoint.object.ProvisioningProject;
+	import sailpoint.object.QueryOptions;
+	import sailpoint.object.SailPointObject;
+	import sailpoint.object.Bundle;
+	import sailpoint.object.Attributes;
+	import sailpoint.object.Identity;
+	import sailpoint.object.Schema;
+	import sailpoint.object.ObjectConfig;
+	import sailpoint.object.Profile;
+	import sailpoint.object.RoleTypeDefinition;
+	import sailpoint.object.AttributeDefinition;
+	import sailpoint.object.Configuration;
+	import sailpoint.tools.GeneralException;
+	import sailpoint.object.Application;
+	import sailpoint.workflow.IdentityRequestLibrary;
+	import sailpoint.persistence.Sequencer;
+	import sailpoint.object.Template.Usage;
+	import sailpoint.services.standard.task.genericImport.Transmogrifier;
+	
+	import java.util.ArrayList;
+	
+	String FUNCTION_CREATE = "create";
+	String FUNCTION_UPDATE = "update";
+	String FUNCTION_DELETE = "delete";
+	String FUNCTION_CONNECT = "connect";
+	String FUNCTION_DISCONNECT = "disconnect";
+	String FUNCTION_ADD_ENTITLEMENT = "addEntitlement";
+	String FUNCTION_REMOVE_ENTITLEMENT = "removeEntitlement";
+	
+	int createdObject = taskResult.getInt("created");
+	int updatedObject = taskResult.getInt("created");
+	int deletedObject = taskResult.getInt("deleted");
+	
+	boolean saveTaskResult = false;
+	
+	//  Methods used to enact CSV functions
+	
+	/**
+	 *	Create or update bundles
+	 **/	
+	void createUpdateBundle(Attributes attributes) {
+	
+		Bundle bundle = attributes.get("Bundle.name");
+		
+		Transmogrifier transmogrifier = new Transmogrifier(context, bundle, row);
+		transmogrifier.setIncludeAttributeSpec("Bundle.*");
+		transmogrifier.setRemovePrefix("Bundle.");
+		transmogrifier.mergeObjectWithRow();
+		
+		// Description isn't a simple setter, so we have to do this ourselves.
+		
+		String defaultLanguage = context.getConfiguration().get(Configuration.DEFAULT_LANGUAGE);
+		if (attributes.containsKey("Bundle.description")) {
+			bundle.addDescription( defaultLanguage, attributes.getString("Bundle.description"));
+			bundle.setAttribute("u_ruv_jc_desc", attributes.get("Bundle.description"));							
+		}
+	
+		context.saveObject(bundle);
+		context.commitTransaction();
+
+
+	}
+	
+	/**
+	 *  Provision role assignment
+	 **/  
+	void provisionRoleAssignment(Attributes attributes, Operation operation) {
+	
+		log.debug("Entering provisionRoleAssignment");
+		Identity identity = attributes.get("Identity.name");
+		Bundle role = attributes.get("Bundle.name");
+		
+		// Clear the locks and
+		context.commitTransaction();
+		
+		// Create a provisioning plan and send..
+		
+		if (identity != null) {
+		
+			Provisioner provisioner = new Provisioner(context);
+
+			ProvisioningPlan plan = ImporterUtil.createRoleAssignmentPlan(null, identity, Arrays.asList( new String[] {  role.getName() } ), operation);
+			ProvisioningProject project = provisioner.compile(plan);
+			
+			if (log.isDebugEnabled()) log.debug("Project plan for role provisioning: " + project.toXml());
+			
+			provisioner.execute(project);
+		}
+		log.debug("Exiting provisionRoleAssignment");
+	}
+	
+	/**
+	 * Delete bundles from the repository
+	 **/
+	void deleteBundle(Attributes attributes) {
+	
+		log.debug("Entering deleteBundle");
+
+		Bundle bundle = attributes.get("Bundle.name");
+
+		if (bundle != null && bundle.getId() != null  && bundle.getId().length()> 0 ) {
+			
+			String bundleName = bundle.getName();
+			//context.decache(bundle);
+			Filter deleteFilter = ImporterUtil.getFilterObjectByName(bundleName);
+			log.debug("Delete filter=" + deleteFilter.getExpression());
+			ImporterUtil.removeObject(context, Bundle.class, deleteFilter);
+			
+		}
+		
+		log.debug("Exiting deleteBundle");
+		
+	}
+	
+	/*
+	 *	Add an entitlement to a bundle constraints.
+	 */ 
+	private boolean addEntitlementToBundleConstraints(Attributes attributes) {
+	
+		log.debug("Entering addEntitlementToConstraints");
+		
+		boolean success = false;
+		
+		// we need the role name, and the entitlements application, attribute and value.
+		// SO check we have them
+		
+		Bundle bundle = attributes.get("Bundle.name");
+		Application application = attributes.get("ManagedAttribute.application");
+		String attributeName = attributes.get("ManagedAttribute.attribute");
+		String attributeValue = attributes.get("ManagedAttribute.value");
+		
+		if (application == null || attributeName == null || 
+			attributeValue == null || bundle.getId() == null || bundle.getId().length() == 0) {
+			
+			log.warn("Cannot add entitlement as parameter is missing or bundle does not get resolved.  Exiting");
+			return false;
+		}  
+		
+		if (log.isDebugEnabled()) log.debug("Attempting to add attribute: " + attributeName + " = " + attributeValue + " from  application '" + application.getName() + "' for role: " + bundle.getName());
+		
+		// Next check to ensure that the bundle type allows for entitlement profiles
+		String roleType = bundle.getType();
+		ObjectConfig config = ObjectConfig.getObjectConfig(Bundle.class);
+		List roleTypeDefinitions = config.get("roleTypeDefinitions");
+		
+		boolean foundRoleType = false;
+		
+		for (RoleTypeDefinition rtd : roleTypeDefinitions) {
+			if (rtd.getName().equals(roleType)) {
+				foundRoleType = true;
+				if (rtd.isNoProfiles()) {
+					log.warn("Role type does not allow profiles, not adding entitlements to this object.  Exiting");
+					return false;
+				}
+				break;
+			}
+		}
+		
+		// SO we should be good to add the profile now, check to see if the
+		// role has any profiles for this application, if not we need to create a new one.
+		
+		List profiles = bundle.getProfilesForApplications(Arrays.asList(application));
+		boolean dontAdd = false;
+		for (Profile p : profiles) {
+			List constraints = p.getConstraints();
+			for (Filter f : constraints) {
+				if (hasValueFromLeafFilter(f, attributeName, attributeValue) ){
+					return false;
+				}
+			}
+		}
+		
+		log.debug("Adding the entitlement");
+		
+		// there are no profiles at all, we can just add one
+		Profile profile = new Profile();
+		profile.setApplication(application);
+		
+		List values = new ArrayList();
+		values.add(attributeValue);
+		profile.addConstraint(Filter.containsAll(attributeName, values));
+		bundle.add(profile);
+				
+		if (log.isDebugEnabled()) log.debug("Persisting new bundle: " + bundle.toXml());
+		context.saveObject(bundle);
+		context.commitTransaction();
+		
+		return true;
+
+	}
+
+	/*
+	 *  Delete an entitlement filter from a bundle object
+	 */
+	public Boolean deleteEntitlementFromBundleConstraints(Attributes attributes) {
+ 		
+ 		log.debug("Entering deleteEntitlementFromConstraints");
+ 		
+ 		boolean update = false;
+ 		
+ 		Bundle bundle = attributes.get("Bundle.name");
+		Application application = attributes.get("ManagedAttribute.application");
+		String attributeName = attributes.get("ManagedAttribute.attribute");
+		String attributeValue = attributes.get("ManagedAttribute.value");
+		
+		if (application == null || attributeName == null || attributeValue == null || 
+			bundle.getId()== null || bundle.getId().length() == 0) {
+			
+			log.warn("Cannot add entitlement as parameter is missing.  Exiting");
+			return false;
+		}  
+
+		try {
+
+			log.debug("Checking profiles");
+			
+			List profiles = bundle.getProfiles();
+			if (profiles != null) {
+			
+				Iterator profilesIt = profiles.iterator();
+				List deleteProfiles = new ArrayList();
+				List updateProfiles = new ArrayList();
+				
+				while (profilesIt.hasNext()) {
+				
+					Profile profile = profilesIt.next();
+					
+					log.debug("Checking profile: " + profile.toXml());
+					if (profile.getApplication().getName().equals(application.getName())) {
+					
+						log.debug("Matched application, getting constraints");
+						List constraints = profile.getConstraints();
+	 		
+				 		if (constraints != null || constraints.size() > 0) {
+				  		
+				  			Iterator itConstraints = constraints.iterator();
+				  			while (itConstraints.hasNext()) {
+					  		
+					  			Filter constraint = itConstraints.next();  
+					     	   			
+					     		if (log.isDebugEnabled()) log.debug("Constraint: " + constraint.getExpression());
+					     		
+					     		// We can parse leaf filters, so filter are either leaf or composite filters so we
+					     		// need to parse them
+					     		
+					     		if (constraint instanceof CompositeFilter) {
+					     		
+					     			// Composite filters are made of leaf filters so decompose
+					     			CompositeFilter composite = (CompositeFilter) constraint;
+					     			Iterator children = composite.getChildren().iterator();
+					     			while (children.hasNext()) {
+					     				Filter child = children.next();
+					     			
+					     				LeafFilter leaf = (LeafFilter) child;
+					     				
+					     				if (leaf.getProperty().equals(attributeName)) {
+					     					
+						     				boolean check = removeValueFromLeafFilter(leaf, attributeName, attributeValue);
+						     				update = (update) ? update : check;
+						     				if (check && leaf.getValue() == null) children.remove();
+						     			}
+					     			}
+					     			
+					     		} else {
+					     		
+					     			// So this IS a leaf filter
+					     			LeafFilter leaf = (LeafFilter) constraint;
+					     			
+					     			if (leaf.getProperty().equals(attributeName) ) {
+					     				boolean check = removeValueFromLeafFilter(leaf, attributeName, attributeValue);
+					     				update = (update) ? update : check;
+					     				if (log.isDebugEnabled()) log.debug("Check == " + check + ", Update == " + update);
+					     				if (check && leaf.getValue() == null) itConstraints.remove();
+					     			}
+					     		}
+						     }
+					     } else {
+					     	log.debug("Constraints is null or 0 in size, skipping processing.");
+					     }
+					}
+					
+					// Check to see if we need to remove this profile
+					if (update) {
+						List constraints = profile.getConstraints();
+						if (constraints == null || constraints.size() == 0)  {
+							if (log.isDebugEnabled()) log.debug("Adding profile to delete list: " + profile.toXml());
+							deleteProfiles.add(profile);
+						} else {
+							if (log.isDebugEnabled()) log.debug("Adding profile to save list: " + profile.toXml());
+							updateProfiles.add(profile);
+							
+						}
+					}
+				}
+				
+				// Clear up tghe profiles...
+				log.debug("Starting clearup");
+				if (deleteProfiles.size() > 0) {
+					for (Profile p : deleteProfiles) {
+						bundle.remove(p);
+						context.removeObject(p);
+						update = true;
+					}
+				}
+				if (updateProfiles.size() > 0) {
+					for (Profile p : updateProfiles) {
+						bundle.remove(p);
+						Profile newProfile = p.derive(context);
+						log.debug("New profile: " + newProfile.toXml());
+						bundle.add(newProfile);
+						context.removeObject(p);
+						update = true;
+					}
+					context.commitTransaction();
+				}
+
+			}
+		} catch (GeneralException ge) {
+	        log.error(ge.toString());
+	    } finally {
+        	
+			context.saveObject(bundle);
+	        context.commitTransaction();
+        }
+        
+		log.debug("Exiting deleteEntitlementFromConstraints");
+		   
+		return update;
+	     
+ 	}
+ 
+	/*
+	 * Helper for deleteEntitlementFromBundleConstraints as it's called
+	 * a couple of times from this method.
+	 */
+ 	private boolean removeValueFromLeafFilter(LeafFilter lf, String attributeName, String attributeValue) {
+ 	
+	     		
+		boolean update = false;
+	   	if (log.isDebugEnabled()) log.debug("Entering removeValueFromLeafFilter: Attribute: '" + attributeName + "', Value: " + attributeValue);
+	     		
+   		Object value = lf.getValue();
+     		
+   		if (value instanceof String) {
+   			
+   			String stringValue = (String) value;
+   			if (stringValue.equals(attributeValue)) {
+   			
+   				if (log.isDebugEnabled()) log.debug("Found string value of '" + attributeValue + "'.");
+   				lf.setValue(null);
+   				update = true;
+   			}
+   			
+   		} else if (value instanceof List) {
+   			
+   			List listValues = value;
+   			Iterator it = listValues.iterator();
+   			
+   			// Iterate through the possible values
+   			
+   			while (it.hasNext()) {
+   			
+   				String listValue = it.next();
+   				if (listValue.equals(attributeValue)) {
+   					
+   					if (log.isDebugEnabled()) log.debug("Found a list value of '" + attributeValue + "', removing from the collection.");
+   					update = true;
+   					it.remove();
+   					
+   				}
+   			}
+   			
+   			if (listValues.size() == 0 ) {
+   				lf.setValue(null);
+   			} else {
+   				lf.setValue(listValues);
+   			}
+   		}
+     		 
+     	if (log.isDebugEnabled()) log.debug("Exiting removeValueFromLeafFilter with return value: " + update); 
+     	return update;
+ 	
+ 	}
+ 	
+ 	private boolean hasValueFromLeafFilter(LeafFilter lf, String attributeName, String attributeValue) {
+ 	
+	     		
+		boolean update = false;
+	   	if (log.isDebugEnabled()) log.debug("Entering hasValueFromLeafFilter: Attribute: '" + attributeName + "', Value: " + attributeValue);
+	     		
+   		Object value = lf.getValue();
+     		
+   		if (value instanceof String) {
+   			
+   			String stringValue = (String) value;
+   			if (stringValue.equals(attributeValue)) {
+   			
+   				if (log.isDebugEnabled()) log.debug("Found string value of '" + attributeValue + "'.");
+   				lf.setValue(null);
+   				update = true;
+   			}
+   			
+   		} else if (value instanceof List) {
+   			
+   			List listValues = value;
+   			Iterator it = listValues.iterator();
+   			
+   			// Iterate through the possible values
+   			
+   			while (it.hasNext()) {
+   			
+   				String listValue = it.next();
+   				if (listValue.equals(attributeValue)) {
+   					
+   					if (log.isDebugEnabled()) log.debug("Found a list value of '" + attributeValue + "'.");
+   					update = true;
+   					it.remove();
+   					
+   				}
+   			}
+   			
+   		}
+     		 
+     	if (log.isDebugEnabled()) log.debug("Exiting hasValueFromLeafFilter with return value: " + update); 
+     	return update;
+ 	
+ 	}
+	
+	
+	// Process the import file
+	
+	String function = row.get("function"); 
+	
+	if (log.isDebugEnabled()) log.debug("Row entry point.  Function: " + function );
+	if (log.isDebugEnabled()) log.debug("Row Data Map=" + row.toString() );
+	
+	switch (function) {
+	
+		case FUNCTION_CREATE : 
+			createUpdateBundle(row);
+			break;
+			
+		case FUNCTION_UPDATE :
+			createUpdateBundle(row);
+			break;
+			
+		case FUNCTION_DELETE :
+			deleteBundle(row);
+			break;
+			
+		case FUNCTION_CONNECT :
+			provisionRoleAssignment(row, Operation.Add);
+			break;
+			
+		case FUNCTION_DISCONNECT :
+			provisionRoleAssignment(row, Operation.Remove);
+			break;
+			
+		case FUNCTION_ADD_ENTITLEMENT:
+			addEntitlementToBundleConstraints(row);
+			break;
+			
+		case FUNCTION_REMOVE_ENTITLEMENT  :
+			deleteEntitlementFromBundleConstraints(row);
+			break;
+			
+		default:
+			log.error("Invalid function '" + function + "'");
+			break;
+	}
+
+	]]></Source>
+</Rule>

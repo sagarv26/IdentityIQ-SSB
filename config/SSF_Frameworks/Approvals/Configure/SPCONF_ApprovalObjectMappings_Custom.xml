@@ -1,0 +1,241 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="SPCONF Approval Object Mappings">
+	<Attributes>
+		<Map>
+<!-- **********************************************************************************************
+	CONFIGURE TO CUSTOMIZE WHAT APPROVAL TYPES ARE IN PLAY FOR ALL, FOR SPECIFIC FLOWS, OR WITH CUSTOM LOGIC
+********************************************************************************************** -->
+		<!-- Approval Types Scheme - Dictates how approval types are calculated
+			Options:
+			Default - Use the list in Default Approval Types entry
+			Map - Define mapping based on the requestType attribute (custom attr passed in from calling workflow,
+			can be whatever, like LCM, Joiner, Leaver, etc.   
+			Custom - Use whatever is returned by Get Approval Types Rule entry-->
+			<entry key="Approval Types Scheme" value="Map" />	<!-- Step 1 -->
+			
+			<!--  Used if Approval Types Scheme is "Default" -->
+			<entry key="Default Approval Types">
+				<value>
+					<List>
+						<!-- no approvals -->
+					</List>
+				</value>
+			</entry> <!-- Step 2, if Default in step 1 -->
+			
+			<!--  Used if Approval Types Scheme is "Map" -->
+			<entry key="Map Request Type Approval Types">
+				<value>
+					<Map>
+						<entry key="LCM">
+							<value>
+								<List>
+									<String>Manager</String>
+									<String>Owner</String>
+								</List>
+							</value>
+						</entry>
+						<entry key="SAMPLE JOINER">
+							<value>
+								<List>
+									<String>Manager</String>
+									<String>Owner</String>
+								</List>
+							</value>
+						</entry>
+					</Map>
+				</value>
+			</entry> <!-- Step 2, if Mp in step 1 -->
+			
+			<!--  Used if Approval Types Scheme is "Custom" -->
+			<entry key="Get Approval Types Custom Rule" value="SP CST Get Approval Types Step Rule" /> <!-- Step 2, if Custom in step 1 -->
+
+<!-- **********************************************************************************************
+	CONFIGURE THE BEHAVIOR OF EACH APPROVAL TYPE
+********************************************************************************************** -->	
+<!-- **********************************************************************************************
+	For each approval type, configure the following options:
+	
+	RULES/METHODS - For each of the following, specify a rule name or a method.  
+		For a rule, just enter the name of the rule.  
+		For a method, prefix the name of the method with "method:".  Define the method in the 
+		approval frameworks custom rule library (the file derived from SP_CST_ApprovalFramework_Custom_RuleLibrary.xml).  
+		Methods are recommended but rules are supported for backwards compatibility.  
+		
+	 - preApprovalRule - a rule or method that will be called before the approval is processed, 
+	 		usually to manipulate the approval set
+	 - approvalAfterScriptRule - a rule or method that will be called after the approval is processed.  
+	 - approvalValidatorScriptRule - a rule or method that is called to validate the approval in the form
+	 - workItemDescriptionRule - a rule or method that is called to overwrite the work item description
+	 - getApprovalOwnersRule - a rule to return the owner, return can be three different object types:
+	 	- String - either the identity name or a workgroup name, will see all items in the approval set
+	 	- List - List of owners.  Each will see all items in approval set.  how list is processed will depend on approvalMode
+	 	- Map - key is the string of an owner, value is a list of the items that they should see.  
+	 
+	 OTHER OPTIONS
+	  - template - allows you to reference another approval type (or a template type) to reduce redundancy.  The template
+	  	entries are merged with the approval type.  The approval type always wins in terms of duplicates.  
+	  - notifyEmailTemplate - the email template that will be sent to the approvers
+	  - displayName - what will show up when monitoring
+	  - approvalMode - parallel, serial, any, etc.
+	  - useDefaultWorkItemConfig - if true, uses the default config at the bottom.  If false, must include a
+	  	workItemConfig entry in the approval type
+	  - workItemConfig - an Attributes object containing the work item config options
+	  - electronicSignature - provide the name of a valid electronic signature to require entering credentials on approval.  
+	  		invalid names and/or blank entries will not require the electronic signature
+	  
+	  // USE OF THE IDENTITY MODEL IN AN EDITABLE FORM ISN'T GOING TO WORK UNTIL 6.3p4
+	  - useCustomApprovalForm - whether or not to use an editable, custom form, as returned by the method in the entry
+	  		getApprovalFormRule
+	  - getApprovalFormRule - returns a method name.  for each method name defined, a method must be written in the 
+	  		custom rule library that will return either null or a form object.  this method will have access
+	  		to the workflow variable.  the form is married to the identityModel object.  
+
+ **********************************************************************************************-->	
+			<!-- Approval Types - Provide config information about each approval type -->
+			<entry key="Approval Types">
+				<value>
+					<Attributes>
+						<Map>
+							<entry key="Sample Approval Type"> <!--  Step 3, Define one of these for each type that will be returned above -->
+								<value>
+									<Attributes>
+										<Map>
+											<entry key="preApprovalRule" value="method:cstPreApprovalDoNothingRule" />
+											<entry key="approvalAfterScriptRule" value="method:cstApprovalAfterScriptDoNothingRule" />
+											<entry key="approvalValidatorScriptRule" value="rule:SP CST Approval Validator Script Default Rule" />
+											<entry key="workItemDescriptionRule" value="rule:SP CST Approval Work Item Description Default Rule" />
+											
+											<!--  Optional static (and mostly useless) workItemDescription:
+												<entry key="workItemDescription" value="Approval for user" />
+											
+											 -->
+											<entry key="electronicSignature" value="SP Default Electronic Signature" />
+											<entry key="notifyEmailTemplate" value="LCM Identity Update Approval" />
+											<entry key="approvalMode" value="parallel" />
+											<entry key="displayName" value="Something" />
+											<entry key="getApprovalOwnersRule" value="method:cstGetApproversManagerRule" />
+											<entry key="useDefaultWorkItemConfig" value="false" />
+											<!--  if useDefaultWorkItemConfig is true, then the following isn't required -->
+											<entry key="workItemConfig">
+												<value>
+													<Attributes>
+														<Map>
+															<entry key="reminderEmailTemplate" value="LCM Identity Update Approval" />
+															<entry key="escalationEmailTemplate" value="LCM Identity Update Approval" />
+															<entry key="escalationStyle" value="both" />
+															<entry key="hoursBetweenReminders" value="24" />
+															<entry key="hoursTillEscalation" value="48" />
+															<entry key="maxReminders" value="2" />
+															<entry key="escalationRule" value="Escalation Rule" />
+														</Map>
+													</Attributes>
+												</value>
+											</entry>
+											
+											<!-- UNLESS USING 6.3 P4 or 6.4, THE FORM SHOULD BE READ ONLY -->
+											<entry key="useCustomApprovalForm" value="false" />
+											<entry key="getApprovalFormRule" value="method:getCSTDefaultApprovalFormRule" />
+										</Map>
+									</Attributes>
+								</value>
+							</entry>		
+						    <entry key="Template Type 1">
+								<value>
+									<Attributes>
+										<Map>
+											<entry key="preApprovalRule" value="method:cstPreApprovalDoNothingRule" />
+											<entry key="approvalAfterScriptRule" value="method:cstApprovalAfterScriptDoNothingRule" />
+											<entry key="approvalValidatorScriptRule" value="rule:SP CST Approval Validator Script Default Rule" />
+											<entry key="workItemDescriptionRule" value="rule:SP CST Approval Work Item Description Default Rule" />
+											
+											<!--  Optional static (and mostly useless) workItemDescription:
+												<entry key="workItemDescription" value="Approval for user" />
+											
+											 -->
+											<entry key="electronicSignature" value="SP Default Electronic Signature" />
+											<entry key="notifyEmailTemplate" value="LCM Identity Update Approval" />
+											<entry key="approvalMode" value="parallel" />
+											<entry key="displayName" value="Something" />
+											
+											<entry key="useDefaultWorkItemConfig" value="true" />
+											
+											<!-- UNLESS USING 6.3 P4 or 6.4, THE FORM SHOULD BE READ ONLY -->
+											<entry key="useCustomApprovalForm" value="false" />
+											<entry key="getApprovalFormRule" value="method:getCSTDefaultApprovalFormRule" />
+										</Map>
+									</Attributes>
+								</value>
+							</entry>			
+							<entry key="Manager">
+								<value>
+									<Attributes>
+										<Map>
+											<!-- TEMPLATES CAN BE USED TO REDUCE REDUNDANCY, IF KEY NOT HERE, KEY
+												FROM TEMPLATE USED -->
+											<entry key="template" value="Template Type 1" />
+											<entry key="approvalMode" value="parallelPoll" />
+											<entry key="displayName" value="Supervisor" />
+											<entry key="getApprovalOwnersRule" value="method:cstGetApproversManagerRule" />
+										</Map>
+									</Attributes>
+								</value>
+							</entry>		
+									
+							<entry key="Owner">
+								<value>
+									<Attributes>
+										<Map>
+											<entry key="template" value="Template Type 1" />
+											<entry key="getApprovalOwnersRule" value="method:cstGetApproversOwnerRule" />
+											<entry key="useDefaultWorkItemConfig" value="false" />
+											<entry key="workItemConfig">
+												<value>
+													<Attributes>
+														<Map>
+															<entry key="reminderEmailTemplate" value="LCM Identity Update Approval" />
+															<entry key="escalationEmailTemplate" value="LCM Identity Update Approval" />
+															<entry key="escalationStyle" value="both" />
+															<entry key="hoursBetweenReminders" value="24" />
+															<entry key="hoursTillEscalation" value="48" />
+															<entry key="maxReminders" value="2" />
+															<entry key="escalationRule" value="Escalation Rule" />
+														</Map>
+													</Attributes>
+												</value>
+											</entry>
+											<entry key="electronicSignature" value="None Required" />
+										</Map>
+									</Attributes>
+								</value>
+							</entry>				
+							
+										
+						</Map>
+					</Attributes>
+				</value>			
+			</entry>
+
+<!-- **********************************************************************************************
+	CONFIGURE VARIOUS DEFAULTS
+********************************************************************************************** -->
+			<!--  Default WorkItem Config - Define Default values for reminders and escalations -->
+			<entry key="Default WorkItem Config">
+				<value>
+					<Attributes>
+						<Map>
+							<entry key="reminderEmailTemplate" value="LCM Identity Update Approval" />
+							<entry key="escalationEmailTemplate" value="LCM Identity Update Approval" />
+							<entry key="escalationStyle" value="both" />
+							<entry key="hoursBetweenReminders" value="48" />
+							<entry key="hoursTillEscalation" value="72" />
+							<entry key="maxReminders" value="2" />
+							<entry key="escalationRule" value="Escalation Rule" />
+							<entry key="renderer" value="lcmEditableWorkItemRenderer.xhtml" />
+						</Map>
+					</Attributes>
+				</value>
+			</entry>
+		</Map>
+	</Attributes>
+</Custom>

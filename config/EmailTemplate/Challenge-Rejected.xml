@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Challenge Rejected">
+  <Body>$certifierName has rejected the challenge for '$challengeItem'.  The decision will remain.
+
+Comments from $certifierName:
+--------------------------------------------------------------------------------
+$!rejectionComments
+--------------------------------------------------------------------------------
+</Body>
+  <Description>
+      Email Template for notifying a challenger that their challenge was rejected.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="challengeItem" type="string">
+        <Description>The shortDescription property of the CertificationItem being challenged.</Description>
+      </Argument>
+      <Argument name="rejectionComments" type="string">
+        <Description>Comments to the challenger.</Description>
+      </Argument>
+      <Argument name="certifierName" type="string">
+        <Description>The full name (first and last) of the Identity that rejected the challenge.</Description>
+      </Argument>
+      <Argument name="certificationItem" type="CertificationItem">
+        <Description>The CertificationItem being challenged.</Description>
+      </Argument>
+      <Argument name="workItem" type="WorkItem">
+        <Description>The WorkItem for the challenge</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Challenge rejected for '$challengeItem'</Subject>
+</EmailTemplate>
+</sailpoint>

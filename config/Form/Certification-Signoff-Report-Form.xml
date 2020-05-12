@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Certification Signoff Report Form" type="Report">
+  <Section columns="2" label="rept_cert_custom_section_title" name="customProperties">
+    <Field columnSpan="1" displayName="rept_cert_field_create" helpKey="rept_cert_help_create" name="creationDate" type="string" value="ref:creationDate">
+      <Attributes>
+        <Map>
+          <entry key="xtype" value="daterange"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field columnSpan="1" displayName="rept_cert_field_signed" helpKey="rept_cert_help_signed" name="signedDate" type="string" value="ref:signedDate">
+      <Attributes>
+        <Map>
+          <entry key="xtype" value="daterange"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field columnSpan="1" displayName="rept_cert_field_due" helpKey="rept_cert_help_due" name="expirationDate" type="string" value="ref:expirationDate">
+      <Attributes>
+        <Map>
+          <entry key="xtype" value="daterange"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="rept_cert_field_mangers" filterString="managerStatus==true" helpKey="rept_cert_help_mangers" multi="true" name="managers" type="Identity" value="ref:managers"/>
+    <Field displayName="rept_cert_field_apps" helpKey="rept_cert_help_apps" multi="true" name="applications" type="Application" value="ref:applications"/>
+    <Field displayName="rept_cert_field_groups" helpKey="rept_cert_help_groups" multi="true" name="groups" type="GroupDefinition" value="ref:groups"/>
+    <Field displayName="rept_cert_field_tags" helpKey="rept_cert_help_tags" multi="true" name="tags" type="Tag" value="ref:tags"/>
+    <Field displayName="rept_cert_field_cert_group" helpKey="rept_cert_help_cert_group" multi="true" name="certificationGroups" type="CertificationGroup" value="ref:certificationGroups"/>
+    <Field defaultValue="null" displayName="rept_cert_signedoff" helpKey="rept_cert_help_signedoff" name="signedOff" type="string" value="ref:signedOff">
+      <Attributes>
+        <Map>
+          <entry key="xtype" value="spBooleanCombo"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field defaultValue="null" displayName="rept_cert_signoff_esigned" helpKey="rept_cert_signoff_help_esigned" name="esigned" type="string" value="ref:esigned">
+      <Attributes>
+        <Map>
+          <entry key="xtype" value="spBooleanCombo"/>
+        </Map>
+      </Attributes>
+    </Field>
+  </Section>
+</Form>
+</sailpoint>

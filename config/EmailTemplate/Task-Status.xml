@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Task Status">
+  <Body>
+The '$taskName' task#if ($status == "Success" ) ended successfully.#{end}#if ($status == "Warning" ) ended with warning.#{end}#if ($status == "Terminated" ) terminated.#{end}#if ($status == "Error" ) ended with error.#{end}
+
+     
+       Started : $spTools.formatDate($taskStartTime,3,1)
+Completed : $spTools.formatDate($taskEndTime,3,1)
+
+#foreach ($msg in $message)
+$msg
+#end
+
+For more details, please check - http://localhost:8080/identityiq/monitor/tasks/renderResults.jsf?TaskResultId=$resultId
+
+  </Body>
+  <Description>
+    Email Template for notifying result of Task.
+  </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="taskResult" type="TaskResult">
+        <Description>Task Result</Description>
+      </Argument>
+      <Argument name="taskName" type="string">
+        <Description>Task Name</Description>
+      </Argument>
+      <Argument name="taskDesc" type="string">
+        <Description>Task Description</Description>
+      </Argument>
+      <Argument name="taskStartTime" type="date">
+        <Description>Time when task is started</Description>
+      </Argument>
+      <Argument name="taskEndTime" type="date">
+        <Description>Time when task is completed.</Description>
+      </Argument>
+      <Argument name="status" type="string">
+        <Description>Task Status</Description>
+      </Argument>
+      <Argument multi="true" name="message" type="string">
+        <Description>List of Messages</Description>
+      </Argument>
+      <Argument name="resultId" type="string">
+        <Description>Task Result Id</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Task $taskName Status - $status </Subject>
+</EmailTemplate>
+</sailpoint>

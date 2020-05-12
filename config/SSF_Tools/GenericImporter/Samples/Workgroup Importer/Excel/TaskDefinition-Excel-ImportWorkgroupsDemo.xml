@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="Generic Importer - Import Workgroups demo - Excel Worksheet" resultAction="Delete" subType="task_item_type_generic" type="Generic">
+  <Attributes>
+    <Map>
+      <entry key="excel_filename" value="{Eneter correct path}\config\SSF_Tools\GenericImporter\Samples\Workgroup Importer\Excel\workgroups.xlsx"/>
+      <entry key="excel_hasHeader" value="true"/>
+      <entry key="excel_headerRow" value="1"/>
+      <entry key="excel_sheetName" value="workgroups"/>
+      <entry key="genericImportDriverClass" value="ExcelSAXImport"/>
+      <entry key="importLoggerLevel" value="debug"/>
+      <entry key="importLoggerName" value="sailpoint.services.task.workgroupDemo"/>
+      <entry key="importManualHeader" value="workgroup_name(+Identity),workgroup_owner(Identity)"/>
+      <entry key="importRowRule" value="WorkgroupImporter_Row"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate"/>
+    </Map>
+  </Attributes>
+  <Description>Generic Import Task
+Import workgroups and their members from an Excel Spreadsheet</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Generic Importer"/>
+  </Parent>
+</TaskDefinition>

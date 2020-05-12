@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow name="IdentityProvisioningStepLibrary" template="true" type="StepLibrary">
+  <Step configForm="Provisioning Approval Step Form" icon="Task" name="Account Approval">
+    <Arg name="approvalMode"/>
+    <Arg name="approvalScheme"/>
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Arg name="approvalAssignmentRule"/>
+    <Arg name="approvingIdentities"/>
+    <Arg name="fallbackApprover" value="ref:fallbackApprover"/>
+    <Arg name="flow" value="ref:flow"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="identityElectronicSignature"/>
+    <Arg name="identityEmailTemplate"/>
+    <Arg name="identityRequestId" value="ref:identityRequestId"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Arg name="managerEmailTemplate"/>
+    <Arg name="managerElectronicSignature"/>
+    <Arg name="ownerEmailTemplate"/>
+    <Arg name="ownerElectronicSignature"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="policyViolations" value="ref:policyViolations"/>
+    <Arg name="priority" value="ref:workItemPriority"/>
+    <Arg name="securityOfficerName"/>
+    <Arg name="securityOfficerEmailTemplate"/>
+    <Arg name="securityOfficerElectronicSignature"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="workItemComments"/>
+    <Arg name="workItemReminderTemplate"/>
+    <Arg name="workItemHoursBetweenReminders"/>
+    <Arg name="workItemMaxReminders"/>
+    <Arg name="workItemEscalationTemplate"/>
+    <Arg name="workItemHoursTillEscalation"/>
+    <Arg name="workItemEscalationRule"/>
+    <Description>
+        Step library that can be used for provisioning request approvals.
+        The process assumes many of the Provisioning Workflow structures exist
+        and has things like provisioning plans and approvalSets are required.           
+      </Description>
+    <Return name="project"/>
+    <Return name="approvalSet"/>
+    <Return name="workItemComments"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Provisioning Approval Subprocess"/>
+    </WorkflowRef>
+  </Step>
+  <Step action="call:sendMultipleNotifications" configForm="Provisioning Notification Step Form" icon="Email" name="Notify">
+    <Arg name="notificationScheme"/>
+    <Arg name="userEmail" value="script:getUserEmail(identityName, plan)"/>
+    <Arg name="userEmailTemplate"/>
+    <Arg name="requesterEmail" value="script:getEmail(launcher)"/>
+    <Arg name="requesterEmailTemplate"/>
+    <Arg name="managerEmail" value="script:getManagersEmail(identityName, plan)"/>
+    <Arg name="managerEmailTemplate"/>
+    <Arg name="securityOfficerName"/>
+    <Arg name="securityOfficerEmailTemplate"/>
+    <Arg name="otherUsersToNotify"/>
+    <Arg name="otherUsersToNotifyEmailTemplate"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="flow" value="ref:flow"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="source" value="ref:source"/>
+    <Description>
+      	  Notify the various actors specified on notification scheme.
+        </Description>
+  </Step>
+</Workflow>
+</sailpoint>

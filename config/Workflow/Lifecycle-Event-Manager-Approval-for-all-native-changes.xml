@@ -1,0 +1,231 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow explicitTransitions="true" libraries="Identity" name="Lifecycle Event - Manager Approval for all native changes" type="IdentityLifecycle">
+  <Variable input="true" name="trigger">
+    <Description>The IdentityTrigger</Description>
+  </Variable>
+  <Variable input="true" name="event" transient="true">
+    <Description>
+      The IdentityChangeEvent.  It can be used to build
+      the provisioning plan, but does not need to be
+      persisted with the case, so marked as transient.
+    </Description>
+  </Variable>
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity.</Description>
+  </Variable>
+  <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>
+      The displayName of the identity being updated.
+      Query for this using a projection query and fall back to the name.
+    </Description>
+  </Variable>
+  <Variable name="plan">
+    <Description>The provisioning plan, which is built by a service method. </Description>
+  </Variable>
+  <Variable editable="true" initializer="false" name="optimisticProvisioning">
+    <Description>
+      Set to true to enable optimistic provisioning.  This will cause
+      changes to the entitlements compiled from role assignments to be 
+      applied immediately to the identity cube rather than waiting
+      for the next refresh/reaggregation after the provisioning system
+      completes the request.
+    </Description>
+  </Variable>
+  <Variable editable="true" initializer="true" name="foregroundProvisioning">
+    <Description>
+      Normally provisioning is done in a step that uses the "background"
+      option to force the workflow to be suspend and be resumed in a
+      background task thread.  This prevents the browser session from
+      hanging since provision can sometimes take a long time.  For demos
+      and testing it can be better to do this in the foreground so that
+      provisioning will have been performed when control is returned to the
+      user.  This prevents having to run the Perform Maintenance task to 
+      see the results of the request.
+    </Description>
+  </Variable>
+  <Variable initializer="spadmin" input="true" name="fallbackApprover">
+    <Description>
+      A String that specifies the name of the Identity that will 
+      be assigned any approvals where the owner of the approver 
+      can't be resolved. Example if the scheme is "owner" and the 
+      application doesn't specify and owner.
+    </Description>
+  </Variable>
+  <Variable initializer="LCM" input="true" name="source">
+    <Description>
+      String version of sailpoint.object.Source to indicate
+      where the request originated.  Defaults to LCM.
+    </Description>
+  </Variable>
+  <Variable initializer="false" input="true" name="trace">
+    <Description>
+      Used for debugging this workflow and when set to true trace
+      will be sent to stdout.
+    </Description>
+  </Variable>
+  <Variable name="project">
+    <Description>
+      ProvisioningProject which is just a compiled version of the ProvisioningPlan.
+    </Description>
+  </Variable>
+  <Variable name="identityRequestId" output="true">
+    <Description>
+       The sequence id of the Identity request object which is stored in 
+       the name field of the identity request.
+    </Description>
+  </Variable>
+  <Variable name="approvalSet">
+    <Description>
+       The variable used to hold the approval set generated from the
+       native changes on the event.
+    </Description>
+  </Variable>
+  <Variable initializer="true" name="provisionRejectedItems">
+    <Description>
+        Flag to indicate if actual provisioning to reverse te native
+        change should take place OR if it should just print a plan to 
+        stdout. Set this variable to true, if you want it to provision
+        the rejected items, otherwise it'll just be printed to stdout. 
+     </Description>
+  </Variable>
+  <Variable name="launcher">
+    <Description>The name of the identity that launched the workflow. In cases where workflows are launched by the system an alternate launcher name may be passed as as a variable.</Description>
+  </Variable>
+  <Variable initializer="Modify" name="operations">
+    <Description>CSV list of operations that are part of the native change request, default to Modify but this will be recalculated in the "Build OP String" step.</Description>
+  </Variable>
+  <Variable initializer="Normal" input="true" name="workItemPriority">
+    <Description>
+       The String version of a WorkItem.Priority. This variable is 
+       used to set the priority on all of the workitems generated 
+       as part of this workflow and also set on the IdentityRequest
+       object.
+    </Description>
+  </Variable>
+  <Description>
+  An example workflow that requires manager approval
+  for all natively detected changes found by IdentityIQ.
+  
+  Any items rejected by the manager will be reversed and 
+  provisioned.    
+  </Description>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="LCM Workflow Library"/>
+  </RuleLibraries>
+  <Step icon="Start" name="start" posX="23" posY="129">
+    <Script>
+      <Source>
+        import sailpoint.tools.Util;
+        if ( Util.otob(trace) ) { 
+            System.out.println("Event was fired for identity ["+identityName+"]");
+            System.out.println("                    trigger ["+trigger.toXml()+"]");
+            System.out.println("                    event ["+event.toXml()+"]");
+        }
+      </Source>
+    </Script>
+    <Transition to="Build Op String"/>
+    <Transition to="end" when="script:(Util.size(event.getNativeChanges())==0)"/>
+  </Step>
+  <Step name="Build Op String" posX="81" posY="20" resultVariable="operations">
+    <Script>
+      <Source>
+        import sailpoint.object.NativeChangeDetection;
+        import sailpoint.object.ProvisioningPlan.AccountRequest;
+        import sailpoint.tools.Util;
+        
+        List ops = new ArrayList();
+        if ( event != null ) {
+            List ncs = event.getNativeChanges();
+            if ( ncs != null ) {
+                for ( NativeChangeDetection nc : ncs ) {
+                    AccountRequest.Operation op = nc.getOperation();
+                    if ( op == null ) 
+                        opString = "Modify";
+                    else
+                        opString = op.toString();
+
+                    if ( !ops.contains(opString) ) {
+                        ops.add(opString);
+                    }
+                }
+            }
+        }
+        return Util.listToCsv(ops);
+      </Source>
+    </Script>
+    <Transition to="Build Native Change Approval"/>
+  </Step>
+  <Step action="call:buildApprovalSetFromNativeChanges" name="Build Native Change Approval" posX="232" posY="20" resultVariable="approvalSet">
+    <Arg name="event" value="ref:event"/>
+    <Return name="approvalSet" to="approvalSet"/>
+    <Transition to="Approve Native Change"/>
+  </Step>
+  <Step name="Approve Native Change" posX="408" posY="20">
+    <Approval mode="parallel" owner="script:getManagerName(identityName, launcher, fallbackApprover);" renderer="nativeChangeApprovalRenderer.xhtml" send="identityDisplayName,identityName">
+      <AfterScript>
+        <Source>
+          import sailpoint.workflow.IdentityRequestLibrary;
+                    
+          if ( item == null ) 
+              return;
+
+          assimilateWorkItemApprovalSet(wfcontext, item, approvalSet);          
+          auditDecisions(item);
+        </Source>
+      </AfterScript>
+      <Arg name="workItemRequester" value="$(launcher)"/>
+      <Arg name="launcher" value="ref:launcher"/>
+      <Arg name="approvalSet" value="ref:approvalSet"/>
+      <Arg name="operations" value="$(operations)"/>
+      <Arg name="workItemDescription" value="Native Account Changes for User: $(identityDisplayName) - Manager Approval"/>
+      <Arg name="workItemNotificationTemplate" value="ref:ownerEmailTemplate"/>
+      <Arg name="workItemPriority" value="ref:workItemPriority"/>
+    </Approval>
+    <Transition to="Process Approval Decisions"/>
+  </Step>
+  <Step action="call:processNativeChangesApprovalDecisions" name="Process Approval Decisions" posX="575" posY="20" resultVariable="plan">
+    <Transition to="Provision Native Change Reversal"/>
+  </Step>
+  <Step condition="script:( Util.otob(provisionRejectedItems) &amp;&amp; plan != null )" icon="Task" name="Provision Native Change Reversal" posX="767" posY="20">
+    <Arg name="flow" value="EntitlementsRequest"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="policyScheme" value="none"/>
+    <Arg name="priority" value="ref:workItemPriority"/>
+    <Arg name="approvalScheme" value="none"/>
+    <Arg name="source" value="ref:source"/>
+    <Arg name="requireViolationReviewComments" value="false"/>
+    <Arg name="allowRequestsWithViolations" value="true"/>
+    <Arg name="enableRetryRequest" value="false"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Arg name="doRefresh" value="true"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Return name="project" to="project"/>
+    <Return name="identityRequestId" to="identityRequestId"/>
+    <Return merge="true" name="workItemComments" to="workItemComments"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="LCM Provisioning"/>
+    </WorkflowRef>
+    <Transition to="end"/>
+  </Step>
+  <Step catches="complete" icon="Catches" name="Complete" posX="658" posY="185">
+    <Arg name="priority" value="ref:workItemPriority"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Arg name="identityRequestId" value="ref:identityRequestId"/>
+    <Description>
+      Call the standard subprocess that can audit/finalize the request if they are in play. 
+    </Description>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Identity Request Finalize"/>
+    </WorkflowRef>
+    <Transition to="end"/>
+  </Step>
+  <Step icon="Stop" name="end" posX="767" posY="125"/>
+</Workflow>
+</sailpoint>

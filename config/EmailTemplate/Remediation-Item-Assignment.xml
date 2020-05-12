@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Remediation Item Assignment">
+  <Body>#if ($requesterName) $requesterName #{else} The system #{end} has assigned the following remediation item to you: $remediationItemName. This item is contained within the work item $workItemName.
+    </Body>
+  <Description>
+      Email Template for notifying remediation item assignee that they have
+      been assigned a remediation item.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="remediationItem" type="RemediationItem">
+        <Description>The RemediationItem that is being reassigned.</Description>
+      </Argument>
+      <Argument name="remediationItemName" type="string">
+        <Description>The description property of the remediationItem.</Description>
+      </Argument>
+      <Argument name="workItem" type="WorkItem">
+        <Description>The parent WorkItem of the RemediationItem being reassigned.</Description>
+      </Argument>
+      <Argument name="workItemName" type="string">
+        <Description>The description property of the WorkItem.</Description>
+      </Argument>
+      <Argument name="requesterName" type="string">
+        <Description>The display name of the Identity that requested the assignment.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Remediation item assigned: $workItemName</Subject>
+</EmailTemplate>
+</sailpoint>

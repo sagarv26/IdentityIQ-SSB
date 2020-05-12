@@ -1,0 +1,182 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="SP Approval Framework Custom Rules Library" language="beanshell">
+	<ReferencedRules>
+	    <Reference class="sailpoint.object.Rule" name="SP Approval Framework Standard Rules Library"/>
+	    <Reference class="sailpoint.object.Rule" name="Approval Library"/>
+    </ReferencedRules>
+	<Source>
+	<![CDATA[
+	import sailpoint.object.*;
+	import sailpoint.api.SailPointContext;
+	import java.util.*;
+	import java.text.*;
+   	import sailpoint.object.ProvisioningPlan;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+	import sailpoint.tools.Util;
+    import sailpoint.tools.Message;
+    
+    import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	private static Log logger = LogFactory.getLog("rule.ApprovalFramwork.RulesLibrary");
+	
+	
+	/***********************************************************************************************
+		Get Approval Types
+	************************************************************************************************/
+	public static List cstGetApprovalTypesStepRule(SailPointContext context, Workflow workflow){
+		logger.trace("Enter cstGetApprovalTypesStepRule");
+		
+		List returnApprovalTypes = new ArrayList();
+		
+		/*
+			Hard code types with this logic:
+		*/
+		/*
+		returnApprovalTypes.add("Manager");
+		returnApprovalTypes.add("Owner");
+		returnApprovalTypes.add("Director");
+		*/
+		
+		/*
+			Use the following call to get all approvals tied to roles and entitlements via requiredApprovals
+			extended attributes:
+		*/
+		
+		ApprovalSet approvalSet = workflow.get("approvalSet");
+		returnApprovalTypes = defaultGetApprovalTypesUseExtended(context, approvalSet, workflow);
+		
+		
+		logger.trace("Exit cstGetApprovalTypesStepRule: " + returnApprovalTypes);
+		return returnApprovalTypes;
+	}
+	
+	
+	/***********************************************************************************************
+		Pre Approval Rules
+	************************************************************************************************/
+	public static boolean cstPreApprovalDefaultSplitterRule(SailPointContext context, Workflow workflow, String approvalType){
+		logger.trace("Enter cstPreApprovalDefaultSplitterRule");
+		
+		ApprovalSet approvalSet = workflow.get("approvalSet");
+		boolean hasItems = defaultPreApprovalSetSplitterUseExtended(context, approvalSet, workflow, approvalType);
+		
+		logger.trace("Exit cstPreApprovalDefaultSplitterRule: " + hasItems);
+		return hasItems;
+	}
+	
+	
+	/***********************************************************************************************
+		Get Approvers Rules
+	************************************************************************************************/
+	public static Object cstGetApproversManagerRule(SailPointContext context, Workflow workflow){
+		logger.trace("Enter cstGetApproversManagerRule");
+		
+		String identityName = workflow.get("identityName");
+		Identity id = context.getObjectByName(Identity.class, identityName);
+		String managerName = null;
+		
+		if (id != null){
+			Identity mgr = id.getManager();
+			if (mgr != null){
+				managerName = mgr.getName();
+			}
+		}
+		
+		logger.trace("Exit cstGetApproversManagerRule");
+		return managerName;
+	}
+	
+	public static Object cstGetApproversOwnerRule(SailPointContext context, Workflow workflow){
+		logger.trace("Enter cstGetApproversOwnerRule");
+		
+		//Copy of the LCM Build Owner Approvals Rules
+       // Attributes needed in the rule context: 
+       //
+       // plan - ProvisioningPlan object 
+       //
+       // approvalSet - An ApprovalSet representing the "cart"
+       // 
+       // fallbackApprover - String representing who gets the approval
+       //                    if we can't resolve one.  
+       //
+       // identityName - name of the identity being operated on
+       //
+       //
+       
+       ApprovalSet approvalSet = workflow.get("approvalSet");
+       ProvisioningPlan plan = workflow.get("plan");
+       String identityName = workflow.get("identityName");
+       String fallbackApprover = workflow.get("fallbackApprover");
+       String launcher = workflow.get("launcher");
+       
+       List approvals = new ArrayList();
+       if ( approvalSet != null ) {
+           // 
+           // Build a map of owner to ApprovalSet from each of the things in the plan 
+           // 
+           Map ownerMap = buildOwnerMap("owner", approvalSet, plan, fallbackApprover, identityName, true);
+           if ( ownerMap != null) {
+               approvals = buildApprovalsFromMap(ownerMap, identityName, launcher);
+           } 
+       }
+       
+       return ( Util.size(approvals) > 0 ) ? approvals : null;
+	}
+	
+	public static Object cstGetApproversDirectorRule(SailPointContext context, Workflow workflow){
+		logger.trace("Enter cstGetApproversManagerRule");
+		
+		// TODO:  write logic to get the director
+		return "directordude";
+	}
+	
+	public static Object cstGetApproversSupervisorRule(SailPointContext context, Workflow workflow){
+		logger.trace("Enter cstGetApproversSupervisorRule");
+		
+		// TODO:  write logic to get the director
+		return "testuser1";
+	}
+	
+	
+	/***********************************************************************************************
+		Approval After Script Rules
+	************************************************************************************************/
+	public static void cstApprovalAfterScriptDefaultMergerRule(SailPointContext context, ApprovalSet approvalSet, ApprovalSet tempApprovalSetRem, String approvalType){
+		logger.trace("Enter cstApprovalAfterScriptDefaultMergerRule");
+		
+		defaultAfterScriptMergeSplit(context, approvalSet, tempApprovalSetRem, true, approvalType);
+	}
+	
+	public static void cstApprovalValidatorScriptExampleRule(SailPointContext context, ApprovalSet approvalSet, WorkItem item){
+		logger.trace("Enter cstApprovalValidatorScriptExampleRule");
+		
+		List approvalItems = approvalSet.getRejected();
+	
+	  	if (approvalItems != null &amp;&amp; approvalItems.size() > 0) {
+	
+	   		// for ApprovalItem Comment
+		   	for (ApprovalItem approvalItem : approvalItems) {
+				List  comments = approvalItem.getComments();
+		    	if (comments == null || comments.size() == 0) {
+		     		return "Please Provide comment for Rejected Item";
+		    	}
+		   	}
+		   	
+		   	// for Generic Comment
+		   	List  workItemComments = item.getComments();
+		   	if (workItemComments == null || workItemComments.size() == 0) {
+		    	return "Please Provide Generic comment for Reason of Rejection";
+		   	}
+		}
+		
+		return null;
+	}
+	
+	
+	
+	]]>
+	</Source>
+</Rule>

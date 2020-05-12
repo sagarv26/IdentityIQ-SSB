@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Work Item Forward">
+  <Body>$requester forwarded work item "$workItemName" from $previousOwner to $newOwner on $spTools.formatDate($forwardDate,3,1)
+
+--------------------------------------------------------------------------------
+$!commentText</Body>
+  <Description>
+      Email Template for notifying the requester/new owner of a work item
+      that it has been forwarded.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workItem" type="WorkItem">
+        <Description>The WorkItem object being forwarded.</Description>
+      </Argument>
+      <Argument name="workItemName" type="string">
+        <Description>The name (also the description) of the WorkItem on which a comment was added.</Description>
+      </Argument>
+      <Argument name="previousOwner" type="string">
+        <Description>The display name of the Identity that was the previous owner of the work item.</Description>
+      </Argument>
+      <Argument name="newOwner" type="string">
+        <Description>The display name of the Identity that is the new owner of the work item.</Description>
+      </Argument>
+      <Argument name="requester" type="string">
+        <Description>The display name of the Identity that requested the forwarding.</Description>
+      </Argument>
+      <Argument name="forwardDate" type="date">
+        <Description>The date the forwarding was requested, represented as a java.util.Date object.</Description>
+      </Argument>
+      <Argument name="commentText" type="string">
+        <Description>Comments about the forwarding.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Work item "$workItemName" forwarded</Subject>
+</EmailTemplate>
+</sailpoint>

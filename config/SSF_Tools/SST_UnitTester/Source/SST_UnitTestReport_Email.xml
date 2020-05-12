@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate  modified="1428325363575" name="SST Unit Test Report Email">
+  <Body>
+  <![CDATA[
+  	<html>
+	<body>
+	<p> 
+  		<h1>SST Unit Tester Report</h1>
+  		<h2>Summary</h2>
+  		<table border="1" cellspacing="0" cellpadding="3">
+	  		<tr>
+		  		<td  style="border: 1pt solid grey; background-color: black; color: white; width: 100px; ">Total Run:</td>
+		  		<td style="border: 1pt solid grey; width: 100px">$total</td></tr>
+		  		<tr><td  style="border: 1pt solid grey; background-color: black; color: white;">Total Success:</td>
+		  		<td style="border: 1pt solid grey; width: 100px;background-color: white; color: #0B610B">$success</td></tr>
+		  		<tr><td  style="border: 1pt solid grey; background-color: black; color: white;">Total Failed:</td>
+		  		<td style="border: 1pt solid grey; width: 100px; background-color: #F2F2F2; color: #B40404">$failed</td>
+	  		</tr>
+  		</table>
+  		<br>
+  		<h2>Individual Results</h2>
+  		<table border="1" cellspacing="0" cellpadding="3">
+  		<tr  style="background-color: black; color: white;">
+	  		<th style="width: 250px;">Rule</th>
+	  		<th style="width: 250px;">Arg File</th>
+	  		<th style="width: 250px;">Use Case</th>
+	  		<th style="width: 150px;">Category</th>
+	  		<th style="width: 150px;">Status</th>
+	  		<th style="width: 450px;">Notes</th>
+  		</tr>
+  		
+  		#foreach ($result in $results)
+  			#if ($result.status == "FAILURE")
+  				<tr style="background-color: #F2F2F2; color: #B40404">
+  			#else
+  				<tr style="background-color: white; color: #0B610B">
+  			#end
+  			
+				<td>$result.ruleName</td>
+				<td>$result.argFile</td>
+				<td>$result.useCase</td>
+				<td>$result.category</td>
+				<td>$result.status</td>
+				<td>$result.message</td>
+			 </tr>
+			
+        #end
+        
+        </table>
+    </p>
+    </body>
+    </html>
+    ]]>
+    </Body>
+  <Description>
+      Email Template for reporting on unit test success/failures.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="results" type="string">
+      </Argument>
+      <Argument name="total" type="int">
+      </Argument>
+      <Argument name="success" type="int">
+      </Argument>
+      <Argument name="failed" type="int">
+      </Argument>
+      
+    </Inputs>
+  </Signature>
+  <Subject>All Unit Tests Report</Subject>
+</EmailTemplate>

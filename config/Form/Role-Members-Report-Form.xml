@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Role Members Report Form" type="Report">
+  <Section columns="2" label="rept_cert_role_members_section_opts" name="customProperties">
+    <Field displayName="rept_role_members_field_status" helpKey="rept_role_members_help_status" name="disabled" type="string" value="ref:disabled">
+      <AllowedValues>
+        <List>
+          <String>null</String>
+          <String>rept_role_members_filter_status_all</String>
+        </List>
+        <List>
+          <String>true</String>
+          <String>rept_role_members_filter_status_disabled</String>
+        </List>
+        <List>
+          <String>false</String>
+          <String>rept_role_members_filter_status_enabled</String>
+        </List>
+      </AllowedValues>
+    </Field>
+    <Field displayName="rept_role_members_field_apps" helpKey="rept_role_members_help_apps" multi="true" name="applications" type="Application" value="ref:applications"/>
+    <Field displayName="rept_role_members_field_owners" helpKey="rept_role_members_help_owners" multi="true" name="owners" type="Identity" value="ref:owners">
+      <Attributes>
+        <Map>
+          <entry key="identitySuggestFilter" value="Owner"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="rept_role_members_field_type" helpKey="rept_role_members_help_type" multi="true" name="type" type="Bundle" value="ref:type">
+      <Attributes>
+        <Map>
+          <entry key="objectColumn" value="type"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="rept_role_members_field_empty" helpKey="rept_role_members_help_empty" name="showEmpty" type="string" value="ref:showEmpty">
+      <AllowedValues>
+        <List>
+          <String>null</String>
+          <String>rept_role_members_opt_full_all</String>
+        </List>
+        <List>
+          <String>false</String>
+          <String>rept_role_members_opt_empty_roles</String>
+        </List>
+        <List>
+          <String>true</String>
+          <String>rept_role_members_opt_full_roles</String>
+        </List>
+      </AllowedValues>
+    </Field>
+  </Section>
+</Form>
+</sailpoint>

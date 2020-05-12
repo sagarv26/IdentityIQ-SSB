@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Mitigation Expiration">
+  <Body>The exception allowed for $!itemDescription on $identityName has expired.
+
+Comments from $mitigator:
+--------------------------------------------------------------------------------
+$!comments
+--------------------------------------------------------------------------------</Body>
+  <Description>
+      Email Template for notifying certifiers that a mitigation they requested
+      has expired.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="identityName" type="string">
+        <Description>The full name (first and last) of the Identity object that has the mitigation.</Description>
+      </Argument>
+      <Argument name="itemDescription" type="string">
+        <Description>A short description of the item that was mitigated.</Description>
+      </Argument>
+      <Argument name="mitigationExpiration" type="MitigationExpiration">
+        <Description>The sailpoint.object.MitigationExpiration that is sending this notification.</Description>
+      </Argument>
+      <Argument name="mitigator" type="string">
+        <Description>The full name (first and last) of the Identity that created the mitigation.</Description>
+      </Argument>
+      <Argument name="comments" type="string">
+        <Description>Comments from the expired mitigation.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Allowed exception has expired for $!identityName</Subject>
+</EmailTemplate>
+</sailpoint>

@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="LCM Build Identity Approvers">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Approval Library"/>
+  </ReferencedRules>
+  <Source>
+    
+       import sailpoint.object.ApprovalSet;
+       import sailpoint.object.ProvisioningPlan;
+       import sailpoint.object.WorkItem.State;
+       import sailpoint.workflow.IdentityLibrary;
+       import sailpoint.tools.Util;
+
+       //
+       // Attributes needed in the rule context: 
+       //
+       // plan - ProvisioningPlan object 
+       //
+       // approvalScheme - String indicating how approvals should be generated
+       //   none - disabled
+       //   manager - the current manager gets the approval
+       //   newManager - the current manager if the manager changd
+       //   securityOfficer - the configured security officer
+       // 
+       // approvalSet - An ApprovalSet representing the "cart"
+       //
+       // fallbackApprover - String representing who gets the approval
+       //                    if we can't resolve one.  
+       //
+       // identityName - name of the identity being operated on
+       //
+       // launcher - name of the identity that launched the request
+       //
+       // securityOfficerName - The name of the securityOfficer to be used
+       //                       for approvals.
+       //
+
+       // Not all callers pass in securityOfficerName.  If not defined, just set
+       // it to null so we don't run into an error when we try to reference it.
+       if (void == securityOfficerName) {
+           securityOfficerName = null;
+       }
+
+       List approvers = new ArrayList();
+       if ( approvalSet != null ) {
+           List items = approvalSet.getItems();
+           // By default there is one item for all of the edits
+           ApprovalItem item = null;
+           if ( Util.size(items) &gt; 0 ) 
+               item = items.get(0); 
+
+           if ( item != null ) {
+               approvers = getApproverNames(approvalScheme, item, plan, identityName, securityOfficerName);
+               if ( approvers != null &amp;&amp; approvers.size() == 0 &amp;&amp; fallbackApprover != null ) {
+                   if ( log.isDebugEnabled() ) { 
+                       log.debug("Approver could not be resolved using fallbackApprover '"+fallbackApprover+"'.");
+                   }
+                   approvers.add(fallbackApprover);
+               } 
+               // If the launcher is an approver remove them from the list
+               if ( approvers != null &amp;&amp; approvers.contains(launcher) ) {
+                   Map args = wfcontext.getArguments();
+                   String esig = null;
+                   if ( args != null ) 
+                       esig = (String)args.get("approverElectronicSignature");
+ 
+                   if ( !IdentityLibrary.isElectronicSignatureEnabled(wfcontext) &amp;&amp; Util.isNullOrEmpty(esig) ) {
+                       approvers.remove(launcher);
+                       // If this is the only approver automaticaly
+                       // mark the item approved.
+                       if ( Util.size(approvers) == 0 ) {
+                           item.setState(WorkItem.State.Finished);
+                           item.setOwner(launcher);
+                       }
+                   }
+               }
+           }
+       }
+       return approvers;
+    
+  </Source>
+</Rule>
+</sailpoint>

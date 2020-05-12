@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.BatchRequestTaskExecutor" hidden="true" name="Batch Request Processing Task" subType="task_item_type_system" template="true" type="System">
+  <Description>
+          Process batch requests
+      </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="batchRequestId" required="true" type="string"/>
+    </Inputs>
+    <Returns>
+      <Argument name="recordsProcessed" type="int">
+        <Prompt>Total processed:</Prompt>
+      </Argument>
+      <Argument name="recordsSuccess" type="int">
+        <Prompt>Total success:</Prompt>
+      </Argument>
+      <Argument name="recordsFail" type="int">
+        <Prompt>Total failed:</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

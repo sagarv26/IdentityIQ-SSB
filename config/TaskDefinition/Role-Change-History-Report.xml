@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="Role Change History Report" progressMode="Percentage" resultAction="Rename" subType="Role Management Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="Role Change Management Report">
+            <DataSource objectType="Bundle" type="Hql">
+              <Query>from Bundle bundle, BundleArchive archive where archive.sourceId=bundle.id and
+                       archive.version = (select max(archive2.version) from BundleArchive archive2 where archive2.sourceId=bundle.id %CREATED)</Query>
+              <QueryParameters>
+                <Parameter argument="applications" property="bundle.profiles.applications.id"/>
+                <Parameter argument="owners" property="bundle.owner.id"/>
+                <Parameter argument="type" property="bundle.type"/>
+                <Parameter argument="disabled" property="bundle.disabled" valueClass="boolean"/>
+                <Parameter argument="createStart" operation="GE" property="archive2.created" valueClass="date"/>
+                <Parameter argument="createEnd" operation="LE" property="archive2.created" valueClass="date"/>
+              </QueryParameters>
+              <QueryScript>
+                <Source>
+                          
+                              import sailpoint.reporting.ReportingLibrary;
+
+                              String dateClause = "";
+                              if (args.get("createStart") != null){
+                                 dateClause += " and archive2.created&gt;=:createStart ";
+                              }
+                              if (args.get("createEnd") != null){
+                                 dateClause += " and archive2.created&lt;=:createEnd ";
+                              }
+
+                              query = query.replace("%CREATED", dateClause);
+
+                              StringBuffer queryBuffer = new StringBuffer(query);
+
+                              List clauseItems = new ArrayList();
+
+                              String typeClause = ReportingLibrary.buildHqlFilter("type", "bundle.type", args);
+                              if (typeClause != null)
+                                clauseItems.add(typeClause);
+
+                              String ownerClause = ReportingLibrary.buildHqlFilter("owners", "bundle.owner.id", args);
+                              if (ownerClause != null)
+                                clauseItems.add(ownerClause);
+
+                              String disabledClause = ReportingLibrary.buildHqlFilter("disabled", "bundle.disabled", args);
+                              if (disabledClause != null)
+                                clauseItems.add(disabledClause);
+
+                              String appsClause = ReportingLibrary.buildHqlFilter("applications", "profile.application.id", args);
+                              if (appsClause != null){
+                                queryBuffer.insert(query.indexOf("where"), " inner join bundle.profiles as profile ");
+                                clauseItems.add(appsClause);
+                              }
+
+                              if (!clauseItems.isEmpty()){
+                                 for(String c : clauseItems){
+                                    queryBuffer.append(" and " + c);
+                                 }
+                              }
+
+                              return queryBuffer.toString();
+                          
+                       </Source>
+              </QueryScript>
+            </DataSource>
+            <ReportForm>
+              <Reference class="sailpoint.object.Form" name="Role Change Management Report Form"/>
+            </ReportForm>
+            <Columns>
+              <ReportColumnConfig field="role" header="rept_role_change_mgmt_name" property="bundle.name" sortable="true" width="110"/>
+              <ReportColumnConfig field="type" header="rept_role_change_mgmt_type" property="bundle.type" sortable="true" width="110">
+                <RenderScript>
+                  <Source>
+                          
+                              import sailpoint.tools.Message;
+                              import sailpoint.reporting.ReportingLibrary;
+                              if (value != null){
+                                String displayName = ReportingLibrary.getRoleTypeDisplayName(value);
+                                if (displayName != null){
+                                  return Message.localize("rept_change_mgmt_role_type_desc", new String[]{value, displayName});
+                                }
+                              }
+
+                              return value;
+                          
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="version" header="rept_role_change_mgmt_version" property="archive.version" sortable="true" width="110"/>
+              <ReportColumnConfig field="changeDate" header="rept_role_change_mgmt_date" property="archive.created" sortable="true" width="110"/>
+              <ReportColumnConfig field="approver" header="rept_role_change_mgmt_approver" property="archive.creator" sortable="true" width="110"/>
+              <ReportColumnConfig field="disabled" header="rept_role_change_mgmt_status" property="bundle.disabled" sortable="true" width="110">
+                <RenderScript>
+                  <Source>
+                          
+                              import sailpoint.tools.Message;
+                              import sailpoint.tools.Util;
+                              return Util.otob(value) ? Message.localize("rept_change_mgmt_status_disabled") :
+                                Message.localize("rept_change_mgmt_status_enabled");
+                          
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+            </Columns>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>A detailed view of the roles that have been recently changed</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessRoleChangeMgmtReport"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument multi="true" name="applications" type="Application">
+        <Description>rept_input_biz_role_report_apps</Description>
+      </Argument>
+      <Argument multi="true" name="type" type="string">
+        <Description>rept_input_biz_role_report_type</Description>
+      </Argument>
+      <Argument multi="true" name="owners" type="Identity">
+        <Description>rept_input_biz_role_report_owners</Description>
+      </Argument>
+      <Argument name="createStart" type="date"/>
+      <Argument name="createEnd" type="date"/>
+      <Argument name="disabled" type="string"/>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

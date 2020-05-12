@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.RoleMiningTask" hidden="true" name="Role Mining" subType="task_item_type_system" type="System">
+  <Description>
+            Performs undirected role mining.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="configId" required="true" type="string">
+        <Prompt>task_in_role_mining_config_id</Prompt>
+      </Argument>
+      <Argument name="filter" type="string">
+        <Prompt>task_in_role_mining_filter</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="totalInstances" type="int">
+        <Prompt>task_out_role_mining_total_instances</Prompt>
+      </Argument>
+      <Argument name="totalRoles" type="int">
+        <Prompt>task_out_role_mining_total_roles</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

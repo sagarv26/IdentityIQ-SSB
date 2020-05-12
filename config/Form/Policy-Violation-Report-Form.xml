@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Policy Violation Report Form" type="Report">
+  <Section columns="2" label="rept_pol_viol_properties_secion" name="customProperties">
+    <Field displayName="rept_pol_viol_filter_identities" helpKey="rept_input_violation_report_identities" multi="true" name="identities" type="Identity" value="ref:identities"/>
+    <Field displayName="rept_pol_viol_filter_policy" filterString="template == false" helpKey="rept_input_violation_report_policies" multi="true" name="policies" type="Policy" value="ref:policies"/>
+    <Field displayName="rept_pol_viol_filter_active" displayType="radio" helpKey="rept_input_violation_report_status" name="status" type="String" value="ref:status">
+      <AllowedValuesDefinition>
+        <Value>
+          <List>
+            <List>
+              <String>null</String>
+              <String>rept_input_violation_report_status_all</String>
+            </List>
+            <List>
+              <String>active</String>
+              <String>rept_input_violation_report_active</String>
+            </List>
+            <List>
+              <String>completed</String>
+              <String>rept_input_violation_report_inactive</String>
+            </List>
+          </List>
+        </Value>
+      </AllowedValuesDefinition>
+    </Field>
+    <Field displayName="rept_pol_viol_filter_viol_date" helpKey="rept_input_violation_report_violation_date" name="violationDate" type="date" value="ref:violationDate"/>
+    <Field displayName="rept_pol_viol_filter_viol_status" helpKey="rept_pol_viol_help_viol_status" multi="true" name="actualStatus" type="String" value="ref:actualStatus">
+      <AllowedValuesDefinition>
+        <Script>
+          <Source>
+                          import sailpoint.object.*;
+
+                          List l = new ArrayList();
+                          for(PolicyViolation.Status pv : PolicyViolation.Status.values()) {
+                          List l2 = new ArrayList();
+                          l2.add(pv.toString());
+                          l2.add(pv.getMessageKey());
+
+                          l.add(l2);
+                          }
+                          return l;
+                      </Source>
+        </Script>
+      </AllowedValuesDefinition>
+    </Field>
+  </Section>
+</Form>
+</sailpoint>

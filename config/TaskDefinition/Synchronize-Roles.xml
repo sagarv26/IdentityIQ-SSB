@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.RoleSynchronizer" name="Synchronize Roles" subType="task_item_type_system" type="System">
+  <Description>
+            Synchronize roles with identity management systems.
+        </Description>
+  <Signature>
+    <Returns>
+      <Argument name="updates" type="int">
+        <Prompt>task_out_role_sync_updates</Prompt>
+      </Argument>
+      <Argument name="updateFailures" type="int">
+        <Prompt>task_out_role_sync_update_failures</Prompt>
+      </Argument>
+      <Argument name="deletes" type="int">
+        <Prompt>task_out_role_sync_deletes</Prompt>
+      </Argument>
+      <Argument name="deleteFailures" type="int">
+        <Prompt>task_out_role_sync_delete_failures</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

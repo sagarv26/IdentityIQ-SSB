@@ -1,0 +1,246 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="Policy Violation Report" progressMode="Percentage" resultAction="Rename" subType="Policy Enforcement Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="Policy Violation Report">
+            <Chart category="status" groupBy="status,policyName" series="policyName" title="rept_violations_chart_title" type="column" value="count(*)"/>
+            <DataSource objectType="PolicyViolation" type="Filter">
+              <QueryParameters>
+                <Parameter argument="identities" property="identity.id"/>
+                <Parameter argument="status" property="active">
+                  <ValueScript>
+                    <Source>
+                                            if ("active".equals(value)){
+                                              return true;
+                                            }
+                                            else if("completed".equals(value)) {
+                                              return false;
+                                            }
+
+                                          return null;
+                                        </Source>
+                  </ValueScript>
+                </Parameter>
+                <Parameter argument="policies" property="policyId"/>
+                <Parameter argument="violationDate" operation="LT" property="created"/>
+                <Parameter argument="actualStatus" property="status"/>
+              </QueryParameters>
+            </DataSource>
+            <ReportForm>
+              <Reference class="sailpoint.object.Form" name="Policy Violation Report Form"/>
+            </ReportForm>
+            <Columns>
+              <ReportColumnConfig field="firstname" header="rept_viol_grid_col_first_name" property="identity.firstname" sortable="true" width="110"/>
+              <ReportColumnConfig field="lastname" header="rept_viol_grid_col_last_name" property="identity.lastname" sortable="true" width="110"/>
+              <ReportColumnConfig field="name" header="rept_viol_grid_col_identity" property="identity.name" sortable="true" width="110"/>
+              <ReportColumnConfig field="policy" header="rept_viol_grid_col_policy" property="policyName" sortable="true" width="110"/>
+              <ReportColumnConfig field="violationOwner" header="rept_viol_grid_col_violation_owner" property="owner" sortable="true" width="110">
+                <RenderScript>
+                  <Source>
+                                        import sailpoint.object.*;
+                                        if (value != null){
+                                        return value.getDisplayableName();
+                                        }
+                                        return "";
+                                    </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="rule" header="rept_viol_grid_col_rule" property="constraintName" sortable="true" width="110"/>
+              <ReportColumnConfig field="status" header="rept_viol_grid_col_status" property="status" scriptArguments="identity,policyName,constraintName,created" sortable="true" width="110">
+                <RenderScript>
+                  <Source>
+                                    
+                                        import sailpoint.object.*;
+                                        import sailpoint.api.*;
+                                        import sailpoint.tools.*;
+                                        import sailpoint.web.messages.MessageKeys;
+                                        import java.text.DateFormat;
+                                        
+                                        String identityId = scriptArgs.get("identity").id;
+                                        QueryOptions ops = new QueryOptions();
+                                        IdentityHistoryItem lastDecision;
+                                        Message out = null;
+                                        
+                                        ops.addFilter(Filter.eq("identity.id", identityId));
+                                        ops.addFilter(Filter.eq("type", IdentityHistoryItem.Type.Decision));
+                                        if (scriptArgs.get("policyName") != null)
+                                            ops.addFilter(Filter.eq("policy", scriptArgs.get("policyName")));
+                                        if (scriptArgs.get("constraintName") != null)
+                                            ops.addFilter(Filter.eq("constraintName", scriptArgs.get("constraintName")));
+                                            
+                                        ops.setOrderBy("created");
+                                        ops.setOrderAscending(false);
+                                        ops.setResultLimit(1);
+                                        List items = context.getObjects(IdentityHistoryItem.class, ops);
+                                        if (items != null &amp;&amp; !items.isEmpty()){
+                                            lastDecision = (IdentityHistoryItem)items.get(0);
+                                        }
+                                        if (lastDecision != null &amp;&amp; lastDecision.getAction() != null){
+                                            // if the decision was made after the last policy scan then display it. We don't want to
+                                            // display old decisions, just those made for the current violation. If no decisions have been made on
+                                            // the violation, display any mitigation if it is still active.
+                                            if (lastDecision.getAction().getCreated().compareTo(scriptArgs.get("created")) &gt; 0 ||
+                                                    lastDecision.getAction().isMitigation()){
+                                
+                                                if (lastDecision.getAction().isMitigation()){
+                                                    LocalizedDate[] ldate = {new LocalizedDate(lastDecision.getAction().getMitigationExpiration(), DateFormat.SHORT, null)};
+                                                    out = Message.localize(MessageKeys.REPT_VIOL_GRID_STATUS_ALLOWED, ldate);
+                                                } else if (lastDecision.getAction().isRemediation()){
+                                                    LocalizedDate[] ldate = {new LocalizedDate(lastDecision.getAction().getCreated(), DateFormat.SHORT, null)};
+                                                    out = Message.localize(MessageKeys.REPT_VIOL_GRID_STATUS_REMEDIATED, ldate);
+                                                } else if (lastDecision.getAction().isAcknowledgment()){
+                                                     LocalizedDate[] ldate = {new LocalizedDate(lastDecision.getAction().getCreated(), DateFormat.SHORT, null)};
+                                                    out = Message.localize(MessageKeys.REPT_VIOL_GRID_STATUS_ACKNOWLEDGED, ldate);       
+                                                }
+                              
+                                            }
+                                        }
+                                         
+                                        if (out==null) {
+                                        out = Message.localize(MessageKeys.REPT_VIOL_GRID_STATUS_OPEN);
+                                        }
+                                        return out.getLocalizedMessage(locale, timezone);
+                                        
+
+                                    </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="summary" header="rept_viol_grid_col_summary" property="description" scriptArguments="rightBundles,leftBundles,policyId,policyName,constraintId,constraintName" sortable="true" width="110">
+                <RenderScript>
+                  <Source>
+                                    
+                                        import sailpoint.object.*;
+                                        import sailpoint.tools.*;
+                                        import java.util.*;
+                                        import sailpoint.web.messages.MessageKeys;
+
+                                        String summary = value;
+                                        BaseConstraint found = null;
+                                        if(summary == null) {
+                                            if (( scriptArgs.get("leftBundles") != null ) &amp;&amp; ( scriptArgs.get("rightBundles") != null)) {
+                                                List leftBundles = Util.csvToList((String)scriptArgs.get("leftBundles"));
+                                                List rightBundles = Util.csvToList((String)scriptArgs.get("rightBundles"));
+        
+                                                List[] bund = new List [] {leftBundles, rightBundles};
+                                                
+                                                Message msg = Message.localize( MessageKeys.POLICY_VIOLATION_SOD_SUMMARY, bund);
+        
+                                                summary = msg.getLocalizedMessage(locale, timezone);
+                                            }
+                                            else {
+                                            Policy p = null;
+                                            if (scriptArgs.get("policyId") != null)
+                                                p = context.getObjectById(Policy.class, scriptArgs.get("policyId"));
+                                            else if (scriptArgs.get("policyName") != null)
+                                                p = context.getObjectByName(Policy.class, scriptArgs.get("policyName"));
+                                            
+         
+                                            found = p.getConstraint(scriptArgs.get("constraintId"), scriptArgs.get("constraintName"));
+                                            
+                                            if(found != null) {
+                                            
+                                            summary = found.getDescription();
+                                            
+                                            }
+                                            
+                                            }
+        
+                                        }
+                                        
+                                        return summary;
+                                        
+                                    </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+            </Columns>
+            <ReportSummary title="rept_cert_summary_title">
+              <DataSourceScript>
+                <Source>
+                              
+                              import java.util.*;
+                              import sailpoint.object.*;
+
+                              QueryOptions ops = baseQueryOptions;
+
+                              List fields = new ArrayList();
+                              fields.add("count(*)");
+                              fields.add("count(distinct identity.id)");
+
+                              Iterator iter = context.search(PolicyViolation.class, ops, fields);
+
+                              Map map = new HashMap();
+
+                              if (iter.hasNext()){
+                                Object[] results = iter.next();
+                                map.put("total", results[0]);
+                                map.put("identities", results[1]);
+                              }
+
+                              QueryOptions mitigations = new QueryOptions(baseQueryOptions);
+                              mitigations.addFilter(Filter.eq("status", PolicyViolation.Status.Mitigated));
+                              map.put("mitigations", context.countObjects(PolicyViolation.class, mitigations));
+
+                              QueryOptions open = new QueryOptions(baseQueryOptions);
+                              open.addFilter(Filter.eq("status", PolicyViolation.Status.Open));
+                              map.put("open", context.countObjects(PolicyViolation.class, open));
+
+                              return map;
+                              
+                            </Source>
+              </DataSourceScript>
+              <Values>
+                <LiveReportSummaryValue label="rept_violations_summary_total" name="total"/>
+                <LiveReportSummaryValue label="rept_violations_summary_identities" name="identities"/>
+                <LiveReportSummaryValue label="rept_violations_summary_open" name="open"/>
+                <LiveReportSummaryValue label="rept_violations_summary_mitigations" name="mitigations"/>
+              </Values>
+            </ReportSummary>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>Displays information about all current policy violations in detailed format.</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessViolationReport"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument name="status" type="string">
+        <Description>rept_input_violation_report_status</Description>
+      </Argument>
+      <Argument name="actualStatus" type="string">
+        <Description>rept_input_violation_report_status</Description>
+      </Argument>
+      <Argument multi="true" name="identities" type="Identity">
+        <Description>rept_input_violation_report_identities</Description>
+      </Argument>
+      <Argument multi="true" name="businessRoles" type="Bundle">
+        <Description>rept_input_violation_report_biz_roles</Description>
+      </Argument>
+      <Argument filterString="template == false" multi="true" name="policies" type="Policy">
+        <Description>rept_input_violation_report_policies</Description>
+      </Argument>
+      <Argument multi="true" name="rules" type="SODConstraint">
+        <Description>rept_input_violation_report_rules</Description>
+      </Argument>
+      <Argument name="violationDate" type="date">
+        <Description>rept_input_violation_report_violation_date</Description>
+      </Argument>
+      <Argument name="resultScope" type="Scope">
+        <Description>rept_input_result_scope</Description>
+      </Argument>
+      <Argument multi="true" name="emailIdentities" type="Identity">
+        <Description>rept_input_email_recips</Description>
+      </Argument>
+      <Argument name="REPORT_MAX_COUNT" type="int">
+        <Description>rept_input_max_rows</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

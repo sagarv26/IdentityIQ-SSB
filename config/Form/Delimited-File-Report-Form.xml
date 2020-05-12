@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Delimited File Report Form" type="Report">
+  <Section columns="2" label="rept_del_file_secion_label" name="customProperties">
+    <Field displayName="rept_del_file_filter_applications" helpKey="rept_input_app_report_apps" multi="true" name="applications" type="Application" value="ref:applications"/>
+  </Section>
+</Form>
+</sailpoint>

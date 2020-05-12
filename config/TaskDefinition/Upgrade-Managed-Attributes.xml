@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.ManagedAttributeUpgrader" hidden="true" name="Upgrade Managed Attributes" progressMode="String" subType="task_item_type_system" type="System">
+  <Attributes>
+    <Map>
+      <entry key="retainGroups" value="false"/>
+    </Map>
+  </Attributes>
+  <Description>
+          Upgrade ManagedAttributes to the 6.0 model, and convert AccountGroups to ManagedAttributes.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="defaultLocale" required="true" type="string">
+        <Prompt>Default locale (example En_US):</Prompt>
+      </Argument>
+      <Argument name="simulate" type="boolean">
+        <Prompt>Simulate execution without persisting changes</Prompt>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

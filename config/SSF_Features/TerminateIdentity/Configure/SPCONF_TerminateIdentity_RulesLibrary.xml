@@ -1,0 +1,198 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="SPCONF Terminate Identity Rules Library" language="beanshell">
+	<ReferencedRules>
+	    <Reference class="sailpoint.object.Rule" name="SP Provisioning Rules Library"/>
+    </ReferencedRules>
+	<Source>
+	<![CDATA[
+	import sailpoint.api.SailPointFactory;
+	import sailpoint.api.SailPointContext;
+	import sailpoint.api.Provisioner;
+	import sailpoint.object.*;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+    import sailpoint.object.ProvisioningPlan.Operation; 
+	import sailpoint.tools.Util;
+    import sailpoint.tools.Message;
+    import sailpoint.tools.GeneralException;
+    import java.sql.Connection;
+	import java.sql.PreparedStatement;
+	import java.sql.ResultSet;
+	import java.sql.SQLException;
+	import java.sql.DriverManager;
+    import java.sql.Timestamp;
+	import java.util.*;
+	import java.text.*;
+	import javax.naming.Context;
+	import javax.naming.InitialContext;
+	import javax.sql.DataSource;
+	import sailpoint.api.PasswordGenerator;
+	
+	
+    import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	private static Log tilogger = LogFactory.getLog("rule.SP.TerminateIdentity.RulesLibrary");
+	
+	/******************************************************************************
+		TODO:  FILL IN FOLLOWING Terminate Identity METHODS
+	******************************************************************************/
+	/*
+		In all rules that receive the workflow param, any workflow variable is accessible by doing workflow.get, such as:
+		
+			String identityName = workflow.get("identityName");
+	*/
+	public static Attributes termInitIdentityModel(SailPointContext context, Workflow workflow){
+		tilogger.trace("Enter initIdentityModel");
+		Attributes idModel = new Attributes();
+	
+		String identityName = workflow.get("identityName");
+	
+		idModel.put("identityName", identityName);
+		idModel.put("identityDisplayName", workflow.get("identityDisplayName"));
+		
+		Identity identity = context.getObjectByName(Identity.class, identityName);
+		
+		String email = identity.getEmail();
+		if (email != null){
+			idModel.put("email", email);
+		}
+		
+		idModel.put("terminationDate", "");
+		
+		tilogger.trace("Enter initIdentityModel: " + idModel);
+		return idModel;
+	}
+	
+	
+	public static ProvisioningPlan buildCustomTerminateIdentityPlan(SailPointContext context, Workflow workflow){
+		String identityName = workflow.get("identityName");
+      	ProvisioningPlan plan = workflow.get("plan");
+      
+	    if (plan == null){
+	      	plan = new ProvisioningPlan();
+	    }
+      
+      	return plan;
+	}
+	
+	/* Return the request Type */
+	public static String getTermRequestTypeRule(SailPointContext context, Workflow workflow){
+		String requestType = "Terminate Identity";
+		
+		return requestType;
+	}
+	
+	/* Return prov success email */
+	public static String getTermProvSuccessEmailTemplateRule(SailPointContext context, Workflow workflow){
+		String val = "Terminate Identity Success Email Template";
+		
+		return val;
+	}
+	
+	/* Return prov failure email */
+	public static String getTermProvFailureEmailTemplateRule(SailPointContext context, Workflow workflow){
+		String val = "Terminate Identity Failure Email Template";
+		
+		return val;
+	}
+	
+	/* Return approved email */
+	public static String getTermApprovedEmailTemplateRule(SailPointContext context, Workflow workflow){
+		String val = "Terminate Identity Approved Email Template";
+		
+		return val;
+	}
+	
+	/* Return rejected email */
+	public static String getTermRejectedEmailTemplateRule(SailPointContext context, Workflow workflow){
+		String val = "Terminate Identity Rejected Email Template";
+		
+		return val;
+	}
+	
+	/* Return prov success email to */
+	public static String getTermProvSuccessEmailToRule(SailPointContext context, Workflow workflow){
+		Identity identity = context.getObject(Identity.class, workflow.get("identityName"));
+		String val = identity.getEmail();
+		
+		context.decache(identity);
+		identity = null;
+		
+		return val;
+	}
+	
+	/* Return prov failure email to */
+	public static String getTermProvFailureEmailToRule(SailPointContext context, Workflow workflow){
+		Identity identity = context.getObject(Identity.class, workflow.get("identityName"));
+		String val = identity.getEmail();
+		
+		context.decache(identity);
+		identity = null;
+		
+		return val;
+	}
+	
+	/* Return approved email to */
+	public static String getTermApprovedEmailToRule(SailPointContext context, Workflow workflow){
+		Identity identity = context.getObject(Identity.class, workflow.get("identityName"));
+		String val = identity.getEmail();
+		
+		context.decache(identity);
+		identity = null;
+		
+		return val;
+	}
+	
+	/* Return rejected email to */
+	public static String getTermRejectedEmailToRule(SailPointContext context, Workflow workflow){
+		String val = "somedefaultaddress@sailpoint.com";
+		
+		return val;
+	}
+	
+	/* Do any updates to workflow variables before ProvisioningPlan is compiled */
+	public static void termBeforePlanRule(SailPointContext context, Workflow workflow){
+		tilogger.trace("Enter Terminate Identity beforePlanRule");
+		
+		tilogger.trace("Getting extension attributes that can be used for customizations");
+		Attributes identityModel = initWorkflowAttributesVar(workflow, "identityModel");
+		Attributes spExtAttrs = initWorkflowAttributesVar(workflow, "spExtAttrs");
+		
+		//TODO:  CAN PUT LOGIC HERE TO INITIALIZE VALUES
+		
+		workflow.put("identityModel", identityModel);
+		workflow.put("spExtAttrs", spExtAttrs);
+		
+		tilogger.trace("Exit Terminate Identity beforePlanRule");
+	}
+	
+	/* Do any updates to workflow variables before ProvisioningProject is provisioned */
+	public static void termBeforeProvisionRule(SailPointContext context, Workflow workflow){
+		tilogger.trace("Enter Terminate Identity beforeProvisionRule");
+		
+		tilogger.trace("Exit Terminate Identity beforeProvisionRule");
+	}
+	
+	/* Do any updates to workflow variables after ProvisioningProject is provisioned */
+	public static void termAfterProvisionRule(SailPointContext context, Workflow workflow){
+		tilogger.trace("Enter Terminate Identity afterProvisionRule");
+		List errors = getErrors(context, workflow);
+		
+		String identityName = workflow.get("identityName");
+		if (identityName != null){
+			setInactive(context, identityName, true);
+		}
+		
+		tilogger.trace("Exit Terminate Identity afterProvisionRule");
+	}
+	
+	/* Do any updates to workflow variables if there was no request to process */
+	public static void termNoRequestRule(SailPointContext context, Workflow workflow){
+		
+	}
+
+	]]>
+	</Source>
+</Rule>

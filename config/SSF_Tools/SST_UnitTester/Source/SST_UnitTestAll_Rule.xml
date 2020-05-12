@@ -1,0 +1,171 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="SST Unit Test All Rule" id="#ID#SSTUNITTESTALLRULE" language="beanshell">
+	<ReferencedRules>
+		<Reference class="sailpoint.object.Rule" name="SST Unit Test Rules Library"/>
+	</ReferencedRules>
+	<Signature returnType="Map">
+		<Inputs>
+			<Argument name="sendReport"/>
+			<Argument name="recipients"/>
+			<Argument name="categories" />
+			<Argument name="ruleConfig" />
+		</Inputs>
+    	<Returns/>
+	</Signature>
+	<Source>
+		<![CDATA[
+			import sailpoint.object.*;
+			import java.util.*;
+			import java.text.SimpleDateFormat;
+			import java.util.Date;
+			import java.io.File;
+			import java.io.IOException;
+			
+			import org.apache.commons.logging.Log;
+			import org.apache.commons.logging.LogFactory;
+
+			private static Log utlogger = LogFactory.getLog("rule.SST.UnitTest.RulesLibrary");
+			
+			String sRep = "";
+			String rec = "";
+			String catString = "";
+			List cats = new ArrayList();
+			
+			utlogger.debug("sendReport: " + sendReport);
+			utlogger.debug("recipients: " + recipients);
+			utlogger.debug("categories: " + categories);
+			
+			if (sendReport != null && sendReport != void){
+				sRep = sendReport;
+			}
+			
+			if (recipients != null && recipients != void){
+				rec = recipients;
+			}
+			
+			if (categories != null && categories != void){
+				catString = categories;
+			}
+			
+			utlogger.debug("ruleConfig: " + config);
+			
+			if (config != null && config != void){
+				if (config.containsKey("sendReport")){
+					sRep = config.get("sendReport");
+				}
+				
+				if (config.containsKey("recipients")){
+					rec = config.get("recipients");
+				}
+				
+				if (config.containsKey("categories")){
+					catString = config.get("categories");
+				}
+			}
+			
+			utlogger.debug("HAVE INPUT ARGUMENTS");
+			utlogger.debug("sRep: " + sRep);
+			utlogger.debug("rec: " + rec);
+			utlogger.debug("catString: " + catString);
+			
+			if (catString != null && !catString.trim().equals("")){
+				if (catString.indexOf(":") > -1){
+					String[] sp = catString.split(":");
+					cats = new ArrayList(Arrays.asList(sp));
+				} else {
+					cats.add(catString);
+				}
+			}
+			
+			utlogger.debug("Categories: " + cats);
+			
+			utlogger.debug("BEGIN ALL UNIT TESTS");
+			
+			boolean doReport = false;
+			
+			if (sRep != null && sRep != void && Boolean.parseBoolean(sRep)){
+				doReport = true;
+			}
+			
+			List results = runAllUnitTests(doReport, cats);
+			
+			utlogger.debug("FINISHED ALL UNIT TESTS.  PRINT RESULTS.");
+			
+			if (results == null || results.isEmpty()){
+				utlogger.warn("WHOOPS, NO RESULTS.");
+				return "No results";
+			}
+			
+			utlogger.trace("Have doReport: " + doReport);
+			if (doReport){
+				utlogger.debug("Send the results as a report");
+				int total = results.size();
+				int failed = 0;
+				int success = 0;
+				
+				utlogger.debug("Loop the results to get the counts");
+				for (Map result : results){
+			
+					if (result.get("status").indexOf("SUCCESS") > -1){
+						success += 1;
+					} else {
+						failed +=1;
+					}
+				}
+				
+				utlogger.debug("Total: " + total);
+				utlogger.debug("Success: " + success);
+				utlogger.debug("Failed: " + failed);
+				
+				EmailTemplate emailTemplate = context.getObjectByName(EmailTemplate.class, "SST Unit Test Report Email");
+				List toAddresses = new ArrayList();
+				
+				if (rec.indexOf(",") > -1){
+					String[] split = rec.split(",");
+					toAddresses.addAll(Arrays.asList(split));
+				} else {
+					toAddresses.add(rec);
+				}
+				
+				utlogger.debug("To Addresses: " + toAddresses);
+				
+				Map emailArgs = new HashMap();
+				
+				emailArgs.put("results", results);
+				emailArgs.put("total", total);
+				emailArgs.put("failed", failed);
+				emailArgs.put("success", success);
+				
+				EmailOptions emailOps = new EmailOptions(toAddresses, emailArgs);
+				
+				utlogger.debug("Sending the email notification");
+				context.sendEmailNotification(emailTemplate, emailOps);
+				
+				String fileName = "%%SST_UT_OUTPUT_PATH%%UT_AllReport-";
+				String fileName2 = "%%SST_UT_OUTPUT_PATH_BUILD%%UT_AllReport-";
+				
+				String pattern = "yyyyMMdd_HHmmss";
+    			SimpleDateFormat format = new SimpleDateFormat(pattern);
+    			
+    			String dt = format.format(new Date());
+    			
+    			fileName += dt + "-%%SST_UT_TARGET%%.html";
+    			fileName2 += dt + "-%%SST_UT_TARGET%%.html";
+    			
+    			writeHtmlFile(emailArgs, fileName);
+    			writeHtmlFile(emailArgs, fileName2);
+    			
+    			
+			} else {
+				utlogger.debug("SEND THE RESULTS TO SYSTEM.OUT");
+				for (Map result : results){
+			
+					utlogger.debug(result);
+				}
+			}
+			return "finished";
+			
+		]]>
+	</Source>
+</Rule>

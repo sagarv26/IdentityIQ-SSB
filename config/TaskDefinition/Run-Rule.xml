@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.RuleExecutor" name="Run Rule" subType="task_item_type_generic" template="true" type="Generic">
+  <Description>A task that can be used to run an arbitrary rule.</Description>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="help_task_run_rule_rule" name="ruleName" type="Rule">
+        <Prompt>label_rule</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_run_rule_ruleconfig" name="ruleConfig" type="string">
+        <Prompt>label_rule_config</Prompt>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

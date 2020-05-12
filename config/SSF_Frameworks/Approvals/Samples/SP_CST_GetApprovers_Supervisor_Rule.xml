@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="SP CST Pre Approval Manager Rule">
+  <Signature>
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="workflow">
+        <Description>
+          Workflow object containing all attributes from the workflow.  To get attributes being set on identity, do workflow.get("fieldValues")
+        </Description>
+       </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="hasItems">
+        <Description>
+          Whether or not the approval has items to approve
+        </Description>
+       </Argument>
+    </Returns>
+  </Signature>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="SP Approval Framework Standard Rules Library"/>
+    <Reference class="sailpoint.object.Rule" name="SP Approval Framework Custom Rules Library"/>
+  </ReferencedRules>
+  <Source>
+  <![CDATA[
+   	
+   	return cstPreApprovalSupervisorRule(context, workflow);
+   	
+  ]]>
+</Source>
+</Rule>

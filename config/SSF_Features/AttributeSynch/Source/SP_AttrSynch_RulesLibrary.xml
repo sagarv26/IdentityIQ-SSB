@@ -1,0 +1,717 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="SP Attr Synch Rules Library" language="beanshell">
+	<ReferencedRules>
+	    <Reference class="sailpoint.object.Rule" name="SP Provisioning Rules Library"/>
+	    <Reference class="sailpoint.object.Rule" name="SP Role Assigment Rule Library"/>
+    </ReferencedRules>
+	<Source>
+	<![CDATA[
+	import sailpoint.api.SailPointFactory;
+	import sailpoint.api.SailPointContext;
+	import sailpoint.api.Provisioner;
+	import sailpoint.object.*;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+    import sailpoint.object.ProvisioningPlan.Operation; 
+	import sailpoint.tools.Util;
+    import sailpoint.tools.Message;
+    import sailpoint.tools.GeneralException;
+    import java.sql.Connection;
+	import java.sql.PreparedStatement;
+	import java.sql.ResultSet;
+	import java.sql.SQLException;
+	import java.sql.DriverManager;
+    import java.sql.Timestamp;
+	import java.util.*;
+	import java.text.*;
+	import javax.naming.Context;
+	import javax.naming.InitialContext;
+	import javax.sql.DataSource;
+	import sailpoint.api.PasswordGenerator;
+	import sailpoint.api.Matchmaker;
+	import sailpoint.api.IdentityService;
+	
+	
+    import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	private Log aslogger = LogFactory.getLog("rule.SP.AttrSynch.RulesLibrary");
+	
+	public boolean isTriggerAttrSynchRule(SailPointContext context, Identity previousIdentity, Identity newIdentity){
+		aslogger.trace("Enter isTriggerAttrSynchRule");
+		boolean flag = false;
+		
+		String currStatus = "";
+
+        if(newIdentity == null || newIdentity == void){
+        	aslogger.warn("New identity objects are null");
+        	return flag;
+        }
+        
+        if(previousIdentity == null || previousIdentity == void){
+        	aslogger.warn("Prev identity objects are null");
+        	return flag;
+        }
+        
+        String identityName = newIdentity.getName();
+        
+        Custom mappingObj = getAttrSynchMappingObject(context);
+		
+		if (mappingObj != null){
+		
+			String onlyFireOnce =  mappingObj.get("Trigger If No Other LCE Triggered");
+			aslogger.debug("Have option to only trigger if no other lce triggered: " + onlyFireOnce);
+			
+			boolean ofo = Boolean.parseBoolean(onlyFireOnce);
+			
+			if (ofo){
+				aslogger.trace("Check if others fired");
+				String lceName = "SP LCE Attr Synch Trigger";
+				boolean othersFired = checkOtherLCEFiring(context, newIdentity, previousIdentity, lceName);
+				
+				aslogger.trace("Have if others fired: " + othersFired);
+				
+				if (othersFired){
+					aslogger.debug("Something else kicked off.  Don't trigger the attribute synch.");
+					return flag;
+				}
+				
+			}
+		
+			String triggerType = mappingObj.get("Trigger Type");
+			
+			aslogger.debug("Have the trigger type: " + triggerType);
+			if ("Custom Rule".equalsIgnoreCase(triggerType)){
+				aslogger.trace("Trigger via custom rule.  Call the trigger method");
+				flag = isAttrSynchCustomTriggerRule(context, previousIdentity, newIdentity);
+			} else if("Selector".equalsIgnoreCase(triggerType)){
+				aslogger.trace("Determine if trigger using a selector");
+				Matchmaker matchMaker = new Matchmaker(context);
+				IdentitySelector idSelector = mappingObj.get("Trigger Field Selector");
+				
+				flag = matchMaker.isMatch(idSelector, newIdentity);
+			} else if("Compare Links".equalsIgnoreCase(triggerType)){
+				aslogger.trace("Determine if trigger by comparing links");
+				
+				flag = isNewLinkChanged(previousIdentity, newIdentity, mappingObj);
+			} else {
+				aslogger.warn("Unknown trigger type: " + triggerType);
+				
+			}
+		}
+		
+		aslogger.trace("Exit isTriggerAttrSynchRule: " + flag);
+		return flag;
+	}
+	
+	public boolean isNewLinkChanged(Identity previousIdentity, Identity newIdentity, Custom mappingObj){
+		aslogger.trace("Enter isNewLinkChanged");
+		boolean flag = false;
+	
+		List checkLinks = mappingObj.get("Trigger Compare Links");
+		Attributes linkSchemas = mappingObj.get("Trigger Compare Links Schemas");
+		IdentityService is = new IdentityService(context);
+		Application app;
+		
+		aslogger.trace("Have link names to check: " + checkLinks);
+		
+		if (checkLinks == null || checkLinks.isEmpty()){
+			aslogger.warn("No links to check");
+			return false;
+		}
+		
+		aslogger.trace("Loop the link names");
+		for (String checkLink : checkLinks){
+			aslogger.trace("Checking link: " + checkLink);
+			
+			app = context.getObject(Application.class, checkLink);
+			
+			List prevLinks = is.getLinks(previousIdentity, app);
+			List newLinks = is.getLinks(newIdentity, app);
+			
+			aslogger.trace("Check if either list is empty: " + prevLinks + ", " + newLinks);
+			
+			if (prevLinks == null || prevLinks.isEmpty() || newLinks == null || newLinks.isEmpty()){
+				aslogger.warn("One of the lists is empty");
+				continue;
+			}
+			
+			aslogger.trace("Making rather big assumption here that there's only only instance of an account that would be checked in this manner.");
+			Link prevLink = prevLinks.get(0);
+			Link newLink = newLinks.get(0);
+		
+			List linkAttrs = linkSchemas.get(checkLink);
+			
+			aslogger.trace("Have list of attrs to check: " + linkAttrs);
+			
+			if (linkAttrs == null || linkAttrs.isEmpty()){
+				aslogger.warn("No attr names to compare");
+				continue;
+			}
+			
+			aslogger.trace("Loop the schema attrs");
+			for (String attrName : linkAttrs){
+				aslogger.trace("Comparing the old and new value of: " + attrName);
+				
+				Object prevVal = prevLink.getAttribute(attrName);
+				Object newVal = newLink.getAttribute(attrName);
+				
+				aslogger.trace("Check if prev and new val are differnt");
+				flag = isFieldValueUpdated(prevVal, newVal);
+				
+				aslogger.trace("Check flag val: " + flag);
+				if (flag){
+					aslogger.debug("Old and new value are different for: " + attrName);
+					break;
+				}
+			}
+			
+		}
+	
+	
+		aslogger.trace("Exit isNewLinkChanged: " + flag);
+		return flag;
+	}
+	
+	
+	public ProvisioningPlan getDynamicAttrSynchPlan(SailPointContext context, String identityName, Workflow workflow){
+		aslogger.trace("Enter getDynamicAttrSynchPlan");
+		
+		Identity identity = context.getObjectByName(Identity.class, identityName);
+		
+		ProvisioningPlan plan = getDynamicAttrSynchPlan (context, identity, workflow);
+		
+		return plan;
+	}
+	
+	public ProvisioningPlan getDynamicAttrSynchPlan(SailPointContext context, Identity identity, Workflow workflow){
+		aslogger.trace("Enter getDynamicAttrSynchPlan");
+		
+		ProvisioningPlan plan = null;
+		
+		List links = identity.getLinks();
+		AccountRequest.Operation acctOp = AccountRequest.Operation.Modify;
+		Application app;
+		String appName;
+		String nativeId;
+		String instance;
+		
+		aslogger.trace("Have links: " + links);
+		if (links == null || links.isEmpty()){
+			aslogger.warn("No links on identity: " + identity.getName());
+			return null;
+		}
+		
+		aslogger.trace("Get the mapping object");
+		Custom mappingObj = getAttrSynchMappingObject(context);
+		
+		if (mappingObj != null){
+			aslogger.trace("Get the assignment type");
+			String assignmentType = mappingObj.get("Plan Construction Type");
+			List excludeApps = mappingObj.get("Excluded Applications");
+			
+			if (excludeApps == null){
+				excludeApps = new ArrayList();
+			}
+			
+			aslogger.trace("Have excluded apps: " + excludeApps);
+			
+			aslogger.debug("Have the assignment type: " + assignmentType);
+			if ("Custom Rule".equalsIgnoreCase(assignmentType)){
+				aslogger.debug("Build plan using custom rule.  Call the method");
+				
+				plan = buildCustomAttrSynchPlan(context, workflow);
+			} else {
+				aslogger.debug("Build plan the default way");
+				plan = new ProvisioningPlan();
+				//plan.setIdentity(identity);
+				
+				for (Link link : links){
+					if (link == null){
+						aslogger.warn("Null link in loop?");
+						continue;
+					}
+			
+					app = link.getApplication();
+					appName = app.getName();
+					nativeId = link.getNativeIdentity();
+					instance = link.getInstance();
+					
+					aslogger.trace("Check if app is excluded: " + appName);
+					if (excludeApps.contains(appName)){
+						aslogger.debug(appName + " App is excluded.  Skip.");
+						continue;
+					}
+					
+					aslogger.debug("Get attr requests for " + nativeId + ":" + instance + " on " + appName);
+					List attrReqs = getUpdateAttributeRequests(context, identity, link, app, nativeId, instance, mappingObj);
+					
+					aslogger.trace("Have attrReqs: " + attrReqs);
+					if (attrReqs != null && !attrReqs.isEmpty()){
+						
+						aslogger.debug("Attr reqs not null.  Build account request");
+						
+						AccountRequest acctReq = new AccountRequest(acctOp, appName, instance, nativeId);
+						acctReq.addAll(attrReqs);
+						
+						aslogger.debug("Add account request: " + acctReq.toXml());
+						plan.add(acctReq);
+						
+					}
+				}
+				
+			}
+		}
+		
+		app = null;
+		links = null;
+		
+		plan.setComments("Adding AttrSynch Access");
+		
+		aslogger.trace("Set plan identity " + identity);
+		//plan.setIdentity(identity);
+		
+		aslogger.trace("Exit getDynamicAttrSynchPlan: " + plan.toXml());
+		return plan;
+	}
+	
+	public List getUpdateAttributeRequests(SailPointContext context, Identity identity, Link link){
+		aslogger.trace("Enter getUpdateAttributeRequests");
+		List attrReqs = new ArrayList();
+		
+		Application app = link.getApplication();
+		String appName = app.getName();
+		String nativeId = link.getNativeIdentity();
+		String instance = link.getInstance();
+		Custom mappingObj = getAttrSynchMappingObject(context);
+		
+		return getUpdateAttributeRequests(context, identity, link, app, nativeId, instance, mappingObj);
+		
+	}
+	
+	public List getUpdateAttributeRequests(SailPointContext context, Identity identity, Link link, Application app,
+		String nativeId, String instance, Custom mappingObj){
+		aslogger.trace("Enter getUpdateAttributeRequests");
+		List attrReqs = new ArrayList();
+		
+		String appName = app.getName();
+		String appType = app.getType();
+		String identityName = identity.getName();
+		String defField = null;
+		Object defVal = null;
+		
+		aslogger.trace("Processing " + nativeId + " on " + appName);
+		
+		String passwordField = app.getAttributeValue("passwordField");
+		
+		if (passwordField == null){
+			passwordField = "userPassword";
+		}
+		
+		if (mappingObj != null){
+			aslogger.trace("Have mappingObj: " + mappingObj.toXml());
+		}
+		
+		aslogger.trace("Build list of fields to skip.");
+		List skipFields = new ArrayList();
+		Attributes entrySkipFields = mappingObj.get("Application Skip Fields");
+		
+		aslogger.trace("Have entrySkipFields: " + entrySkipFields);
+		if (entrySkipFields != null){
+			
+			aslogger.trace("EntrySkipFields: " + entrySkipFields);
+			aslogger.trace("See if it contains the appName: " + appName);
+			if (entrySkipFields.containsKey(appName)){
+				aslogger.trace("Getting skip fields based on appName: " + appName);
+				skipFields = entrySkipFields.get(appName);
+			} else if (entrySkipFields.containsKey(appType)){
+				aslogger.trace("Getting skip fields based on appType: " + appType);
+				skipFields = entrySkipFields.get(appType);
+			}
+		}
+		
+		aslogger.debug("Have list of fields to skip: " + skipFields);
+		
+		aslogger.trace("Get the provisioning policy (Template)");					
+		List templates = app.getTemplates();
+		Template updateTemp = null;
+		
+		if (templates != null && templates.size() > 0){
+			aslogger.trace("loop the templates");
+			
+			for (Template temp : templates){
+				String tempName = temp.getName();
+				String objType = temp.getSchemaObjectType();
+				
+				boolean isAccount = false;
+				
+				aslogger.trace("Check objType: " + objType + " and tempName: " + tempName);
+				if (objType != null && objType.equalsIgnoreCase("account") ){
+					isAccount = true;
+				} else if (tempName != null && tempName.equalsIgnoreCase("account") ){
+					isAccount = true;
+				}
+				
+				aslogger.trace("Check if the template is for the account prov policy: " + isAccount);
+				if (isAccount){
+					Template.Usage usage = temp.getUsage();
+					if (usage.equals(Template.Usage.Create)){
+						aslogger.trace("Set to create template in case no update");
+						updateTemp = temp;
+						break;
+					}
+				}
+			}
+		}
+		
+		aslogger.debug("Have the provsioning policy");
+		
+		if (updateTemp != null){
+		
+			aslogger.trace("Get the prov policy fields");
+			List fields = updateTemp.getFields();
+			Map allNewVals = new HashMap();
+			
+			if (fields != null && fields.size() > 0){
+				for (Field field : fields){
+					aslogger.trace("Get field name");
+					String fieldName = field.getName();
+					String displayName = field.getDisplayName();
+					
+					aslogger.trace("Check if field is a password field or in list of skip fields: " + fieldName);
+					aslogger.trace("Against: " + skipFields);
+					if (skipFields.contains(fieldName)){
+						aslogger.trace("Skip field: " + fieldName);
+						
+						continue;
+					}
+					
+					aslogger.trace("Didn't skip");
+					
+					
+					try {
+						aslogger.trace("No easy way to check if displayOnly so using the xml");
+						String xml = field.toXml();
+						
+						if (xml.indexOf("displayOnly") > -1){
+							aslogger.debug("Display only field so skip");
+							continue;
+						}
+					
+					} catch (Exception fe){
+						aslogger.error("Exception checking the xml");
+					}
+					
+					Object oldVal = link.getAttribute(fieldName);
+					if(oldVal instanceof List || oldVal instanceof Map){
+						oldVal = oldVal.clone();
+					}
+					
+					if (oldVal == null && displayName != null){
+						oldVal = link.getAttribute(displayName);
+					}
+					
+					boolean runRule = true;
+					boolean runScript = false;
+					
+					aslogger.trace("Get the rule and script");
+					Rule rule = field.getFieldRule();
+					Script script = null;
+					
+					if (rule == null){
+						aslogger.warn("No field rule.");
+						runRule = false;
+						script = field.getScript();
+						
+						if (script == null){
+							aslogger.warn("No field script.");
+							runScript = false;
+							continue;
+						} else {
+							runScript = true;
+						}
+					}
+					
+					HashMap params = new HashMap();
+					
+					params.put("context", context);
+					params.put("identity", identity);
+					params.put("field", field);
+					
+					
+					if (runScript){
+						aslogger.debug("Is a script so put all of the vals from the previous fields in case they are needed by the script.");
+						params.putAll(allNewVals);
+					}
+					
+					Object val = null;
+					
+					try {
+						if (runRule){
+							aslogger.trace("Run the rule");
+							val = context.runRule(rule, params);
+						} else if (runScript){
+							aslogger.trace("Run the script");
+							val = context.runScript(script, params);
+						} else {
+							aslogger.warn("No field rule or script to run so skip.");
+						}
+					} catch (Exception re){
+						aslogger.error("*** EXCEPTION RUNNING RULE/SCRIPT: " + re.toString());
+						continue;
+					}
+					
+					allNewVals.put(fieldName, val);
+					
+					aslogger.trace("Compare new and old val for field, " + fieldName + ".  New Val: " + val + " Old val: " + oldVal);
+					
+					boolean addRequest = false;
+					
+					aslogger.trace("check if defField: " + defField);
+					if (defField != null && fieldName.compareTo(defField) == 0){
+						aslogger.trace("Process a default field value");
+						addRequest = false;
+						//handleFieldWithDefaultValues(fieldName, oldVal, val, defVal, attrReqs);
+						
+					} else {
+						
+						if ("distinguishedName".equals(fieldName) || "dn".equals(fieldName) || "entrydn".equals(fieldName)){
+							//if ("Active Directory - Direct".equals(app.getType())){
+								updateADDNNameFields(nativeId, val, attrReqs);
+							//}
+						}
+						else {
+							if (!nativeId.startsWith(fieldName)){
+								aslogger.trace("Now check if the value was updated");
+								addRequest = isFieldValueUpdated(oldVal, val);
+							}
+							
+						}
+					}
+					
+					if (addRequest){
+						aslogger.trace(fieldName + " attribute value has changed, create attr request");
+		
+						if(field.isMulti()) {
+						   AttributeRequest attrReq = new AttributeRequest(fieldName, ProvisioningPlan.Operation.Add, val); 
+						   attrReqs.add(attrReq);
+						} else { 
+						   AttributeRequest attrReq = new AttributeRequest(fieldName, ProvisioningPlan.Operation.Set, val); 
+						   attrReqs.add(attrReq);
+                  }	
+
+					}
+				}
+			}
+		}
+		
+		
+		aslogger.trace("Exit getUpdateAttributeRequests: " + attrReqs);
+		return attrReqs;
+	}
+	
+	public boolean isFieldValueUpdated(Object oldVal, Object val){
+		aslogger.trace("Enter isFieldValueUpdated with oldVal: " + oldVal + " and newVal: " + val);
+		
+		boolean isUpdate = false;
+		// TODO:  MIGHT NEED TO HANDLE IF NULLING OUT A VALUE
+		if (val != null && oldVal != null && val instanceof List && oldVal instanceof List){
+						
+			if (!val.containsAll( oldVal) || !oldVal.containsAll(val)){
+				isUpdate = true;
+			}
+		} else {
+			if (val != null && !(val+"").trim().equals("") && (oldVal == null || !val.equals(oldVal))){
+				isUpdate = true;
+			} else if ((val == null || val == "") && oldVal != null){
+				isUpdate = true;
+			}
+		}
+		if((val instanceof List && val.isEmpty() && oldVal == null)){
+			isUpdate = false;
+		}
+		
+		aslogger.trace("Exit isFieldValueUpdated: " + isUpdate);
+		return isUpdate;
+	}
+	
+	public void updateADDNNameFields(Object oldVal, Object val, List attrReqs){
+		aslogger.debug("Enter updateADDNNameFields");
+
+		aslogger.debug("updating dn.  old: " + oldVal + ". new: " + val);
+		if (val == null || oldVal == null || !(val instanceof String) || !(oldVal instanceof String)){
+			aslogger.warn("DN fields invalid");
+			return;
+		} 
+		
+		String oldName = "";
+		String oldParent = "";
+		
+		String newName = "";
+		String newParent = "";
+		
+		String ouField = "OU=";
+		
+		String[] oldSplit = oldVal.split(",OU=");
+		String[] newSplit = val.split(",OU=");
+		
+		aslogger.trace("Using OU,= oldSplit: " + oldSplit);
+		aslogger.trace("Using OU,= newSplit: " + newSplit);
+		
+		if (oldSplit == null || oldSplit.length <2){
+			oldSplit = oldVal.split(",ou=");
+			
+			if (oldSplit == null || oldSplit.length <2){
+				aslogger.error("Couldn't find the ou value to split on.");
+				return;
+			}
+			
+			ouField = "ou=";
+		}
+		
+		if (newSplit == null || newSplit.length <2){
+			
+			newSplit = val.split(",ou=");
+			
+			if (newSplit == null || newSplit.length <2){
+				aslogger.error("Couldn't find the ou value to split on.");
+				return;
+			}
+		}
+		
+		aslogger.trace("Using ou,= oldSplit: " + oldSplit);
+		aslogger.trace("Using ou,= newSplit: " + newSplit);
+		
+		String oldName = oldSplit[0];
+		String newName = newSplit[0];
+	
+		aslogger.debug("Have the names");
+		aslogger.debug("Old: " + oldName);
+		aslogger.debug("New: " + newName);
+		
+		/*
+		aslogger.trace("Get oldDC based on length of oldSplit: " + oldSplit.length);
+		String oldDC = oldSplit[oldSplit.length-1];
+		
+		aslogger.trace("oldDC: " + oldDC);
+		
+		aslogger.trace("Get newDC based on length of newSplit: " + newSplit.length);
+		String newDC = oldSplit[newSplit.length-1];
+		
+		aslogger.trace("newDC: " + newDC);
+		
+		aslogger.trace("Call skipDCChange");
+		boolean skipDCChange = skipDCChange(oldDC, newDC);
+		
+		aslogger.trace("Have skipDCChange: " + skipDCChange);
+		if (skipDCChange){
+			aslogger.debug("We are skipping dc changes and found one, must be handled with special logic.");
+			return;
+		}*/
+		
+		aslogger.debug("Build the parents");
+		for (int i = 1; i< oldSplit.length; i++){
+			oldParent += ouField + oldSplit[i];
+			
+			if (i+1< oldSplit.length){
+				oldParent +=",";
+			}
+		}
+		
+		for (int i = 1; i< newSplit.length; i++){
+			newParent += ouField + newSplit[i];
+			
+			if (i+1< newSplit.length){
+				newParent +=",";
+			}
+		}
+		
+		aslogger.debug("Have the parents");
+		aslogger.debug("Old: " + oldParent);
+		aslogger.debug("New: " + newParent);
+		
+		if (!equalsCNValues(oldName, newName) || !oldParent.equalsIgnoreCase(newParent)){
+			aslogger.debug("Create the rename attribute request");
+			AttributeRequest attrReq = new AttributeRequest("AC_NewName", ProvisioningPlan.Operation.Set, newName);
+			attrReqs.add(attrReq);
+			
+			AttributeRequest parReq = new AttributeRequest("AC_NewParent", ProvisioningPlan.Operation.Set, newParent);
+			attrReqs.add(parReq);
+		} else {
+			newName = null;
+		}
+		
+		aslogger.debug("Exit updateADDNNameFields");
+		return;
+	}
+	
+	public boolean skipDCChange(String oldDC, String newDC){
+		aslogger.trace("Enter skipDCChange");
+		boolean flag = false;
+		
+		Custom mappingObj = getAttrSynchMappingObject(context);
+		
+		if (mappingObj != null){
+		
+			String skipDCRenames =  mappingObj.get("Skip DC Renames");
+			boolean sdr = Boolean.parseBoolean(skipDCRenames);
+			
+			aslogger.trace("Have skip dc renames: " + skipDCRenames + " " + sdr);
+			if (!sdr){
+				aslogger.debug("Not checking so return false");
+				return flag;
+			}
+		}
+		
+		aslogger.trace("Get the old and new split of the dc");
+		String[] oldSplit = oldDC.split(",");
+		String[] newSplit = newDC.split(",");
+		
+		boolean hasDiff = false;
+		
+		for (int i = 1; i< oldSplit.length; i++){
+			String o = oldSplit[i];
+			String n = newSplit[i];
+			
+			aslogger.trace("Compare old to new:  " + o + " to " + n);
+			if (!o.equalsIgnoreCase(n)){
+				aslogger.trace("Not a match");
+				flag = true;
+				break;
+			}
+		}
+		
+		aslogger.trace("Exit skipDCChange: " + flag);
+		return flag;
+	}
+
+	public boolean equalsCNValues(String oldName, String newName){
+		aslogger.trace("Enter equalsCNValues");
+		if(newName == null || oldName == null){
+			aslogger.warn("Invalid cn values");
+			return true;
+		}
+		
+		String regex = "(.*)( [0-9]+)";
+		newName = newName.replaceAll(regex, "$1");
+		oldName = oldName.replaceAll(regex, "$1");
+		
+		aslogger.debug("newName after regex: " + newName);
+		aslogger.debug("oldName after regex: " + oldName);
+		
+		return newName.equalsIgnoreCase(oldName);
+	}
+	
+	
+	public Custom getAttrSynchMappingObject(SailPointContext context){
+		aslogger.trace("Enter getAttrSynchMappingObject");
+		
+		Custom mappingObj = context.getObjectByName(Custom.class, "SPCONF Attr Synch Mappings Custom");
+		aslogger.trace("Exit getAttrSynchMappingObject: " + mappingObj);
+		return mappingObj;
+	}
+	
+	]]>
+	</Source>
+</Rule>

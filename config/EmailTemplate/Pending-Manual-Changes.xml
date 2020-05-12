@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Pending Manual Changes">
+  <Body>
+      
+$launcher is requesting the following changes for '$identityDisplayName' be manually made by you.
+
+#if ( $approvalSet.items )
+#foreach ($item in $approvalSet.items)
+        Application: $item.applicationName
+#if ( $item.nativeIdentity )       
+           Account : $item.nativeIdentity
+#end           
+#if ( $item.instance ) 
+          Instance : $item.instance
+#end
+          Operation: $item.operation
+#if ( $item.displayName )          
+          Attribute: $item.displayName
+#elseif ( $item.name ) 
+          Attribute: $item.name
+#end
+#if ( $item.displayValue )
+           Value(s): $item.displayValue
+#elseif ( $item.csv ) 
+           Value(s): $item.csv
+#end
+#if ( $item.requesterComments )
+ Requester Comments: $item.requesterComments
+#end
+#end
+#end
+       
+    </Body>
+  <Description>
+      Email Template for notifying approvers when they need to do perform an account action manually
+      Note that in addition to the declared arguments, all workflow variables,
+      Step arguments, and Approval arguments defined in the Workflow are
+      also available.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workflow" type="Workflow">
+        <Description>The Workflow object being executed.</Description>
+      </Argument>
+      <Argument name="item" type="Workitem">
+        <Description>The WorkItem representing the review.</Description>
+      </Argument>
+      <Argument name="approvalSet" type="ApprovalSet">
+        <Description>The ApprovalSet object contained in the work item.</Description>
+      </Argument>
+      <Argument name="launcher" type="string">
+        <Description>The name of the Identity that launched the workflow.</Description>
+      </Argument>
+      <Argument name="identityName" type="string">
+        <Description>The name of the Identity that is being changed.</Description>
+      </Argument>
+      <Argument name="identityDisplayName" type="string">
+        <Description>The display name of the Identity that is being changed.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Changes requested to $identityDisplayName need manual interaction</Subject>
+</EmailTemplate>
+</sailpoint>

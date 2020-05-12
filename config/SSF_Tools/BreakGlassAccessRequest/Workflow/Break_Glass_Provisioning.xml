@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" handler="sailpoint.api.StandardWorkflowHandler" libraries="Identity,Role,PolicyViolation,LCM,BatchRequest" name="Break Glass Provisioning" taskType="LCM" type="LCMProvisioning">
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity being updated.</Description>
+  </Variable>
+  <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>The displayName of the identity being updated.
+        Query for this using a projection query and fall back to the name.</Description>
+  </Variable>
+  <Variable initializer="AccessRequest" name="flow">
+    <Description>
+      The name of the LCM flow to be passed to the provisioning workflow.
+    </Description>
+  </Variable>
+  <Variable input="true" name="plan">
+    <Description>The provisioning plan ready to execute.</Description>
+  </Variable>
+  <Variable name="identityRequestId">
+    <Description>Request ID for this request.
+See the documentation for information on how to 
+present this to the requester at the end of the request.</Description>
+  </Variable>
+  <Variable initializer="%%BREAKGLASS_SECURITY_OFFICER_NAME%%" input="true" name="securityOfficerName">
+    <Description>The name of the identity that will be sent approvals
+        during security officer approvals.</Description>
+  </Variable>
+  <Variable initializer="false" name="trace">
+    <Description>Used for debugging this workflow and when set to true
+        trace
+        will be sent to stdout.</Description>
+  </Variable>
+  <Variable editable="true" initializer="script:return false;" name="breakGlass" output="true" type="boolean">
+    <Description>Request to bypass all approvals, to be used in case of
+        emergency</Description>
+  </Variable>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="LCM Workflow Library"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="21" posY="130">
+    <Transition to="Check Break Glass Workgroup"/>
+  </Step>
+  <Step icon="Task" name="Check Break Glass Workgroup" posX="127" posY="131">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Transition to="Break Glass Form">
+      <Script>
+        <Source><![CDATA[
+            import sailpoint.object.Identity;
+            
+            Identity wg = context.getObjectByName(Identity.class, "Break Glass Users");
+            Identity id = context.getObjectByName(Identity.class, launcher);
+            return (id.isInWorkGroup(wg));
+          ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="Launch main provisioning workflow"/>
+  </Step>
+  <Step icon="Message" name="Break Glass Form" posX="285" posY="44">
+    <Approval name="Request Break Glass" owner="ref:launcher" return="breakGlass" send="trace">
+      <Form name="Request Break Glass">
+        <Attributes>
+          <Map>
+            <entry key="pageTitle" value="Request Break Glass"/>
+          </Map>
+        </Attributes>
+        <Section label="Break Glass policy" type="text">
+          <Field value="Per corporate policy, this option provides a workaround for immediate access, without approval. It is to be used in emergency situations only."/>
+          <Field value="If this option is used, the security officer will be notified immediately."/>
+        </Section>
+        <Section label="Note:" type="datatable">
+          <Field value="By selecting &quot;I need an exception&quot; below, you acknowledge that abuse of this procedure will result in severe disciplinary actions."/>
+          <Field value="The normal approval process will be followed if you do not select this option."/>
+        </Section>
+        <Section>
+          <Field displayName="I need an exception" helpKey="This option is to be used in emergency situations only. If this option is used, the security office will be notified." name="breakGlass" type="boolean" value="false"/>
+        </Section>
+        <Button action="next" label="Continue"/>
+      </Form>
+    </Approval>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Transition to="Break Glass Alert"/>
+  </Step>
+  <Step action="call:sendEmail" condition="breakGlass" icon="Email" name="Break Glass Alert" posX="377" posY="44">
+    <Arg name="template" value="Break Glass - Security Officer Notification"/>
+    <Arg name="requesterDisplayName">
+      <Script>
+        <Source>import sailpoint.object.Identity;
+Identity requester = context.getObjectByName(Identity.class, launcher);
+if (null != requester)
+   return requester.getDisplayableName();</Source>
+      </Script>
+    </Arg>
+    <Arg name="requesterEmail" value="script:getEmail(launcher)"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="to">
+      <Script>
+        <Source>import sailpoint.api.ObjectUtil;
+import sailpoint.object.Identity;
+import sailpoint.tools.Util;
+
+Identity toIdentity = context.getObjectByName(Identity.class, securityOfficerName);
+List toEmailAddresses = ObjectUtil.getEffectiveEmails(context, toIdentity);
+if (null != toEmailAddresses &amp;&amp; ! toEmailAddresses.isEmpty()) {
+   return Util.listToCsv(toEmailAddresses);
+} else {
+   return null;
+}</Source>
+      </Script>
+    </Arg>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Description>
+        Notify the Security Officer.
+      </Description>
+    <Transition to="Launch main provisioning workflow"/>
+  </Step>
+  <Step icon="Default" name="Launch main provisioning workflow" posX="466" posY="126">
+    <Arg name="flow" value="ref:flow"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="approvalScheme" value="script:if (breakGlass) return &quot;none&quot;; else return null;"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="%%BREAKGLASS_PROVISIONING_WORKFLOW%%"/>
+    </WorkflowRef>
+    <Transition to="end"/>
+  </Step>
+  <Step icon="Stop" name="end" posX="602" posY="126"/>
+</Workflow>

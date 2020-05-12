@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Template_Finalise">
+  <Description>Generic Importer rule executed when all the rows have been processed/</Description>
+  <Signature returnType="sailpoint.object.Attributes">
+    <Inputs>
+      <Argument name="taskResult">
+        <Description>
+        The current task result object.
+        Type: sailpoint.object.TaskResult
+      </Description>
+      </Argument>
+      <Argument name="taskAttributes">
+        <Description><![CDATA[
+        A list of the attributes passed from the Task Defintion
+        Type: sailpoint.object.Attributes<String,Object>
+      ]]></Description>
+      </Argument> 
+    </Inputs>
+    <Returns/>
+  </Signature>
+  <Source><![CDATA[
+	// IIQDA hints.
+  	// Expect: sailpoint.object.Attributes taskAttributes
+  	// Expect: sailpoint.object.TaskResult taskResult
+  	
+	// Do stuff after iterator has been processed
+	
+	]]></Source>
+</Rule>

@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate name="Email Approvals Confirmation" cc="$!notifyadminemail" >
+  <Body>
+ #if ( $emailApprovalResult )
+The approval was successful. 
+ #else				
+The approval was not successful. 
+ #end
+      
+    </Body>
+  <Description>
+  </Description>
+  <Signature>
+    <Inputs>
+        <Argument name="identityDisplayName" type="string">
+      </Argument>
+      <Argument name="emailApprovalResult" type="string">
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Your Email Approval for $identityDisplayName</Subject>
+</EmailTemplate>

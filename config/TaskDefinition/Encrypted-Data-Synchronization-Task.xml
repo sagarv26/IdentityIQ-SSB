@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.EncryptedDataSyncExecutor" name="Encrypted Data Synchronization Task" progressInterval="5000" progressMode="String" resultAction="Rename" subType="task_item_type_system" template="true" type="System">
+  <Description>A task that can be used to re-encrypt all encrypted data using the newest key in the keystore. 
+                     It can be used to change the public/private keys that can be used for IQService comm.
+                     It also can be used to convert all encrypted identity secrets to hashing, 
+                     including Identity password, Identity and application password history, 
+                     authentication question answers.</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="SyncEncryptedDataTask"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument name="disableApplicationSync" type="boolean">
+        <Prompt>task_in_key_sync_disable_applications</Prompt>
+      </Argument>
+      <Argument name="disableIdentitySync" type="boolean">
+        <Prompt>task_in_key_sync_disable_identities</Prompt>
+      </Argument>
+      <Argument name="disableIntegrationSync" type="boolean">
+        <Prompt>task_in_key_sync_disable_integration</Prompt>
+      </Argument>
+      <Argument name="convertIdentitySecretToHashing" type="boolean">
+        <Prompt>task_in_key_convert_identity_secret_to_hashing</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="applicationsRefreshed" type="String">
+        <Prompt>task_out_applications_synced</Prompt>
+      </Argument>
+      <Argument name="identitiesRefreshed" type="String">
+        <Prompt>task_out_identities_synced</Prompt>
+      </Argument>
+      <Argument name="integrationConfigsRefreshed" type="String">
+        <Prompt>task_out_integrations_synced</Prompt>
+      </Argument>
+      <Argument name="linksUpdated" type="String">
+        <Prompt>task_out_links_updated</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

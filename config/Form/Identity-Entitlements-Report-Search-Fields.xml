@@ -1,0 +1,201 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Identity Entitlements Report Search Fields" type="Report">
+  <Section columns="2" label="rept_identity_entitlement_arguments" name="customProperties">
+    <Field displayName="identities" helpKey="help_rept_identity_entitlement_identities" multi="true" name="identity" type="Identity" value="ref:identity"/>
+    <Field displayName="applications" helpKey="help_rept_identity_entitlement_applications" multi="true" name="application" type="Application" value="ref:application"/>
+    <Field displayName="rept_identity_entitlement_grid_attributes" helpKey="help_rept_identity_entitlement_attributes" multi="true" name="attribute" type="IdentityEntitlement" value="ref:attribute">
+      <Attributes>
+        <Map>
+          <entry key="objectColumn" value="name"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="rept_identity_entitlement_grid_entitlements" helpKey="help_rept_identity_entitlement_entitlements" multi="true" name="entitlementValue" type="IdentityEntitlement" value="ref:entitlementValue">
+      <Attributes>
+        <Map>
+          <entry key="objectColumn" value="value"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="rept_identity_entitlement_grid_accounts" helpKey="help_rept_identity_entitlement_accounts" multi="true" name="accountId" type="IdentityEntitlement" value="ref:accountId">
+      <Attributes>
+        <Map>
+          <entry key="objectColumn" value="nativeIdentity"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="rept_identity_entitlement_grid_instances" helpKey="help_rept_identity_entitlement_instances" multi="true" name="instance" type="IdentityEntitlement" value="ref:instance">
+      <Attributes>
+        <Map>
+          <entry key="objectColumn" value="instance"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="rept_identity_entitlement_grid_assigners" helpKey="help_rept_identity_entitlement_assigners" multi="true" name="assigner" type="IdentityEntitlement" value="ref:assigner">
+      <Attributes>
+        <Map>
+          <entry key="objectColumn" value="assigner"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="identity_entitlements_source" helpKey="help_rept_identity_entitlement_sources" multi="true" name="source" value="ref:source">
+      <AllowedValues>
+        <List>
+          <String>Aggregation</String>
+          <String>source_aggregation</String>
+        </List>
+        <List>
+          <String>LCM</String>
+          <String>source_lcm</String>
+        </List>
+        <List>
+          <String>PAM</String>
+          <String>source_pam</String>
+        </List>
+        <List>
+          <String>Rule</String>
+          <String>source_rule</String>
+        </List>
+        <List>
+          <String>Task</String>
+          <String>source_task</String>
+        </List>
+        <List>
+          <String>WebServices</String>
+          <String>source_web_service</String>
+        </List>
+      </AllowedValues>
+    </Field>
+    <Field displayName="identity_entitlements_aggregation_state_display" helpKey="help_rept_identity_entitlement_agg_state" name="aggregationState" value="ref:aggregationState">
+      <AllowedValues>
+        <List>
+          <String>null</String>
+          <String>rept_app_account_attrs_filter_include_all</String>
+        </List>
+        <List>
+          <String>Connected</String>
+          <String>txt_true</String>
+        </List>
+        <List>
+          <String>Disconnected</String>
+          <String>txt_false</String>
+        </List>
+      </AllowedValues>
+    </Field>
+    <Field displayName="srch_input_def_entitlement_type" helpKey="help_rept_identity_entitlement_types" name="type" value="ref:type">
+      <AllowedValues>
+        <List>
+          <String>null</String>
+          <String>rept_app_account_attrs_filter_include_all</String>
+        </List>
+        <List>
+          <String>Entitlement</String>
+          <String>entitlement</String>
+        </List>
+        <List>
+          <String>Permission</String>
+          <String>permission</String>
+        </List>
+      </AllowedValues>
+    </Field>
+    <Field displayName="identity_entitlements_role_allowed" helpKey="help_rept_identity_entitlement_allowed" name="allowed" value="ref:allowed">
+      <AllowedValues>
+        <List>
+          <String>null</String>
+          <String>rept_app_account_attrs_filter_include_all</String>
+        </List>
+        <List>
+          <String>true</String>
+          <String>txt_true</String>
+        </List>
+        <List>
+          <String>false</String>
+          <String>txt_false</String>
+        </List>
+      </AllowedValues>
+    </Field>
+    <Field displayName="rept_identity_entitlement_grid_additional" helpKey="help_rept_identity_entitlement_only_additional" name="grantedByRole" value="ref:grantedByRole">
+      <AllowedValues>
+        <List>
+          <String>null</String>
+          <String>rept_app_account_attrs_filter_include_all</String>
+        </List>
+        <List>
+          <String>false</String>
+          <String>txt_true</String>
+        </List>
+        <List>
+          <String>true</String>
+          <String>txt_false</String>
+        </List>
+      </AllowedValues>
+    </Field>
+    <Field displayName="rept_identity_entitlement_grid_certified" helpKey="help_rept_identity_entitlement_certified" name="certified" value="ref:certified">
+      <AllowedValues>
+        <List>
+          <String>null</String>
+          <String>rept_app_account_attrs_filter_include_all</String>
+        </List>
+        <List>
+          <String>true</String>
+          <String>txt_true</String>
+        </List>
+        <List>
+          <String>false</String>
+          <String>txt_false</String>
+        </List>
+      </AllowedValues>
+    </Field>
+    <Field displayName="rept_identity_entitlement_grid_pending_certification" helpKey="help_rept_identity_entitlement_pending_certification" name="pendingCertification" value="ref:pendingCertification">
+      <AllowedValues>
+        <List>
+          <String>null</String>
+          <String>rept_app_account_attrs_filter_include_all</String>
+        </List>
+        <List>
+          <String>true</String>
+          <String>txt_true</String>
+        </List>
+        <List>
+          <String>false</String>
+          <String>txt_false</String>
+        </List>
+      </AllowedValues>
+    </Field>
+    <Field displayName="rept_identity_entitlement_grid_requested" helpKey="help_rept_identity_entitlement_requested" name="currentRequest" value="ref:currentRequest">
+      <AllowedValues>
+        <List>
+          <String>null</String>
+          <String>rept_app_account_attrs_filter_include_all</String>
+        </List>
+        <List>
+          <String>true</String>
+          <String>txt_true</String>
+        </List>
+        <List>
+          <String>false</String>
+          <String>txt_false</String>
+        </List>
+      </AllowedValues>
+    </Field>
+    <Field displayName="rept_identity_entitlement_grid_pending_request" helpKey="help_rept_identity_entitlement_pending_request" name="pendingRequest" value="ref:pendingRequest">
+      <AllowedValues>
+        <List>
+          <String>null</String>
+          <String>rept_app_account_attrs_filter_include_all</String>
+        </List>
+        <List>
+          <String>true</String>
+          <String>txt_true</String>
+        </List>
+        <List>
+          <String>false</String>
+          <String>txt_false</String>
+        </List>
+      </AllowedValues>
+    </Field>
+  </Section>
+</Form>
+</sailpoint>

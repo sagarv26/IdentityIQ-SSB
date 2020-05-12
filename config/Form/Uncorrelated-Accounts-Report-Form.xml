@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Uncorrelated Accounts Report Form" type="Report">
+  <Section columns="2" label="rept_uncorrelated_accounts_params_label" name="customProperties">
+    <Field displayName="report_input_correlated_apps" filterString="logical==false &amp;&amp; authoritative==false" helpKey="rept_input_uncorrelated_ident_report_correlated_apps" multi="true" name="correlatedApps" type="Application" value="ref:correlatedApps"/>
+  </Section>
+</Form>
+</sailpoint>

@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition formPath="/monitor/tasks/accountAggregationTask.xhtml" name="Aggregation Employees and Contrator" resultAction="Delete" subType="task_item_type_acct_aggregation" type="AccountAggregation">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="159"/>
+      <entry key="TaskDefinition.runLengthTotal" value="1439"/>
+      <entry key="TaskDefinition.runs" value="9"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="applications" value="HR System Employees, Contractor System Employee"/>
+      <entry key="checkDeleted" value="true"/>
+      <entry key="checkHistory" value="false"/>
+      <entry key="checkPolicies" value="false"/>
+      <entry key="correlateEntitlements" value="false"/>
+      <entry key="correlateOnly" value="false"/>
+      <entry key="correlateScope" value="false"/>
+      <entry key="deltaAggregation" value="false"/>
+      <entry key="enablePartitioning" value="false"/>
+      <entry key="haltOnMaxError" value="false"/>
+      <entry key="noAutoCreateApplications" value="false"/>
+      <entry key="noAutoCreateScopes" value="false"/>
+      <entry key="noNeedsRefresh" value="false"/>
+      <entry key="noOptimizeReaggregation" value="true"/>
+      <entry key="promoteManagedAttributes" value="false"/>
+      <entry key="refreshCertifications" value="false"/>
+      <entry key="refreshScorecard" value="false"/>
+      <entry key="sequential" value="false"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate"/>
+    </Map>
+  </Attributes>
+  <Description>Task template for application account scanning.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Account Aggregation"/>
+  </Parent>
+</TaskDefinition>
+</sailpoint>

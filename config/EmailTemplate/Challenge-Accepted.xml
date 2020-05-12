@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Challenge Accepted">
+  <Body>$certifierName has accepted the challenge for '$challengeItem' and will change the decision.
+
+Comments from $certifierName:
+--------------------------------------------------------------------------------
+$!decisionComments
+--------------------------------------------------------------------------------
+</Body>
+  <Description>
+      Email Template for notifying a challenger that their challenge was accepted.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="challengeItem" type="string">
+        <Description>The shortDescription property of the CertificationItem being challenged.</Description>
+      </Argument>
+      <Argument name="decisionComments" type="string">
+        <Description>Comments to the challenger.</Description>
+      </Argument>
+      <Argument name="certifierName" type="string">
+        <Description>The full name (first and last) of the Identity that accepted the challenge.</Description>
+      </Argument>
+      <Argument name="certificationItem" type="CertificationItem">
+        <Description>The CertificationItem being challenged.</Description>
+      </Argument>
+      <Argument name="workItem" type="WorkItem">
+        <Description>The WorkItem for the challenge</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Challenge accepted for '$challengeItem'</Subject>
+</EmailTemplate>
+</sailpoint>

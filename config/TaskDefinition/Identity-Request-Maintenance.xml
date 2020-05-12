@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.IdentityRequestMaintenance" name="Identity Request Maintenance" progressMode="String" resultAction="Delete" subType="task_item_type_system" template="true" type="System">
+  <Description>Prune and Verify Identity Request objects.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="maxAge" type="int">
+        <Prompt>task_in_identity_request_prune</Prompt>
+      </Argument>
+      <Argument name="scanRequests" type="boolean">
+        <Prompt>task_in_identity_request_scan</Prompt>
+      </Argument>
+      <Argument name="maxVerificationDays" type="int">
+        <Prompt>task_in_identity_request_verification_timeout</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="requestsScanned" type="String">
+        <Prompt>task_out_identity_request_scanned</Prompt>
+      </Argument>
+      <Argument name="requestsPruned" type="String">
+        <Prompt>task_out_identity_request_pruned</Prompt>
+      </Argument>
+      <Argument name="requestsTimedout" type="String">
+        <Prompt>task_out_identity_request_verification_timeout</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

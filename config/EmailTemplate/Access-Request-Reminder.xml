@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Access Request Reminder">
+  <Body>You have a pending work item that requires attention. Work Item: $workItemDescription</Body>
+  <Description>
+      Email template used to notify work item owner of pending work item for access request.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workItemName" type="string">
+        <Description>The description property (also the name property) of the request WorkItem.</Description>
+      </Argument>
+      <Argument name="workItemDescription" type="string">
+        <Description>The WorkItem description.</Description>
+      </Argument>
+      <Argument name="workItem" type="WorkItem">
+        <Description>The WorkItem object for the request.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Access Request requires completion of Work Item ID : $workItemName</Subject>
+</EmailTemplate>
+</sailpoint>

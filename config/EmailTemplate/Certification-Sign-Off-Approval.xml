@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Certification Sign Off Approval">
+  <Body>$certification.name was signed by $certifier.displayableName and requires your approval.
+
+Login and view your work item inbox to complete this request.
+    </Body>
+  <Description>
+      Email Template for notifying users when a certification is signed and sent to them
+      for approval.
+
+      This supports the following parameters:
+       - certification: The sailpoint.object.Certification object that was signed.
+       - certifier:     The sailpoint.object.Identity that signed the certification.
+       - approver:      The sailpoint.object.Identity that needs to approve the
+                        certification.  This is the recipient of this email.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="certification" type="Certification">
+        <Description>The Certification object containing the delegated item.</Description>
+      </Argument>
+      <Argument name="workItem" type="WorkItem">
+        <Description>The WorkItem object for the certification approval.</Description>
+      </Argument>
+      <Argument name="certifier" type="Identity">
+        <Description>The Identity object for the user that finished the certification.</Description>
+      </Argument>
+      <Argument name="approver" type="Identity">
+        <Description>The Identity object that is the owner of the work item.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>$certification.name requires approval</Subject>
+</EmailTemplate>
+</sailpoint>

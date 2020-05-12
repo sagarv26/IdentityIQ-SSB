@@ -1,0 +1,147 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" formPath="/analyze/reports/userreportargs.xhtml" name="Identity Risk Live Report" progressMode="Percentage" resultAction="Rename" subType="Risk Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="Identity Risk Report">
+            <Chart bottomLabel="rept_id_risk_chart_bottom_label" leftLabel="rept_id_risk_chart_left_label" title="rept_id_risk_chart_title" type="column">
+              <Script>
+                <Source>
+                        
+                          import sailpoint.object.*;
+                          import java.util.*;
+
+                          Map scores = new HashMap();
+                          scores.put("rept_id_risk_col_score", "compositeScore");
+                          scores.put("rept_id_risk_col_role", "businessRoleScore");
+                          scores.put("rept_id_risk_col_entitlements", "entitlementScore");
+                          scores.put("rept_id_risk_col_policy", "policyScore");
+                          scores.put("rept_id_risk_col_certification", "certificationScore");
+
+                          List data = new ArrayList();
+                          for(Map.Entry entry : scores.entrySet()){
+                            for(var i=1;i&lt;=5;i++){
+                              int min = (i - 1) * 200;
+                              int max = i * 200;
+
+                              Map rowData = new HashMap();
+                              rowData.put("category", min + " - " + max);
+                              rowData.put("series", entry.getKey());
+
+                              List filters = new ArrayList();
+                              filters.add(Filter.ge("scorecard." + entry.getValue(), min));
+                              filters.add(Filter.le("scorecard." + entry.getValue(), max));
+                              QueryOptions ops = new QueryOptions(baseQueryOptions);
+                              ops.addFilter(Filter.and(filters));
+                              int count = context.countObjects(Identity.class, ops);
+                              rowData.put("value", count);
+
+                              data.add(rowData);
+                            }
+                          }
+                          return data;
+                        
+                      </Source>
+              </Script>
+            </Chart>
+            <DataSource objectType="Identity" type="Filter">
+              <QueryParameters>
+                <Parameter argument="identities" property="id"/>
+                <Parameter argument="lastRefreshStart" operation="GT" property="lastRefresh"/>
+                <Parameter argument="lastRefreshEnd" operation="LT" property="lastRefresh"/>
+                <Parameter argument="lastLoginStart" operation="GT" property="lastLogin"/>
+                <Parameter argument="lastLoginEnd" operation="LT" property="lastLogin"/>
+                <Parameter argument="identityApplications" property="links.application.id"/>
+                <Parameter argument="capabilities" property="capabilities.id"/>
+                <Parameter argument="identityBusinessRoles">
+                  <QueryScript>
+                    <Source>
+                            import sailpoint.object.*;
+                            import java.lang.*;
+                            List roleFilters = new ArrayList();
+                            if (value != null){
+                              for(String role : value){
+                                roleFilters.add(Filter.eq("bundles.id", role));
+                                roleFilters.add(Filter.eq("assignedRoles.id", role));
+                              }
+
+                              if (!roleFilters.isEmpty())
+                                queryOptions.addFilter(Filter.or(roleFilters));
+                            }
+                            return queryOptions;
+                          </Source>
+                  </QueryScript>
+                </Parameter>
+                <Parameter argument="groupDefinitions">
+                  <QueryScript>
+                    <Source>
+                            import sailpoint.object.*;
+                            import sailpoint.reporting.*;
+                            Filter f = ReportingLibrary.getGroupDefinitionFilter(context, value, false);
+                            if(f!=null) {
+                                queryOptions.addFilter(f);
+                            }
+                            return queryOptions;
+                          </Source>
+                  </QueryScript>
+                </Parameter>
+              </QueryParameters>
+            </DataSource>
+            <ReportForm>
+              <Reference class="sailpoint.object.Form" name="Identity Risk Report Form"/>
+            </ReportForm>
+            <Columns>
+              <ReportColumnConfig field="username" header="rept_id_risk_col_username" property="name" sortable="true" width="110"/>
+              <ReportColumnConfig field="firstname" header="rept_id_risk_col_first_name" property="firstname" sortable="true" width="110"/>
+              <ReportColumnConfig field="manager" header="rept_id_risk_col_manager" property="manager.displayName" sortable="true" width="110"/>
+              <ReportColumnConfig field="risk" header="rept_id_risk_col_score" property="scorecard.compositeScore" sortable="true" width="110"/>
+              <ReportColumnConfig field="roleRisk" header="rept_id_risk_col_role" property="scorecard.businessRoleScore" sortable="true" width="110"/>
+              <ReportColumnConfig field="entitlementRisk" header="rept_id_risk_col_entitlements" property="scorecard.entitlementScore" sortable="true" width="110"/>
+              <ReportColumnConfig field="policyRisk" header="rept_id_risk_col_policy" property="scorecard.policyScore" sortable="true" width="110"/>
+              <ReportColumnConfig field="certRisk" header="rept_id_risk_col_certification" property="scorecard.certificationScore" sortable="true" width="110"/>
+            </Columns>
+            <InitializationRule>
+              <Reference class="sailpoint.object.Rule" name="Identity Report Form Customizer"/>
+            </InitializationRule>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>A detailed view of the risk associated with each identity detected by IdentityIQ.</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessIdentityRiskReport"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument multi="true" name="groupDefinitions" type="string">
+        <Description>rept_input_user_report_group_definition</Description>
+      </Argument>
+      <Argument name="capabilities" type="string">
+        <Description>rept_input_user_report_capabilities</Description>
+      </Argument>
+      <Argument name="lastLoginStart" type="date">
+        <Description>rept_input_user_report_last_login</Description>
+      </Argument>
+      <Argument name="lastLoginEnd" type="date">
+        <Description>rept_input_user_report_last_login</Description>
+      </Argument>
+      <Argument name="lastRefreshStart" type="date">
+        <Description>rept_input_user_report_last_refresh</Description>
+      </Argument>
+      <Argument name="lastRefreshEnd" type="date">
+        <Description>rept_input_user_report_last_refresh</Description>
+      </Argument>
+      <Argument multi="true" name="identityBusinessRoles" type="Bundle">
+        <Description>rept_input_user_report_biz_roles</Description>
+      </Argument>
+      <Argument multi="true" name="identityApplications" type="Application">
+        <Description>rept_input_user_report_apps</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

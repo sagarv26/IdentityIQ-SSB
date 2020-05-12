@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.ITRoleMiningTask" hidden="true" name="New IT Role Mining" resultAction="Rename" subType="task_item_type_it_role_mining" type="ITRoleMining">
+  <Description>
+      IT Role Mining based on a population, List of applications/entitlements and thresholds.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument multi="true" name="identityFilter" type="Filter">
+        <Prompt>Filter that restricts the population of identities to mine roles from.</Prompt>
+      </Argument>
+      <Argument multi="true" name="applications" required="true" type="String">
+        <Prompt>IDs for Applications that contain the users and entitlements from which roles are mined</Prompt>
+      </Argument>
+      <Argument multi="true" name="includedEntitlements" type="IdentityItem">
+        <Prompt>Entitlements from which to mine roles</Prompt>
+      </Argument>
+      <Argument name="minIdentities" type="int">
+        <Prompt>Minimum number of identities that must contain a given entitlement set to generate a candidate role</Prompt>
+      </Argument>
+      <Argument name="minEntitlements" type="int">
+        <Prompt>Mininmum number of entitlements that must be in an entitlement set to generate a candidate role</Prompt>
+      </Argument>
+      <Argument name="maxCandidateRoles" type="int">
+        <Prompt>Maximum number of candidate roles that will be generated before the task starts discarding data</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="itRoleMiningResult" type="Complex"/>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

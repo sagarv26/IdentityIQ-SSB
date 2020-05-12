@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Map PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Map>
+	<entry key="argsFileName" value="sstSampleUnitTest Args1 - TestValue1" />
+	<entry key="useCase" value="Simple Return Test Value" />
+   	
+   	<entry key='inputValue' value="This is an input value" />
+  
+   	<entry key="expectedResult">
+   		<value>
+   			<String>TestValue1</String>
+   		</value>
+   	</entry>
+</Map>

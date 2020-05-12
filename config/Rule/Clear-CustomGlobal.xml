@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Clear CustomGlobal">
+  <Source>
+      
+        import sailpoint.object.CustomGlobal;
+
+        List results = new ArrayList();
+        results.add("CustomGlobal BEFORE clear had ["+
+                    CustomGlobal.size() + "] keys.");
+        CustomGlobal.clear();
+        results.add("CustomGlobal AFTER clear has [" +
+                   CustomGlobal.size()+"] keys.");
+
+        return results;
+      
+    </Source>
+</Rule>
+</sailpoint>

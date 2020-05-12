@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="SPCONF Attr Synch Mappings Custom">
+	<Attributes>
+		<Map>
+		
+			<!--  Enter the Trigger Type.  
+					Options Include:
+						- Selector:  Will dynamically re-evaluate all target attributes and update as necessary.
+						- Compare Links:  Will review the links defined in the Compare Links entry below.  If any schema attributes
+							have changed from the previous to the new identity, the workflow will launch.   
+						- Custom Rule:  Will call the method isAttrSynchCustomTriggerRule in 
+								SPCONF Attr Synch Rules Library .  
+			-->
+			<entry key="Trigger Type" value="Compare Links" />	
+			
+			<!--  Set to true if trigger logic needs to check all active LCEs and ensure that no other
+				LCE workflows will be firing for this identity.  This is in place because often
+				the attribute synch feature is used by other LCE features, such as Mover and Rehire and this
+				LCE is used as a last resort to ensure all target attributes are in synch.   -->
+			<entry key="Trigger If No Other LCE Triggered" value="true" />		
+			
+			<!--  Create the Selector to determine whether to kick off the Joiner -->
+			<entry key="Trigger Field Selector">
+				<value>
+					    <IdentitySelector>
+					      <MatchExpression and="true">
+					        <MatchTerm name="personStatus" value="A"/>
+					        <MatchTerm name="joinerDate" value="NULL"/>
+					      </MatchExpression>
+					    </IdentitySelector>
+				</value>
+			</entry>
+			
+			<!-- Per link that is being compared, specify the schema attributes that should be compared.
+					This mechanism is used in case it is desired not to launch if a user has only been
+					terminated or rehired, meaning it will only check to see if other significant attributes have changed.
+					 -->
+			<entry key="Trigger Compare Links Schemas">
+				<value>
+					<Attributes>
+						<Map>
+							<entry key="HR">
+								<value>
+									<List>
+										<String>EMPL_ID</String>
+										<String>FIRST_NAME</String>
+										<String>LAST_NAME</String>
+										<String>MID_NAME</String>
+										<String>DEPT_NUM</String>
+									</List>
+								</value>
+							</entry>
+						</Map>
+					</Attributes>
+				</value>
+			</entry>
+
+			<!-- Specify the links to compare -->
+			<entry key="Trigger Compare Links">
+				<value>
+					<List>
+						<String>HR</String>
+					</List>
+				</value>
+			</entry>
+			
+			<!--  Enter the Birthright Assignment Type.  
+					Options Include:
+						- Dynamic Targets:  Will dynamically re-evaluate all target attributes and update as necessary.  
+						- Custom Rule:  Will call the method buildCustomAttrSynchPlan
+							in SP CONF Attr Synch Rules Library.  
+						 
+			-->
+			<entry key="Plan Construction Type" value="Dynamic Targets" />		
+			
+			
+			<!-- Enter the applications that shouldn't be updated -->
+			<entry key="Excluded Applications">
+				<value>
+					<List>
+						<String>HR</String>
+					</List>
+				</value>
+			</entry>
+			
+			<!-- Populate which fields should be skipped per application.  Otherwise, put logic into actual
+				provisioning policy if fields should preserve native values.  
+				Entry key can be individual application names or connector types
+				Password fields will always be skipped.  
+				Fields resulting in a rename might be handled specially
+				 -->
+			<entry key="Application Skip Fields">
+				<value>
+					<Attributes>
+						<Map>
+							<entry key="Application Name">
+								<value>
+									<List>
+										<String></String>
+									</List>
+								</value>
+							</entry>
+							<entry key="Active Directory - Direct">
+								<value>
+									<List>
+										<String>userAccountControl</String>
+										<String>extendedAttribute5</String>
+									</List>
+								</value>
+							</entry>
+							<entry key="LDAP">
+								<value>
+									<List>
+										<String>carLicense</String>
+									</List>
+								</value>
+							</entry>
+						</Map>
+					</Attributes>
+					
+				</value>
+			</entry>
+			
+			<!--  Set to true to avoid automatically doing a rename that involves a DC change. -->
+			<entry key="Skip DC Renames" value="true" />
+			
+			
+		</Map>
+	</Attributes>
+</Custom>

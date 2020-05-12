@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="xmlChecks" >
+     
+<!-- 
+    snellepalli:Automatic Build Checks
+    Checks XML files for wildcard imports
+-->
+  
+  <target   name="sp.services.runCodeChecks">
+  <echo   file="../build/buildChecks/buildCheckImport.log"      >
+
+================= Check for java import wild card =============
+The following files have wildcard import statements, which could impact BeanShell performance.
+
+    </echo> 
+   
+    <foreach param="xmlfile" target="xmlchk">
+      <path>
+      <fileset  dir="../config">
+        <include name="**/*.xml"/>
+        <exclude name="**/SSF_Features/**" />
+        <exclude name="**/SSF_Frameworks/**" />
+        <exclude name="**/SSF_Tools/**" />
+        <exclude name="**/SSP_Tools/**" />
+      </fileset>
+    </path>
+    </foreach>
+      <echo   file="../build/buildChecks/buildCheckImport.log" append="true"     >
+
+=================== End Check for import wild card ============
+    </echo> 
+
+  </target>
+   
+  <target name="xmlchk">
+
+    <unset name="spImportmatches"/>
+    <loadfile property="xmlFileContent" srcFile="${xmlfile}"/>
+    <grep allmatches="yes" in="${xmlFileContent}" quiet="true" property="spImportmatches" multiline="false" regex="import.*\*\;" separator="${line.separator}"/>
+    <if>
+    <isset property="spImportmatches"/>
+    <then> 
+      <echo file="../build/buildChecks/buildCheckImport.log"  append="true" >
+${xmlfile}
+      </echo>
+    </then>
+    </if>
+
+    <unset name="spImportmatches"/>
+
+    
+  </target>
+</project>

@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.AlertAggregationTask" formPath="/monitor/tasks/alertAggregationTask.xhtml" name="Alert Aggregation" progressMode="String" resultAction="Delete" subType="task_item_type_activity_alerts" template="true" type="ActivityAlert">
+  <Description>
+      Aggregate Alert Objects from External Sources and optionally process.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="help_task_alert_select_sources" multi="true" name="sources" required="true" type="Application">
+        <Prompt>task_in_alert_aggregation_sources</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_alert_delta_aggregation" name="deltaAggregation" type="boolean">
+        <Prompt>task_in_alert_aggregation_delta</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_alert_agg_process" name="processAlerts" type="boolean">
+        <Prompt>task_in_alert_aggregation_process</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_alert_agg_defs" name="alertDefinitionNames" type="string">
+        <Prompt>task_in_alert_aggregation_definitions</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="sources" type="String">
+        <Prompt>task_out_alert_agg_sources</Prompt>
+      </Argument>
+      <Argument name="totalAlerts" type="int">
+        <Prompt>task_out_alert_agg_total_alerts</Prompt>
+      </Argument>
+      <Argument name="alertsCreated" type="int">
+        <Prompt>task_out_alert_agg_created_alerts</Prompt>
+      </Argument>
+      <Argument name="alertsIgnored" type="int">
+        <Prompt>task_out_alert_agg_ignored_alerts</Prompt>
+      </Argument>
+      <Argument name="alertsProcessed" type="int">
+        <Prompt>task_out_alert_agg_processed_alerts</Prompt>
+      </Argument>
+      <Argument name="actionsCreated" type="int">
+        <Prompt>task_out_alert_agg_actions_created</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

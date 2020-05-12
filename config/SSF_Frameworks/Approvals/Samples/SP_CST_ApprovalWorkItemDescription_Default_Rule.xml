@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="SP CST Approval Work Item Description Default Rule">
+  <Signature>
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="workflow">
+        <Description>
+          Approval Set that was processed
+        </Description>
+       </Argument>
+       
+    </Inputs>
+    <Returns>
+      <!--  return the description string -->
+    </Returns>
+  </Signature>
+  
+  <Source>
+  <![CDATA[
+  	import sailpoint.object.*;
+  	
+  	Attributes approvalTypeObj = workflow.get("approvalTypeObj");
+  	String identityDisplayName = workflow.get("identityDisplayName");
+  
+   	return approvalTypeObj.get("displayName") + " Approval - Account Changes for User: " + identityDisplayName;
+  ]]>
+</Source>
+</Rule>

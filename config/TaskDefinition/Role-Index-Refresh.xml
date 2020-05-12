@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.RoleIndexRefreshExecutor" name="Role Index Refresh" progressInterval="5000" progressMode="String" subType="task_item_type_generic" template="true" type="Generic">
+  <Description>
+            Analyzes each role in the system and collects statistics about them into a role index.
+        </Description>
+  <Signature>
+    <Returns>
+      <Argument name="totalRoles" type="int">
+        <Prompt>task_out_refresh_role_indexes_totalRoles</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

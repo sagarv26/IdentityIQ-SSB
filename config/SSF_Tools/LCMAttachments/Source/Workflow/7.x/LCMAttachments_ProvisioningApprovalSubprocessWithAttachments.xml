@@ -1,0 +1,427 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+
+<!-- **********************************************************************
+  -
+  - Modified version of Provisioning Approval Subprocess to work with the 
+  - Access Request Attachments SSD component.  This will not work with 
+  - versions of IdentityIQ earlier than 7.0.  See the documentation included
+  - with the SSD for instructions to configure for earlier versions.
+  -
+  ********************************************************************** -->
+
+<Workflow name="Provisioning Approval Subprocess with Attachments"
+          libraries="Identity"
+          explicitTransitions="true"
+          type="Subprocess">
+
+  <RuleLibraries>
+    <Reference name="LCM Workflow Library" class="sailpoint.object.Rule"/>
+  </RuleLibraries>
+
+  <Description>
+    Simple approval subrocess introduced into release 6.2 to make
+    adding custom approvals easier.  This approval subprocess
+    has a configuration form to make it easier to configure
+    from the Business Process Editor.
+  </Description>
+
+  <!--  Inputs  -->
+  <Variable name="approvalMode" initializer="serial" input="true">
+    <Description>
+        A string that specifies how we should handle the approvals.
+
+        By default this is serial since most of these request with
+        the exception of manager transfers will have only one approver.
+
+        parallel
+        Approvals are processed concurrently and there must be consensus,
+        we wait for all approvers to approve.  The first approver that
+        rejects terminates the entire approval.
+
+        parallelPoll
+        Approvals are processed concurrently but consensus is not required.
+        All approvals will be processed, we don't stop if there are any
+        rejections.
+
+        serial
+        Approvals are processed one at a time and there must be consensus.
+        The first approver that rejects terminates the entire approval.
+
+        serialPoll
+        Approvals are processed in order but consensus is not required.
+        All approvals will be processed, we don't stop if there are any
+        rejections.  In effect we are "taking a poll" of the approvers.
+
+        any
+        Approvals are processed concurrently, the first approver to
+        respond makes the decision for the group.
+    </Description>
+  </Variable>    
+  
+  <Variable input="true" name="approvalScheme">
+    <Description>
+      A csv string that specifies how approval items should be generated 
+      for the incoming request.
+
+      The value can be "none", in which case approvals are disabled.
+
+      The value can also be a combination of any of the values below 
+      in any order, separated by commas. The order in which they are 
+      specified is the order in which they are processed:
+
+      owner
+        The object owner gets the approval item. 
+        For Role approvals this is the Role object owner. 
+        For Entitlement approvals this is the Entitlement object owner.
+
+      manager
+        The manager gets the approval item.
+
+      securityOfficer
+        The identity in the variable securityOfficerName gets the approval item.
+
+      identity
+        The identities/workgroups in the variable approvingIdentities get the approval item.
+
+    </Description>
+  </Variable>    
+  
+  <Variable name="approvingIdentities" input="true">
+    <Description>
+       List of identities and/or workgroups names/ids that should be involved in the approval 
+       process.    
+    </Description>
+  </Variable>
+  
+  <Variable name="fallbackApprover" initializer="spadmin" input="true">
+    <Description>
+      A String that specifies the name of the Identity that will 
+      be assigned any approvals where the owner of the approver 
+      can't be resolved. Example if the scheme is "owner" and the 
+      application doesn't specify and owner.
+    </Description>
+  </Variable>
+  
+  <Variable name="flow" input="true">
+    <Description>
+      The name of the LCM flow that launched this workflow.
+
+      This is one of these values:
+
+      AccountsRequest
+      EntitlementsRequest
+      RolesRequest
+      IdentityCreateRequest
+      IdentityEditRequest
+      ForgotPassword
+      ExpiredPassword
+      PasswordRequest
+
+    </Description>
+  </Variable>
+
+  <Variable name="identityName" input="true">
+    <Description>The name of the identity being updated.</Description>
+  </Variable>
+
+  <Variable name="identityDisplayName" input="true">          
+    <Description>
+      The displayName of the identity being updated.
+      Query for this using a projection query and fall back to the name.      
+    </Description>
+  </Variable>
+  
+  <Variable name="identityRequestId" input="true">
+    <Description>
+       The ID of the IdentityRequest for this request.
+    </Description>
+  </Variable>
+  
+  <Variable name="policyViolations" input="true">
+    <Description>
+       List of policy violations that were found during our initial policy scan.
+       This list is passed into each work item so the approvers can see
+       pending violations.
+    </Description>
+  </Variable>
+  
+  <Variable name="managerElectronicSignature" input="true">
+    <Description>
+       The name of the electronic signature object that should be used when workitems
+       are completed by a manager.
+    </Description>
+  </Variable>
+
+  <Variable name="ownerElectronicSignature" input="true">
+    <Description>
+       The name of the electronic signature object that should be used when workitems
+       are completed by object owners.
+    </Description>
+  </Variable>
+
+  <Variable name="securityOfficerElectronicSignature" input="true">
+    <Description>
+       The name of the electronic signature object that should be used when workitems
+       are completed by the security officer.
+    </Description>
+  </Variable>
+
+  <Variable name="identityElectronicSignature" input="true">
+    <Description>
+       The name of the electronic signature object that should be used when workitems
+       are completed by object owners.
+    </Description>
+  </Variable>
+  
+  <Variable name="managerEmailTemplate" initializer="LCM Identity Update Approval" input="true">
+    <Description>
+       Name of the email template to use when manager of pending approvals.
+    </Description>
+  </Variable>
+
+  <Variable name="ownerEmailTemplate" initializer="LCM Identity Update Approval" input="true">
+    <Description>
+       Name of the email template to use when notifying the owner of pending approvals.
+    </Description>
+  </Variable>
+
+  <Variable name="securityOfficerEmailTemplate" initializer="LCM Identity Update Approval" input="true">
+    <Description>
+       Name of the email template to use when notifying the security officer of pending approvals.
+    </Description>
+  </Variable>
+  
+  <Variable name="identityEmailTemplate" initializer="LCM Identity Update Approval" input="true">
+    <Description>
+       Name of the email template to use when notifying the security officer of pending approvals.
+    </Description>
+  </Variable>
+  
+  <Variable name="trace" initializer='false'>
+    <Description>
+      Used for debugging this workflow and when set to true trace
+      will be sent to stdout.
+    </Description>
+  </Variable>
+         
+  <Variable name='workItemDescription' input='true'>
+     <Description>String "template" that will be used as the workitem description.</Description>
+  </Variable>
+  
+  <Variable name='workItemEscalationTemplate' input='true'>
+      <Description>The email template that should be used when sending out reminders.</Description>
+  </Variable>
+    
+  <Variable name='workItemHoursBetweenReminders' input='true'>
+    <Description>The number of hours to wait between sending reminders to approvers.</Description>
+  </Variable>
+  
+  <Variable name='workItemHoursTillEscalation' input='true'>
+    <Description>The number of hourse to wait until an approval should be escalated.</Description>
+  </Variable>
+  
+  <Variable name="workItemPriority" initializer="Normal" input="true">
+    <Description>
+       The String version of a WorkItem.Priority. This variable is
+       used to set the priority on all of the workitems generated
+       as part of this workflow and also set on the IdentityRequest
+       object.
+    </Description>
+  </Variable>
+  
+  <Variable name='workItemReminderTemplate' input='true'>
+    <Description>The email template that should be used when sending out reminders.</Description>
+  </Variable>
+
+  <Variable name='workItemEscalationRule' input='true'>
+    <Description>The rule used to assign a new ownder during escalation.</Description>
+  </Variable>
+  
+  <Variable name='workItemMaxReminders' input='true'>
+    <Description>The maximum number of reminder emails that will be sent before we begin the escalation process.</Description>
+  </Variable>
+
+  <Variable name="filterRejects" input="true" initializer="true">
+    <Description>True to filter rejected items when running in Serial/SerialPoll mode.</Description>
+  </Variable>
+
+  <Variable name="setPreviousApprovalDecisions" input="true" initializer="false">
+      <Description>True to pre-populate approval decisions from previous approvals.</Description>
+  </Variable>
+
+  <Variable name="clearApprovalDecisions" input="true" initializer="false">
+      <Description>True to clear all decisions when generating approvals</Description>
+  </Variable>
+
+  <Variable name="dontUpdatePlan" input="true" initializer="true">
+      <Description>True to skip updating the ProvisioningProject masterPlan when processing approval decisions.</Description>
+  </Variable>
+  
+  <!--  Output Variables -->    
+  <Variable name="approvalSet" input="true" output="true">
+    <Description>
+      ApprovalSet representing the things that were requested and come from
+      the master provisioning plan. 
+    </Description>
+  </Variable>
+  
+  <Variable name="project" input="true" output="true">
+    <Description>
+      ProvisioningProject which is just a compiled version of the ProvisioningPlan, the 
+      master plan will be adjusted when approval decisions are applied and a new 
+      revised provisiobion project will be returned.
+    </Description>
+  </Variable>
+  
+  <Variable name="plan" input="true" output="true">
+    <Description>The provisioning plan.</Description>
+  </Variable>
+
+  <Step icon="Start" name="Start" posX="20" posY="22">
+    <Transition to="Approval"/>
+  </Step>
+
+  <Step name="Approval" icon="Approval" posX="158" posY="22">
+    <Approval renderer='lcmFileUploadWorkItemRenderer.xhtml' 
+              owner="call:buildCommonApprovals"
+              mode="ref:approvalMode" 
+              send='identityDisplayName,identityName,approvalSet,flow,policyViolations,identityRequestId'>
+
+      <Arg name='launcher' value='ref:launcher'/>      
+      <Arg name='workItemDescription' value='ref:workItemDescription'/>
+      <Arg name='workItemEscalationRule' value='ref:workItemEscalationRule'/>
+      <Arg name='workItemEscalationTemplate' value='ref:workItemEscalationTemplate'/>
+      <Arg name='workItemHoursTillEscalation' value='ref:workItemHoursTillEscalation'/>  
+      <Arg name='workItemMaxReminders' value='ref:workItemMaxReminders'/>  
+      <Arg name='workItemEscalationFrequency' value='ref:workItemEscalationFrequency'/>
+      <Arg name='workItemHoursBetweenReminders' value='ref:workItemHoursBetweenReminders'/>
+      <Arg name='workItemNotificationTemplate' value='ref:approvalEmailTemplate'/>
+      <Arg name='workItemPriority' value='ref:workItemPriority'/>
+      <Arg name="workItemType" value="Generic"/>
+      <Arg name='approvalMode' value='ref:approvalMode'/>
+      <Arg name='approvalScheme' value='ref:approvalScheme'/>
+      <Arg name='approvalSplitPoint' value='ref:approvalSplitPoint'/>
+      <Arg name='clearApprovalDecisions' value='ref:clearApprovalDecisions'/>
+      <AfterScript>
+        <Source>
+          import sailpoint.workflow.IdentityRequestLibrary;
+                    
+          if ( item == null ) 
+              return;
+
+          assimilateWorkItemApprovalSet(wfcontext, item, approvalSet);          
+          auditDecisions(item);  
+          IdentityRequestLibrary.assimilateWorkItemApprovalSetToIdentityRequest(wfcontext, approvalSet);
+        </Source> 
+      </AfterScript>
+      <InterceptorScript>
+        <Source>
+            <![CDATA[
+            import sailpoint.object.Workflow.Approval;
+            import sailpoint.object.ApprovalItem;
+            import sailpoint.object.ApprovalSet;
+            import sailpoint.object.Workflow;
+            import sailpoint.object.WorkItem;
+            import sailpoint.tools.Util;
+            import java.util.Iterator;
+            import java.util.ArrayList;
+            import java.lang.Boolean;
+
+            if (Workflow.INTERCEPTOR_PRE_ASSIMILATION.equals(method)) {
+                // promote completion state to Rejected if all items are rejected
+                ApprovalSet aset = item.getApprovalSet();
+                if (aset != null) {
+                    List items = aset.getItems();
+                    if (items != null) {
+                        int rejectCount = 0;
+                        for (ApprovalItem item : items) {
+                            // note that isRejected can't be used since that
+                            // assumes no answer means rejected
+                            if (item.getState() == WorkItem.State.Rejected) {
+                                rejectCount++;
+                            }
+                        }
+                        if (rejectCount == items.size()) {
+                            item.setState(WorkItem.State.Rejected);
+                        }
+                    }
+                }
+            } else if (Workflow.INTERCEPTOR_START_APPROVAL.equals(method)) {
+
+                ApprovalSet currentSet = approval.getApprovalSet();
+
+                if (currentSet != null && !Util.isEmpty(currentSet.getItems())) {
+                    //If filterRejects is true, filter any rejected items in the master ApprovalSet from the currentSet
+                    if (Boolean.valueOf(filterRejects)) {
+                        filterRejectsFromApprovalSet(approvalSet, currentSet);
+                    }
+
+                    //We've filtered all items from the approval set
+                    if (Util.isEmpty(currentSet.getItems())) {
+                        //Complete the approval if it contains no ApprovalItems
+                        approval.setComplete(true);
+                    } else {
+
+                        if (Boolean.valueOf(setPreviousApprovalDecisions)) {
+                            // If setPreviousApprovalDecisions is enabled, set the decision
+                            // on the items to that of the global item.
+                            setPreviousDecisionsOnApprovalSet(approvalSet, currentSet);
+                        }
+                    }
+                }
+
+            } else if (Workflow.INTERCEPTOR_END_APPROVAL.equals(method)) {
+                // Owner children approvals need to propagate the rejection state if all children are rejected
+                Approval parentApp = approval.getParent();
+                // Never relay the state to the root approval
+                // If we don't have an approvalSet, must be a container approval
+                if (parentApp != null && approval.getApprovalSet() == null) {
+                    boolean completeAndRejected = false;
+                    for (Approval child : Util.safeIterable(approval.getChildren())) {
+                        if (child.isComplete() && child.getState() == WorkItem.State.Rejected) {
+                            completeAndRejected = true;
+                        } else {
+                            completeAndRejected = false;
+                            break;
+                        }
+                    }
+                    //If all children complete and rejected, set the status on the parent approval
+                    if (completeAndRejected) {
+                        approval.setState(WorkItem.State.Rejected);
+                    }
+                }
+            } else if (Workflow.INTERCEPTOR_OPEN_WORK_ITEM.equals(method)) {
+               import sailpoint.workflow.IdentityRequestLibrary;
+
+               //Sync IdentityRequestItems with the WorkItem
+               IdentityRequestLibrary.assimilateWorkItemApprovalSetToIdentityRequest(wfcontext, item.getApprovalSet(), false);
+            }
+            ]]>
+        </Source>
+      </InterceptorScript>
+      <Arg name='workItemReminderTemplate' value='ref:workItemReminderTemplate'/>
+      <Arg name='workItemRequester' value='$(launcher)'/>   
+    </Approval>
+    <Transition to="Process Approval Decisions" when="script:(step.getApproval() != null &amp;&amp; step.getApproval().containsApprovalItems())"/>
+    <Transition to="end"/>
+  </Step>
+  
+  <Step name="Process Approval Decisions" 
+        action="call:processApprovalDecisions"
+        icon="Task"
+        posX="420"
+        resultVariable="project">
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Arg name="disableAudit" value="true"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="recompilePlan" value="true"/>
+    <Arg name="dontUpdatePlan" value="ref:dontUpdatePlan"/>
+
+    <Transition to="end"/>
+  </Step>  
+    
+  <Step name="end" icon="Stop" posX="420" posY="225"/>
+  
+</Workflow>

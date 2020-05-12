@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition executor="sailpoint.services.standard.task.ManualCorrelationExporter" name="Manual Correlation Exporter" progressInterval="5000" progressMode="String" resultAction="Delete" subType="task_item_type_generic" template="true" type="Generic">
+  <Description>Export manual correlations</Description>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="Full path of the CSV file where the correlation data will be exported to" name="exportFile" required="true" type="string">
+        <Prompt>Export file</Prompt>
+      </Argument>
+      <Argument helpKey="Applications to include in export" multi="true" name="applications" type="Application">
+        <Prompt>Applications (leave blank for all)</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="totalExported" type="string">
+        <Prompt>Correlations exported</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>

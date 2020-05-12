@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="SPCONF Field Value Rules Library" language="beanshell">
+	
+	<Source>
+	<![CDATA[
+	import sailpoint.api.SailPointFactory;
+	import sailpoint.api.SailPointContext;
+	import sailpoint.api.Provisioner;
+	import sailpoint.object.*;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+    import sailpoint.object.ProvisioningPlan.Operation; 
+	import sailpoint.tools.Util;
+    import sailpoint.tools.Message;
+    import sailpoint.tools.GeneralException;
+    import java.sql.Connection;
+	import java.sql.PreparedStatement;
+	import java.sql.ResultSet;
+	import java.sql.SQLException;
+	import java.sql.DriverManager;
+    import java.sql.Timestamp;
+	import java.util.*;
+	import java.text.*;
+	import javax.naming.Context;
+	import javax.naming.InitialContext;
+	import javax.sql.DataSource;
+	import sailpoint.api.PasswordGenerator;
+	
+	
+    import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	private static Log logger = LogFactory.getLog("rule.SP.FieldValue.RulesLibrary");
+	
+	
+	/******************************************************************************
+		TODO:  ADD METHOD FOR EACH APP/FIELD COMBINATION IN THE FORMAT:
+		public static Object getFV_<App_Name>_<Field_Name>Rule(SailPointContext context, Identity identity, String op){
+			return "val";
+		}
+		
+		ALWAYS USE UNDERSCORES (_) IN PLACE OF ANY SPACES, PERIODS OR A DASHES IN THE 
+		APP OR FIELD NAME.  THE METHODS ARE CASE SENSITIVE
+	******************************************************************************/
+	
+	//Example field
+	public static Object getFV_Active_Directory_sAMAccountName_Rule(SailPointContext context, Identity identity, String op){
+		logger.trace("Enter SAMPLE APP sAMAccountName rule");
+		
+		String val = identity.getName();
+		
+		logger.trace("Exit SAMPLE APP sAMAccountName rule: " + val);
+		return val;
+	}
+	
+	public static String verifyNull(Object o){
+	    if(o != null){
+	    	return o.toString();
+	    }else{
+	    	return "";
+	    }
+    }
+    
+    public static Link getSafeLink(Identity identity, String appName){
+    	Application app = context.getObjectByName(Application.class, appName);
+    	Link link = identity.getLink(app);
+    	
+    	if (link == null){
+    		link = new Link();
+    	}
+    	
+    	context.decache(app);
+    	
+    	return link;
+    }
+
+	]]>
+	</Source>
+</Rule>

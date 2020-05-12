@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.CertificationExecutor" hidden="true" name="Certification Manager" progressMode="String" subType="task_item_type_certification" template="true" type="Certification">
+  <Description>
+            Template Task for scheduling access certifications.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="certifier" required="true" type="string">
+        <Description>
+                        Username that will be assigned as the certifier for this
+                        Manager access certification.
+                    </Description>
+      </Argument>
+      <Argument name="identities" type="string">
+        <Description>
+                        List of identity ids for use with creating an individual
+                        certification
+                    </Description>
+      </Argument>
+      <Argument name="identityManagers" type="string">
+        <Description>
+                        String representation of a mapping of identities to managers for
+                        individually assigned certifications
+                    </Description>
+      </Argument>
+      <Argument name="application" required="true" type="string">
+        <Description>
+                        Application that will be assigned as the application for
+                        this App access certification.
+                    </Description>
+      </Argument>
+      <Argument name="certifiedApplicationIds" required="true" type="string">
+        <Description>
+                        A comma-separated string of application IDs to certify for an
+                        application owner certification.
+                    </Description>
+      </Argument>
+      <Argument name="certificationType" required="true" type="string">
+        <Description>Type of Access Certification to Run.</Description>
+      </Argument>
+      <Argument name="duration" required="true" type="string">
+        <Description>
+                        Date that the access certification will expire
+                    </Description>
+      </Argument>
+      <Argument name="creator" required="true" type="string">
+        <Description>
+                        Username of the person who created this access certification.
+                    </Description>
+      </Argument>
+      <Argument name="sendReminders" required="true" type="string">
+        <Description>
+                        "true" or "false" flag on whether to send reminders when the
+                        certification expires.
+                    </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="type" type="String">
+        <Prompt>task_out_certification_manager_type</Prompt>
+      </Argument>
+      <Argument name="total" type="int">
+        <Prompt>task_out_certification_manager_total</Prompt>
+      </Argument>
+      <Argument name="individual" type="String">
+        <Prompt>task_out_certification_manager_individual</Prompt>
+      </Argument>
+      <Argument name="application" type="String">
+        <Prompt>task_out_certification_manager_application</Prompt>
+      </Argument>
+      <Argument name="manager" type="String">
+        <Prompt>task_out_certification_manager_manager</Prompt>
+      </Argument>
+      <Argument name="iPOPs" type="String">
+        <Prompt>task_out_certification_manager_ipo_ps</Prompt>
+      </Argument>
+      <Argument name="activePeriodDurationAmount" type="String">
+        <Prompt>task_out_active_period_duration</Prompt>
+      </Argument>
+      <Argument name="activePeriodDurationScale" type="String">
+        <Prompt>task_out_active_period_scale</Prompt>
+      </Argument>
+      <Argument name="challengePeriodDurationAmount" type="String">
+        <Prompt>task_out_challenge_period_duration</Prompt>
+      </Argument>
+      <Argument name="challengePeriodDurationScale" type="String">
+        <Prompt>task_out_challenge_period_scale</Prompt>
+      </Argument>
+      <Argument name="remediationPeriodDurationAmount" type="String">
+        <Prompt>task_out_remediation_period_duration</Prompt>
+      </Argument>
+      <Argument name="remediationPeriodDurationScale" type="String">
+        <Prompt>task_out_remediation_period_scale</Prompt>
+      </Argument>
+      <Argument name="emailsSuppressed" type="String">
+        <Prompt>task_out_emails_suppressed</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

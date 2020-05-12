@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Configuration PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Configuration name="Enhanced Email Notifier">
+	<Attributes>
+		<Map>
+			<!-- 
+				Server root path of IdentityIQ.
+				In IdentityIQ version 7.0 or later the Server Root Path will be derived from the
+				system configuration setting:
+				
+					Global Settings -> IdentityIQ Configuration -> Mail Settings tab ->  Server Root Path entry.
+					
+			 -->
+			<entry key="serverRootPath" value="http://localhost:8080/identityiq"/>
+			<!-- 
+			
+				This rule is executed so that the logic can change if required the
+				email template name.  This rule is executed before the 
+				dynamicEmailIdentityAttribute is evaluated.
+				
+			 -->
+			<!-- entry key="dynamicEmailRuleName" value="Dynamic Template Test" / -->
+			
+			<!-- 
+			
+				dynamicEmailIdentityAttribute indicates the Identity attribute used
+				to denote the post fix for an template name.
+				
+				e.g.
+					o  The attribute is set to "country", which can have the values UK, GER, SPA etc
+					o  The identity has the country set to UK
+					o  When an email template is passed through this filter, the notifier class will
+					   attempt to find the template name + "_UK", and if found it will use that 
+					   email template  
+					   
+			 -->
+			<!-- entry key="dynamicEmailIdentityAttribute" value="country"/ -->
+			
+			<!-- 
+				The summary template Map, lists all the template names to 
+				process for summary information.
+				
+				The key of each entry  of the map indicates the Template name to
+				process if encountered by this email notifier, and is referred to
+				as the "Template Key".
+				
+				Each "Template Key" entry can optionally contain a list of instructions
+				to render the the template data in the summary email template.  If
+				no rendering instructions are specified, a default set of values
+				will be generated and stored here when the Processor task is
+				executed and processes the Email Template indicated by the
+				"Template Key".
+				
+			 -->
+			<entry key="summaryTemplateMap">
+				<value>
+					<Map>
+						<!-- The template key -->
+						<entry key="Work Item Assignment"/>
+						<entry key="LCM Identity Update"/>
+					</Map>
+				</value>
+			</entry>
+			
+			
+			<!-- 
+				The summary rule name is always executed if it has been populated.
+				This rule will evaluate the sent email and the programmer can decided 
+				whether to summarize the email or just send it as is.
+				
+				The above summary list will pass a flag if the email is in scope
+				or not to aid scoping the template for processing.
+			 -->
+			<!-- entry key="summaryRuleName" value=""/ -->
+			
+			<!--
+				Summary email template name to render the summary emails 
+			 -->
+			<!--  entry key="summaryEmailTemplateName" value=""/ -->
+			<entry key="summaryEmailTemplateName" value="Summary Email"/>
+			
+		</Map>
+	</Attributes>
+</Configuration>

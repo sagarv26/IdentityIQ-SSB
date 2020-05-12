@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="Identity Status Summary Report" progressMode="Percentage" resultAction="Rename" subType="Identity and User Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="Identity Status Report">
+            <DataSource objectType="Identity" type="Filter"/>
+            <Columns>
+              <ReportColumnConfig field="identity" header="rept_identity_status_summary_name" property="name" sortable="true" width="110"/>
+              <ReportColumnConfig field="displayName" header="rept_identity_status_summary_display_name" property="displayName" sortable="true" width="110"/>
+              <ReportColumnConfig field="status" header="rept_identity_status_summary_status" property="inactive" sortable="true" width="110"/>
+              <ReportColumnConfig field="correlated" header="rept_identity_status_summary_correlated" property="correlated" sortable="true" width="110"/>
+            </Columns>
+            <ReportSummary title="rept_identity_status_summary_summary_title">
+              <DataSourceScript>
+                <Source>
+                            
+                            import java.util.*;
+                            import sailpoint.object.*;
+                            import java.lang.*;
+
+                            QueryOptions queryOptions = baseQueryOptions;
+
+                            queryOptions.addGroupBy("inactive");
+                            queryOptions.addGroupBy("correlated");
+                            List fields = new ArrayList();
+                            fields.add("inactive");
+                            fields.add("correlated");
+                            fields.add("count(*)");
+
+                            int activeCorrelated = 0;
+                            int activeUncorrelated = 0;
+                            int inactiveCorrelated = 0;
+                            int inactiveUncorrelated = 0;
+                            Iterator results = context.search(Identity.class, queryOptions, fields);
+                            while(results.hasNext()){
+                                Object[] row = results.next();
+                                int count = row[2] != null ? row[2].intValue() : 0;
+                                if (row[0]){
+                                  //Inactive
+                                  if (row[1]) {
+                                    //Inactive and Correlated
+                                    inactiveCorrelated = count;
+                                  } else {
+                                    //Inactive not Correlated
+                                    inactiveUncorrelated = count;
+                                  }
+                                } else {
+                                  //Active
+                                  if (row[1]) {
+                                    //Active and Correlated
+                                    activeCorrelated = count;
+                                  } else {
+                                    //Active not Correlated
+                                    activeUncorrelated = count;
+                                  }
+                                }
+                            }
+
+                            Map map = new HashMap();
+                            map.put("total", inactiveCorrelated + inactiveUncorrelated + activeCorrelated + activeUncorrelated);
+                            map.put("inactive", inactiveCorrelated + inactiveUncorrelated);
+                            map.put("active", activeCorrelated + activeUncorrelated);
+                            map.put("inactiveCorrelated", inactiveCorrelated);
+                            map.put("inactiveUncorrelated", inactiveUncorrelated);
+                            map.put("activeCorrelated", activeCorrelated);
+                            map.put("activeUncorrelated", activeUncorrelated);
+
+                            return map;
+                            
+                          </Source>
+              </DataSourceScript>
+              <Values>
+                <LiveReportSummaryValue label="rept_identity_status_summary_active_identities" name="active"/>
+                <LiveReportSummaryValue label="rept_identity_status_summary_correlated" name="activeCorrelated"/>
+                <LiveReportSummaryValue label="rept_identity_status_summary_uncorrelated" name="activeUncorrelated"/>
+                <LiveReportSummaryValue label="rept_identity_status_summary_inactive_identities" name="inactive"/>
+                <LiveReportSummaryValue label="rept_identity_status_summary_correlated" name="inactiveCorrelated"/>
+                <LiveReportSummaryValue label="rept_identity_status_summary_uncorrelated" name="inactiveUncorrelated"/>
+                <LiveReportSummaryValue label="rept_identity_status_summary_total_identities" name="total"/>
+              </Values>
+            </ReportSummary>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>Displays summary of active, inactive, correlated, uncorrelated, and total identities</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessIdentityCubeSummaryReport"/>
+  </RequiredRights>
+</TaskDefinition>
+</sailpoint>

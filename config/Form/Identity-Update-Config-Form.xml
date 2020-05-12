@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Identity Update Config Form" type="WorkflowConfig">
+  <Section label="wf_config_provisioning_identity_update_section">
+    <Field displayName="wf_config_provisioning_advanced_manual_actions" helpKey="help_wf_provisioning_manual_actions" name="doManualActions" type="boolean"/>
+    <Field displayName="wf_config_provisioning_advanced_refresh" helpKey="help_wf_provisioning_refresh" name="doRefresh" type="boolean"/>
+    <Field displayName="wf_config_provisioning_advanced_foreground" helpKey="help_wf_provisioning_foreground" name="foregroundProvisioning" type="boolean"/>
+    <Field displayName="wf_config_provisioning_advanced_optimistic" helpKey="help_wf_provisioning_optimistic" name="optimisticProvisioning" type="boolean"/>
+    <Field displayName="wf_config_provisioning_require_create_template" helpKey="help_wf_provisioning_require_create_template" name="requireCreateTemplates" type="boolean"/>
+    <Field displayName="wf_config_provisioning_advanced_trace" helpKey="help_wf_trace" name="trace" type="boolean"/>
+  </Section>
+</Form>
+</sailpoint>

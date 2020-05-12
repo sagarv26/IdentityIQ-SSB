@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.ApplyCertificationDefinitionChangesTask" hidden="true" name="Apply Certification Definition Changes" progressMode="String" subType="task_item_type_certification" template="true" type="Certification">
+  <Description>
+            Task for applying changes made to a CertificationDefinition to the related Certifications and WorkItems.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="certificationGroupId" required="true" type="String">
+        <Description>
+                        The id of the certification group to update.
+                    </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

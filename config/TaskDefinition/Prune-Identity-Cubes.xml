@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.IdentityCleanser" name="Prune Identity Cubes" progressInterval="5000" progressMode="String" subType="task_item_type_identity" type="Identity">
+  <Description>
+            Delete identities that have no account links and have no important references.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="filter" type="string">
+        <Prompt>task_in_identity_refresh_filter</Prompt>
+      </Argument>
+      <Argument name="noDelete" type="boolean">
+        <Prompt>task_in_cleanser_no_delete</Prompt>
+      </Argument>
+      <Argument name="protectIfCertifying" type="boolean">
+        <Prompt>task_in_cleanser_if_certifying</Prompt>
+      </Argument>
+      <Argument name="protectIfManuallyCorrelated" type="boolean">
+        <Prompt>task_in_cleanser_if_manually_correlated</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="total" type="int">
+        <Prompt>task_out_cleanser_total</Prompt>
+      </Argument>
+      <Argument name="deleted" type="int">
+        <Prompt>task_out_cleanser_deleted</Prompt>
+      </Argument>
+      <Argument name="protected" type="int">
+        <Prompt>task_out_cleanser_protected</Prompt>
+      </Argument>
+      <Argument name="certifying" type="int">
+        <Prompt>task_out_cleanser_certifying</Prompt>
+      </Argument>
+      <Argument name="errors" type="int">
+        <Prompt>task_out_cleanser_errors</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

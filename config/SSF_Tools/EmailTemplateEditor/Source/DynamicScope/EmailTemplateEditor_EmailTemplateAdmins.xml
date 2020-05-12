@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE DynamicScope PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<DynamicScope name="EmailTemplateAdmins">
+  <Selector>
+    <IdentitySelector>
+      <MatchExpression>
+        <MatchTerm name="workgroups" value="Email Template Admins"/>
+      </MatchExpression>
+    </IdentitySelector>
+  </Selector>
+</DynamicScope>

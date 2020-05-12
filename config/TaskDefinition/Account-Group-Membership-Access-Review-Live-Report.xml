@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="Account Group Membership Access Review Live Report" progressMode="Percentage" resultAction="Rename" subType="Access Review and Certification Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="Certification Report">
+            <DataSource dataSourceClass="sailpoint.reporting.datasource.CertificationLiveReportDataSource" objectType="CertificationItem" type="Java">
+              <QueryParameters>
+                <Parameter argument="type" defaultValue="AccountGroupMembership" property="parent.certification.type" valueClass="sailpoint.object.Certification$Type"/>
+                <Parameter argument="tags" property="parent.certification.tags.id"/>
+                <Parameter argument="certificationGroups" property="parent.certification.certificationGroups.id"/>
+                <Parameter argument="applications" property="parent.certification.applicationId"/>
+                <Parameter argument="creationDate" property="parent.certification.created" valueClass="daterange"/>
+                <Parameter argument="signedDate" property="parent.certification.signed" valueClass="daterange"/>
+                <Parameter argument="expirationDate" property="parent.certification.expiration" valueClass="daterange"/>
+              </QueryParameters>
+            </DataSource>
+            <ReportForm>
+              <Reference class="sailpoint.object.Form" name="Account Group Membership Access Review Report Form"/>
+            </ReportForm>
+            <Columns>
+              <ReportColumnConfig field="nativeIdentity" header="rept_cert_col_account_id" property="exceptionEntitlements.nativeIdentity" sortable="true" width="110"/>
+              <ReportColumnConfig field="identity" header="rept_cert_col_identity" property="targetName" sortable="true" width="110"/>
+              <ReportColumnConfig field="application" header="rept_cert_col_application" property="parent.application" sortable="true" width="110"/>
+              <ReportColumnConfig field="accountGroup" header="rept_cert_col_account_group" property="parent.accountGroup" sortable="true" width="110"/>
+              <ReportColumnConfig field="accountGroupType" header="rept_cert_col_type" property="parent.schemaObjectType" sortable="true" width="110"/>
+              <ReportColumnConfig field="certName" header="rept_cert_col_cert_access_review" property="parent.certification.name" sortable="true" width="110"/>
+              <ReportColumnConfig field="certGroupName" header="rept_cert_col_cert_grp_name" property="parent.certification.certificationGroups.name" sortable="true" width="110"/>
+              <ReportColumnConfig field="tags" header="rept_cert_col_tags" property="parent.certification.tags.name" subQueryKey="id" width="110"/>
+              <ReportColumnConfig field="status" header="rept_cert_col_status" property="summaryStatus" sortable="true" width="110"/>
+              <ReportColumnConfig field="decision" header="rept_cert_col_decision" property="action.status" sortable="true" width="110"/>
+              <ReportColumnConfig field="newValue" header="rept_cert_col_newValue" property="action" width="110">
+                <RenderScript>
+                  <Source>
+                        import sailpoint.reporting.datasource.*;
+                        return DataSourceUtil.getRemediationModifiableNewValue(value);
+                      </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="remediationCompleted" header="rept_cert_col_revoke_completed" property="action" width="110">
+                <RenderScript>
+                  <Source>
+                        import sailpoint.reporting.ReportingLibrary;
+                        import sailpoint.tools.Util;
+                        import java.lang.String;
+                        String status = ReportingLibrary.getRemediationStatus(context, value);
+                        return Util.isNullOrEmpty(status) ? "" : status;
+                      </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="decisionMaker" header="rept_cert_col_decision_maker" property="action.actorName" sortable="true" width="110"/>
+              <ReportColumnConfig field="comments" header="rept_cert_col_decision_maker_comments" property="action" width="110">
+                <RenderScript>
+                  <Source>
+                              return value != null ? value.getComments() : null;
+                          </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="exclusionExplanation" header="rept_cert_col_exclusion_explanation" property="parent" width="110">
+                <RenderScript>
+                  <Source>
+                        
+                        if (value != null){
+                          if (value instanceof sailpoint.object.ArchivedCertificationEntity) {
+                            return value.getExplanation();
+                          }
+                        }
+                        
+                      </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+            </Columns>
+            <InitializationRule>
+              <Reference class="sailpoint.object.Rule" name="Certification Report Customizer"/>
+            </InitializationRule>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>Displays information about the account group membership certifications in detailed format.</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessEntitlementOwnerAccessReviewReport"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument name="exclusions" type="boolean"/>
+      <Argument multi="true" name="certificationGroups" type="CertificationGroup"/>
+      <Argument multi="true" name="applications" type="Application">
+        <Description>rept_input_account_grp_cert_report_apps</Description>
+      </Argument>
+      <Argument name="creationDate" type="date">
+        <Description>rept_input_cert_report_create_dt</Description>
+      </Argument>
+      <Argument name="signedDate" type="date">
+        <Description>rept_input_cert_report_signed_date</Description>
+      </Argument>
+      <Argument name="expirationDate" type="date">
+        <Description>rept_input_cert_report_exp_dt</Description>
+      </Argument>
+      <Argument multi="true" name="tags" type="Tag">
+        <Description>rept_input_cert_report_tags</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

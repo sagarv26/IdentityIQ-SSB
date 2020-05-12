@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Account Selection Notification">
+  <Body>The accounts that are being targeted for changes must be selected for $identityDisplayName before the provisioning request can be completed.
+
+Please login to IdentityIQ and view your work item inbox to complete this form at your earliest convenience.</Body>
+  <Description>
+      Email Template for notifying users when they need to select which accounts
+      a provisioning request should apply to when a user has multiple accounts on
+      an application.
+
+      This is used by the Do Provisioning Forms workflow subprocess.
+      Note that in addition to the declared arguments, all workflow variables,
+      Step arguments, and Approval arguments defined in the Workflow are
+      also available.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workflow" type="Workflow">
+        <Description>The Workflow object being executed.</Description>
+      </Argument>
+      <Argument name="item" type="WorkItem">
+        <Description>The WorkItem representing the account selection.</Description>
+      </Argument>
+      <Argument name="launcher" type="string">
+        <Description>The name of the Identity that launched the workflow.</Description>
+      </Argument>
+      <Argument name="identityDisplayName" type="string">
+        <Description>The display name (usually full name) of the Identity that is the target of the provisioning.</Description>
+      </Argument>
+      <Argument name="identityName" type="string">
+        <Description>The name of the Identity that is the target of the provisioning.</Description>
+      </Argument>
+      <Argument multi="true" name="accounts" type="AccountSelection">
+        <Description>A list of AccountSelection objects for the accounts that need to be selected.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Account selection required for $identityDisplayName</Subject>
+</EmailTemplate>
+</sailpoint>

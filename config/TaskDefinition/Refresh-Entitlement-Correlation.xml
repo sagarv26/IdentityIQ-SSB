@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition name="Refresh Entitlement Correlation" subType="task_item_type_identity" type="Identity">
+  <Attributes>
+    <Map>
+      <entry key="correlateEntitlements" value="true"/>
+    </Map>
+  </Attributes>
+  <Description>
+            Refresh the business role assignments of all identities.
+        </Description>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Identity Refresh"/>
+  </Parent>
+</TaskDefinition>
+</sailpoint>

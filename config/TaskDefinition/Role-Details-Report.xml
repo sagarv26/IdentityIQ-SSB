@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="Role Details Report" progressMode="Percentage" resultAction="Rename" subType="Role Management Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="Role Details Report">
+            <DataSource objectType="Bundle" type="Filter">
+              <QueryParameters>
+                <Parameter argument="applications" property="profiles.application.id"/>
+                <Parameter argument="type" property="type"/>
+                <Parameter argument="owners" property="owner.id"/>
+                <Parameter argument="disabled" property="disabled" valueClass="boolean"/>
+              </QueryParameters>
+            </DataSource>
+            <ReportForm>
+              <Reference class="sailpoint.object.Form" name="Role Profiles Details Report Custom Fields"/>
+            </ReportForm>
+            <Columns>
+              <ReportColumnConfig field="role" header="rept_role_details_col_role" property="name" sortable="true" width="110"/>
+              <ReportColumnConfig field="owner" header="rept_role_details_col_owner" property="owner.name" sortable="true" width="110"/>
+              <ReportColumnConfig field="type" header="rept_role_details_col_type" property="type" sortable="true" width="110">
+                <RenderScript>
+                  <Source>
+                          
+                              import sailpoint.tools.Message;
+                              import sailpoint.reporting.ReportingLibrary;
+                              if (value != null){
+                                String displayName = ReportingLibrary.getRoleTypeDisplayName(value);
+                                if (displayName != null){
+                                  return displayName;
+                                }
+                              }
+
+                              return value;
+                          
+                        </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="application" header="rept_role_details_col_apps" property="profiles.application.name" subQueryKey="id" width="110"/>
+            </Columns>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>Displays information about each role in detailed format.</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessBusinessRoleReport"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument multi="true" name="applications" type="Application">
+        <Description>rept_input_biz_role_report_apps</Description>
+      </Argument>
+      <Argument multi="true" name="type" type="string">
+        <Description>rept_input_biz_role_report_type</Description>
+      </Argument>
+      <Argument filterString="capabilitiesString != &quot;null&quot;" multi="true" name="owners" type="Identity">
+        <Description>rept_input_biz_role_report_owners</Description>
+      </Argument>
+      <Argument name="disabled" type="string">
+        <Description>rept_input_biz_role_report_status</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

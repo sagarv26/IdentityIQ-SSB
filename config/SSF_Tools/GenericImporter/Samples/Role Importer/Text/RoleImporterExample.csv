@@ -1,0 +1,12 @@
+function,Bundle.name,Identity.name,Bundle.owner,Bundle.type,Bundle.description,ManagedAttribute.value,ManagedAttribute.application,ManagedAttribute.attribute
+create,Test IT Role 1,,spadmin,it,Test Role 1,,,
+update,Existing IT Role 2,,spadmin,it,Update Existing Role 1,,,
+update,Existing IT Role 3,,spadmin,it,Update Existing Role 2,,,
+create,Test Business Role 1,,spadmin,business,Test Role 2,,,
+delete,Delete IT Role 1,,,,,,,
+connect,Test Business Role 1,spadmin,,,,,,
+disconnect,Test Business Role 1,chrisc,,,,,,
+addEntitlement,Test IT Role 1,,,,,"cn=Test_Group_1,ou=groups,dc=sailpoint,dc=com",LDAP GenericImport TEST,groups
+addEntitlement,Test IT Role 1,,,,,"cn=Test_Group_2,ou=groups,dc=sailpoint,dc=com",LDAP GenericImport TEST,groups
+addEntitlement,Test IT Role 1,,,,,"cn=Test_Group_3,ou=groups,dc=sailpoint,dc=com",LDAP GenericImport TEST,groups
+removeEntitlement,Existing IT Role 2,,,,,"cn=Test_Group_2,ou=groups,dc=sailpoint,dc=com",LDAP GenericImport TEST,groups

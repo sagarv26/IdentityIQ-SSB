@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.IQServiceKeyExchangeTask" name="IQService Public Key Exchange Task" progressInterval="5000" progressMode="String" resultAction="Rename" subType="task_item_type_system" template="true" type="System">
+  <Description>A task that can be used used to change the public keys that are used for IQService communications.</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="IQServicePublicKeyExchangeTask"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="help_task_iqservice_key_exchange_select_apps" multi="true" name="applications" type="Application">
+        <Prompt>task_in_iqservice_key_exchange_apps</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="iqServiceKeysExchanged" type="String">
+        <Prompt>task_out_iqservices_key_exchange_updated</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

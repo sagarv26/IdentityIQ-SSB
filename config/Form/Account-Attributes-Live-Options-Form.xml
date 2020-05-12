@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Account Attributes Live Options Form" type="Report">
+  <Section columns="2" label="rept_account_attrs_section_identity_attrs" name="Identity Attributes"/>
+  <Section columns="2" label="rept_account_attrs_section_identity_extended" name="Identity Extended Attributes"/>
+  <Section columns="2" label="rept_account_attrs_section_props" name="Identity Properties">
+    <Field columnSpan="1" displayName="rept_account_attrs_field_app" helpKey="rept_account_attrs_help_app" multi="true" name="identityApplication" type="Application" value="ref:identityApplication"/>
+    <Field columnSpan="1" displayName="rept_account_attrs_field_capability" helpKey="rept_account_attrs_help_capability" multi="true" name="capabilities" type="Capability" value="ref:capabilities"/>
+    <Field columnSpan="1" displayName="rept_account_attrs_field_group_def" helpKey="rept_account_attrs_help_group_def" multi="true" name="groupDefinitions" type="GroupDefinition" value="ref:groupDefinitions"/>
+    <Field columnSpan="1" displayName="rept_account_attrs_field_last_refresh" helpKey="rept_account_attrs_help_last_refresh" name="lastRefresh" type="string" value="ref:lastRefresh">
+      <Attributes>
+        <Map>
+          <entry key="xtype" value="daterange"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field columnSpan="1" displayName="rept_account_attrs_field_last_login" helpKey="rept_account_attrs_help_last_login" name="lastLogin" type="string" value="ref:lastLogin">
+      <Attributes>
+        <Map>
+          <entry key="xtype" value="daterange"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field columnSpan="1" displayName="rept_account_attrs_field_scopes_caps" helpKey="rept_account_attrs_help_scopes_caps" name="showScopes" type="boolean" value="ref:showScopes"/>
+  </Section>
+</Form>
+</sailpoint>

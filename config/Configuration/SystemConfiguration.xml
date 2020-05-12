@@ -1,0 +1,709 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Configuration name="SystemConfiguration">
+  <Attributes>
+    <Map>
+      <entry key="AccountGroupPermissions.challengeGenerationEmailTemplate" value="Account Group Challenge Creation Notification"/>
+      <entry key="LoginAuthDurationMillis" value="3600000"/>
+      <entry key="ProtectedUserLockout" value="true"/>
+      <entry key="accessRequestReminderEmailTemplate" value="Access Request Reminder"/>
+      <entry key="accessRequestTypes">
+        <value>
+          <List>
+            <String>AccessRequest</String>
+            <String>RolesRequest</String>
+            <String>EntitlementsRequest</String>
+            <String>AccountsRequest</String>
+            <String>ExpirePassword</String>
+            <String>ForgotPassword</String>
+            <String>PasswordsRequest</String>
+            <String>IdentityCreateRequest</String>
+            <String>IdentityEditRequest</String>
+            <String>Registration</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="activePeriodDuration">
+        <value>
+          <TimeDuration amount="1" scale="Month"/>
+        </value>
+      </entry>
+      <entry key="additionalEntitlementGranularity" value="Value"/>
+      <entry key="allowAutoComplete" value="false"/>
+      <entry key="allowCertificationEntityBulkAccountRevocation" value="true"/>
+      <entry key="allowCertificationEntityBulkApprove" value="true"/>
+      <entry key="allowCertificationEntityBulkClearDecisions" value="true"/>
+      <entry key="allowCertificationEntityBulkRevocation" value="true"/>
+      <entry key="allowCreatingRolesFromCertification" value="true"/>
+      <entry key="allowGeneratePasswordDelegated" value="true"/>
+      <entry key="allowGroupManagement" value="true"/>
+      <entry key="allowIdentitySearch" value="true"/>
+      <entry key="allowListViewBulkApprove" value="true"/>
+      <entry key="allowListViewBulkClearDecisions" value="true"/>
+      <entry key="allowListViewBulkMitigate" value="false"/>
+      <entry key="allowListViewBulkReassign" value="true"/>
+      <entry key="allowListViewBulkRevoke" value="true"/>
+      <entry key="allowListViewSaveCustomEntityFields" value="false"/>
+      <entry key="allowPopulationSearch" value="true"/>
+      <entry key="allowProvisioningMissingRequirements" value="false"/>
+      <entry key="allowSelfCertification">
+        <value>
+          <SelfCertificationAllowedLevel>CertificationAdministrator</SelfCertificationAllowedLevel>
+        </value>
+      </entry>
+      <entry key="allowUnauthenticatedEndUserPages" value="true"/>
+      <entry key="allowiFrame" value="false"/>
+      <entry key="applicationTemplateAccountUsages" value="Create,Update,Delete,Enable,Disable,Unlock,ChangePassword"/>
+      <entry key="audit_extension">
+        <value>
+          <Map>
+            <entry key="accountName" value="duser"/>
+            <entry key="action" value="act"/>
+            <entry key="application" value="cs1:Application Name"/>
+            <entry key="attributeName" value="cs4:Attribute Name"/>
+            <entry key="attributeValue" value="cs5:Attribute Value"/>
+            <entry key="created" value="deviceReceiptTime"/>
+            <entry key="instance" value="cs6:Instance"/>
+            <entry key="source" value="cs3:Requestor"/>
+            <entry key="target" value="cs2:Requestee"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="authQuestionLockoutDurationMillis" value="3600000"/>
+      <entry key="authQuestionsEnabled" value="false"/>
+      <entry key="automateSignOffOnReassignment" value="false"/>
+      <entry key="automateSignOffPopup" value="false"/>
+      <entry key="automaticClosingAction">
+        <value>
+          <CertificationStatus>Remediated</CertificationStatus>
+        </value>
+      </entry>
+      <entry key="automaticClosingDuration">
+        <value>
+          <TimeDuration amount="7" scale="Day"/>
+        </value>
+      </entry>
+      <entry key="automaticClosingSigner" value="spadmin"/>
+      <entry key="batchRequestAccessRequest" value="LCM Provisioning"/>
+      <entry key="batchRequestAccountsRequest" value="LCM Provisioning"/>
+      <entry key="batchRequestIdentityCreateRequest" value="LCM Create and Update"/>
+      <entry key="batchRequestIdentityEditRequest" value="LCM Create and Update"/>
+      <entry key="batchRequestPasswordsRequest" value="LCM Manage Passwords"/>
+      <entry key="bulkReassignmentEmailTemplate" value="Bulk Reassignment"/>
+      <entry key="bulkSelectionCountForConfirmation" value="25"/>
+      <entry key="bundlesUIDisplayLimit" value="50"/>
+      <entry key="cefActivityCorrelationRule" value="CEFActivityCorrelation"/>
+      <entry key="cefActivityTransformRule" value="CEFTransformRule"/>
+      <entry key="cefFormat">
+        <value>
+          <List>
+            <String>cef_version</String>
+            <String>device_vendor</String>
+            <String>device_product</String>
+            <String>device_version</String>
+            <String>signatureId</String>
+            <String>name</String>
+            <String>severity</String>
+            <String>extension</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="cefHeader">
+        <value>
+          <Map>
+            <entry key="cef_version" value="CEF:0"/>
+            <entry key="device_product" value="IdentityIQ"/>
+            <entry key="device_vendor" value="SailPoint"/>
+            <entry key="severity" value="2"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="cefLinkAttributeName" value="sAMAccountName"/>
+      <entry key="cefLogFileFieldsFilePath" value="cefActivityFeedDataFieldFile.xml"/>
+      <entry key="cefSyslogSeverity">
+        <value>
+          <Map>
+            <entry key="ALL" value="1"/>
+            <entry key="DEBUG" value="3"/>
+            <entry key="ERROR" value="10"/>
+            <entry key="FATAL" value="9"/>
+            <entry key="INFO" value="2"/>
+            <entry key="TRACE" value="4"/>
+            <entry key="WARN" value="5"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="cefUserName">
+        <value>
+          <List>
+            <String>duser</String>
+            <String>suser</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="certificationArchiveMaxAge" value="0"/>
+      <entry key="certificationDecisionChallengedEmailTemplate" value="Certification Decision Challenged Notification"/>
+      <entry key="certificationDelegationReview" value="false"/>
+      <entry key="certificationDetailedViewFilterSet" value="false"/>
+      <entry key="certificationDisableDelegationForwarding" value="false"/>
+      <entry key="certificationEmailTemplate" value="Certification"/>
+      <entry key="certificationEntityCompletionRule"/>
+      <entry key="certificationEntityCustomizationRule"/>
+      <entry key="certificationEntityDelegationEnabled" value="true"/>
+      <entry key="certificationEntityRefreshRule"/>
+      <entry key="certificationItemCompletionRule"/>
+      <entry key="certificationItemCustomizationRule"/>
+      <entry key="certificationItemDelegationEnabled" value="false"/>
+      <entry key="certificationLimitReassignments" value="false"/>
+      <entry key="certificationMaxAge" value="0"/>
+      <entry key="certificationMitigationDuration">
+        <value>
+          <TimeDuration amount="1" scale="Month"/>
+        </value>
+      </entry>
+      <entry key="certificationMitigationEnabled" value="false"/>
+      <entry key="certificationMitigationPopupEnabled" value="false"/>
+      <entry key="certificationPageListItems" value="true"/>
+      <entry key="certificationReminderEmailTemplate" value="Certification Reminder"/>
+      <entry key="certificationRequiredDuration">
+        <value>
+          <TimeDuration amount="1" scale="Month"/>
+        </value>
+      </entry>
+      <entry key="certificationSignOffApprovalEmailTemplate" value="Certification Sign Off Approval"/>
+      <entry key="certifiedDuration">
+        <value>
+          <TimeDuration amount="11" scale="Month"/>
+        </value>
+      </entry>
+      <entry key="challengeAcceptedEmailTemplate" value="Challenge Accepted"/>
+      <entry key="challengeDecisionExpirationEmailTemplate"/>
+      <entry key="challengeExpirationEmailTemplate"/>
+      <entry key="challengeGenerationEmailTemplate" value="Challenge Creation Notification"/>
+      <entry key="challengePeriodDuration">
+        <value>
+          <TimeDuration amount="1" scale="Week"/>
+        </value>
+      </entry>
+      <entry key="challengePeriodEnabled" value="false"/>
+      <entry key="challengePeriodEndEmailTemplate" value="Challenge Period End"/>
+      <entry key="challengePeriodStartEmailTemplate" value="Challenge Period Start"/>
+      <entry key="challengeRejectedEmailTemplate" value="Challenge Rejected"/>
+      <entry key="checkPasswordsAgainstDictionary" value="false"/>
+      <entry key="checkPasswordsAgainstIdentityAttributes" value="false"/>
+      <entry key="columnSuggestBlacklist">
+        <value>
+          <Map>
+            <entry key="AuthenticationAnswer" value="*"/>
+            <entry key="Identity" value="password"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="completeCertificationHierarchy" value="false"/>
+      <entry key="confirmRiskyCertificationSchedules" value="false"/>
+      <entry key="continuousCertCertificationRequiredScanInterval">
+        <value>
+          <TimeDuration amount="1" scale="Day"/>
+        </value>
+      </entry>
+      <entry key="continuousCertOverdueScanInterval">
+        <value>
+          <TimeDuration amount="1" scale="Day"/>
+        </value>
+      </entry>
+      <entry key="customThemeCodeMirror" value="scripts/codemirror-4.3/theme/custom.css"/>
+      <entry key="dashboardMaxCertPercentApplications" value="10"/>
+      <entry key="dashboardMaxCertPercentGroups" value="10"/>
+      <entry key="dashboardMaxCertPercents" value="5"/>
+      <entry key="defaultElectronicSignature"/>
+      <entry key="defaultEmailFromAddress" value="admin@example.com"/>
+      <entry key="defaultEmailGap" value="0"/>
+      <entry key="defaultEmailHost" value="mail.example.com"/>
+      <entry key="defaultHomeWidgets" value="Approvals, Violations, Forms, DirectReports, MyAccessReviews, CertificationCampaigns, TopFiveRisks"/>
+      <entry key="defaultLanguage" value="en_US"/>
+      <entry key="defaultMaxReminders" value="5"/>
+      <entry key="defaultQuickLinkCards" value="Policy Violations, Access Reviews, Approvals, Request Access, Track Requests"/>
+      <entry key="defaultRemediator"/>
+      <entry key="defaultReminderStart" value="1209600000"/>
+      <entry key="defaultWakeUpInterval" value="86400000"/>
+      <entry key="defaultWorkItemDuration" value="30"/>
+      <entry key="delegationEmailTemplate" value="Delegation"/>
+      <entry key="delegationFinishedEmailTemplate" value="Delegation Finished"/>
+      <entry key="delegationRevocationEmailTemplate" value="Delegation Revocation"/>
+      <entry key="disableDefaultToAppOwnerRemediation" value="false"/>
+      <entry key="disableRoleModelerTreeView" value="false"/>
+      <entry key="emailNotifierType" value="smtp"/>
+      <entry key="emailRequestDefinition" value="Email Request"/>
+      <entry key="enableAuthLockout" value="false"/>
+      <entry key="enableLocalizeApplicationDescriptions" value="true"/>
+      <entry key="enableLocalizeManagedAttributeDescriptions" value="true"/>
+      <entry key="enableLocalizePolicyDescriptions" value="true"/>
+      <entry key="enableLocalizeRoleDescriptions" value="true"/>
+      <entry key="enableModelerProfileView" value="true"/>
+      <entry key="enableOverrideViolationDefaultRemediator" value="true"/>
+      <entry key="enableProvisioningTransactionLog" value="true"/>
+      <entry key="enableRoleSunActivate" value="false"/>
+      <entry key="enableRoleSunAssign" value="false"/>
+      <entry key="enableSyslog" value="true"/>
+      <entry key="entitlementMiningMaxAppBuckets" value="25"/>
+      <entry key="entitlementMiningMaxBuckets" value="25"/>
+      <entry key="escalationEmailTemplate" value="Work Item Escalation"/>
+      <entry key="flattenCertificationManagerHierarchy" value="false"/>
+      <entry key="formsTypeFilter">
+        <value>
+          <List>
+            <String>Application</String>
+            <String>Role</String>
+            <String>Workflow</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="groupIndexGranule" value="month"/>
+      <entry key="hashIdentitySecrets" value="false"/>
+      <entry key="hashingIterations" value="1000"/>
+      <entry key="identityControlsAssignedScope">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="identityIndexGranule" value="month"/>
+      <entry key="identityMaxSearchableAttributes" value="10"/>
+      <entry key="identitySnapshotInterval" value="86400"/>
+      <entry key="identitySnapshotMaxAge" value="0"/>
+      <entry key="identity_extension">
+        <value>
+          <Map>
+            <entry key="SPT_links.application.id" value="cs1:Application Name"/>
+            <entry key="SPT_workgroups.id" value="cs6:Workgroup"/>
+            <entry key="email" value="cs5:Email ID"/>
+            <entry key="firstname" value="cs2:Identity First Name"/>
+            <entry key="lastname" value="cs3:Identity Last Name"/>
+            <entry key="manager.displayName" value="cs4:Manager"/>
+            <entry key="name" value="duser"/>
+            <entry key="scorecard.businessRoleScore" value="cfp3"/>
+            <entry key="scorecard.certificationScore" value="cn1:Certification Score"/>
+            <entry key="scorecard.compositeScore" value="cn2:Composite Score"/>
+            <entry key="scorecard.policyScore" value="cfp1"/>
+            <entry key="scorecard.rawBusinessRoleScore" value="cfp2"/>
+            <entry key="scorecard.rawEntitlementScore" value="cn3"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="includePasswordPolicyDetailsInHelp">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="lcmAllowAccessAttributesSearch" value="true"/>
+      <entry key="lcmAllowAccessPercentageSlider" value="false"/>
+      <entry key="lcmAllowAccessPopulationSearch" value="true"/>
+      <entry key="lcmAllowAccessSortPercentage" value="true"/>
+      <entry key="lcmAllowAccessSortPercentageCount" value="50"/>
+      <entry key="lcmAllowRequestPermits" value="true"/>
+      <entry key="lcmCreateIdentityUseByDays" value="30"/>
+      <entry key="lcmEnableFulltext" value="true"/>
+      <entry key="lcmEnabled" value="true"/>
+      <entry key="lcmManageAccountsShowAllButtons" value="false"/>
+      <entry key="lcmMobileMaxSelectableUsers" value="100"/>
+      <entry key="lcmRequirePasswordIdentityCreate" value="true"/>
+      <entry key="lcmSearchMaxResults" value="100"/>
+      <entry key="lcmShowExternalTicketId" value="false"/>
+      <entry key="lcmUserAccessFulltextIndex" value="BundleManagedAttribute"/>
+      <entry key="linkMaxSearchableAttributes" value="5"/>
+      <entry key="link_extension">
+        <value>
+          <Map>
+            <entry key="application.name" value="cs1:Application Name"/>
+            <entry key="created" value="deviceReceiptTime"/>
+            <entry key="displayName" value="cs2:Account Name"/>
+            <entry key="entitlements" value="cs4:Entitlements"/>
+            <entry key="identity.name" value="cs3:Identity Name"/>
+            <entry key="instance" value="cs6:Instance"/>
+            <entry key="nativeIdentity" value="duser"/>
+            <entry key="uuid" value="duid"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="loginErrorStyle" value="simple"/>
+      <entry key="loginReturnsToDashboard" value="false"/>
+      <entry key="manageAccountsActions">
+        <value>
+          <List>
+            <AccountOperation>Delete</AccountOperation>
+            <AccountOperation>Disable</AccountOperation>
+            <AccountOperation>Enable</AccountOperation>
+            <AccountOperation>Unlock</AccountOperation>
+          </List>
+        </value>
+      </entry>
+      <entry key="manageAccountsDeleteSelfEnabled" value="true"/>
+      <entry key="manageAccountsDeleteSubordinateEnabled" value="true"/>
+      <entry key="manageAccountsDisableAutoRefreshStatus">
+        <value>
+          <List>
+            <String> </String>
+          </List>
+        </value>
+      </entry>
+      <entry key="manageAccountsDisableSelfEnabled" value="true"/>
+      <entry key="manageAccountsDisableSubordinateEnabled" value="true"/>
+      <entry key="manageAccountsEnableSelfEnabled" value="true"/>
+      <entry key="manageAccountsEnableSubordinateEnabled" value="true"/>
+      <entry key="manageAccountsUnlockSelfEnabled" value="true"/>
+      <entry key="manageAccountsUnlockSubordinateEnabled" value="true"/>
+      <entry key="managedAttributeStatsMaxAttributes" value="5000"/>
+      <entry key="managedAttributeStatsMaxIdentities" value="200"/>
+      <entry key="maxAuthLoginFailures" value="5"/>
+      <entry key="maxAuthQuestionFailures" value="3"/>
+      <entry key="mitigationExpirationAction" value="NOTHING"/>
+      <entry key="mitigationExpirationActionParameters"/>
+      <entry key="mitigationExpirationEmailTemplate" value="Mitigation Expiration"/>
+      <entry key="mobileQuickLinkCards" value="Request Access, Manage Passwords, Manage Accounts, Mobile Access Reviews, Mobile Approvals, Forms, Mobile Violation Reviews"/>
+      <entry key="notifyRemediation" value="false"/>
+      <entry key="numAuthQuestionAnswersRequired" value="3"/>
+      <entry key="numAuthQuestionsForAuthn" value="2"/>
+      <entry key="openCertsEmailTemplate" value="Open Certifications"/>
+      <entry key="optinResultsDetails" value="false"/>
+      <entry key="passwordSpecialCharacters" value="~!@#$%^*_+-={}\\][:;?,."/>
+      <entry key="pendingRoleRequestDeleteEmailTemplate" value="Pending Role Request Deleted"/>
+      <entry key="policyViolationDelegationEmailTemplate" value="Policy Violation Delegation"/>
+      <entry key="policyViolationEmailTemplate" value="Policy Violation"/>
+      <entry key="policyViolationWorkItemTemplate" value="Policy Violation Details"/>
+      <entry key="promptForAuthQuestionAnswersAfterLogin" value="false"/>
+      <entry key="provisioningRequestExpirationDays" value="7"/>
+      <entry key="provisioningTransactionLogLevel" value="Failure"/>
+      <entry key="provisioningTransactionLogPruneAge" value="0"/>
+      <entry key="quickLinkCategories">
+        <value>
+          <List>
+            <QuickLinkCategory cssClass="quickLinkCategoryTasks" messageKey="quicklink_category_all_tasks" name="Tasks" ordering="1"/>
+            <QuickLinkCategory cssClass="quickLinkCategoryAccess" messageKey="quicklink_category_access" name="Access" ordering="2"/>
+            <QuickLinkCategory cssClass="quickLinkCategoryManage" messageKey="quicklink_category_manage" name="Manage" ordering="3"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="redirectingEmailNotifierAddress" value="admin@example.com"/>
+      <entry key="redirectingEmailNotifierFilename" value="/tmp/iiqmbox"/>
+      <entry key="registerForm" value="Self-service Registration Form"/>
+      <entry key="remediationEmailTemplate" value="Remediation Work Item"/>
+      <entry key="remediationItemAssignmentEmailTemplate" value="Remediation Item Assignment"/>
+      <entry key="remediationItemAssignmentRemovalEmailTemplate" value="Remediation Item Assignment Removal"/>
+      <entry key="remediationNotificationEmailTemplate" value="Remediation Notification"/>
+      <entry key="remediationPeriodDuration">
+        <value>
+          <TimeDuration amount="1" scale="Month"/>
+        </value>
+      </entry>
+      <entry key="remediationPeriodEnabled" value="true"/>
+      <entry key="remediationScanInterval" value="86400000"/>
+      <entry key="reminderEmailTemplate" value="Work Item Reminder"/>
+      <entry key="reportCompletionEmailTemplate" value="Report Completion"/>
+      <entry key="reportingResultRowThreshold" value="200000"/>
+      <entry key="requestMaxAge" value="0"/>
+      <entry key="requestProcessorPoolSize" value="10"/>
+      <entry key="requestRolesAssignableSelfEnabled" value="true"/>
+      <entry key="requestRolesAssignableSubordinateEnabled" value="true"/>
+      <entry key="requestRolesPermittedSelfEnabled" value="true"/>
+      <entry key="requestRolesPermittedSubordinateEnabled" value="true"/>
+      <entry key="requireBulkCertifyConfirmation" value="false"/>
+      <entry key="requireDelegationCompletion" value="false"/>
+      <entry key="requireOldPasswordAtChange" value="false"/>
+      <entry key="requireReassignmentCompletion" value="true"/>
+      <entry key="scimSearchMaxResults" value="1000"/>
+      <entry key="scopePathsDenormalized">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="scopeTreeUIDisplayLimit" value="50"/>
+      <entry key="scopingEnabled">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="searchInputDefinitions">
+        <value>
+          <List>
+            <SearchInputDefinition description="srch_input_def_last_name" headerKey="srch_input_def_last_name" ignoreCase="true" inputType="Like" matchMode="START" name="lastName" propertyName="lastname" propertyType="String" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_first_name" headerKey="srch_input_def_first_name" ignoreCase="true" inputType="Like" matchMode="START" name="firstName" propertyName="firstname" propertyType="String" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_user_name" headerKey="srch_input_def_user_name" ignoreCase="true" inputType="Like" matchMode="START" name="userName" propertyName="name" propertyType="String" searchType="None"/>
+            <SearchInputDefinition description="srch_input_def_display_name" headerKey="srch_input_def_display_name" ignoreCase="true" inputType="Like" matchMode="START" name="displayName" propertyName="displayName" propertyType="String" searchType="None"/>
+            <SearchInputDefinition description="srch_input_def_manager" headerKey="srch_input_def_manager" ignoreCase="true" inputType="Like" matchMode="START" name="manager" nullPropertyName="manager" nullPropertyType="String" propertyName="manager.displayName" propertyType="Identity" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_email" headerKey="srch_input_def_email" ignoreCase="true" inputType="Like" matchMode="START" name="email" propertyName="email" propertyType="String" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_inactive" headerKey="srch_input_def_inactive" inputType="Equal" name="inactive" propertyName="inactive" propertyType="Boolean" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_ismanager" headerKey="srch_input_def_ismanager" inputType="Equal" name="isManager" propertyName="managerStatus" propertyType="Boolean" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_detected_role" headerKey="srch_input_def_detected_role" ignoreCase="true" inputType="Equal" name="businessRole" nullPropertyName="bundleSummary" nullPropertyType="String" propertyName="bundles.id" propertyType="Collection" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_detected_role_include_descr" headerKey="srch_input_def_detected_role_include" inputType="Equal" name="roleHierarchy" nullPropertyName="bundleSummary" nullPropertyType="String" propertyName="roleHierarchy" propertyType="None" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_assigned_role" headerKey="srch_input_def_assigned_role" ignoreCase="true" inputType="Equal" name="assignedRole" nullPropertyName="assignedRoleSummary" nullPropertyType="String" propertyName="assignedRoles.id" propertyType="Collection" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_assigned_role_include_descr" headerKey="srch_input_def_assigned_role_include" inputType="Equal" name="assignedRoleHierarchy" nullPropertyName="assignedRoleSummary" nullPropertyType="String" propertyName="assignedRoleHierarchy" propertyType="None" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_workgroup" headerKey="srch_input_def_workgroup" inputType="Equal" name="workgroup" nullPropertyName="workgroups" nullPropertyType="Collection" propertyName="SPT_workgroups.id" propertyType="Collection" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_application" headerKey="srch_input_def_application" ignoreCase="true" inputType="Equal" name="application" nullPropertyName="links" nullPropertyType="Collection" propertyName="SPT_links.application.id" propertyType="Collection" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_instance" headerKey="srch_input_def_instance" ignoreCase="true" inputType="Equal" name="instance" nullPropertyName="instance" nullPropertyType="String" propertyName="SPT_links.instance" propertyType="String" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_ipop" filterBuilder="sailpoint.search.IpopFilterBuilder" headerKey="srch_input_def_ipop" ignoreCase="true" inputType="Equal" name="identity.ipop" propertyName="ipop" propertyType="String" searchType="Identity"/>
+            <SearchInputDefinition filterBuilder="sailpoint.search.IdentityEntitlementsFilterBuilder" headerKey="identityEntitlements" name="identityEntitlements" propertyName="SPT_IdentityEntitlements" propertyType="Collection" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_missing_cert" filterBuilder="sailpoint.search.IdentityEntitlementsFilterBuilder" headerKey="srch_input_def_missing_cert" name="isEntitlementCertEmpty" propertyName="identityEntitlements.certificationItem" propertyType="String" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_missing_pending_cert" filterBuilder="sailpoint.search.IdentityEntitlementsFilterBuilder" headerKey="srch_input_def_missing_pending_cert" name="isEntitlementPendingCert" propertyName="identityEntitlements.pendingCertificationItem" propertyType="String" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_missing_request" filterBuilder="sailpoint.search.IdentityEntitlementsFilterBuilder" headerKey="srch_input_def_missing_request" name="isEntitlementRequestEmpty" propertyName="identityEntitlements.requestItem" propertyType="String" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_missing_pending_request" filterBuilder="sailpoint.search.IdentityEntitlementsFilterBuilder" headerKey="srch_input_def_missing_pending_request" name="isEntitlementPendingRequest" propertyName="identityEntitlements.pendingRequestItem" propertyType="String" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_connected_status" filterBuilder="sailpoint.search.IdentityEntitlementsFilterBuilder" headerKey="srch_input_def_connected_status" name="entitlementConnectionStatus" propertyName="identityEntitlements.aggregationState" propertyType="String" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_entitlement_assigned" filterBuilder="sailpoint.search.IdentityEntitlementsFilterBuilder" headerKey="srch_input_def_entitlement_assigned" name="isEntitlementAssigned" propertyName="identityEntitlements.assigned" propertyType="Boolean" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_last_name" headerKey="srch_input_def_advanced_last_name" ignoreCase="true" inputType="Like" matchMode="START" name="advanced.lastName" propertyName="lastname" propertyType="String" searchType="AdvancedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_first_name" headerKey="srch_input_def_advanced_first_name" ignoreCase="true" inputType="Like" matchMode="START" name="advanced.firstName" propertyName="firstname" propertyType="String" searchType="AdvancedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_user_name" headerKey="srch_input_def_advanced_user_name" ignoreCase="true" inputType="Like" matchMode="START" name="advanced.userName" propertyName="name" propertyType="String" searchType="AdvancedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_manager" headerKey="srch_input_def_advanced_manager" ignoreCase="true" inputType="Like" matchMode="START" name="advanced.manager" nullPropertyName="manager" propertyName="manager.name" propertyType="Identity" searchType="AdvancedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_inactive" headerKey="srch_input_def_advanced_inactive" inputType="Equal" name="advanced.inactive" propertyName="inactive" propertyType="Boolean" searchType="AdvancedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_ismanager" headerKey="srch_input_def_advanced_ismanager" inputType="Equal" name="advanced.isManager" propertyName="managerStatus" propertyType="Boolean" searchType="AdvancedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_email" headerKey="srch_input_def_advanced_email" ignoreCase="true" inputType="Like" matchMode="START" name="advanced.email" propertyName="email" propertyType="String" searchType="AdvancedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_detected_role" filterBuilder="sailpoint.search.BundleFilterBuilder" headerKey="srch_input_def_advanced_detected_role" ignoreCase="true" inputType="Equal" name="advanced.businessRole" nullPropertyName="bundles" nullPropertyType="Collection" propertyName="bundles.name" propertyType="Collection" searchType="AdvancedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_assigned_role" filterBuilder="sailpoint.search.BundleFilterBuilder" headerKey="srch_input_def_advanced_assigned_role" ignoreCase="true" inputType="Equal" name="advanced.assignedRole" nullPropertyName="assignedRoles" nullPropertyType="Collection" propertyName="assignedRoles.name" propertyType="Collection" searchType="AdvancedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_application" headerKey="srch_input_def_advanced_application" ignoreCase="true" inputType="Equal" name="advanced.application" nullPropertyName="links" nullPropertyType="Collection" propertyName="links.application.name" propertyType="Collection" searchType="AdvancedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_composite_score" headerKey="srch_input_def_composite_score" inputType="Equal" name="compositeScore" propertyName="scorecard.compositeScore" propertyType="Integer" searchType="Risk"/>
+            <SearchInputDefinition description="srch_input_def_business_role_score" headerKey="srch_input_def_business_role_score" inputType="Equal" name="businessRoleScore" propertyName="scorecard.businessRoleScore" propertyType="Integer" searchType="Risk"/>
+            <SearchInputDefinition description="srch_input_def_business_role_raw_score" headerKey="srch_input_def_business_role_raw_score" inputType="Equal" name="businessRoleRawScore" propertyName="scorecard.rawBusinessRoleScore" propertyType="Integer" searchType="Risk"/>
+            <SearchInputDefinition description="srch_input_def_entitlement_score" headerKey="srch_input_def_entitlement_score" inputType="Equal" name="entitlementScore" propertyName="scorecard.entitlementScore" propertyType="Integer" searchType="Risk"/>
+            <SearchInputDefinition description="srch_input_def_entitlement_raw_score" headerKey="srch_input_def_entitlement_raw_score" inputType="Equal" name="entitlementRawScore" propertyName="scorecard.rawEntitlementScore" propertyType="Integer" searchType="Risk"/>
+            <SearchInputDefinition description="srch_input_def_policy_score" headerKey="srch_input_def_policy_score" inputType="Equal" name="policyScore" propertyName="scorecard.policyScore" propertyType="Integer" searchType="Risk"/>
+            <SearchInputDefinition description="srch_input_def_policy_raw_score" headerKey="srch_input_def_policy_raw_score" inputType="Equal" name="policyRawScore" propertyName="scorecard.rawPolicyScore" propertyType="Integer" searchType="Risk"/>
+            <SearchInputDefinition description="srch_input_def_certification_score" headerKey="srch_input_def_certification_score" inputType="Equal" name="certificationScore" propertyName="scorecard.certificationScore" propertyType="Integer" searchType="Risk"/>
+            <SearchInputDefinition description="srch_input_def_detected_roles" headerKey="srch_input_def_detected_roles" inputType="Equal" name="businessRoles" propertyName="bundleSummary" propertyType="String" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_assigned_roles" headerKey="srch_input_def_assigned_roles" inputType="Equal" name="assignedRoles" propertyName="assignedRoleSummary" propertyType="String" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_mining_application" headerKey="srch_input_def_mining_application" inputType="Equal" name="miningApplication" propertyName="links.application.id" propertyType="AndedList" searchType="None"/>
+            <SearchInputDefinition description="srch_input_def_activity_include" headerKey="srch_input_def_activity_include" ignoreCase="true" inputType="Equal" name="activityInclude" propertyName="" propertyType="String" searchType=""/>
+            <SearchInputDefinition description="srch_input_def_ipop" filterBuilder="sailpoint.search.IpopFilterBuilder" headerKey="srch_input_def_ipop" ignoreCase="true" inputType="Equal" name="ipop" propertyName="ipop" propertyType="String" searchType="Activity"/>
+            <SearchInputDefinition description="srch_input_def_activity_start_date" headerKey="srch_input_def_activity_start_date" inputType="None" name="activityStartDate" propertyName="timeStamp" propertyType="Date" searchType="Activity"/>
+            <SearchInputDefinition description="srch_input_def_activity_end_date" headerKey="srch_input_def_activity_end_date" inputType="None" name="activityEndDate" propertyName="timeStamp" propertyType="Date" searchType="Activity"/>
+            <SearchInputDefinition description="srch_input_def_time_stamp" headerKey="srch_input_def_time_stamp" inputType="None" name="timeStamp" propertyName="timeStamp" propertyType="Date" searchType="Activity"/>
+            <SearchInputDefinition description="srch_input_def_identity_name" headerKey="srch_input_def_identity_name" ignoreCase="true" inputType="None" name="identityName" propertyName="identityName" propertyType="String" searchType="Activity"/>
+            <SearchInputDefinition description="srch_input_def_source_application" headerKey="srch_input_def_source_application" ignoreCase="true" inputType="Equal" listOperation="OR" name="sourceApplication" propertyName="sourceApplication" propertyType="String" searchType="Activity"/>
+            <SearchInputDefinition description="srch_input_def_action" headerKey="srch_input_def_action" ignoreCase="true" inputType="Equal" listOperation="OR" name="action" propertyName="action" propertyType="String" searchType="Activity"/>
+            <SearchInputDefinition description="srch_input_def_result" headerKey="srch_input_def_result" ignoreCase="true" inputType="Equal" listOperation="OR" name="result" propertyName="result" propertyType="String" searchType="Activity"/>
+            <SearchInputDefinition description="srch_input_def_data_source" headerKey="srch_input_def_data_source" ignoreCase="true" inputType="Like" matchMode="START" name="dataSource" propertyName="dataSource" propertyType="String" searchType="Activity"/>
+            <SearchInputDefinition description="srch_input_def_target" headerKey="srch_input_def_target" ignoreCase="true" inputType="Like" matchMode="START" name="target" propertyName="target" propertyType="String" searchType="Activity"/>
+            <SearchInputDefinition description="srch_input_def_category" headerKey="srch_input_def_category" ignoreCase="true" inputType="In" name="category" propertyName="target" propertyType="StringList" searchType="Activity"/>
+            <SearchInputDefinition description="srch_input_def_identity" headerKey="srch_input_def_identity" ignoreCase="true" inputType="Equal" listOperation="OR" name="identity" propertyName="identityId" propertyType="String" searchType="Activity"/>
+            <SearchInputDefinition description="srch_input_def_time_periods" headerKey="srch_input_def_time_periods" inputType="ContainsAll" name="timePeriods" propertyName="timePeriods" propertyType="TimePeriodList" searchType="Activity"/>
+            <SearchInputDefinition description="srch_input_def_info" headerKey="srch_input_def_info" ignoreCase="true" inputType="In" name="info" propertyName="info" propertyType="String" searchType="Activity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_activity_start_date" headerKey="srch_input_def_advanced_activity_start_date" inputType="None" name="advanced.activityStartDate" propertyName="timeStamp" propertyType="Date" searchType="AdvancedActivity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_activity_end_date" headerKey="srch_input_def_advanced_activity_end_date" inputType="None" name="advanced.activityEndDate" propertyName="timeStamp" propertyType="Date" searchType="AdvancedActivity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_source_application" headerKey="srch_input_def_advanced_source_application" ignoreCase="true" inputType="Equal" name="advanced.sourceApplication" propertyName="sourceApplication" propertyType="String" searchType="AdvancedActivity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_action" headerKey="srch_input_def_advanced_action" ignoreCase="true" inputType="Equal" name="advanced.action" propertyName="action" propertyType="String" searchType="AdvancedActivity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_result" headerKey="srch_input_def_advanced_result" ignoreCase="true" inputType="Equal" name="advanced.result" propertyName="result" propertyType="String" searchType="AdvancedActivity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_data_source" headerKey="srch_input_def_advanced_data_source" ignoreCase="true" inputType="Like" matchMode="START" name="advanced.dataSource" propertyName="dataSource" propertyType="String" searchType="AdvancedActivity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_target" headerKey="srch_input_def_advanced_target" ignoreCase="true" inputType="Like" matchMode="START" name="advanced.target" propertyName="target" propertyType="String" searchType="AdvancedActivity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_category" headerKey="srch_input_def_advanced_category" ignoreCase="true" inputType="In" name="advanced.category" propertyName="target" propertyType="StringList" searchType="AdvancedActivity"/>
+            <SearchInputDefinition description="srch_input_def_audit_start_date" headerKey="auditStartDate" inputType="None" name="auditStartDate" propertyName="created" propertyType="Date" searchType="Audit" sortIndex="0"/>
+            <SearchInputDefinition description="srch_input_def_audit_end_date" headerKey="auditEndDate" inputType="None" name="auditEndDate" propertyName="created" propertyType="Date" searchType="Audit" sortIndex="1"/>
+            <SearchInputDefinition description="srch_input_def_audit_date" headerKey="srch_input_def_audit_date" inputType="None" name="audit.created" propertyName="created" propertyType="Date" searchType="Audit" sortIndex="2"/>
+            <SearchInputDefinition description="srch_input_def_audit_action" headerKey="srch_input_def_audit_action" ignoreCase="true" inputType="Equal" name="audit.action" propertyName="action" propertyType="String" searchType="Audit" sortIndex="3"/>
+            <SearchInputDefinition description="srch_input_def_audit_source" headerKey="srch_input_def_audit_source" ignoreCase="true" inputType="Like" matchMode="START" name="source" propertyName="source" propertyType="String" searchType="Audit" sortIndex="4"/>
+            <SearchInputDefinition description="srch_input_def_audit_target" headerKey="srch_input_def_audit_target" ignoreCase="true" inputType="Like" matchMode="START" name="audit.target" propertyName="target" propertyType="String" searchType="Audit" sortIndex="5"/>
+            <SearchInputDefinition description="srch_input_def_audit_interface" headerKey="srch_input_def_audit_interface" ignoreCase="true" inputType="Equal" name="audit.interface" propertyName="interface" propertyType="String" searchType="Audit" sortIndex="6"/>
+            <SearchInputDefinition description="srch_input_def_audit_application" headerKey="srch_input_def_audit_application" ignoreCase="true" inputType="Equal" name="audit.application" propertyName="application" propertyType="String" searchType="Audit" sortIndex="7"/>
+            <SearchInputDefinition description="srch_input_def_audit_instance" headerKey="srch_input_def_audit_instance" ignoreCase="true" inputType="Equal" name="audit.instance" propertyName="instance" propertyType="String" searchType="Audit" sortIndex="8"/>
+            <SearchInputDefinition description="srch_input_def_audit_account_name" headerKey="srch_input_def_audit_account_name" ignoreCase="true" inputType="Equal" name="accountName" propertyName="accountName" propertyType="String" searchType="Audit" sortIndex="9"/>
+            <SearchInputDefinition description="srch_input_def_audit_attribute_name" headerKey="srch_input_def_audit_attribute_name" ignoreCase="true" inputType="Equal" name="attributeName" propertyName="attributeName" propertyType="String" searchType="Audit" sortIndex="10"/>
+            <SearchInputDefinition description="srch_input_def_audit_attribute_value" headerKey="srch_input_def_audit_attribute_value" ignoreCase="true" inputType="Equal" name="attributeValue" propertyName="attributeValue" propertyType="String" searchType="Audit" sortIndex="11"/>
+            <SearchInputDefinition description="srch_input_def_audit_string1" headerKey="srch_input_def_audit_string1" ignoreCase="true" inputType="Equal" name="string1" propertyName="string1" propertyType="String" searchType="Audit" sortIndex="12"/>
+            <SearchInputDefinition description="srch_input_def_audit_string2" headerKey="srch_input_def_audit_string2" ignoreCase="true" inputType="Equal" name="string2" propertyName="string2" propertyType="String" searchType="Audit" sortIndex="13"/>
+            <SearchInputDefinition description="srch_input_def_audit_string3" headerKey="srch_input_def_audit_string3" ignoreCase="true" inputType="Equal" name="string3" propertyName="string3" propertyType="String" searchType="Audit" sortIndex="14"/>
+            <SearchInputDefinition description="srch_input_def_audit_string4" headerKey="srch_input_def_audit_string4" ignoreCase="true" inputType="Equal" name="string4" propertyName="string4" propertyType="String" searchType="Audit" sortIndex="15"/>
+            <SearchInputDefinition description="srch_input_def_workitem" headerKey="srch_input_def_workitem" ignoreCase="true" inputType="Like" matchMode="START" name="workItem" propertyName="description" propertyType="String" searchType="WorkItem"/>
+            <SearchInputDefinition description="srch_input_def_certifier" headerKey="certifier" ignoreCase="true" inputType="ContainsAll" name="certification.certifier" propertyName="certifiers" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_member" filterBuilder="sailpoint.search.CertificationEntityFilterBuilder" headerKey="member" ignoreCase="true" inputType="Equal" name="certification.member" propertyName="CertificationEntity.targetId" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_manager" headerKey="manager" ignoreCase="true" inputType="Equal" name="certification.manager" propertyName="manager" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_application" filterBuilder="sailpoint.search.ApplicationFilterBuilder" headerKey="application" ignoreCase="true" inputType="Equal" name="certification.application" propertyName="Application.name" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_application_id" filterBuilder="sailpoint.search.ApplicationFilterBuilder" headerKey="applicationId" ignoreCase="true" inputType="Equal" name="certification.applicationId" propertyName="applicationId" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_application_id" filterBuilder="sailpoint.search.ApplicationFilterBuilder" headerKey="applicationId" ignoreCase="true" inputType="Equal" name="certification.accountGroupApplicationId" propertyName="applicationId" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_type" headerKey="type" ignoreCase="true" inputType="Equal" name="certification.type" propertyName="type" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_phase" headerKey="phase" ignoreCase="true" inputType="Equal" name="certification.phase" propertyName="phase" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_creator" headerKey="creator" ignoreCase="true" inputType="Equal" name="certification.creator" propertyName="creator" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_name" headerKey="name" ignoreCase="true" inputType="Like" matchMode="START" name="certification.name" propertyName="shortName" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_cert_grp_name" headerKey="srch_input_def_cert_grp_name" ignoreCase="true" inputType="Like" matchMode="START" name="SPT_certificationGroup" propertyName="SPT_certificationGroup" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_certification_date" headerKey="certificationDate" inputType="Equal" name="certification.date" propertyName="" propertyType="Date" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_certification_start_date" headerKey="certificationStartDate" inputType="None" name="certification.startDate" propertyName="" propertyType="Date" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_certification_end_date" headerKey="certificationEndDate" inputType="None" name="certification.endDate" propertyName="" propertyType="Date" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_created" headerKey="created" inputType="Equal" name="certification.created" propertyName="created" propertyType="Date" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_expiration" headerKey="expiration" inputType="Equal" name="certification.expiration" propertyName="expiration" propertyType="Date" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_signed" headerKey="signed" inputType="Equal" name="certification.signed" propertyName="signed" propertyType="Date" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_finished" headerKey="finished" inputType="Equal" name="certification.finished" propertyName="finished" propertyType="Date" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_e_signed" headerKey="srch_input_def_e_signed" inputType="Equal" name="certification.electronicallySigned" propertyName="electronicallySigned" propertyType="Boolean" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_signed_by" headerKey="srch_input_def_signed_by" inputType="Equal" name="certification.signOffHistory.signerId" propertyName="signOffHistory.signerId" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_signed_by_name" headerKey="srch_input_def_signed_by_name" inputType="Equal" name="certification.signOffHistory.signerDisplayName" propertyName="signOffHistory.signerDisplayName" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_total_entities" headerKey="totalEntities" inputType="Equal" name="certification.totalEntities" propertyName="statistics.totalEntities" propertyType="Integer" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_completed_entities" headerKey="completedEntities" inputType="Equal" name="certification.completedEntities" propertyName="statistics.completedEntities" propertyType="Integer" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_delegated_entities" headerKey="delegatedEntities" inputType="Equal" name="certification.delegatedEntities" propertyName="statistics.delegatedEntities" propertyType="Integer" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_percent_complete" headerKey="percentage_complete" inputType="Equal" name="certification.percentComplete" propertyName="statistics.itemPercentComplete" propertyType="Integer" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_completed_items" headerKey="completed_items" inputType="Equal" name="certification.completedItems" propertyName="statistics.completedItems" propertyType="Integer" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_total_items" headerKey="total_items" inputType="Equal" name="certification.totalItems" propertyName="statistics.totalItems" propertyType="Integer" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_certification_role" filterBuilder="sailpoint.search.CertificationEntityFilterBuilder" headerKey="srch_input_def_certification_role" ignoreCase="true" inputType="Equal" name="certification.role" propertyName="CertificationEntity.targetName" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_certification_role" headerKey="srch_input_def_certification_role" ignoreCase="true" inputType="Equal" name="SPT_roles" propertyName="SPT_roles" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_certification_account_group" filterBuilder="sailpoint.search.CertificationEntityFilterBuilder" headerKey="srch_input_def_certification_account_group" ignoreCase="true" inputType="Equal" name="certification.accountGroup" propertyName="CertificationEntity.accountGroup" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_certification_account_group" headerKey="srch_input_def_certification_account_group" ignoreCase="true" inputType="Equal" name="SPT_accountGroups" propertyName="SPT_accountGroups" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_certifier" headerKey="srch_input_def_certifier" ignoreCase="true" inputType="Equal" name="SPT_certifiers" propertyName="SPT_certifiers" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_tags" headerKey="srch_input_def_tags" inputType="Equal" name="SPT_tags.id" nullPropertyName="tags" nullPropertyType="Collection" propertyName="SPT_tags.id" propertyType="Collection" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_certification_groups" filterBuilder="sailpoint.search.GroupDefinitionFilterBuilder" headerKey="srch_input_certification_groups" inputType="Equal" name="certification.groups" propertyName="certifiers" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_signed" filterBuilder="sailpoint.search.CertificationStatusFilterBuilder" headerKey="srch_input_def_status" name="certification.status" propertyName="status" propertyType="String" searchType="Certification"/>
+            <SearchInputDefinition description="srch_input_def_name" headerKey="name" ignoreCase="true" inputType="Like" matchMode="START" name="role.name" propertyName="name" propertyType="String" searchType="Role"/>
+            <SearchInputDefinition description="srch_input_def_display_name" headerKey="display_name" ignoreCase="true" inputType="Like" matchMode="START" name="role.displayName" propertyName="displayName" propertyType="String" searchType="Role"/>
+            <SearchInputDefinition description="srch_input_def_owner" headerKey="owner" ignoreCase="true" inputType="Equal" name="role.owner" propertyName="owner.name" propertyType="String" searchType="Role"/>
+            <SearchInputDefinition description="srch_input_def_description" headerKey="description" ignoreCase="true" inputType="Equal" name="role.description" propertyName="description" propertyType="String" searchType="Role"/>
+            <SearchInputDefinition description="srch_input_def_status" headerKey="status" ignoreCase="true" inputType="Equal" name="role.status" propertyName="disabled" propertyType="Boolean" searchType="Role"/>
+            <SearchInputDefinition description="srch_input_def_risk_score_weight" headerKey="srch_input_def_risk_score_weight" inputType="Equal" name="role.riskScoreWeight" propertyName="riskScoreWeight" propertyType="Integer" searchType="Role"/>
+            <SearchInputDefinition description="srch_input_def_type" headerKey="srch_input_def_type" ignoreCase="true" inputType="Equal" name="role.type" propertyName="type" propertyType="String" searchType="Role"/>
+            <SearchInputDefinition description="srch_input_def_assigned_count" filterBuilder="sailpoint.search.BundleFilterBuilder" headerKey="srch_input_def_assigned_count" inputType="Equal" name="role.assignedCount" propertyName="roleIndex.assignedCount" propertyType="Integer" searchType="Role"/>
+            <SearchInputDefinition description="srch_input_def_detected_count" filterBuilder="sailpoint.search.BundleFilterBuilder" headerKey="srch_input_def_detected_count" inputType="Equal" name="role.detectedCount" propertyName="roleIndex.detectedCount" propertyType="Integer" searchType="Role"/>
+            <SearchInputDefinition description="srch_input_def_entitlement_count" filterBuilder="sailpoint.search.BundleFilterBuilder" headerKey="srch_input_def_entitlement_count" inputType="Equal" name="role.entitlementCount" propertyName="roleIndex.entitlementCountInheritance" propertyType="Integer" searchType="Role"/>
+            <SearchInputDefinition description="srch_input_def_associated" filterBuilder="sailpoint.search.BundleFilterBuilder" headerKey="srch_input_def_associated" inputType="Equal" name="role.associatedToRole" propertyName="roleIndex.associatedToRole" propertyType="Boolean" searchType="Role"/>
+            <SearchInputDefinition description="srch_input_def_last_certified_membership" filterBuilder="sailpoint.search.BundleFilterBuilder" headerKey="srch_input_def_last_certified_membership" inputType="Equal" name="role.lastCertifiedMembership" propertyName="roleIndex.lastCertifiedMembership" propertyType="Date" searchType="Role"/>
+            <SearchInputDefinition description="srch_input_def_last_certified_composition" filterBuilder="sailpoint.search.BundleFilterBuilder" headerKey="srch_input_def_last_certified_composition" inputType="Equal" name="role.lastCertifiedComposition" propertyName="roleIndex.lastCertifiedComposition" propertyType="Date" searchType="Role"/>
+            <SearchInputDefinition description="srch_input_def_last_assignment" filterBuilder="sailpoint.search.BundleFilterBuilder" headerKey="srch_input_def_last_assignment" inputType="Equal" name="role.lastAssigned" propertyName="roleIndex.lastAssigned" propertyType="Date" searchType="Role"/>
+            <SearchInputDefinition description="srch_input_def_role_date" headerKey="srch_input_def_role_date" inputType="Equal" name="role.date" propertyName="" propertyType="Date" searchType="Role"/>
+            <SearchInputDefinition description="start_date" filterBuilder="sailpoint.search.BundleFilterBuilder" headerKey="start_date" inputType="None" name="role.startDate" propertyName="" propertyType="Date" searchType="Role"/>
+            <SearchInputDefinition description="end_date" filterBuilder="sailpoint.search.BundleFilterBuilder" headerKey="end_date" inputType="None" name="role.endDate" propertyName="" propertyType="Date" searchType="Role"/>
+            <SearchInputDefinition description="srch_input_def_effective_access" headerKey="role.associations" ignoreCase="true" inputType="Equal" name="role.associations" propertyName="associations.targetName" propertyType="String" searchType="Role"/>
+            <SearchInputDefinition description="application" headerKey="application" ignoreCase="true" inputType="Equal" name="accountGroup.application" propertyName="application.id" propertyType="String" searchType="AccountGroup"/>
+            <SearchInputDefinition description="srch_input_def_attribute" headerKey="attribute" ignoreCase="true" inputType="Like" matchMode="START" name="accountGroup.name" propertyName="attribute" propertyType="String" searchType="AccountGroup"/>
+            <SearchInputDefinition description="srch_input_def_name" headerKey="display_name" ignoreCase="true" inputType="Like" matchMode="START" name="accountGroup.displayableName" propertyName="displayableName" propertyType="String" searchType="AccountGroup"/>
+            <SearchInputDefinition description="srch_input_def_value" headerKey="value" ignoreCase="true" inputType="Like" matchMode="START" name="accountGroup.nativeIdentity" propertyName="value" propertyType="String" searchType="AccountGroup"/>
+            <SearchInputDefinition description="srch_input_def_target" headerKey="target" ignoreCase="true" inputType="Like" matchMode="START" name="accountGroup.target" propertyName="permissions.target" propertyType="String" searchType="AccountGroup"/>
+            <SearchInputDefinition description="rights" filterBuilder="sailpoint.search.AccountGroupFilterBuilder" headerKey="rights" ignoreCase="true" inputType="Like" matchMode="START" name="accountGroup.rights" propertyName="permissions.rights" propertyType="String" searchType="AccountGroup"/>
+            <SearchInputDefinition description="label_annotation" headerKey="label_annotation" ignoreCase="true" inputType="Like" matchMode="START" name="accountGroup.annotation" propertyName="permissions.annotation" propertyType="String" searchType="AccountGroup"/>
+            <SearchInputDefinition description="srch_input_def_owner" headerKey="owner" ignoreCase="true" inputType="Equal" name="accountGroup.owner" propertyName="owner.name" propertyType="String" searchType="AccountGroup"/>
+            <SearchInputDefinition description="srch_input_def_type" headerKey="type" ignoreCase="true" inputType="Equal" name="accountGroup.typeFilter" propertyName="type" propertyType="String" searchType="AccountGroup"/>
+            <SearchInputDefinition description="srch_input_def_effective_access" excludeDisplayFields="true" headerKey="accountGroup.associations" ignoreCase="true" inputType="Equal" name="accountGroup.associations" propertyName="associations.targetName" propertyType="String" searchType="AccountGroup"/>
+            <SearchInputDefinition description="srch_input_def_request_id" filterBuilder="sailpoint.search.IdentityRequestFilterBuilder" headerKey="srch_input_def_request_id" ignoreCase="true" inputType="Like" matchMode="START" name="identityRequest.requestId" propertyName="name" propertyType="String" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_date" excludeDisplayFields="true" headerKey="requestDate" inputType="Equal" name="identityRequest.date" propertyName="" propertyType="Date" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_date" headerKey="srch_input_def_request_date" inputType="Equal" name="identityRequest.created" propertyName="created" propertyType="Date" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_start_date" excludeDisplayFields="true" headerKey="requestStartDate" inputType="None" name="identityRequest.startDate" propertyName="created" propertyType="Date" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_end_date" excludeDisplayFields="true" headerKey="requestEndDate" inputType="None" name="identityRequest.endDate" propertyName="created" propertyType="Date" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_completion_date" headerKey="srch_input_def_request_completion_date" inputType="Equal" name="identityRequest.completionDate" propertyName="endDate" propertyType="Date" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_completion_start_date" excludeDisplayFields="true" headerKey="requestCompletionStartDate" inputType="None" name="identityRequest.completionStartDate" propertyName="endDate" propertyType="Date" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_completion_end_date" excludeDisplayFields="true" headerKey="requestCompletionEndDate" inputType="None" name="identityRequest.completionEndDate" propertyName="endDate" propertyType="Date" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_state" headerKey="srch_input_def_request_state" ignoreCase="true" inputType="Like" matchMode="START" name="identityRequest.state" propertyName="state" propertyType="String" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_requester" headerKey="srch_input_def_request_requester" ignoreCase="true" inputType="Equal" name="identityRequest.requestor" propertyName="requesterDisplayName" propertyType="String" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_requestee" headerKey="srch_input_def_request_requestee" ignoreCase="true" inputType="Equal" name="identityRequest.requestee" propertyName="targetDisplayName" propertyType="String" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_requester" excludeDisplayFields="true" headerKey="srch_input_def_request_requester" ignoreCase="true" inputType="Equal" name="identityRequest.requestorId" propertyName="requesterId" propertyType="String" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_requestee" excludeDisplayFields="true" headerKey="srch_input_def_request_requestee" ignoreCase="true" inputType="Equal" name="identityRequest.requesteeId" propertyName="targetId" propertyType="String" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_priority" headerKey="srch_input_def_request_priority" inputType="Equal" name="identityRequest.priority" propertyName="priority" propertyType="String" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_completion_status" headerKey="srch_input_def_request_completion_status" ignoreCase="true" inputType="Equal" name="identityRequest.completionStatus" propertyName="completionStatus" propertyType="String" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="dash_access_req_search_type" headerKey="dash_access_req_search_type" ignoreCase="true" inputType="Equal" name="identityRequest.type" propertyName="type" propertyType="String" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_verified" filterBuilder="sailpoint.search.NotNullFilterBuilder" headerKey="srch_input_def_request_verified" inputType="Equal" name="identityRequest.verified" propertyName="verified" propertyType="Date" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_external_ticket_id" headerKey="srch_input_def_request_external_ticket_id" ignoreCase="true" inputType="Equal" name="identityRequest.externalTicketId" propertyName="externalTicketId" propertyType="String" searchType="IdentityRequest"/>
+            <SearchInputDefinition description="srch_input_def_request_application" excludeDisplayFields="true" headerKey="srch_input_def_request_application" inputType="Equal" name="identityRequestItem.application" propertyName="items.application" propertyType="String" searchType="IdentityRequestItem"/>
+            <SearchInputDefinition description="srch_input_def_request_native_identity" excludeDisplayFields="true" headerKey="srch_input_def_request_native_identity" ignoreCase="true" inputType="Like" matchMode="START" name="identityRequestItem.nativeIdentity" propertyName="items.nativeIdentity" propertyType="String" searchType="IdentityRequestItem"/>
+            <SearchInputDefinition description="srch_input_def_request_instance" excludeDisplayFields="true" headerKey="srch_input_def_request_instance" ignoreCase="true" inputType="Like" matchMode="START" name="identityRequestItem.instance" propertyName="items.instance" propertyType="String" searchType="IdentityRequestItem"/>
+            <SearchInputDefinition description="srch_input_def_request_attribute_name" excludeDisplayFields="true" headerKey="srch_input_def_request_attribute_name" ignoreCase="true" inputType="Like" matchMode="START" name="identityRequestItem.name" propertyName="items.name" propertyType="String" searchType="IdentityRequestItem"/>
+            <SearchInputDefinition description="srch_input_def_request_attribute_value" excludeDisplayFields="true" headerKey="srch_input_def_request_attribute_value" ignoreCase="true" inputType="Like" matchMode="START" name="identityRequestItem.value" propertyName="items.value" propertyType="String" searchType="IdentityRequestItem"/>
+            <SearchInputDefinition description="srch_input_def_request_operation" excludeDisplayFields="true" headerKey="srch_input_def_request_operation" ignoreCase="true" inputType="Like" matchMode="START" name="identityRequestItem.operation" propertyName="items.operation" propertyType="String" searchType="IdentityRequestItem"/>
+            <SearchInputDefinition description="srch_input_def_request_provisioning_engine" excludeDisplayFields="true" headerKey="srch_input_def_request_provisioning_engine" ignoreCase="true" inputType="Like" matchMode="START" name="identityRequestItem.provisioningEngine" propertyName="items.provisioningEngine" propertyType="String" searchType="IdentityRequestItem"/>
+            <SearchInputDefinition description="srch_input_def_request_approval_state" excludeDisplayFields="true" headerKey="srch_input_def_request_approval_state" inputType="Equal" name="identityRequestItem.approvalState" propertyName="items.approvalState" propertyType="String" searchType="IdentityRequestItem"/>
+            <SearchInputDefinition description="srch_input_def_request_provisioning_state" excludeDisplayFields="true" headerKey="srch_input_def_request_provisioning_state" inputType="Equal" name="identityRequestItem.provisioningState" propertyName="items.provisioningState" propertyType="String" searchType="IdentityRequestItem"/>
+            <SearchInputDefinition description="srch_input_def_request_compilation_status" excludeDisplayFields="true" headerKey="srch_input_def_request_compilation_status" inputType="Equal" name="identityRequestItem.compilationStatus" propertyName="items.compilationStatus" propertyType="String" searchType="IdentityRequestItem"/>
+            <SearchInputDefinition description="srch_input_def_request_retries" excludeDisplayFields="true" headerKey="srch_input_def_request_retries" inputType="Equal" name="identityRequestItem.retries" propertyName="items.retries" propertyType="Integer" searchType="IdentityRequestItem"/>
+            <SearchInputDefinition description="srch_input_def_syslog_start_date" headerKey="syslogStartDate" inputType="None" name="syslogStartDate" propertyName="created" propertyType="Date" searchType="Syslog"/>
+            <SearchInputDefinition description="srch_input_def_syslog_end_date" headerKey="syslogEndDate" inputType="None" name="syslogEndDate" propertyName="created" propertyType="Date" searchType="Syslog"/>
+            <SearchInputDefinition description="srch_input_def_syslog_date" headerKey="srch_input_def_syslog_date" ignoreCase="true" inputType="Equal" name="created" propertyName="created" propertyType="Date" reportColumnWidth="75" searchType="Syslog"/>
+            <SearchInputDefinition description="srch_input_def_syslog_quick_key" headerKey="srch_input_def_syslog_quick_key" ignoreCase="true" inputType="Equal" name="quickKey" propertyName="quickKey" propertyType="String" reportColumnWidth="75" searchType="Syslog"/>
+            <SearchInputDefinition description="srch_input_def_syslog_event_level" headerKey="srch_input_def_syslog_event_level" ignoreCase="true" inputType="Equal" name="eventLevel" propertyName="eventLevel" propertyType="String" reportColumnWidth="40" searchType="Syslog"/>
+            <SearchInputDefinition description="srch_input_def_syslog_classname" headerKey="srch_input_def_syslog_classname" ignoreCase="true" inputType="Equal" name="classname" propertyName="classname" propertyType="String" searchType="Syslog"/>
+            <SearchInputDefinition description="srch_input_def_syslog_line_number" headerKey="srch_input_def_syslog_line_number" ignoreCase="true" inputType="Equal" name="lineNumber" propertyName="lineNumber" propertyType="String" reportColumnWidth="40" searchType="Syslog"/>
+            <SearchInputDefinition description="srch_input_def_syslog_message" headerKey="srch_input_def_syslog_message" ignoreCase="true" inputType="Like" matchMode="ANYWHERE" name="message" propertyName="message" propertyType="String" reportColumnWidth="200" searchType="Syslog"/>
+            <SearchInputDefinition description="srch_input_def_syslog_server" headerKey="srch_input_def_syslog_server" ignoreCase="true" inputType="Equal" name="server" propertyName="server" propertyType="String" searchType="Syslog"/>
+            <SearchInputDefinition description="srch_input_def_syslog_thread" headerKey="srch_input_def_syslog_thread" ignoreCase="true" inputType="Equal" name="thread" propertyName="thread" propertyType="String" searchType="Syslog"/>
+            <SearchInputDefinition description="srch_input_def_syslog_username" headerKey="srch_input_def_syslog_username" ignoreCase="true" inputType="Equal" name="username" propertyName="username" propertyType="String" searchType="Syslog"/>
+            <SearchInputDefinition description="srch_input_def_syslog_stacktrace" excludeDisplayFields="true" headerKey="srch_input_def_syslog_stacktrace" ignoreCase="true" inputType="Equal" name="stacktrace" propertyName="stacktrace" propertyType="String" reportColumnWidth="300" searchType="Syslog"/>
+            <SearchInputDefinition description="srch_input_def_link_application" headerKey="srch_input_def_link_application" ignoreCase="true" inputType="Equal" name="link.application" propertyName="application.name" propertyType="String" searchType="Link"/>
+            <SearchInputDefinition description="srch_input_def_link_display_name" headerKey="srch_input_def_link_display_name" ignoreCase="true" inputType="Like" matchMode="START" name="link.displayname" propertyName="displayName" propertyType="String" searchType="Link"/>
+            <SearchInputDefinition description="srch_input_def_link_owner" headerKey="srch_input_def_link_owner" ignoreCase="true" inputType="Equal" name="link.owner" propertyName="owner.name" propertyType="String" searchType="Link"/>
+            <SearchInputDefinition description="srch_input_def_link_created" headerKey="srch_input_def_link_created" ignoreCase="true" inputType="Equal" name="link.created" propertyName="created" propertyType="Date" searchType="Link"/>
+            <SearchInputDefinition description="srch_input_def_link_entitlements" headerKey="srch_input_def_link_entitlements" ignoreCase="true" inputType="Equal" name="entitlements" propertyName="entitlements" propertyType="String" searchType="Link"/>
+            <SearchInputDefinition description="srch_input_def_link_native_identity" headerKey="srch_input_def_link_native_identity" ignoreCase="true" inputType="Like" matchMode="START" name="link.nativeIdentity" propertyName="nativeIdentity" propertyType="String" searchType="Link"/>
+            <SearchInputDefinition description="srch_input_def_link_instance" headerKey="srch_input_def_link_instance" ignoreCase="true" inputType="Like" matchMode="START" name="link.instance" propertyName="instance" propertyType="String" searchType="Link"/>
+            <SearchInputDefinition description="srch_input_def_link_uuid" headerKey="srch_input_def_link_uuid" ignoreCase="true" inputType="Like" matchMode="START" name="link.uuid" propertyName="uuid" propertyType="String" searchType="Link"/>
+            <SearchInputDefinition description="srch_input_def_link_identity" headerKey="srch_input_def_link_identity" ignoreCase="true" inputType="Equal" name="link.identity" propertyName="identity.name" propertyType="String" searchType="Link"/>
+            <SearchInputDefinition description="srch_input_def_name" filterBuilder="sailpoint.search.NameFilterBuilder" headerKey="srch_input_def_name" ignoreCase="true" inputType="Like" matchMode="START" name="lcm.name" propertyName="name" propertyType="String" searchType="LCM"/>
+            <SearchInputDefinition description="srch_input_def_manager" headerKey="srch_input_def_manager" ignoreCase="true" inputType="Equal" matchMode="START" name="lcm.manager" propertyName="manager.id" propertyType="String" searchType="LCM" suggestType="manager"/>
+            <SearchInputDefinition description="srch_input_def_application" headerKey="srch_input_def_application" ignoreCase="true" inputType="Equal" matchMode="START" name="lcm.application" propertyName="links.application.id" propertyType="Collection" searchType="LCM" suggestType="application"/>
+            <SearchInputDefinition description="srch_input_def_detected_role" headerKey="srch_input_def_detected_role" ignoreCase="true" inputType="Equal" name="lcm.detectedRole" nullPropertyName="bundleSummary" nullPropertyType="String" propertyName="bundles.id" propertyType="Collection" searchType="LCM" suggestType="role"/>
+            <SearchInputDefinition description="srch_input_def_assigned_role" headerKey="srch_input_def_assigned_role" ignoreCase="true" inputType="Equal" name="lcm.assignedRole" nullPropertyName="assignedRoleSummary" nullPropertyType="String" propertyName="assignedRoles.id" propertyType="Collection" searchType="LCM" suggestType="role"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="selfRegistrationGroup" value="SelfRegistrationWorkGroup"/>
+      <entry key="serverRootPath" value="http://localhost:8080/identityiq"/>
+      <entry key="showAutoRemediationDialog" value="false"/>
+      <entry key="showCertificationIconTooltips" value="false"/>
+      <entry key="showCertificationRoleRevocationDetails" value="false"/>
+      <entry key="signoffEmailTemplate" value="Task Result Signoff"/>
+      <entry key="smReadTimeout" value="10"/>
+      <entry key="subordinateCertificationEnabled">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="subordinateCertificationPageSize" value="10"/>
+      <entry key="supportedLanguages">
+        <value>
+          <List>
+            <String>en_US</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="suppressDuplicateEmails" value="true"/>
+      <entry key="syncSchema" value="true"/>
+      <entry key="syslogLevel" value="ERROR"/>
+      <entry key="syslogPurgeAge" value="0"/>
+      <entry key="syslog_extension">
+        <value>
+          <Map>
+            <entry key="classname" value="cs2:Class Name"/>
+            <entry key="created" value="deviceReceiptTime"/>
+            <entry key="eventLevel" value="cs1:Event Level"/>
+            <entry key="lineNumber" value="cn2"/>
+            <entry key="message" value="msg"/>
+            <entry key="quickKey" value="cn1"/>
+            <entry key="server" value="cs3:Server"/>
+            <entry key="thread" value="cs4:Name of Thread"/>
+            <entry key="username" value="duser"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="taskCompletionEmailTemplate" value="Task Status"/>
+      <entry key="taskCompletionRule" value="Task Completion Email Rule"/>
+      <entry key="taskResultMaxAge" value="0"/>
+      <entry key="unscopedObjectsGloballyAccessible">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="unsupportedBrowserNotification" value="true"/>
+      <entry key="useManagedAttributesForRemediation" value="true"/>
+      <entry key="workItemAssignmentEmailTemplate" value="Work Item Assignment"/>
+      <entry key="workItemAssignmentRemovalEmailTemplate" value="Work Item Assignment Removal"/>
+      <entry key="workItemCommentEmailTemplate" value="Work Item Comment"/>
+      <entry key="workItemDisableForwardingFromOutbox" value="true"/>
+      <entry key="workItemForwardEmailTemplate" value="Work Item Forward"/>
+      <entry key="workItemNotificationsInterval" value="300"/>
+      <entry key="workflowIdentityRefresh" value="Identity Refresh"/>
+      <entry key="workflowIdentityUpdate" value="Identity Update"/>
+      <entry key="workflowLCMAccessRequest" value="LCM Provisioning"/>
+      <entry key="workflowLCMAccountsRequest" value="LCM Provisioning"/>
+      <entry key="workflowLCMEntitlementsRequest" value="LCM Provisioning"/>
+      <entry key="workflowLCMExpirePassword" value="LCM Manage Passwords"/>
+      <entry key="workflowLCMForgotPassword" value="LCM Manage Passwords"/>
+      <entry key="workflowLCMIdentityCreateRequest" value="LCM Create and Update"/>
+      <entry key="workflowLCMIdentityEditRequest" value="LCM Create and Update"/>
+      <entry key="workflowLCMPasswordsRequest" value="LCM Manage Passwords"/>
+      <entry key="workflowLCMRolesRequest" value="LCM Provisioning"/>
+      <entry key="workflowLCMSelfServiceRegistrationRequest" value="LCM Registration"/>
+      <entry key="workflowLCMUnlockAccount" value="LCM Provisioning"/>
+      <entry key="workflowManagedAttribute" value="Entitlement Update"/>
+      <entry key="workflowPasswordIntercept" value="Password Intercept"/>
+      <entry key="workflowRoleApproval" value="Role Modeler - Impact Analysis"/>
+      <entry key="workflowScheduledAssignment" value="Scheduled Assignment"/>
+      <entry key="workflowScheduledRoleActivation" value="Scheduled Role Activation"/>
+    </Map>
+  </Attributes>
+</Configuration>
+</sailpoint>

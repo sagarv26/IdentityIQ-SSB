@@ -1,0 +1,214 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow libraries="Group" name="Entitlement Update" type="ManagedAttribute">
+  <Variable editable="true" name="optimisticProvisioning">
+    <Description>
+      Set to true to enable optimistic provisioning.  This will cause
+      changes to the entitlements compiled from role assignments to be 
+      applied immediately to the identity cube rather than waiting
+      for the next refresh/reaggregation after the provisioning system
+      completes the request.
+    </Description>
+  </Variable>
+  <Variable editable="true" initializer="true" name="foregroundProvisioning">
+    <Description>
+      Normally provisioning is done in a step that uses the "backgroud"
+      option to force the workfow to be suspend and be resumed in a
+      background task thread.  This prevents the browser session from
+      hanging since provision can sometimes take a long time.  For demos
+      and testing it can be better to do this in the foreground so that
+      provisioning will have been performed when control is returned to the
+      user.  This prevents having to run the Perform Maintanance task to 
+      see the resutls of the request.  For group requests this is much less
+      of a problem than it is for account provisioning.
+    </Description>
+  </Variable>
+  <Variable editable="true" initializer="false" name="doManualActions">
+    <Description>
+      When set to 'true' the unmanged plan from the provisioning project
+      will be converted into one or more manual action work items to request
+      the changes since they can't be done automatically.
+    </Description>
+  </Variable>
+  <Variable editable="true" initializer="spadmin" name="fallbackApprover">
+    <Description>
+      The name of an Identity that will be assigned ownership of any
+      manual action work items if the application owner is not set.
+    </Description>
+  </Variable>
+  <Variable input="true" name="plan" required="true">
+    <Description>
+      Master provisioning plan containing the changes to process.
+    </Description>
+  </Variable>
+  <Variable initializer="script:System.getProperty(&quot;iiq.forceApprover&quot;)" input="true" name="approver">
+    <Description>
+      Name of Identity to approve entitlement changes.
+      This is not set when launched from the UI, but you may want
+      to hard code an initializer for testing.
+    </Description>
+  </Variable>
+  <Variable name="sessionOwner">
+    <Description>
+      This is a system variable that we do not need to declare, but it's 
+      good for documentation.  This will be set when the workflow is launched
+      to the name of the Identity that is considered to be the owner
+      of the interactive UI session.  This is passed to call:buildProvisioningForm
+      so that we present forms to the active user first before suspending and
+      opening work items for other users.
+    </Description>
+  </Variable>
+  <Variable name="summaryName">
+    <Description>
+      Single string representation of ManagedAttribute identity.
+      This must be at least a combination of the application name
+      and the managed attribute value (group name).
+    </Description>
+  </Variable>
+  <Variable name="project">
+    <Description>
+      Provisioning project containing assigned roles and side effects,
+      compiled from the input plan.
+    </Description>
+  </Variable>
+  <Variable name="changes">
+    <Description>
+      A ChangeSummary object containing a JSF friendly summary of the
+      changes being made.  
+    </Description>
+  </Variable>
+  <Step icon="Start" name="start" posX="17" posY="19">
+    <Transition to="Examine Plan"/>
+  </Step>
+  <Step action="getSummaryName" name="Examine Plan" posX="112" posY="19" resultVariable="summaryName">
+    <Description>
+      Derive a single string we can use as the name of the entitlement
+      in approvals and logging.
+    </Description>
+    <Transition to="Compile Project"/>
+  </Step>
+  <Step action="compileGroupProject" name="Compile Project" posX="219" posY="19" resultVariable="project">
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="requester" value="ref:launcher"/>
+    <Arg name="source" value="GroupManagement"/>
+    <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+    <Description>
+      Compile the provisioning plan into a provisioning project.
+      Unlike the project compilation step for identities, we do not
+      expect to be dealing with provisioning policies and forms.
+    </Description>
+    <Transition to="Start Approval Process" when="ref:approver"/>
+    <Transition to="Start Provisioning Process"/>
+  </Step>
+  <Step action="setLaunchMessage" icon="Message" name="Start Approval Process" posX="285" posY="112">
+    <Arg name="message" value="workflow_identity_approval"/>
+    <Arg name="arg1" value="ref:summaryName"/>
+    <Arg name="arg2" value="ref:approver"/>
+    <Description> 
+      Add a message to the worflow launch result indicating that an approval is in progress.
+      This also serves an example of building localized messages from the catalog.
+    </Description>
+    <Transition to="Build Approval Summary"/>
+  </Step>
+  <Step action="buildGroupChangeSummary" name="Build Approval Summary" posX="432" posY="112" resultVariable="changes">
+    <Arg name="plan" value="ref:plan"/>
+    <Transition to="Approval"/>
+  </Step>
+  <Step icon="Approval" name="Approval" posX="554" posY="112">
+    <Approval owner="ref:approver" renderer="entitlement.xhtml" send="summaryName,changes">
+      <Arg name="workItemDescription">
+        <Script>
+          <Source>
+            String action = "modification";
+            if (changes.delete)
+                action = "deletion";
+            else if (changes.create)
+                action = "creation";
+            return "Approve " + action + " of entitlement " + summaryName;
+          </Source>
+        </Script>
+      </Arg>
+    </Approval>
+    <Transition to="end" when="!ref:approved"/>
+    <Transition to="Start Provisioning Process"/>
+  </Step>
+  <Step action="setLaunchMessage" icon="Message" name="Start Provisioning Process" posX="612" posY="15">
+    <Arg name="message">
+      <Script>
+        <Source>
+          // pick a message with more detail if we're provisioning
+          import sailpoint.object.ProvisioningPlan;
+          String msg = "workflow_identity_saved";
+          boolean otherPlans = false;
+          List plans = project.getPlans();
+          if (plans != null) {
+              for (int i = 0 ; i &lt; plans.size() ; i++) {
+                  ProvisioningPlan plan = (ProvisioningPlan)plans.get(i);
+                  if (!ProvisioningPlan.APP_IIQ.equals(plan.getTargetIntegration())) {
+                     otherPlans = true;
+                     break;
+                  }
+              }
+          }
+
+          if (project.getUnmanagedPlan() != null &amp;&amp; isTrue(doManualActions)) {
+              if (otherPlans)
+                  msg = "workflow_identity_provisioning_manual";
+              else
+                  msg = "workflow_identity_manual";
+          }
+          else if (otherPlans) {
+              // jsl - if there are errors it looks odd to show
+              // a "succesfully requesting provisioning" message
+              // followed by the error message, just leave this out,
+              // we can say something about manual provisioning but if
+              // simply committed the change we dont' need anything more
+              // msg = "workflow_identity_provisioning";
+          }
+          return msg;
+        </Source>
+      </Script>
+    </Arg>
+    <Arg name="arg1" value="ref:summaryName"/>
+    <Description>
+      Leave a launch message that can be displayed in the browser before
+      we start provisioning which may be asynchronous.  Note that this
+      uses the same message catalog keys as the identity update workflows
+      which is okay because they don't mention the type of object being
+      processed.  If that changes we'll need our own set of keys.
+    </Description>
+    <Transition to="Provision"/>
+  </Step>
+  <Step action="call:provisionGroupProject" icon="Provision" name="Provision" posX="732" posY="15">
+    <Arg name="background" value="!ref:foregroundProvisioning"/>
+    <Arg name="project" value="ref:project"/>
+    <Description>
+      Provision what remains in the project.  Normally we won't
+      be here with unanswered provisioning questions.
+    </Description>
+    <Transition to="Check Provisioning Errors"/>
+  </Step>
+  <Step name="Check Provisioning Errors" posX="851" posY="15">
+    <Description>
+      Placeholder for custom logging or other actions.  
+      If there were group provisioning errors, provisionGroupProject
+      will have left them in the WorkflowCase.messages list.
+    </Description>
+    <Script>
+      <Source>
+        import sailpoint.tools.Message;
+        //System.out.println("Checking provisioning errors...");
+        List errors = wfcontext.getWorkflowCase().getErrors();
+        if (errors != null) {
+            for (Message error : errors) {
+                //System.out.println("*** " + error.toString());
+            }
+        }
+      </Source>
+    </Script>
+    <Transition to="end"/>
+  </Step>
+  <Step icon="Stop" name="end" posX="977" posY="14"/>
+</Workflow>
+</sailpoint>

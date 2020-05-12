@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition name="Role Overlap Analysis" resultRenderer="impactAnalysis.xhtml" subType="task_item_type_system" type="System">
+  <Attributes>
+    <Map>
+      <entry key="baseResultName" value="Overlap Analysis - "/>
+      <entry key="doOverlapAnalysis" value="true"/>
+      <entry key="noImpactAnalysis" value="true"/>
+    </Map>
+  </Attributes>
+  <Description>
+            Run overlap analysis on a selected role.
+        </Description>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Impact Analysis"/>
+  </Parent>
+  <Signature>
+    <Inputs>
+      <Argument name="targetRole" required="true" type="Bundle">
+        <Prompt>task_in_overlap_role</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="roles" type="string">
+        <Prompt>task_out_impact_analysis_roles</Prompt>
+      </Argument>
+      <Argument name="profiles" type="string">
+        <Prompt>task_out_impact_analysis_profiles</Prompt>
+      </Argument>
+      <Argument name="totalIdentities" type="int">
+        <Prompt>task_out_impact_analysis_total_identities</Prompt>
+      </Argument>
+      <Argument name="totalLosses" type="int">
+        <Prompt>task_out_impact_analysis_total_losses</Prompt>
+      </Argument>
+      <Argument name="totalGains" type="int">
+        <Prompt>task_out_impact_analysis_total_gains</Prompt>
+      </Argument>
+      <Argument name="totalConflicts" type="int">
+        <Prompt>task_out_impact_analysis_total_conflicts</Prompt>
+      </Argument>
+      <Argument name="analysis" type="complex"/>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

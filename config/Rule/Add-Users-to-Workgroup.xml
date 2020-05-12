@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Add Users to Workgroup" type="Correlation">
+  <Source>
+import java.io.*;
+import java.util.*;
+import sailpoint.object.Identity;
+
+String filePath="\\\\E:\\Data\\test.csv";
+File testFile = new File(filePath);
+
+if ((!testFile.exists()) || (testFile.isDirectory())) {
+   System.out.println("Unable to find file: " + filePath);
+   return;
+}
+
+BufferedReader fileIn = new BufferedReader(new FileReader(filePath));
+String l="";    
+  
+while((l=fileIn.readLine())!=null){  
+System.out.print(l+"\n"); 
+
+String user = l.split(",")[0];
+String group = l.split(",")[1];
+
+if(null != user &amp;&amp; null != group){
+	Identity identity = context.getObjectByName(Identity.class,user);
+	Identity workgroupIdentity = context.getObjectByName(Identity.class,group);
+				
+	if(null != identity &amp;&amp; null != workgroupIdentity){
+	  identity.add(workgroupIdentity);
+	  context.saveObject(identity);
+	  context.commitTransaction();
+	  context.decache(identity);
+	  context.decache(workgroupIdentity);
+	}
+}
+
+}  
+
+
+
+fileIn.close(); 
+	
+	
+</Source>
+</Rule>
+</sailpoint>

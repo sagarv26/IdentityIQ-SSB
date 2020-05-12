@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.ApplicationScorer" name="Refresh Application Scores" progressInterval="5000" progressMode="String" subType="task_item_type_scoring" type="Scoring">
+  <Description>
+            Refresh application scores.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument multi="true" name="applications" type="Application">
+        <Prompt>task_in_refresh_application_scores_applications</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="applicationScoresRefreshed" type="int">
+        <Prompt>task_out_refresh_application_scores_application_scores_refreshed</Prompt>
+      </Argument>
+      <Argument name="linksExamined" type="int">
+        <Prompt>task_out_refresh_application_scores_links_examined</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Native Account Change Manager Notification">
+  <Body>
+            
+IdentityIQ detected the following native changes on your accounts:
+
+#if ( $event.nativeChanges)
+#foreach ($change in $event.nativeChanges)
+
+       Operation  : $change.operation
+       Application: $change.applicationName
+#if ( $change.nativeIdentity )       
+           Account : $change.nativeIdentity
+#end 
+#if ( $change.instance ) 
+          Instance : $change.instance
+#end               
+#if ( $change.differences )
+#foreach ($difference in $change.differences)
+            Attribute      : $difference.attribute
+#if ( not $difference.multi)
+#if ( $difference.newValue )
+            New Value(s) : $difference.newValue
+#end
+#end
+#if ( $difference.multi)
+#if ( $difference.addedValues ) 
+            Added Value(s) : $difference.addedValues
+#end
+#if ( $difference.removedValues )
+            Removed Value(s) : $difference.removedValues
+#end
+#end
+#end 
+#end 
+#end 
+#end  
+
+    </Body>
+  <Description>
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="event" type="Workflow">
+        <Description>Identity Change Event, which will have a list of 
+            NativeChangeDetections on it. 
+          </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>IdentityIQ detected native changes on $identityName</Subject>
+</EmailTemplate>
+</sailpoint>

@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.MitigationExpirationScanner" name="Check Expired Mitigations" subType="task_item_type_system" type="System">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="2"/>
+      <entry key="TaskDefinition.runLengthTotal" value="170"/>
+      <entry key="TaskDefinition.runs" value="58"/>
+    </Map>
+  </Attributes>
+  <Description>Send notifications when mitigations expire.</Description>
+  <Signature>
+    <Returns>
+      <Argument name="identities" type="int">
+        <Prompt>task_out_check_expired_mitigations_identities</Prompt>
+      </Argument>
+      <Argument name="expired" type="int">
+        <Prompt>task_out_check_expired_mitigations_expired</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

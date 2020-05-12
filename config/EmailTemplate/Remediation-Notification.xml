@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate cc="$!identity.manager.email" name="Remediation Notification">
+  <Body>$requesterName has revoked one or more entitlements from you.
+
+Comments from $requesterName:
+--------------------------------------------------------------------------------
+$!comments
+--------------------------------------------------------------------------------
+
+#if ($remediationDetails.nonModifyAccountRequests &amp;&amp;
+     $remediationDetails.getNonModifyAccountRequests().size() &gt; 0)
+
+Account Requests:
+-----------------
+#foreach ($acctReq in $remediationDetails.nonModifyAccountRequests)
+Application: $acctReq.applicationName
+  Operation: $acctReq.operation
+ Account ID: $acctReq.nativeIdentity
+
+#end
+#end
+#if ($remediationDetails.modifyAccountRequests &amp;&amp;
+     $remediationDetails.getModifyAccountRequests().size() &gt; 0)
+
+Modification Requests:
+----------------------
+#foreach ($acctReq in $remediationDetails.modifyAccountRequests)
+Application: $acctReq.applicationName
+#if ($acctReq.nativeIdentity) ## Role modification requests in IIQ won't have a nativeIdentity
+ Account ID: $acctReq.nativeIdentity
+#end
+
+#foreach ($attrReq in $acctReq.attributeRequests)
+  Operation: $attrReq.operation
+  Attribute: $attrReq.name
+   Value(s): $attrReq.value
+
+#end
+#foreach ($permReq in $acctReq.permissionRequests)
+  Operation: $permReq.operation
+ Permission: $permReq.target
+   Right(s): $permReq.rightsList
+
+#end
+
+#end
+#end
+</Body>
+  <Description>
+      Email Template for notifying users that an item has been remediated.
+      Notice that this is setup to CC the user's manager (see CC attribute above).
+
+      Arguments
+      ---------
+      item:                The CertificationItem being remediated.
+      remediationDetails:  The ProvisioningPlan with the entitlements being removed.
+                           (Convenience accessor for item.action.remediationDetails)
+      identity:            The Identity that is having their item remediated.
+      comments:            Comments from the remediator about the remediation.
+      requester:           The Identity that remediated the item.
+      requesterName:       Full name of the Identity that remediated the item.
+                           (Convenience accessor for requestor.fullName)
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="item" type="CertificationItem">
+        <Description>The CertificationItem being remediated.</Description>
+      </Argument>
+      <Argument name="remediationDetails" type="ProvisioningPlan">
+        <Description>The ProvisioningPlan with the entitlements being removed (Convenience accessor for item.action.remediationDetails).</Description>
+      </Argument>
+      <Argument name="identity" type="Identity">
+        <Description>The Identity that owns the item being remediated.</Description>
+      </Argument>
+      <Argument name="comments" type="string">
+        <Description>Comments from the remediator about the reason for remediation.</Description>
+      </Argument>
+      <Argument name="requesterName" type="string">
+        <Description>The display name (usually full name) of the identity that requested the remediation.</Description>
+      </Argument>
+      <Argument name="requester" type="Identity">
+        <Description>The Identity object of the requester.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Access is being revoked by $requesterName</Subject>
+</EmailTemplate>
+</sailpoint>

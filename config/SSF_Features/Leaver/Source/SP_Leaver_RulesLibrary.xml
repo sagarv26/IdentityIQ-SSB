@@ -1,0 +1,244 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="SP Leaver Rules Library" language="beanshell">
+	<ReferencedRules>
+	    <Reference class="sailpoint.object.Rule" name="SP Provisioning Rules Library"/>
+	    <Reference class="sailpoint.object.Rule" name="SP Role Assigment Rule Library"/>
+    </ReferencedRules>
+	<Source>
+	<![CDATA[
+	import sailpoint.api.SailPointFactory;
+	import sailpoint.api.SailPointContext;
+	import sailpoint.api.Provisioner;
+	import sailpoint.object.*;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+    import sailpoint.object.ProvisioningPlan.Operation; 
+	import sailpoint.tools.Util;
+    import sailpoint.tools.Message;
+    import sailpoint.tools.GeneralException;
+    import java.sql.Connection;
+	import java.sql.PreparedStatement;
+	import java.sql.ResultSet;
+	import java.sql.SQLException;
+	import java.sql.DriverManager;
+    import java.sql.Timestamp;
+	import java.util.*;
+	import java.text.*;
+	import javax.naming.Context;
+	import javax.naming.InitialContext;
+	import javax.sql.DataSource;
+	import sailpoint.api.PasswordGenerator;
+	import sailpoint.api.Matchmaker;
+	
+	
+    import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	private Log llogger = LogFactory.getLog("rule.SP.Leaver.RulesLibrary");
+	
+	public boolean isTriggerLeaverRule(SailPointContext context, Identity previousIdentity, Identity newIdentity){
+		llogger.trace("Enter isTriggerLeaverRule");
+		boolean flag = false;
+		
+		String currStatus = "";
+
+        if(newIdentity == null || newIdentity == void){
+        	llogger.warn("Identity objects are null");
+        	return flag;
+        }
+        
+        String identityName = newIdentity.getName();
+        
+        Custom mappingObj = getLeaverMappingObject(context);
+        
+        llogger.trace("Have mapping object: " + mappingObj);
+		if (mappingObj == null){
+			llogger.warn("No mapping object");
+			return flag;
+		}
+		
+		llogger.trace("Mapping object not null: " + mappingObj.toXml());
+		
+		String triggerType = mappingObj.get("Trigger Type");
+		
+		if ("Custom Rule".equalsIgnoreCase(triggerType)){
+			llogger.trace("Call custom rule to trigger");
+			
+			flag = isLeaverCustomTriggerRule(context, previousIdentity, newIdentity);
+		} else if("Selector".equalsIgnoreCase(triggerType)){
+			llogger.trace("Determine if trigger using a selector");
+			Matchmaker matchMaker = new Matchmaker(context);
+			IdentitySelector idSelector = mappingObj.get("Trigger Field Selector");
+			
+			flag = matchMaker.isMatch(idSelector, newIdentity);
+		} else {
+			llogger.warn("Unknown trigger type: " + triggerType);
+			
+		}
+		
+		llogger.trace("Exit isTriggerLeaverRule: " + flag);
+		return flag;
+	}
+	
+	public ProvisioningPlan getDynamicLeaverPlan(SailPointContext context, String identityName, Workflow workflow){
+		llogger.trace("Enter getDynamicLeaverPlan");
+		
+		Identity identity = context.getObjectByName(Identity.class, identityName);
+		
+		ProvisioningPlan plan = getDynamicLeaverPlan (context, identity, workflow);
+		
+		return plan;
+	}
+	
+	public ProvisioningPlan getDynamicLeaverPlan(SailPointContext context, Identity identity, Workflow workflow){
+		llogger.trace("Enter getDynamicLeaverPlan");
+		
+		ProvisioningPlan plan = new ProvisioningPlan();
+		//plan.setIdentity(identity);
+		plan.setComments("Leaver Access");
+		
+		Custom mappingObj = getLeaverMappingObject(context);
+		
+		if (mappingObj == null){
+			String msg = "No mapping object for leaver";
+			llogger.error(msg);
+			throw new Exception(msg);
+		}
+		
+		String planType = mappingObj.get("Leaver Build Plan Type");
+			
+		llogger.trace("Plan type: " + planType);
+		
+		if ("Custom Rule".equalsIgnoreCase(planType)){
+			
+			llogger.trace("Call custom rule for leaver build plan");
+			plan = buildCustomLeaverPlan(context, workflow);
+		} else {
+			llogger.trace("Get links");
+			List links = identity.getLinks();
+			List defDeletes = mappingObj.get("Default Deletes");
+			List defDisables = mappingObj.get("Default Disables");
+			
+			llogger.trace("Def disables: " + defDisables);
+            llogger.trace("Def deletes: " + defDeletes);
+			
+			llogger.trace("Loop links");
+			for (Link link : links){
+				String nativeId = link.getNativeIdentity();
+				String appName = link.getApplicationName();
+				AccountRequest acctReq; 
+				
+				if ("Disable All".equalsIgnoreCase(planType)){
+					llogger.trace("In Disable all build req");
+					acctReq = new AccountRequest(AccountRequest.Operation.Disable, appName, null, nativeId);
+					
+				} else if ("Delete All".equalsIgnoreCase(planType)){
+					llogger.trace("In delete all build req");
+					acctReq = new AccountRequest(AccountRequest.Operation.Delete, appName, null, nativeId);
+				
+				} else if ("Selective Lists".equalsIgnoreCase(planType)){
+					llogger.trace("In selective list build req");
+					if (defDisables != null && defDisables.contains(appName)){
+						acctReq = new AccountRequest(AccountRequest.Operation.Disable, appName, null, nativeId);
+					
+					} else if (defDeletes != null && defDeletes.contains(appName)){
+						acctReq = new AccountRequest(AccountRequest.Operation.Delete, appName, null, nativeId);
+					}
+				}
+				
+				
+				llogger.trace("Add req");
+				plan.add(acctReq);
+			}
+		}
+		
+		
+		llogger.trace("Exit getDynamicLeaverPlan: " + plan.toXml());
+		return plan;
+	}
+	
+	public String getNativeIdentity(SailPointContext context, String appName, Identity identity){
+		llogger.trace("Enter getNativeIdentity");
+		String nativeId = "";
+		
+		Application app = context.getObjectByName(Application.class, appName);
+		
+		Schema schema = app.getAccountSchema();
+		String niField = schema.getIdentityAttribute();
+		
+		llogger.trace("The native id field is: " + niField);
+		
+		List templates = app.getTemplates();
+		Template updateTemp = null;
+		
+		if (templates != null && templates.size() > 0){
+			llogger.trace("loop the templates");
+			
+			for (Template temp : templates){
+				Template.Usage usage = temp.getUsage();
+				if (usage.equals(Template.Usage.Create)){
+					llogger.trace("Set to create template in case no update");
+					updateTemp = temp;
+					break;
+				}
+			}
+			
+			if (updateTemp != null){
+			
+				List fields = updateTemp.getFields();
+				
+				if (fields != null && fields.size() > 0){
+					for (Field field : fields){
+						llogger.trace("Get field name");
+						String fieldName = field.getName();
+						String displayName = field.getDisplayName();
+						
+						if (niField.compareTo(fieldName) == 0){
+							Rule rule = field.getFieldRule();
+							
+							HashMap params = new HashMap();
+						
+							params.put("context", context);
+							params.put("identity", identity);
+							params.put("field", field);
+							
+							try {
+								llogger.trace("Run the rule");
+								nativeId = context.runRule(rule, params);
+							} catch (Exception re){
+								llogger.error("*** EXCEPTION RUNNING RULE/SCRIPT: " + re.toString());
+								continue;
+							}
+						}		
+					}
+				}
+			}
+		}
+		
+		
+		llogger.trace("Exit getNativeIdentity: " + nativeId);
+		return nativeId;
+	}
+	
+	public Custom getLeaverMappingObject(SailPointContext context){
+		llogger.trace("Enter getLeaverMappingObject");
+		
+		Custom mappingObj = context.getObjectByName(Custom.class, "SPCONF Leaver Mappings Custom");
+																   
+		llogger.trace("Exit getJoinerMappingObject: " + mappingObj);
+		return mappingObj;
+	}
+	
+	
+	public void markInactive(SailPointContext context, Workflow workflow){
+		llogger.trace("Enter markInactive");
+
+		setInactive(context, identityName, true);
+		
+		llogger.trace("Exit markInactive");
+	}
+	
+	]]>
+	</Source>
+</Rule>

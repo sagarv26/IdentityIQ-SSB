@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Application Account by Attribute Report Form" type="Report">
+  <Section columns="2" label="rept_account_by_attr_properties_section" name="Account Properties">
+    <Field displayName="rept_account_by_attr_label_app" helpKey="rept_account_by_attr_help_app" name="application" postBack="true" required="true" type="Application" value="ref:application"/>
+  </Section>
+</Form>
+</sailpoint>

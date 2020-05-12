@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition executor="sailpoint.services.standard.tasklauncher.ServerSpecificTaskLauncher" name="Server-Specific Task Launcher" progressInterval="5000" progressMode="String" resultAction="Delete" subType="task_item_type_generic" template="true" type="Generic">
+  <Description>Run a task on a specified server or servers</Description>
+  <Signature>
+    <Inputs>
+      <Argument filterString="template != true &amp;&amp; parent.name != &quot;Server-Specific Task Launcher&quot;" helpKey="Select a task to launch" name="taskDefinition" required="true" type="TaskDefinition">
+        <Prompt>Task to launch</Prompt>
+      </Argument>
+      <Argument filterString="inactive != true" helpKey="Select server(s) to run task on" multi="true" name="servers" required="true" type="Server">
+        <Prompt>Run on server(s)</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="launchResult" type="string">
+        <Prompt>Result</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>

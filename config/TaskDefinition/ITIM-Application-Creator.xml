@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.ITIMApplicationGenerator" name="ITIM Application Creator" subType="task_item_type_system" template="true" type="System">
+  <Description>
+            Automatically creates ITIM account applications using connection
+            information from an authoritative ITIM application.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument multi="true" name="itimAppIds" required="true" type="Application">
+        <Prompt>task_in_itim_app_generator_applications</Prompt>
+      </Argument>
+      <Argument name="appNamePrefix" type="string">
+        <Prompt>task_in_itim_app_generator_app_name_prefix</Prompt>
+      </Argument>
+      <Argument name="appNameSuffix" type="string">
+        <Prompt>task_in_itim_app_generator_app_name_suffix</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="appsCreated" type="int">
+        <Prompt>task_out_itim_app_generator_apps_created</Prompt>
+      </Argument>
+      <Argument name="appsIgnored" type="int">
+        <Prompt>task_out_itim_app_generator_apps_ignored</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

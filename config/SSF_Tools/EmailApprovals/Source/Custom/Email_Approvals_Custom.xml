@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+ <Custom name="Email Approvals">
+  <Attributes>
+    <Map>
+      <entry key="ApproveDeny">
+        <value>
+          <Map>      
+            <entry key="mail.protocol" value="%%SP_EA_MAIL_PROTOCOL%%"/>    
+            <entry key="mail.host" value="%%SP_EA_HOST%%"/>
+            <entry key="mail.port" value="%%SP_EA_PORT%%"/>
+            <entry key="svcAccountEmail" value="%%SP_EA_SVC_ACCOUNT%%"/>
+            <entry key="svcAccountPassword" value="%%SP_EA_SVC_ACCOUNT_PASSWORD%%"/>
+            <entry key="notifyApprover" value="%%SP_EA_NOTIFY_STATUS%%"/>
+            <entry key="notifyadmin" value="%%SP_EA_NOTIFY_ADMIN%%"/>
+            <entry key="notifyadminemail" value="%%SP_EA_ADMIN_EMAILADDRESS%%"/>     
+		  </Map>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+</Custom>

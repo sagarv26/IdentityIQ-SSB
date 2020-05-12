@@ -1,0 +1,65 @@
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.RuleExecutor" 
+                    name="SP BeanShell MultiThreading Framework Task" 
+            resultAction="Rename" 
+                 subType="Generic" 
+                    type="Generic"
+        progressInterval="5000" 
+            progressMode="String"                    
+                template="true">
+  <Attributes>
+    <Map>
+      <entry key="perItemRuleName" value="unspecified"/>
+      <entry key="queueBuilderRuleName" value="unspecified"/>
+      <entry key="ruleName" value="SP BeanShell MultiThreading Framework Rule"/>
+      <!-- options we can pass into the executing Rule. -->
+      <entry key="ruleConfig">
+         <value>
+            <Map>
+                <!-- Place holder for arguments. -->
+               <entry key="placeHolder" value="false"/>
+            </Map>
+         </value>   
+      </entry>      
+    </Map>
+  </Attributes>
+  <Description>Launches a MultiThreaded custom task using bean shell rules.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <Signature>
+    <Inputs>
+      <Argument multi="false" name="queueBuilderRuleName" type="Rule"
+         filterString="type == Rule.Type.BuildMap" 
+              helpKey="The Queue-builder rule is a rule that identifies items to process and puts Strings onto the workQueue for worker threads to process." >
+        <Description>Queue-builder rule name.</Description>
+        <Prompt>Queue-builder rule name.</Prompt>
+      </Argument>    
+      <Argument multi="false" name="perItemRuleName" type="Rule"
+         filterString="type == Rule.Type.BuildMap" 
+              helpKey="The Per-item rule is a rule that accepts a String called 'workItem' that idenifies an object or data set to process.  It parses the workItem string and does whatever work the Rule intends to accomplish.">
+        <Description>Per-item rule name.</Description>
+        <Prompt>Per-item rule name.</Prompt>
+      </Argument>
+      <Argument multi="false" name="initializationRuleName" type="Rule"
+         filterString="type == Rule.Type.BuildMap" 
+              helpKey="The initialization rule is a rule that does initial setup logic before the queue builder rule is invoked.">
+        <Description>Initialization rule name.</Description>
+        <Prompt>Initialization rule name.</Prompt>
+      </Argument>
+      <Argument multi="false" name="cleanupRuleName" type="Rule"
+         filterString="type == Rule.Type.BuildMap" 
+              helpKey="The cleanup rule is a rule that does cleanup or tear-down logic after the per-item rules have completed.">
+        <Description>Cleanup rule name.</Description>
+        <Prompt>Cleanup rule name.</Prompt>
+      </Argument>      
+      <Argument multi="false" name="numThreadsConfig" type="int"
+              helpKey="The number of threads to use during processing.  If not specified the number of threads defaults to 2x the number of cores available on the Task Server running the task.">
+        <Description>Number of worker threads.</Description>
+        <Prompt>Number of worker threads.</Prompt>
+      </Argument>      
+    </Inputs>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

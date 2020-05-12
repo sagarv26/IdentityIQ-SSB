@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+	<ImportAction name="merge">
+		<Configuration name="ConnectorRegistry">
+			<Attributes>
+				<Map>
+					<entry key="applicationTemplates">
+						<value>
+							<List>
+								<Application connector="sailpoint.services.standard.connector.LoopbackConnector" featuresString="PROVISIONING, SEARCH" icon="databaseIcon" name="IdentityIQ Loopback Connector" type="IdentityIQ Loopback Connector">
+									<Attributes>
+										<Map>
+											<entry key="connectorClass" value="sailpoint.services.standard.connector.LoopbackConnector" />
+											<entry key="formPath" value="emptyAttributes.xhtml" />
+											<entry key="attributeTransformMap">
+												<value>
+													<Map>
+														<entry key="capabilities.name" value="Capabilities"/>
+														<entry key="workgroups.name" value="workgroups"/>
+													</Map>
+												</value>
+											</entry>
+										</Map>
+									</Attributes>
+									<Schemas>
+										<Schema	displayAttribute="name"	identityAttribute="name" instanceAttribute="" nativeObjectType="Identity" objectType="account" permissionsRemediationModificationType="None">
+											<AttributeDefinition name="name" remediationModificationType="None" required="true" type="string">
+												<Description>Account name</Description>
+											</AttributeDefinition>
+											<AttributeDefinition name="firstname" remediationModificationType="None" type="string">
+												<Description>First name</Description>
+											</AttributeDefinition>
+											<AttributeDefinition name="lastname" remediationModificationType="None" type="string">
+												<Description>Last name</Description>
+											</AttributeDefinition>
+											<AttributeDefinition name="displayName" remediationModificationType="None" type="string">
+												<Description>Display name</Description>
+											</AttributeDefinition>
+											<AttributeDefinition entitlement="true" managed="true" multi="true" name="workgroups.name" remediationModificationType="None" schemaObjectType="workgroup" type="string">
+												<Description>Identity's workgroups</Description>
+											</AttributeDefinition>
+											<AttributeDefinition entitlement="true" managed="true" multi="true" name="capabilities.name" remediationModificationType="None" schemaObjectType="capability" type="string">
+												<Description>Identity's capabilities</Description>
+											</AttributeDefinition>
+											<AttributeDefinition  name="inactive" remediationModificationType="None" type="string">
+												<Description>Identity's inactive flag</Description>
+											</AttributeDefinition>
+										</Schema>
+										<Schema displayAttribute="name" identityAttribute="name" instanceAttribute="" nativeObjectType="Workgroup" objectType="workgroup" permissionsRemediationModificationType="None">
+											<AttributeDefinition name="name" remediationModificationType="None" required="true" type="string">
+												<Description>Workgroup name</Description>
+											</AttributeDefinition>
+											<AttributeDefinition name="displayName" remediationModificationType="None" type="string">
+												<Description>Display name</Description>
+											</AttributeDefinition>
+										</Schema>
+										<Schema displayAttribute="name" identityAttribute="name" instanceAttribute="" nativeObjectType="Capability" objectType="capability" permissionsRemediationModificationType="None">
+											<AttributeDefinition name="name" remediationModificationType="None" required="true" type="string">
+												<Description>Capability name</Description>
+											</AttributeDefinition>
+										</Schema>
+									</Schemas>
+								</Application>
+							</List>
+						</value>
+					</entry>
+				</Map>
+			</Attributes>
+		</Configuration>
+	</ImportAction>
+</sailpoint>

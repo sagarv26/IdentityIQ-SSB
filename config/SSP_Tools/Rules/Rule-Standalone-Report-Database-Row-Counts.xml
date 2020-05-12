@@ -1,0 +1,169 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Sailpoint Report Database Row Counts">
+  <Source><![CDATA[
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.bsf.BSFException;
+
+import java.util.*;
+
+import sailpoint.object.*;
+import sailpoint.tools.GeneralException;
+import sailpoint.api.SailPointContext;
+import sailpoint.api.Scheduler;
+import sailpoint.Version;
+import sailpoint.server.Environment;
+import sailpoint.tools.Util;
+
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
+import java.sql.DatabaseMetaData;
+
+// Use a StringBuilder to accumulate the large amount of output this 
+// task produces.  The output is then printed at the end of the run.
+StringBuilder sb = new StringBuilder();
+
+// Keep a flag around to identify whether this rule is being run inside a Task
+// context or whether it is being run stand-alone from the console ore Debug 
+// page.  For 6.3 and newer installs we can use the presence of the variable 
+// 'taskResult' to determine if we are running in task context.
+boolean inTaskContext = false;
+if ((void != taskResult) && (null != taskResult)) {   
+  inTaskContext = true;    
+}  
+
+
+// A simple function to return the row counts from a table.  
+public int getRowCountFromTable (Connection cxn, String tableName) {
+
+	int rowCount = 0;
+	Statement stmt = cxn.createStatement();
+
+	try {	
+		ResultSet res = stmt.executeQuery("SELECT COUNT(*) FROM " + tableName);
+		while (res.next()) {
+			rowCount = res.getInt(1);
+		}
+	} catch (java.sql.SQLSyntaxErrorException ex) {
+	
+	   if (ex.toString().contains("ORA-00942")) {	   
+	      // Silently swallow ORA-00942 errors.
+	      // These don't have proper rows, so return zero to caller.	       
+	   } else if (ex.toString().contains("ORA-00604")) {	   
+	      // Silently swallow ORA-00604 errors.
+	      // These don't have proper rows, so return zero to caller.	       
+	   } else {	   
+	      // Otherwise report the exception back to the output.
+	      sb.append(ex.toString() + "\n");	   
+	   }
+	
+	} catch (Exception ex) {
+		sb.append(ex.toString() + "\n");
+	} finally {
+	   // Close the SQL Statement regardless of the exceptions seen.
+	   stmt.close();
+	}
+		
+	return rowCount;	
+}
+	
+Connection jdbcConnection = context.getConnection();
+DatabaseMetaData md = jdbcConnection.getMetaData();
+String[] types = {"TABLE"};
+ResultSet rs = md.getTables(null, null, "%", types);
+// ResultSet rs = md.getTables(jdbcConnection.getCatalog(), null, "%", types);
+// sb.append("Done collecting tables metadata.\n");
+
+ResultSetMetaData rsmd = rs.getMetaData();
+int columnCount = rsmd.getColumnCount();
+
+HashMap nameToColumnNumberMap = new HashMap();
+
+// The column count starts from 1 for some odd reason here.
+for (int i = 1; i < columnCount + 1; i++ ) {
+  String columnName = rsmd.getColumnName(i);
+  nameToColumnNumberMap.put(columnName, i);  
+  // System.out.println("Column name: " + columnName);   
+}
+ 	 
+// Sloppy parallel arrays, too lazy to invent a new data structure.
+ArrayList tabNames    = new ArrayList();
+ArrayList tabRowCount = new ArrayList();
+ 	 
+while (rs.next()) { 
+
+   String tableName    = rs.getString(nameToColumnNumberMap.get("TABLE_NAME")); 
+   String tableCatalog = rs.getString(nameToColumnNumberMap.get("TABLE_CAT")); 
+   String tableSchema  = rs.getString(nameToColumnNumberMap.get("TABLE_CAT"));
+   
+   // sb.append("Examining table details for: " + tableName + "\n");
+   // System.out.println("Table : " + tableName + "nCatalog : " + tableCatalog + "nSchema : " + tableSchema + " ");
+	
+   tabNames.add(tableName);
+   tabRowCount.add(getRowCountFromTable(jdbcConnection, tableName));
+
+}
+
+sb.append("TABLE                            | ROW COUNT \n");
+sb.append("--------------------------------------------------\n");
+for (int t = 0; t < tabNames.size(); t++) {
+
+	String tableName = tabNames.get(t);
+	int rowCount = tabRowCount.get(t);
+
+// for (String tableName: talbeToRowCountsHash.keySet()) {
+	//int rowCount = talbeToRowCountsHash.get(tableName);
+	
+	// Make the column widths pretty.
+	int spaceCount = 32 - tableName.length();
+	String spacePad = "";
+	for (int i = 0; i < spaceCount; i++) spacePad += " ";
+	
+	sb.append("" + tableName + spacePad + " | " + rowCount + "\n");
+}
+
+
+sb.append("\n");
+
+// For now this only works for Oracle
+sb.append("INDEX DETAILS (Oracle Specific)\n");
+sb.append("--------------------------------------------------\n");
+
+String[] types = {"INDEX"};
+ResultSet rs = md.getTables(null, null, "%", types);
+ResultSetMetaData rsmd = rs.getMetaData();
+
+// The column count starts from 1 for some odd reason here.
+for (int i = 1; i < columnCount + 1; i++ ) {
+  String columnName = rsmd.getColumnName(i);
+  nameToColumnNumberMap.put(columnName, i);  
+  sb.append("Index details column available: " + columnName + "\n");
+  // System.out.println("Column name: " + columnName);   
+}
+
+sb.append("\n");
+
+while (rs.next()) { 
+ 
+   String tableCatalog = rs.getString(nameToColumnNumberMap.get("TABLE_CAT")); 
+   String tableSchema  = rs.getString(nameToColumnNumberMap.get("TABLE_SCHEM"));
+   String tableName    = rs.getString(nameToColumnNumberMap.get("TABLE_NAME"));
+   String tableType    = rs.getString(nameToColumnNumberMap.get("TABLE_TYPE"));
+   String remarks      = rs.getString(nameToColumnNumberMap.get("REMARKS"));
+   
+   sb.append(tableName +"|"+ tableCatalog +"|"+ tableSchema +"|" + tableType +"|" + remarks +"\n");
+   
+}
+
+return sb.toString();
+
+]]></Source>
+</Rule>
+</sailpoint>

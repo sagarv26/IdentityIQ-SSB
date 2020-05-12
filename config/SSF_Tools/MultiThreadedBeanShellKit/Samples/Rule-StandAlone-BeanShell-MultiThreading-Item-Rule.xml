@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell"  
+          name="BeanShell MultiThreading Example Item Rule"       
+          type="BuildMap" >
+  <Description>BeanShell MultiThreading Example Item Rule</Description>  
+  <Source><![CDATA[
+// Library inclusions for BeanShell.
+import java.lang.*;
+import sailpoint.api.*;
+import sailpoint.object.*;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
+Logger log = Logger.getLogger("sailpoint.services.BeanShellMultiThreading.Item");
+// log.setLevel((Level) Level.DEBUG);  // TODO: Remove this in production rules.
+
+// Sanity checking to make sure we were passed a valid workItem String.
+if ((void == workItem) || (null == workItem)) {
+   log.error("Received a null or void workItem string.");
+   return;
+}
+if ( !(workItem instanceof String) ) {
+   log.error("Received a workItem that is not a String.");
+   return;
+} 
+
+// Begin item specific logic here.  What do we want this rule to do?
+// For this example we pull back a Link object by ID and simply log its 
+// account name to the console.
+
+Link link = context.getObjectById(Link.class, workItem);
+if (null == link) {
+   log.error("Could not find a Link object with id: " + workItem);   
+   return;
+}
+
+String acctName = link.getNativeIdentity();
+log.debug("Found Link for account: " + acctName);
+
+// Let's pretend that the items take a little bit of time to process.
+Thread.sleep(50);
+
+
+// Un-comment this Simulate a problem by throwing an exception and stop workers.
+// if (acctName.contains("-14")) {
+//    throw new Exception("BurmaShave!");
+//}
+
+
+// Here is an example of how we would update the task result from within the item rule, if so desired
+// The task result id is passed in to the rule, rather than the object itself. This is necessary to keep
+// hibernate happy and this thread safe.
+
+/*if (taskResultId != null && taskResultId != null){
+  log.debug("Passed in task result id is: " + taskResultId);
+
+  String msg = "I am passing this message to the task result";
+  
+  Map ops = new HashMap();
+  ops.put(context.LOCK_TYPE, context.LOCK_TYPE_TRANSACTION);
+  TaskResult thisResult = context.lockObjectById(TaskResult.class,taskResultId,ops);        
+  thisResult.addMessage(new Message(Message.Type.Info, msg, null));
+  context.saveObject(thisResult);        
+  context.commitTransaction();  
+  context.unlockObject(thisResult);   
+} */
+
+// Be nice and voluntarily cleanup the cache when we are done with the Link. 
+context.decache(link);
+
+return ;
+]]>
+  </Source>
+</Rule>
+</sailpoint>

@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.RoleScorer" name="Refresh Role Scorecard" progressInterval="5000" progressMode="String" subType="task_item_type_scoring" type="Scoring">
+  <Description>
+            Analyzes each role in the system and collects statistics about them.
+        </Description>
+  <Signature>
+    <Returns>
+      <Argument name="totalRoles" type="int">
+        <Prompt>task_out_role_scorer_total_roles</Prompt>
+      </Argument>
+      <Argument name="rolesScored" type="int">
+        <Prompt>task_out_role_scorer_roles_scored</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

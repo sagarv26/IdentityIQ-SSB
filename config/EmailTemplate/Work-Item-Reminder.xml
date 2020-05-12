@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Work Item Reminder">
+  <Body>This is your $ordinalNumReminders reminder that the work item $workItemName #if($requester)requested by $requester.displayableName, and #{end}created on $spTools.formatDate($created,3,1), #if($expiration)#if($expiration.getTime() &gt; $nowDate.getTime())is due on $spTools.formatDate($expiration,3,1).#{else}was due on $spTools.formatDate($expiration,3,1).#{end}#{else}was due on $spTools.formatDate($oldDueDate,3,1).#{end}
+
+#if ($newDueDate &gt; $expiration)
+The due date has been extended to $spTools.formatDate($newDueDate,3,1).
+
+#end
+#if ($remindersRemaining &gt; 0)
+This work item will escalate after $remindersRemaining more reminder(s).
+
+#end
+Please login to IdentityIQ and view your work item inbox to resolve this at your earliest convenience.
+    </Body>
+  <Description>
+      Email Template for reminding work item owners that their work
+      items are overdue.
+      NOTE: In addition to the declared arguments, all entries 
+      from the work item attributes map are also available by name in the template.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workItem" type="WorkItem">
+        <Description>The WorkItem object.</Description>
+      </Argument>
+      <Argument name="workItemName" type="string">
+        <Description>The name of the WorkItem.</Description>
+      </Argument>
+      <Argument name="certification" type="Certification">
+        <Description>The Certification object.</Description>
+      </Argument>
+      <Argument name="certificationName" type="string">
+        <Description>The name of the Certification.</Description>
+      </Argument>
+      <Argument name="ownerName" type="string">
+        <Description>The name of the Identity that owns the work item.</Description>
+      </Argument>
+      <Argument name="requester" type="Identity">
+        <Description>The identity object that represents the creator of the work item.</Description>
+      </Argument>
+      <Argument name="ordinalNumReminders" type="string">
+        <Description>The number of this reminder, starting from 1.  Passed as a String.</Description>
+      </Argument>
+      <Argument name="remindersRemaining" type="string">
+        <Description>The number of reminders remaining after this one.  Passed as a String.</Description>
+      </Argument>
+      <Argument name="oldDueDate" type="date">
+        <Description>The former due date, passed as a java.util.Date.</Description>
+      </Argument>
+      <Argument name="newDueDate" type="date">
+        <Description>The new due date, passed as a java.util.Date.</Description>
+      </Argument>
+      <Argument name="nowDate" type="date">
+        <Description>The current date, passed as a java.util.Date.</Description>
+      </Argument>
+      <Argument name="created" type="date">
+        <Description>The date the work item was created, passed as a java.util.Date.</Description>
+      </Argument>
+      <Argument name="expiration" type="date">
+        <Description>The optional date the work item completely expires, passed as a java.util.Date.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Work Item Reminder</Subject>
+</EmailTemplate>
+</sailpoint>

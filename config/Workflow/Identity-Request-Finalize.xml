@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow libraries="Identity,IdentityRequest" name="Identity Request Finalize" type="Subprocess">
+  <Variable name="project">
+    <Description>
+      ProvisioningProject which is just a compiled version of the ProvisioningPlan.
+      From the project the IdentityRequestItem model will be updated.
+    </Description>
+  </Variable>
+  <Variable input="true" name="identityRequestId" output="true">
+    <Description>
+       The ID ot the identitytRequestId.
+
+       This step will update the identityRequest status and completion
+       status.
+    </Description>
+  </Variable>
+  <Variable input="true" name="approvalSet">
+    <Description>
+       This attributes is set during the "Build Approval Set" step,
+       which builds this list by going through the ProvisioningPlan
+       to build the line items that need to be approved,
+
+       This variable includes all ApprovalItems that are part of
+       the request process and is updated during the AfterScript
+       of the approval process by assimilating the decisions
+       and comments from the Approvals copy of the ApprovalItem.
+    </Description>
+  </Variable>
+  <Variable input="true" name="trace">
+    <Description>
+      Used for debugging this subprocess and when set to true trace
+      statements will be sent to stdout.
+    </Description>
+  </Variable>
+  <Variable input="true" name="ticketManagementApplication">
+    <Description>
+      Name of the application that can handle ticket requests.
+      When non-null the Manage Ticket Steps will be visited to open
+      tickets during the workflow lifecycle.
+    </Description>
+  </Variable>
+  <Variable input="true" name="ticketDataGenerationRule">
+    <Description>
+      A rule that builds up the ticketing provisioning plan based on the workflow
+      context.  This rule gets all of the arguments to this subprocess
+      plus the curreent workflow context.  The rule can return either a
+      ProvisioningPlan or a Map of name value pairs.
+
+      The rule name can be specified here on the subprocess or on the
+      ticketManagementApplication config under the same name as this
+      variable.
+    </Description>
+  </Variable>
+  <Variable name="autoVerifyIdentityRequest">
+    <Description>
+      Flag to indicate when finishing the request we should
+      automatically mark it verified. Currently used by
+      the change password workflow so we don't wait to
+      verify since passwords can't be verifed.
+    </Description>
+  </Variable>
+  <Variable input="true" name="priority">
+    <Description>
+      String version of WorkItem.level that was used
+      to set the priority of the IdentityRequest and
+      workitems.
+    </Description>
+  </Variable>
+  <Step icon="Start" name="Start" posX="15" posY="12">
+    <Transition to="Audit Completion"/>
+  </Step>
+  <Step action="call:auditLCMCompletion" icon="Audit" name="Audit Completion" posX="115" posY="12">
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Transition to="Complete Identity Request"/>
+  </Step>
+  <Step action="call:completeIdentityRequest" icon="Task" name="Complete Identity Request" posX="261" posY="12" resultVariable="identityRequest">
+    <Arg name="project" value="ref:project"/>
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Arg name="autoVerify" value="$(autoVerifyIdentityRequest)"/>
+    <Arg name="identityRequestId" value="ref:identityRequestId"/>
+    <Transition to="Update Ticket On Complete"/>
+  </Step>
+  <Step condition="script:(ticketManagementApplication != null)" icon="Task" name="Update Ticket On Complete" posX="443" posY="12">
+    <Arg name="action" value="complete"/>
+    <Arg name="source" value="ref:source"/>
+    <Arg name="priority" value="ref:priority"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="ticketManagementApplication" value="ref:ticketManagementApplication"/>
+    <Arg name="identityRequestId" value="ref:identityRequestId"/>
+    <Arg name="ticketDataGenerationRule" value=""/>
+    <Arg name="trace" value="ref:trace"/>
+    <Description>
+      Call a subprocess to update the ticket in the ticketManagementApplication is non-null.
+
+      You can specify a specific 'ticketDataGenerationRule' here or you can also specify
+      it on the application.  It'll be read from the argument first and fall back to the '
+      application config.
+    </Description>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Manage Ticket"/>
+    </WorkflowRef>
+    <Transition to="end"/>
+  </Step>
+  <Step icon="Stop" name="end" posX="601" posY="13"/>
+</Workflow>
+</sailpoint>

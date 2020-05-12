@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Build Manual Action Approvals">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Approval Library"/>
+  </ReferencedRules>
+  <Source>
+    
+       import sailpoint.object.ApprovalSet;
+       import sailpoint.object.ApprovalItem;
+       import sailpoint.object.ProvisioningPlan;
+       import sailpoint.object.ProvisioningPlan.AccountRequest;
+       import sailpoint.service.ProvisioningTransactionService;
+       import sailpoint.service.ProvisioningTransactionService.TransactionDetails;
+       import sailpoint.workflow.IdentityLibrary;
+
+       //
+       // Attributes needed in the rule context: 
+       //
+       // project - Provisioning Project
+       //
+       // fallbackApprover - String representing who gets the approval
+       //                    if we can't resolve one.  
+       //
+       // identityName - name of the identity being operated on
+       //
+
+       List approvals = null;
+       ProvisioningPlan unmanaged = project.getUnmanagedPlan();
+       if ( unmanaged != null ) {
+           // 
+           // Build an ApprovalSet from each of the things in the plan 
+           // 
+           Identity id = context.getObject(Identity.class, identityName);
+           ApprovalSet set = new ApprovalSet();
+           for ( AccountRequest acctReq : unmanaged.getAccountRequests() ) {
+               ProvisioningTransactionService transService = new ProvisioningTransactionService(context);
+
+               AccountRequest account = new AccountRequest(acctReq.toMap());
+               if ( AccountRequest.Operation.Create.equals(account.getOperation()) ) {
+                   ApprovalItem item = new ApprovalItem();
+                   // need to deal with this 
+                   item.setApplication(account.getApplication());
+                   item.setInstance(account.getInstance());
+                   item.setNativeIdentity(account.getNativeIdentity());
+                   AccountRequest.Operation op = account.getOperation();
+                   if (op == null) {
+                       // shouldn't be here but assume modify
+                       op = AccountRequest.Operation.Modify;
+                   }
+                   item.setOperation(op.toString());
+                   
+                   //MEH 15833, get those comments transferred to the new approval item!
+                   String requesterComments = null;
+                   String attrComments = getRequesterComments(account.getAttributeRequests());
+                   String permComments = getRequesterComments(account.getPermissionRequests());
+                   
+                   //only one of these should be set... ideally
+                   if(attrComments.length() &gt; 0) {
+                      requesterComments = attrComments;
+                   }
+                   
+                   if(permComments.length() &gt; 0) {
+                      requesterComments = permComments;
+                   }
+
+                   if(requesterComments == null) {
+                      if(account.getComments() != null) {
+                         requesterComments = account.getComments();
+                      }
+                   }
+
+                   item.setRequesterComments(requesterComments);
+
+                   List reqs = new ArrayList();
+                   
+                   flattenAttributeRequests(account.getAttributeRequests(), reqs);
+                   flattenPermissionRequests(account.getPermissionRequests(), reqs);
+
+                   item.setValue(reqs);
+                   set.add(item);
+               } else {
+                   // The default ApprovalSet builder creates an ApprovalItem for
+                   // every attribute/permission request
+                   IdentityLibrary.addApprovalItems(id, account, set);
+               }
+
+               TransactionDetails details = new TransactionDetails();
+               details.setIdentityName(identityName);
+               details.setProject(project);
+               details.setRequest(account);
+               details.setPartitionedPlan(unmanaged);
+               details.setManual(true);
+
+               if (project.getMasterPlan() != null) {
+                   details.setSource(project.getMasterPlan().getSource());
+               }
+
+               transService.logTransaction(details);
+           }
+           // 
+           // Build a map of owner to ApprovalSet from each of the items
+           // in the unmanaged plan 
+           // 
+           // Default to the owner scheme, but we might need an option 
+           // 
+           Map ownerMap = buildOwnerMap("owner", set, unmanaged, fallbackApprover, identityName, false);
+           if ( ownerMap != null ) {
+               approvals = buildApprovalsFromMap(ownerMap, identityName, launcher);
+           }
+       }
+       return approvals;
+    
+  </Source>
+</Rule>
+</sailpoint>

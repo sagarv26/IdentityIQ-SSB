@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+	<Form name="SP Terminate Identity Entry Form">
+		<Button action="next" label="Continue" />
+		<Button action="back" label="Cancel Request" />
+		<Section name="Identity Information" type="text">
+			<Attributes>
+				<Map>
+					<entry key="hideNulls" value="true"/>
+				</Map>
+			</Attributes>
+			<Field displayName="Selected User Name: " name="identityName" readOnly="true"/>
+			<Field displayName="Selected User Display Name: " name="identityDisplayName"  readOnly="true"/>
+			<Field displayName="Email: " name="email"  readOnly="true"/>
+			<Field displayName="Termination Date: " name="terminationDate"/>
+		</Section>
+	</Form>
+	
+	
+	<Form name="SP Terminate Identity Confirm Form">
+		<Button action="next" label="Submit Request" />
+		<Button action="back" label="Cancel Request" />
+		<Section name="Identity Information" type="text">
+			<Attributes>
+				<Map>
+					<entry key="hideNulls" value="true"/>
+				</Map>
+			</Attributes>
+			<Field displayName="Selected User Name: " name="identityName" readOnly="true"/>
+			<Field displayName="Selected User Display Name: " name="identityDisplayName"  readOnly="true"/>
+			<Field displayName="Email: " name="email"  readOnly="true"/>
+			<Field displayName="Termination Date: " name="terminationDate"  readOnly="true"/>
+		</Section>
+	</Form>
+
+
+</sailpoint>

@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+
+	<DynamicScope name="SST QL UT Report Scope">
+	  <Selector>
+	    <IdentitySelector>
+	      <MatchExpression>
+	         <MatchTerm name="rights" value="SystemAdministrator"/>
+	      </MatchExpression>
+	    </IdentitySelector>
+	  </Selector>
+	 </DynamicScope>
+	 
+	 <QuickLink action="workflow" category="Manage" 
+		messageKey="SST Unit Test Reports" name="SST Unit Test Reports QuickLink" ordering="23">
+		<Attributes>
+			<Map>
+				<entry key="forceAllowSelf" value="true" />
+				<entry key="hideAllowOthers" value="true" />
+				<entry key="workflowName" value="SST View Unit Tests WF"/>
+			</Map>
+		</Attributes>
+		<DynamicScopes>
+			<Reference class="sailpoint.object.DynamicScope" name="SST QL UT Report Scope"/>
+		</DynamicScopes>
+	</QuickLink>
+	
+	<Workflow handler="sailpoint.api.StandardWorkflowHandler" 
+	libraries="Identity,Role,PolicyViolation,LCM,BatchRequest" 
+	name="SST View Unit Tests WF" taskType="LCM" type="LCMProvisioning">
+		<Variable initializer="%%SST_VIEW_UNIT_TESTS_WF_TRACE%%" name="trace">
+		    <Description>
+		      Used for debugging this workflow and when set to true trace
+		      will be sent to stdout.
+		    </Description>
+		  </Variable>
+		  <Variable initializer="true" name="transient">
+		    <Description>
+		      Used for debugging this workflow and when set to true trace
+		      will be sent to stdout.
+		    </Description>
+		  </Variable>
+		  <Variable name="viewForm" />
+		  <Variable name="identityModel"  />
+		  <RuleLibraries>
+		    <Reference class="sailpoint.object.Rule" name="SST Unit Test Rules Library"/>
+		  </RuleLibraries>
+		  
+		  <Step icon="Start" name="Start" posX="28" posY="12">
+		    <Transition to="Build Identity Model"/>
+		  </Step>
+		  
+		  <Step name="Build Identity Model" resultVariable="identityModel">
+		  	<Script>
+		  		<Source>
+		  			return getIdentityModel();
+		  		</Source>
+		  	</Script>
+		  	<Transition to="Build Form"/>
+		  </Step>
+		  
+		  <Step name="Build Form" resultVariable="viewForm">
+		  	<Script>
+		  		<Source>
+		  			return getUTReportForm();
+		  		</Source>
+		  	</Script>
+		  	<Transition to="Display Form"/>
+		  </Step>
+		  
+		  <Step name="Display Form">
+		  	<Approval mode="serial" owner="ref:launcher" send="identityModel" return="identityModel" >
+				<Arg name="workItemType" value="Approval" />
+				<Arg name="workItemForm" value="ref:viewForm" />
+				<Arg name="workItemDescription" value="UT Report Form" />
+				<Arg name="workItemFormBasePath" value="identityModel"/>
+			</Approval>
+			<Transition to="end" when="!approved" />
+			<Transition to="Run Tests" />
+		  </Step>
+		  
+		  <Step name="Run Tests">
+		  	<Script>
+		  		<Source>
+		  			import sailpoint.object.*;
+		  			import java.util.*;
+		  			
+		  			Rule rule = context.getObjectByName(Rule.class, "SST Unit Test All Rule");
+		  			Map params = new HashMap();
+		  			
+		  			params.put("sendReport", "true");
+		  			params.put("recipients", "%%SST_RUN_ALL_UT_RECIPIENTS%%");
+		  			
+		  			context.runRule(rule, params);
+		  		</Source>
+		  	</Script>
+		  	<Transition to="Build Form" />
+		  </Step>
+		  
+		  <Step icon="Stop" name="end" posX="720" posY="163"/>
+	</Workflow>
+	
+	<Form name="SST UT Report Form">
+		<Attributes>
+		    <Map>
+		        <entry key="pageTitle" value="SST Unit Test Reports"/>
+		        <entry key="subtitle" value="Click a link below to view report details.  Click Run Tests to re-run all tests and generate a new report.  New reports can take several seconds to generate.  If you don't see the new report, simply return to the dashboard, wait a bit, perhaps refill your coffee, then click the View Unit Test Reports link again.  "/>
+		    </Map>
+		  </Attributes>
+		<Button action="next" label="Run Tests" />
+		<Button action="back" label="Return to Dashboard" />
+		<!-- 
+		<Section name="InputSection" label="Test Options">
+			<Field displayName="Run All Types" name="runAll" type="boolean" postBack="true"/>
+			<Field displayName="Test Types" name="testTypes" multi="true" dynamic="true" >
+				<Attributes>
+					<Map>
+						<entry key="hidden">
+							<value>
+								<Script>
+									<Source>
+									<![CDATA[
+										if (runAll != null && runAll){
+											return true;
+										} else {
+											return false;
+										}
+									]]>
+									</Source>
+								</Script>
+							</value>
+						</entry>
+					</Map>
+				</Attributes>
+				<AllowedValuesDefinition>
+					<Script>
+						<Source>
+						<![CDATA[
+							return identityModel.get("testTypes");
+						]]>
+						</Source>
+					</Script>
+				</AllowedValuesDefinition>
+		</Field>
+		</Section> -->
+	</Form>
+	
+</sailpoint>

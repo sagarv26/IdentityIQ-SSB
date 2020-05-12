@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="UT">
+  <Signature>
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="SP Approval Framework Rules Library"/>
+  </ReferencedRules>
+  <Source>
+    import sailpoint.api.SailpointContext;
+  	import sailpoint.object.*;
+  	import java.util.*;
+  	import sailpoint.tools.Util;
+	
+	System.out.println("Start");
+	
+	
+	
+	String filePath = "/Users/andy.dunfee/Documents/myworkspace/SpiritAeroBeanstalkBranchOptimize/config/ApprovalFramework/SampleApprovalSet.xml";
+	String xml = Util.readFile(filePath);
+	
+	//System.out.println("Have xml string: " + xml);
+	
+	
+	
+	ApprovalSet approvalSet = (ApprovalSet) ApprovalSet.parseXml(context, xml);
+	Workflow workflow = new Workflow();
+	
+	List approvalTypes = defaultGetApprovalTypesUseExtended(context, approvalSet, workflow);
+	System.out.println("Have types: " + approvalTypes);
+	
+	for (String approvalType : approvalTypes){
+		approvalSet = (ApprovalSet) ApprovalSet.parseXml(context, xml);
+		Workflow workflow = new Workflow();
+		
+		boolean hasItems = defaultPreApprovalSetSplitterUseExtended(context, approvalSet, workflow, approvalType);
+		System.out.println(approvalType + " Approval Has items: " + hasItems);
+		System.out.println("Workflow after rule: " + workflow.toXml());
+	
+	}
+	
+	System.out.println("Finished.");
+</Source>
+</Rule>

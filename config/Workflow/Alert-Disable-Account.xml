@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow explicitTransitions="true" name="Alert - Disable Account" type="Alert">
+  <Variable input="true" name="alertDefinition" required="true">
+    <Description>The alertDefinition object that matched the alert.</Description>
+  </Variable>
+  <Variable input="true" name="alertId" required="true">
+    <Description>The id of the Alert that triggered the workflow.</Description>
+  </Variable>
+  <Variable name="plan" output="true">
+    <Description>ProvisioningPlan generated for the Alert.</Description>
+  </Variable>
+  <Variable name="project" output="true">
+    <Description>The compiled project from the plan</Description>
+  </Variable>
+  <Variable initializer="Disable" name="op">
+    <Description>Operation to take.</Description>
+  </Variable>
+  <Description>Disable accounts when alert is triggered.
+
+    If the alert's targetType is Identity, this will set the Identity inactive.
+
+    If the alert's targetType is Link, this will disable the account associated to the link.</Description>
+  <Step icon="Start" name="Start" posX="28" posY="10">
+    <Transition to="Build Provisioning Plan"/>
+  </Step>
+  <Step action="buildAlertPlan" icon="Task" name="Build Provisioning Plan" posX="98" posY="10" resultVariable="plan">
+    <Arg name="op" value="ref:op"/>
+    <Arg name="alertId" value="ref:alertId"/>
+    <Description>Build the Provisioning plan to disable the correct account</Description>
+    <Transition to="Compile Plan"/>
+  </Step>
+  <Step action="compileProvisioningProject" icon="Task" name="Compile Plan" posX="312" posY="10" resultVariable="project">
+    <Arg name="plan" value="ref:plan"/>
+    <Transition to="Provision"/>
+  </Step>
+  <Step action="provisionProject" icon="Provision" name="Provision" posX="438" posY="10">
+    <Arg name="project" value="ref:project"/>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="540" posY="10"/>
+</Workflow>
+</sailpoint>

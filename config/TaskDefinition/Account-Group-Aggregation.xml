@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.task.ResourceIdentityScan" formPath="/monitor/tasks/accountGroupAggregationTask.xhtml" name="Account Group Aggregation" progressInterval="5000" progressMode="String" resultRenderer="accountGroupAggregationResult.xhtml" subType="task_item_type_acct_grp_aggregation" template="true" type="AccountGroupAggregation">
+  <Attributes>
+    <Map>
+      <entry key="aggregationType" value="group"/>
+    </Map>
+  </Attributes>
+  <Description>
+            Task template for application group scanning.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="help_task_select_apps" multi="true" name="applications" required="true" type="Application">
+        <Prompt>task_in_account_group_aggregation_applications</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_group_select_schema" name="groupSchema" type="sailpoint.web.task.GroupSchemaCustomSerializer">
+        <Prompt>task_in_account_group_aggregation_groups_to_scan</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_group_delta_aggregation" name="deltaAggregation" type="boolean">
+        <Prompt>task_in_account_aggregation_delta</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_group_detect_deleted" name="checkDeleted" type="boolean">
+        <Prompt>task_in_account_aggregation_check_deleted_acct_groups</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_check_deleted_threshold" name="checkDeletedThreshold" type="string">
+        <Prompt>task_in_account_group_aggregation_check_deleted_threshold</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_group_description_locale" name="descriptionLocale" type="string">
+        <Prompt>task_in_account_aggregation_description_locale</Prompt>
+      </Argument>
+      <Argument helpKey="help_task_group_description_attribute" name="descriptionAttribute" type="string">
+        <Prompt>task_in_account_aggregation_description_attribute</Prompt>
+      </Argument>
+      <Argument filterString="type == Rule.Type.GroupAggregationRefresh" helpKey="help_task_group_refresh_rule" name="accountGroupRefreshRule" type="Rule">
+        <Prompt>task_in_account_group_aggregation_refresh_rule</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="applications" type="int">
+        <Prompt>task_out_account_group_aggregation_applications</Prompt>
+      </Argument>
+      <Argument name="total" type="int">
+        <Prompt>task_out_account_group_aggregation_total</Prompt>
+      </Argument>
+      <Argument name="groupsCreated" type="int">
+        <Prompt>task_out_account_group_aggregation_created</Prompt>
+      </Argument>
+      <Argument name="groupsUpdated" type="int">
+        <Prompt>task_out_account_group_aggregation_updated</Prompt>
+      </Argument>
+      <Argument name="groupsDeleted" type="int">
+        <Prompt>task_out_account_group_aggregation_deleted</Prompt>
+      </Argument>
+      <Argument name="groupDetails" type="complex"/>
+    </Returns>
+  </Signature>
+</TaskDefinition>
+</sailpoint>

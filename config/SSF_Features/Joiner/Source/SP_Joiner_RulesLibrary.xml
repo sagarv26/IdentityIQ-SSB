@@ -1,0 +1,220 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="SP Joiner Rules Library" language="beanshell">
+	<ReferencedRules>
+	    <Reference class="sailpoint.object.Rule" name="SP Provisioning Rules Library"/>
+	    <Reference class="sailpoint.object.Rule" name="SP Role Assigment Rule Library"/>
+    </ReferencedRules>
+	<Source>
+	<![CDATA[
+	import sailpoint.api.SailPointFactory;
+	import sailpoint.api.SailPointContext;
+	import sailpoint.api.Provisioner;
+	import sailpoint.object.*;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+    import sailpoint.object.ProvisioningPlan.Operation; 
+	import sailpoint.tools.Util;
+    import sailpoint.tools.Message;
+    import sailpoint.tools.GeneralException;
+    import java.sql.Connection;
+	import java.sql.PreparedStatement;
+	import java.sql.ResultSet;
+	import java.sql.SQLException;
+	import java.sql.DriverManager;
+    import java.sql.Timestamp;
+	import java.util.*;
+	import java.text.*;
+	import javax.naming.Context;
+	import javax.naming.InitialContext;
+	import javax.sql.DataSource;
+	import sailpoint.api.PasswordGenerator;
+	import sailpoint.api.Matchmaker;
+	
+	
+    import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	private Log logger = LogFactory.getLog("rule.SP.Joiner.RulesLibrary");
+	
+	public boolean isTriggerJoinerRule(SailPointContext context, Identity previousIdentity, Identity newIdentity){
+		logger.trace("Enter isTriggerJoinerRule");
+		boolean flag = false;
+		
+		String currStatus = "";
+
+        if(newIdentity == null || newIdentity == void){
+        	logger.warn("Identity objects are null");
+        	return flag;
+        }
+        
+        String identityName = newIdentity.getName();
+        
+        Custom mappingObj = getJoinerMappingObject(context);
+		
+		logger.trace("Have mapping object: " + mappingObj);
+		if (mappingObj == null){
+			logger.warn("No mapping object");
+			return flag;
+		}
+		
+		logger.trace("Mapping object not null: " + mappingObj.toXml());
+		
+		String triggerType = mappingObj.get("Trigger Type");
+		
+		if ("Custom Rule".equalsIgnoreCase(triggerType)){
+			logger.trace("Call the custom method ");
+			
+			flag = isJoinerCustomTriggerRule(context, previousIdentity, newIdentity);
+		} else if("Selector".equalsIgnoreCase(triggerType)){
+			logger.trace("Determine if trigger using a selector");
+			Matchmaker matchMaker = new Matchmaker(context);
+			IdentitySelector idSelector = mappingObj.get("Trigger Field Selector");
+			
+			flag = matchMaker.isMatch(idSelector, newIdentity);
+		} else {
+			logger.warn("Unknown trigger type: " + triggerType);
+			
+		}
+			
+		logger.trace("Exit isTriggerJoinerRule: " + flag);
+		return flag;
+	}
+	
+	public ProvisioningPlan getDynamicJoinerPlan(SailPointContext context, String identityName, Workflow workflow){
+		logger.trace("Enter getDynamicJoinerPlan");
+		
+		Identity identity = context.getObjectByName(Identity.class, identityName);
+		
+		ProvisioningPlan plan = getDynamicJoinerPlan (context, identity, workflow);
+		
+		return plan;
+	}
+	
+	public ProvisioningPlan getDynamicJoinerPlan(SailPointContext context, Identity identity, Workflow workflow){
+		logger.trace("Enter getDynamicJoinerPlan");
+		
+		ProvisioningPlan plan = null;
+		Custom mappingObj = getJoinerMappingObject(context);
+		
+		if (mappingObj != null){
+			String assignmentType = mappingObj.get("Birthright Assignment Type");
+			
+			if ("Custom Rule".equalsIgnoreCase(assignmentType)){
+				
+				logger.trace("Build plan with custom rule: ");
+				
+				plan = buildCustomJoinerPlan(context, workflow);
+			} else if ("Dynamic Roles".equalsIgnoreCase(assignmentType)){
+				logger.debug("Dynamically assign roles");
+				plan = getDynamicRolesPlan(context, identity);
+			} else {
+				plan = new ProvisioningPlan();
+				plan.setIdentity(identity);
+				
+				List assignments = mappingObj.get("Default Assignments");
+				
+				if (assignments == null || assignments.size() < 1){
+					logger.warn("Nothing to assign.  Return null.");
+					return null;
+				}
+				
+				if ("Default Roles".equalsIgnoreCase(assignmentType)){
+					AccountRequest acctReq = new AccountRequest(AccountRequest.Operation.Modify, "IIQ", null, identity.getName());
+					acctReq.add(new AttributeRequest("assignedRoles", ProvisioningPlan.Operation.Set, assignments));
+					plan.add(acctReq);
+				} else {
+					for (String app : assignments){
+						String nativeId = getNativeIdentity(context, app, identity);
+						AccountRequest acctReq = new AccountRequest(AccountRequest.Operation.Create, app, null, nativeId);
+						
+						acctReq.setNativeIdentity(nativeId);
+						plan.add(acctReq);
+					}
+				}
+			}
+		}
+		
+		plan.setComments("Adding Joiner Access");
+		
+		logger.trace("Set plan identity " + identity);
+		plan.setIdentity(identity);
+		
+		logger.trace("Exit getDynamicJoinerPlan: " + plan.toXml());
+		return plan;
+	}
+	
+	public String getNativeIdentity(SailPointContext context, String appName, Identity identity){
+		logger.trace("Enter getNativeIdentity");
+		String nativeId = "";
+		
+		Application app = context.getObjectByName(Application.class, appName);
+		
+		Schema schema = app.getAccountSchema();
+		String niField = schema.getIdentityAttribute();
+		
+		logger.trace("The native id field is: " + niField);
+		
+		List templates = app.getTemplates();
+		Template updateTemp = null;
+		
+		if (templates != null && templates.size() > 0){
+			logger.trace("loop the templates");
+			
+			for (Template temp : templates){
+				Template.Usage usage = temp.getUsage();
+				if (usage.equals(Template.Usage.Create)){
+					logger.trace("Set to create template in case no update");
+					updateTemp = temp;
+					break;
+				}
+			}
+			
+			if (updateTemp != null){
+			
+				List fields = updateTemp.getFields();
+				
+				if (fields != null && fields.size() > 0){
+					for (Field field : fields){
+						logger.trace("Get field name");
+						String fieldName = field.getName();
+						String displayName = field.getDisplayName();
+						
+						if (niField.compareTo(fieldName) == 0){
+							Rule rule = field.getFieldRule();
+							
+							HashMap params = new HashMap();
+						
+							params.put("context", context);
+							params.put("identity", identity);
+							params.put("field", field);
+							
+							try {
+								logger.trace("Run the rule");
+								nativeId = context.runRule(rule, params);
+							} catch (Exception re){
+								logger.error("*** EXCEPTION RUNNING RULE/SCRIPT: " + re.toString());
+								continue;
+							}
+						}		
+					}
+				}
+			}
+		}
+		
+		
+		logger.trace("Exit getNativeIdentity: " + nativeId);
+		return nativeId;
+	}
+	
+	public Custom getJoinerMappingObject(SailPointContext context){
+		logger.trace("Enter getJoinerMappingObject");
+		
+		Custom mappingObj = context.getObjectByName(Custom.class, "SPCONF Joiner Mappings Custom");
+		logger.trace("Exit getJoinerMappingObject: " + mappingObj);
+		return mappingObj;
+	}
+	
+	]]>
+	</Source>
+</Rule>

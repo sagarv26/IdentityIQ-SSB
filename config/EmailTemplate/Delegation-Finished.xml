@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<EmailTemplate name="Delegation Finished">
+  <Body>$delegateeName has finished the delegated item '$workItemName'.
+Please review the items. 
+    </Body>
+  <Description>
+      Email Template for notifying the original owner that the delegated item has been completed.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workItemName" type="string">
+        <Description>The description property of the delegation WorkItem.</Description>
+      </Argument>
+      <Argument name="certification" type="Certification">
+        <Description>The Certification object containing the delegated item.</Description>
+      </Argument>
+      <Argument name="delegateeName" type="string">
+        <Description>The display name of the Identity that finished the delegation.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Delegation Completed by $delegateeName</Subject>
+</EmailTemplate>
+</sailpoint>

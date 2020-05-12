@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="Application Account Attributes Report Form" type="Report">
+  <Section columns="2" label="rept_app_properties_section" name="customProperties">
+    <Field displayName="rept_app_account_attrs_label_app" helpKey="rept_app_account_attrs_help_app" name="application" postBack="true" required="true" type="Application" value="ref:application"/>
+    <Field displayName="rept_app_account_attrs_label_identity_status" helpKey="rept_app_account_attrs_help_inactive" name="inactive" type="string" value="ref:inactive">
+      <AllowedValues>
+        <List>
+          <String> </String>
+          <String>rept_app_account_attrs_filter_include_all</String>
+        </List>
+        <List>
+          <String>true</String>
+          <String>rept_app_account_attrs_filter_inactive</String>
+        </List>
+        <List>
+          <String>false</String>
+          <String>rept_app_account_attrs_filter_active</String>
+        </List>
+      </AllowedValues>
+    </Field>
+  </Section>
+</Form>
+</sailpoint>

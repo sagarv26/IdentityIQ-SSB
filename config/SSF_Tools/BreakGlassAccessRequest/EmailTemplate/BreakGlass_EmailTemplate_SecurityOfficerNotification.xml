@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate name="Break Glass - Security Officer Notification">
+  <Body>
+
+
+<![CDATA[<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Break Glass Account changes for $identityDisplayName were processed</title>  
+</head>
+
+<!-- Background for  -->
+<body style="background:#00799d;margin:0;padding:0;text-align:left;">
+
+  <table cellpadding="0" cellspacing="0" width="588" border="0" align="center" style="margin:0 auto;padding:0;">
+    <tr valign="top">
+      
+    </tr>
+    <tr valign="top">
+        <td>
+        <!-- EMAILER CONTENT BEGINS -->
+        
+        <!-- HEADER -->
+        <!-- CHANGE BACKGROUND COLOR IN STYLE BELOW: blue - #0987a0 ; tan - #847f5c -->
+        <table cellpadding="0" cellspacing="0" width="588" style="background:#fafafa;margin:0;padding:0;text-align:left;border-top:5px solid #b2b2b2;border-bottom:5px solid #b2b2b2;">
+        <tr valign="middle">
+          <td height="85">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+            <td>
+            <!-- CHANGE COLOR STYLE BELOW: blue - #98bec6 ; tan - #b5b192 -->
+            <h2 style="color:#222222;margin:0;padding:0;font:bold 12pt Arial;text-transform:uppercase;">Break Glass Account Changes Were Processed</h2>
+            <h1 style="color:#037da1;margin:0;padding:0;font:bold 22pt Arial;">$identityDisplayName</h1>             
+          </td>
+        </tr>
+        </table>
+
+       <!-- /HEADER -->
+        
+        <!-- CONTENT -->
+     <table cellpadding="0" cellspacing="0" width="588" style="background:#dadada;margin:0;padding:0;text-align:left;border-left:0px solid #b2b2b2;border-right:0px solid #b2b2b2; border-bottom:5px solid #b2b2b2;">
+        <tr valign="top">
+          <td width="40">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+          <td>
+          <table cellpadding="0" cellspacing="0" width="100%" border="0">
+                            <tr valign="top" colspan="3">
+                                <td>
+										 
+                                <p style="margin:0 0 20px;padding:0;color:#007080;font:normal 10pt Arial;line-height:15pt;">This is an automated notification from IdentityIQ.</p>
+                                <p style="margin:0;padding:0;color:#007080;font:normal 10pt Arial;line-height:15pt;">Dear Security Officer,</p>                                       
+                                <p style="margin:0;padding:0;color:#007080;font:normal 10pt Arial;line-height:15pt;">$requesterDisplayName requested a BREAK GLASS procedure for $identityDisplayName<br/><br/></p>
+                                </td>
+							</tr>
+							<td>
+                            <table cellpadding="0" cellspacing="0" width="90%" border="0" style="margin-bottom:30px">
+							<tr>
+							<td>
+							   <table cellspacing="0" cellpadding="2" border="0" width="75%" align="center">
+							   
+							    #foreach ($acctReq in $plan.getAccountRequests())
+  							    <tr valign="top">
+                        		<td style="background:#fafafa;border-bottom:2px solid #FFF;">
+                         		<p style="color:#007080;font:normal 10pt Arial;margin:10px 0 0 15px;padding:0;line-height:13pt;"><strong>Account Details</strong></p>
+								<p style="color:#007080;font:normal 8pt Arial;margin:10px 0 0 15px;padding:0;line-height:13pt;"><strong>Application: </strong>$acctReq.getApplication()</p>
+        						<p style="color:#007080;font:normal 8pt Arial;margin:10px 0 0 15px;padding:0;line-height:13pt;"><strong>Account ID: </strong>#if ($acctReq.getNativeIdentity()) $acctReq.getNativeIdentity() #else <i>New account</i> #end</p>
+      							</td>
+      							</tr>
+      							
+      							#foreach ($attrReq in $acctReq.getAttributeRequests())
+      							<tr valign="top">
+      							<td style="background:#fafafa;border-bottom:2px solid #FFF;">
+                         		<p style="color:#007080;font:normal 10pt Arial;margin:10px 0 0 15px;padding:0;line-height:13pt;"><strong>Entitlement Change Details</strong></p>
+								<p style="color:#007080;font:normal 8pt Arial;margin:10px 0 0 15px;padding:0;line-height:13pt;"><strong>Operation: $attrReq.getOperation()</p>
+                         		<p style="color:#007080;font:normal 8pt Arial;margin:10px 0 0 15px;padding:0;line-height:13pt;"><strong>Attribute: $attrReq.getName()</p>
+                         		<p style="color:#007080;font:normal 8pt Arial;margin:10px 0 0 15px;padding:0;line-height:13pt;"><strong>Value(s): $attrReq.getValue()</p>
+                         		</tr>
+      							#end
+      							#end
+				  			 </table>
+							</td>
+							</tr>
+                            </table>
+							</td>
+                        </tr>
+                    </table>
+
+            <!-- CHANGE STYLE COLOR IN anchor or a TAG BELOW and in all anchor tags that apply below : red - #a22831 ; blue - #0987a0 -->
+    <p style="margin:0;padding:0;color:#007080;font:normal 10pt Arial;line-height:15pt;">Thank you for your cooperation</p>
+            <p style="margin:0 0 50px;padding:0;color:#007080;font:bold 10pt Arial;line-height:15pt;">Your Security and Compliance Team</p>
+            </td>
+            <td width="40">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        </tr>
+        </table>
+        <!-- /CONTENT -->
+        
+        <!-- /EMAILER -->
+        </td>
+    </tr>
+    </table>
+	</body>
+	</html>]]>
+
+
+
+    </Body>
+  <Description>
+      Email Template for notifying security officers when a "Break Glass" Access request is completed.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workflow" type="Workflow">
+        <Description>The Workflow object being executed.</Description>
+      </Argument>
+      <Argument name="approvalSet" type="ApprovalSet">
+        <Description>The ApprovalSet object contained in the workflow.</Description>
+      </Argument>
+      <Argument name="identityName" type="string">
+        <Description>The name of the Identity that is registering.</Description>
+      </Argument>
+      <Argument name="identityDisplayName" type="string">
+        <Description>The display name of the Identity that is registering.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>BREAK GLASS request for $identityDisplayName has been processed</Subject>
+</EmailTemplate>

@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate name="Email Approvals">
+  <Body>
+  
+  <![CDATA[
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+     
+$launcher is requesting the following changes for '$identityDisplayName'
+ 
+</p>
+The access request details are:
+</p>
+
+<p> </p>
+ 
+#if ( $approvalSet.items )
+#foreach ($item in $approvalSet.items)
+ 
+        Application: $item.application
+<p> </p> 
+#if ( $item.nativeIdentity )
+           Account : $item.nativeIdentity
+<p> </p> 
+#end
+#if ( $item.instance )
+          Instance : $item.instance
+<p> </p> 
+#end
+          Operation: $item.operation
+<p> </p> 
+#if ( $item.displayName )
+          Attribute: $item.displayName
+<p> </p> 
+#elseif ( $item.name )
+          Attribute: $item.name
+<p> </p> 
+#end
+#if ( $item.displayValue )
+           Value(s): $item.displayValue
+<p> </p> 
+#elseif ( $item.csv )
+           Value(s): $item.csv
+<p> </p> 
+#end
+#if ( $item.requesterComments )
+Requester Comments: $item.requesterComments
+#end
+#end
+#end
+ 
+#set ( $case= $item.getWorkflowCase())
+#set ( $caseid= $case.getId())
+
+
+<p> </p> 
+
+Click on the link below to approve, or reject.
+
+<p> </p>
+ 
+<a href="mailto:%%SP_EA_SVC_ACCOUNT%%?subject=wkAction=approve;wkId=$item.id;caseId=$caseid">Approve </a>
+<p>
+<a href="mailto:%%SP_EA_SVC_ACCOUNT%%?subject=wkAction=reject;wkId=$item.id;caseId=$caseid">Reject </a>
+ 
+</p>
+ 
+Or click on the link to review.
+%%SP_EA_IIQ_BASE_URL%%/workitem/workItem.jsf?id=$item.id
+ 
+</body>
+</html>
+  ]]>
+    </Body>
+  <Description>
+      Email Template for notifying approvers when they need to approve a request made through LCM.
+      Note that in addition to the declared arguments, all workflow variables,
+      Step arguments, and Approval arguments defined in the Workflow are
+      also available.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workflow" type="Workflow">
+        <Description>The Workflow object being executed.</Description>
+      </Argument>
+      <Argument name="item" type="WorkItem">
+        <Description>The WorkItem representing the review.</Description>
+      </Argument>
+      <Argument name="approvalSet" type="ApprovalSet">
+        <Description>The ApprovalSet object contained in the work item.</Description>
+      </Argument>
+      <Argument name="launcher" type="string">
+        <Description>The name of the Identity that launched the workflow.</Description>
+      </Argument>
+      <Argument name="identityName" type="string">
+        <Description>The name of the Identity that is being changed.</Description>
+      </Argument>
+      <Argument name="identityDisplayName" type="string">
+        <Description>The display name of the Identity that is being changed.</Description>
+      </Argument>
+      <Argument name="launcherDisplayName" type="string">
+        <Description>The display name of the identity who initiatee the request.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Changes requested to $identityDisplayName need approval</Subject>
+</EmailTemplate>

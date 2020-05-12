@@ -1,0 +1,1277 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="SP Provisioning Rules Library" language="beanshell">
+   <ReferencedRules>
+    </ReferencedRules>
+   <Source>
+   <![CDATA[
+   import sailpoint.api.Provisioner;
+   import sailpoint.api.SailPointFactory;
+   import sailpoint.api.SailPointContext;
+   import sailpoint.object.*;
+   import sailpoint.object.ProvisioningPlan.AttributeRequest;
+   import sailpoint.object.ProvisioningPlan.AccountRequest;
+   import sailpoint.object.ProvisioningPlan.AccountRequest.Operation;
+    import sailpoint.object.ProvisioningPlan.Operation; 
+   import sailpoint.tools.Util;
+    import sailpoint.tools.Message;
+    import sailpoint.tools.GeneralException;
+    import java.sql.Connection;
+   import java.sql.PreparedStatement;
+   import java.sql.ResultSet;
+   import java.sql.SQLException;
+   import java.sql.DriverManager;
+    import java.sql.Timestamp;
+   import java.util.*;
+   import java.text.*;
+   import javax.naming.Context;
+   import javax.naming.InitialContext;
+   import javax.sql.DataSource;
+   import java.lang.reflect.*;
+   import sailpoint.api.PasswordGenerator;
+   import sailpoint.tools.Util;
+   import sailpoint.workflow.WorkflowContext;
+   import sailpoint.tools.JdbcUtil;
+   import sailpoint.workflow.StandardWorkflowHandler;
+   import sailpoint.api.*;
+   import sailpoint.task.CertificationExecutor.CertifierSelectionType;
+   import sailpoint.Version;
+   
+    import org.apache.commons.logging.Log;
+   import org.apache.commons.logging.LogFactory;
+
+   private Log plogger = LogFactory.getLog("rule.SP.Provisioning.RulesLibrary");
+   
+   public void persistIdentityRequestId(SailPointContext context, WorkflowContext wfcontext, String identityRequestId){
+      plogger.trace("Enter persistIdentityRequestId");
+   
+       try {
+            plogger.trace("Get the top wfcontext");
+           WorkflowContext top = wfcontext.getRootContext();
+           
+           plogger.trace("See if it has the ir id");
+           
+           String irId = (String)top.getVariable("identityRequestId");
+           plogger.trace("Top id req id: " + irId);
+           
+           if (irId == null){
+            plogger.trace("Set top level context id req id to: " + identityRequestId);
+            top.setVariable("identityRequestId", identityRequestId);
+           }
+          
+          } catch (Exception){
+            plogger.trace("Exception: " + e.toString());
+          }
+   
+      plogger.trace("Exit persistIdentityRequestId");
+   }
+
+   public boolean doProcessProject(SailPointContext context, ProvisioningProject project){
+      plogger.trace("Enter processProject");
+      boolean flag = false;
+      
+      if (project != null){
+         plogger.trace("Have project: " + project.toXml());
+         List plans = project.getPlans();
+         
+         if (plans != null && plans.size()> 0){
+            for (ProvisioningPlan plan : plans){
+               List reqs = plan.getAccountRequests();
+               
+               if (reqs != null && reqs.size() > 0){
+                  plogger.trace("Have project with plan with requests, so process");
+                  flag = true;
+                  break;
+               }
+            }
+         }
+      } else {
+         plogger.trace("No project..");
+      }
+      
+      plogger.trace("Exit processProject: " + flag);
+      return flag;
+   }
+   
+   public boolean checkOtherLCEFiring(SailPointContext context, 
+      Identity newIdentity, Identity prevIdentity, String lceName){
+      plogger.trace("Enter checkOtherLCEFiring");
+      boolean flag = false;
+      
+      List triggers = context.getObjects(IdentityTrigger.class);
+      
+      if (triggers == null || triggers.isEmpty()){
+         plogger.warn("No triggers to evaluate");
+         return flag;
+      }
+      
+      for (IdentityTrigger trigger : triggers){
+         String tName = trigger.getName();
+         
+         if (lceName.equalsIgnoreCase(tName)){
+            plogger.debug("Skip the lce we are trying to fire");
+            continue;
+         }
+         
+         if (trigger.isDisabled()){
+            plogger.debug("Skip the trigger because it is disabled");
+            continue;
+         }
+         
+         plogger.debug("Now begin to do logic to evaluate if true.");
+         
+         boolean matches = trigger.matches(prevIdentity, newIdentity, new Matchmaker(context), context);
+            
+         if (matches){
+            plogger.debug("Found a matching LCE.  Return true and break");
+            flag = true;
+            break;
+         }
+      }
+      
+      
+      plogger.trace("Exit checkOtherLCEFiring: " + flag);
+      return flag;
+   }
+   
+   public ProvisioningPlan getDynamicRolesPlan(SailPointContext context, String identityName){
+      plogger.trace("Enter getDynamicRolesPlan");
+      
+      Identity identity = context.getObjectByName(Identity.class, identityName);
+      
+      return getDynamicRolesPlan(context, identity);
+   }
+   
+   public ProvisioningPlan getDynamicRolesPlan(SailPointContext context, Identity identity){
+      plogger.trace("Enter getDynamicRolesPlan");
+      
+      ProvisioningPlan plan = new ProvisioningPlan();
+      plan.setIdentity(identity);
+      
+         plogger.trace("Get the roles request");
+        AccountRequest rolesReq = getAddOrRemoveRolesAccountRequest(context, identity);
+           
+        if (rolesReq != null){
+         plogger.trace("Add the roles req");
+         plan.add(rolesReq);
+        }
+        
+        plogger.trace("Have plan: " + plan.toXml());
+      
+      plogger.trace("Exit getDynamicRolesPlan");
+      return plan;
+   }
+   
+   public String getAttrReqValue(AccountRequest acctReq, String attrName){
+      plogger.trace("Enter getAttrReqValue");
+      String val = "";
+      AttributeRequest attrReq = acctReq.getAttributeRequest(attrName);
+      
+      if (attrReq != null){
+         val = attrReq.getValue();
+         if (val != null){
+            val = val.toString();
+         }
+      }
+   
+      plogger.trace("Exit getAttrReqValue: " + val);
+      return val;
+   }
+   
+   public AccountRequest getCreateAccountRequest(SailPointContext context, Identity identity, String app, String nativeId){
+      plogger.trace("Enter getCreateAccountRequest");
+      
+      String identityName = identity.getName();
+      
+      AccountRequest.Operation op = AccountRequest.Operation.Create;
+      AccountRequest acctReq = new AccountRequest(op, app, null, identityName);
+        
+        acctReq.setNativeIdentity( nativeId);
+   
+      plogger.trace("Exit getCreateAccountRequest");
+      return acctReq;
+   }
+   
+   public AccountRequest getUpdateAccountRequest(SailPointContext context, Identity identity, String app, String nativeId){
+      plogger.trace("Enter getUpdateAccountRequest");
+      
+      String identityName = identity.getName();
+      
+      AccountRequest.Operation op = AccountRequest.Operation.Modify;
+      AccountRequest acctReq = new AccountRequest(op, app, null, identityName);
+        
+        acctReq.setNativeIdentity( nativeId);
+   
+      plogger.trace("Exit getUpdateAccountRequest");
+      return acctReq;
+   }
+   
+   public void tryAppendDisableRequests(SailPointContext context, Identity identity, ProvisioningPlan plan){
+      plogger.trace("Enter tryAppendDisableRequests");
+      
+      try {
+         appendDisableRequests(context, identity, plan);
+      } catch (Exception e){
+         plogger.error("Exception appending disable requests: " + e.toString());
+      }
+      
+      plogger.trace("Exit tryAppendDisableRequests");
+   }
+   
+   public void tryAppendDisableRequests(SailPointContext context, String identityName, ProvisioningPlan plan){
+      plogger.trace("Enter tryAppendDisableRequests");
+      
+      try {
+         appendDisableRequests(context, identityName, plan);
+      } catch (Exception e){
+         plogger.error("Exception appending disable requests: " + e.toString());
+      }
+      
+      plogger.trace("Exit tryAppendDisableRequests");
+   }
+   
+   public void appendDisableRequests(SailPointContext context, String identityName, ProvisioningPlan plan){
+      plogger.trace("Enter appendDisableRequests");
+      
+      if (plan == null){
+         plogger.warn("No plan. Exit");
+         return;
+      }
+      
+      plogger.trace("Get the identity: " + identityName);
+      Identity identity = context.getObjectByName(Identity.class, identityName);
+      
+      
+      plogger.trace("Call the overloaded method");
+      appendDisableRequests(context, identity, plan);
+   }
+   
+   public void appendDisableRequests(SailPointContext context, Identity identity, ProvisioningPlan plan){
+      plogger.trace("Enter appendDisableRequests");
+      
+      if (plan == null){
+         plogger.warn("No plan. Exit");
+         return;
+      }
+      
+      if (identity == null){
+         plogger.warn("No identity.");
+         return;
+      }
+      
+      List reqs = plan.getAccountRequests("IIQ");
+      
+      List remRoles = new ArrayList();
+      List addRoles = new ArrayList();
+      List disableAccounts = new ArrayList();
+      
+      if (reqs == null || reqs.size() < 1){
+         plogger.debug("No IIQ reqs to process");
+         return;
+      }
+      
+      plogger.trace("Loop the account requests");
+      for (AccountRequest req : reqs){
+         List attrReqs = req.getAttributeRequests("assignedRoles");
+         
+         if (attrReqs != null && attrReqs.size() > 0){
+            for (AttributeRequest attrReq : attrReqs){
+               ProvisioningPlan.Operation attrOp = attrReq.getOp();
+               ProvisioningPlan.Operation remOp = ProvisioningPlan.Operation.Remove;
+               ProvisioningPlan.Operation addOp = ProvisioningPlan.Operation.Add;
+               
+               if (remOp.equals(attrOp)){
+                  Object roleVal = attrReq.getValue();
+                  
+                  if (roleVal instanceof List){
+                     remRoles.addAll(roleVal);
+                  } else {
+                     remRoles.add(roleVal);
+                  }
+                  
+               }
+               
+               if (addOp.equals(attrOp)){
+                  Object roleVal = attrReq.getValue();
+                  
+                  if (roleVal instanceof List){
+                     addRoles.addAll(roleVal);
+                  } else {
+                     addRoles.add(roleVal);
+                  }
+                  
+               }
+            }
+         }
+      }
+      
+      plogger.trace("Check if any roles being removed: " + remRoles);
+      if (remRoles == null || remRoles.size() < 1){
+         plogger.debug("No roles being removed.  Exit.");
+         return;
+      }
+      
+      plogger.trace("Get the currentRoles");
+      
+      List keeperRoles = new ArrayList();
+      
+      logger.trace("Check roles being added: " + addRoles);
+      if (addRoles != null && addRoles.size() > 0){
+         logger.trace("Add the new roles to the keeper roles");
+         keeperRoles.addAll(addRoles);
+      }
+      
+      ArrayList roleAssigns = identity.getRoleAssignments();
+      
+      if (roleAssigns != null){
+         plogger.debug("# currently assigned = " + roleAssigns.size());
+         
+         for (RoleAssignment roleAssign : roleAssigns){
+            String rName = roleAssign.getName();
+            plogger.debug("Have role assign: " + rName);
+            if (!remRoles.contains(rName)){
+               keeperRoles.add(rName);
+            }
+         }
+      }
+      
+      List rAppList = getFlatListOfProfileApps(context, remRoles);
+      List kAppList = getFlatListOfProfileApps(context, keeperRoles);
+      
+      plogger.trace("Now, remove from the removal apps list, " + rAppList + ", the keepers: " + kAppList);
+      rAppList.removeAll(kAppList);
+      
+      plogger.trace("We are left with: " + rAppList);
+      
+      if (rAppList.size() > 0){
+         plogger.trace("Create any disable requests");
+         
+         plogger.trace("Try doing a load first");
+         identity.load();
+         
+         plogger.trace("Now get the links");
+         List links = identity.getLinks();
+         
+         plogger.trace("Did that work? " + links);
+         
+         if (links == null || links.size() < 1){
+            plogger.warn("No links? Exit");
+            return;
+         }
+         
+         AccountRequest.Operation disOp = AccountRequest.Operation.Disable;
+         
+         plogger.trace("Loop the links");
+         for (Link link : links){
+            String lAppName = link.getApplicationName();
+            
+            plogger.trace("Check if app name in list: " + lAppName);
+            if (rAppList.contains(lAppName)){
+               String nativeId = link.getNativeIdentity();
+               
+               AccountRequest dReq = new AccountRequest(disOp, lAppName, null, nativeId);
+               
+               plogger.debug("Add disable account request to plan: " + dReq.toXml());
+               plan.add(dReq);
+            }
+         }
+      }
+      
+      plogger.trace("Exit appendDisableRequests: " + plan.toXml());
+   }
+   
+   public List getFlatListOfProfileApps(SailPointContext context, List roles){
+      plogger.trace("Enter getFlatListOfProfileApps: ");
+      List appNames = new ArrayList();
+      
+      boolean isSeven = false;
+      
+      String version = Version.getVersion();
+      
+      if (version != null && version.startsWith("7")){
+         isSeven = true;
+      }
+      
+      for (Object role : roles){
+         Bundle b = null;
+         if (role instanceof String){
+            b = context.getObjectByName(Bundle.class, role);
+         } else {
+            b = role;
+         }
+         
+         plogger.trace("Try loading the role?");
+         b.load();
+         
+         plogger.trace("Get hierarchy for role, " + b.getName());
+         //Collection reqs = b.getFlattenedRequirements();
+         List reqs = b.getRequirements();
+         
+         if (reqs != null && reqs.size() > 0){
+            plogger.trace("Loop the requirements: " + reqs);
+            
+            for (Bundle rb : reqs){
+               String rbName = rb.getName();
+               plogger.trace("Get the apps for role: " + rbName);
+               
+               Set apps = rb.getApplications();
+               
+               plogger.trace("Have apps set: " + apps);
+               if (apps != null && apps.size() > 0){
+               
+                  Iterator it = apps.iterator();
+                  
+                  while (it.hasNext()){
+                     Application app = it.next();
+                     String appName = app.getName();
+                     
+                     plogger.trace("Check if app in list: " + appName);
+                     
+                     if (!appNames.contains(appName)){
+                        plogger.trace("Add appName: " + appName);
+                        appNames.add(appName);
+                     }
+                  }
+               }
+               
+               
+               List templates;
+               
+               if (isSeven){
+                  templates = rb.getOldTemplates();
+               } else {
+                  templates = rb.getTemplates();
+               }
+               
+               if (templates != null && templates.size() > 0){
+                  
+                  for (Template t : templates){
+                     
+                     Application app = t.getApplication();
+                     String appName = app.getName();
+                     
+                     plogger.trace("Check if app in list: " + appName);
+                     
+                     if (!appNames.contains(appName)){
+                        plogger.trace("Add appName: " + appName);
+                        appNames.add(appName);
+                     }
+                  }
+               }
+            }
+         }
+         
+         plogger.trace("Decache and null out the role");
+         context.decache(b);
+         b = null;
+      }
+      
+      plogger.trace("Exit getFlatListOfProfileApps: " + appNames);
+      return appNames;
+   }
+   
+   public ProvisioningProject compileProject(SailPointContext context, Identity identity, ProvisioningPlan plan) {
+      plogger.trace("Enter testCompileProject");
+      ProvisioningProject project;
+      
+      if (plan != null) {
+           Provisioner provisioner = new Provisioner(context);
+           provisioner.setAssigner("spadmin");
+           
+           List iiqReqs = plan.getAccountRequests("IIQ");
+           boolean doReconcile = false;
+           List addRoles = new ArrayList();
+           List oldRoles = new ArrayList();
+           
+           
+           if (iiqReqs != null && iiqReqs.size() > 0){
+            AccountRequest iiqReq = iiqReqs.get(0);
+            
+            List attrReqs = iiqReq.getAttributeRequests();
+            
+            if (attrReqs != null && attrReqs.size() > 0){
+            
+               for (AttributeRequest attrReq : attrReqs){
+                  String name = attrReq.getName();
+                  
+                  if (name.compareTo("assignedRoles") == 0){
+                     String val = attrReq.getValue();
+                     Bundle b = context.getObjectByName(Bundle.class, val);
+                     
+                     ProvisioningPlan.Operation op = attrReq.getOperation();
+                     
+                     if (!op.equals(ProvisioningPlan.Operation.Remove)){
+                        addRoles.add(b);
+                     } 
+                        
+                     oldRoles.add(b);
+                     
+                  }
+               }
+               
+               if (addRoles.size() > 0 && oldRoles.size() > 0){
+                  //doReconcile = true;
+                  doReconcile = false;
+               }
+            }
+           }
+           
+           if (doReconcile){
+            plogger.trace("Run the reconcile versus compile");
+            project = provisioner.reconcile(identity,oldRoles,addRoles, new Attributes());
+           } else {
+            plogger.trace("Run compile");
+            project = provisioner.compile(identity,plan,false);
+           }
+      }
+      
+      plogger.trace("Return project: " + project.toXml());
+      return project;
+   }
+   
+   public void invokeDynamicMethod(String methodName, Object[]params) throws Exception{
+      plogger.trace("Call method: " + methodName + " with params: " + params);
+      this.invokeMethod(methodName, params);
+   }
+   
+   public List getPostProvProjectEmailArgs(SailPointContext context, ProvisioningProject project, 
+      Workflow workflow) {
+      plogger.trace("Enter getPostProvProjectEmailArgs");
+      
+      return getPostProvProjectEmailArgs(context, project, workflow, false);
+   }
+   
+   public Attributes initWorkflowAttributesVar(Workflow workflow, String key){
+      plogger.trace("Enter initWorkflowAttributesVar");
+      Attributes attrs = workflow.get(key);
+      
+      if (attrs == null){
+         attrs = new Attributes();
+      }
+      
+      plogger.trace("Exit initWorkflowAttributesVar");
+      return attrs;
+   }
+   
+   public List getPostProvProjectEmailArgs(SailPointContext context, ProvisioningProject project, 
+      Workflow workflow, boolean doSend) {
+      plogger.trace("Enter getPostProvProjectEmailArgs");
+
+      boolean sendStandardEmails = false;
+      
+      Object sendEmailProp = workflow.get("updateStandardPostProvEmails");
+      
+      if (sendEmailProp == null){
+         plogger.debug("The email prop is not present.  Not sending standard emails.");
+      } else {
+         if ((sendEmailProp instanceof String) && !sendEmailProp.equalsIgnoreCase("true")){
+            plogger.debug("The email prop is false.  Not sending standard emails.");
+         } else if ((sendEmailProp instanceof Boolean) && !sendEmailProp){
+            plogger.debug("The email prop is false.  Not sending standard emails.");
+            } else {
+                sendStandardEmails = true; 
+            }
+      }
+      
+      plogger.trace("Get the email texts mapping obj");
+      Custom mappingObj = getEmailTextsMappingObject(context);
+      
+      List emailArgList = workflow.get("emailArgList");
+      
+      if (emailArgList == null){
+         plogger.trace("Init new emailArgList");
+         emailArgList = new ArrayList();
+      } else {
+         if (doSend){
+            plogger.trace("doSend true so send all existing emails now");
+            try {
+               if (emailArgList.size() > 0){
+                     for (Map lArgs : emailArgList){
+                        EmailTemplate lTemplate = context.getObjectByName(EmailTemplate.class, lArgs.get("emailTemplate"));
+                        if (lTemplate == null){
+                            lTemplate = context.getObjectByName(EmailTemplate.class, lArgs.get("template"));
+                        }
+
+                        if (lTemplate == null){
+                           continue;
+                        }
+                     
+                     EmailOptions lOptions = new EmailOptions(lArgs.get("to"), lArgs);
+                     
+                     plogger.trace("Send email");
+                     context.sendEmailNotification(lTemplate, lOptions);
+                     }
+                     
+                     emailArgList = new ArrayList();
+                  }
+               } catch (Exception e){
+                  plogger.trace("Exception: " + e.toString());
+               }
+         }
+      }
+      
+      if (sendStandardEmails) {
+         Identity identity = context.getObjectByName(Identity.class,project.getIdentity());
+
+         plogger.trace("Project: " + project.toXml());
+         
+         List plans = project.getPlans();
+         plogger.trace("getPostProvProjectEmailArgs.  Have plans");
+         
+         if (plans == null){
+            plogger.trace("No plans");
+            return null;
+         }
+         
+         Iterator itPlans = plans.iterator();
+         
+         while (itPlans.hasNext()) {
+            plogger.trace("getPostProvProjectEmailArgs.  Get plan, errors, reqs.  ");
+            ProvisioningPlan plan = (ProvisioningPlan) itPlans.next();
+            List errors = getErrors(context,plan);
+            List reqs = plan.getAccountRequests();
+                   
+                if (reqs == null){
+                  plogger.trace("No requests");
+                  continue;
+                }
+                     
+            plogger.trace("getPostProvProjectEmailArgs.  Have reqs");
+               Iterator itReqs = reqs.iterator();
+                while (itReqs.hasNext()){
+                  AccountRequest acctReq = itReqs.next();
+                  plogger.trace("Have acctReq: " + acctReq.toXml());
+                     
+                  try {
+                     Map emailArgs = buildPostProvEmailArgs(context, acctReq, mappingObj, workflow, errors, identity);
+                     
+                     if (doSend){
+                        plogger.trace("here before getting template...");
+                        plogger.trace("Email args template = " + emailArgs.get("template"));
+                        EmailTemplate template = context.getObjectByName(EmailTemplate.class, emailArgs.get("emailTemplate"));
+                        if (template == null){
+                               template = context.getObjectByName(EmailTemplate.class, emailArgs.get("template"));
+                        }
+                        
+                        if (template == null){
+                              continue;
+                        }
+                           
+                        Map mArgs = new HashMap();
+                        mArgs.put("emailArgs", emailArgs);
+                        
+                        EmailOptions options = new EmailOptions(emailArgs.get("to"), mArgs);
+                        
+                        context.sendEmailNotification(template, options);
+                     } else {
+                        emailArgList.add(emailArgs);
+                     }
+                  } catch (Exception e){
+                     plogger.trace("Unable to add email args: " + e.toString());
+                     if (plogger.isTraceEnabled()){
+                        e.printStackTrace();
+                     }
+                  }
+                } // end while reqs iterator
+         } // end while plans iterator
+      }
+
+        if (null == emailArgList || emailArgList.isEmpty()) {
+           plogger.trace("Empty arg list.  Returning null.");  
+         return null;   
+        }
+
+      plogger.trace("Exit getPostProvProjectEmailArgs: " + emailArgList);     
+      return emailArgList;
+   }
+   
+   
+   private Map buildPostProvEmailArgs(SailPointContext context, AccountRequest acctReq, Custom mappingObj, 
+      Workflow workflow, List errors, Identity identity) throws Exception{
+      
+      plogger.trace("Eenter buildPostProvEmailArgs: ");
+      plogger.trace("Have acctReq: " + acctReq.toXml());
+      
+        String successTo = workflow.get("successTo");
+      String failureTo = workflow.get("failureTo");
+      String successTemplate = workflow.get("successTemplate");
+      String failureTemplate = workflow.get("failureTemplate");
+      
+       String appName = acctReq.getApplication();
+       String passwordVal = "";
+       
+       if (appName.compareTo("IIQ") != 0){
+            Application app = context.getObjectByName(Application.class, appName);
+            plogger.trace("Add the password");  
+         String passwordField = app.getAttributeValue("passwordField");
+         
+         if (passwordField != null){
+            AttributeRequest pAttr = acctReq.getAttributeRequest(passwordField);
+         
+            
+            if (pAttr != null){
+               passwordVal = pAttr.getValue();
+               passwordVal = context.decrypt(passwordVal);
+               
+            } 
+         } 
+         }
+         
+         if (passwordVal == null){
+            passwordVal = "";
+         }
+         
+      plogger.trace("getPostProvProjectEmailArgs.  Have app name: " + appName);
+                     
+         HashMap emailArgs = getBaseAcctReqArgs(context, acctReq);
+         addAttributeRequests(emailArgs, acctReq);
+                     
+         plogger.trace("Calc the status, to, and template");
+         String status = "Success";
+         String toAddress = successTo;
+         String template = successTemplate;
+                  
+         if (errors != null && errors.size() > 0){
+         status = "Failure";
+         emailArgs.put("errors", errors);
+         toAddress = failureTo;
+         template = failureTemplate;
+      }
+               
+      plogger.trace("getPostProvProjectEmailArgs. Status: " + status);
+         plogger.trace("getPostProvProjectEmailArgs. postToEmail: " + toAddress);
+         plogger.trace("getPostProvProjectEmailArgs. template: " + template);
+                     
+      emailArgs.put("postToEmail", toAddress);
+      emailArgs.put("to", toAddress);
+      emailArgs.put("status", status);
+      
+      emailArgs.put("template", template);
+      emailArgs.put("emailTemplate", template);
+      
+            
+      plogger.trace("Add the workflow variables");
+      Attributes vars = workflow.getVariables();   
+      if (vars != null && vars.size() > 0){
+         List skipVars = new ArrayList();
+         
+         skipVars.add("plan");
+         skipVars.add("project");
+         skipVars.add("approvalSet");
+         skipVars.add("emailArgList");
+         
+         List varKeys = vars.getKeys();
+      
+         for (String var : varKeys){
+            if (!skipVars.contains(var)){
+               Object varVal = vars.get(var);
+               
+               if (varVal != null){
+                  emailArgs.put(var, vars.get(var));
+               }
+            }
+         }
+      }
+      
+      
+      plogger.trace("Add the identity attributes");
+      Attributes idAttrs = identity.getAttributes();  
+      if (idAttrs != null && idAttrs.size() > 0){
+         
+         List keys = idAttrs.getKeys();
+      
+         for (String key : keys){
+         
+            Object idAttrVal = idAttrs.get(key);
+            
+            if (idAttrVal == null){
+               idAttrVal = "";
+            }
+            
+            emailArgs.put(key, idAttrVal);
+         }
+      }
+      
+         
+      plogger.trace("Add the request id");   
+      ProvisioningProject project = workflow.get("project");
+      
+      
+      if (project != null && project.getMasterPlan() != null && project.getMasterPlan().getArguments() != null){
+         
+         String requestID = project.getMasterPlan().getArguments().get("identityRequestId");
+         emailArgs.put("requestID", requestID != null ? requestID : "Unknown Request ID");
+      }
+      
+      emailArgs.put("password", passwordVal);
+      
+      plogger.trace("Add the custom text");  
+      String op = acctReq.getOperation().toString();
+      plogger.trace("here 6");
+      if (mappingObj == null){
+         plogger.trace("SP Email Text Custom object does not exist.");
+      }
+               
+      plogger.trace("Get email text entry for app: " + appName);
+      
+      Attributes entryObj = null;
+      
+      if (mappingObj.containsAttribute(appName)){
+         entryObj = mappingObj.get(appName);
+      }
+      
+      String customText = "";
+      
+      if (!(errors != null && errors.size() > 0)){
+         if (entryObj == null){
+            plogger.trace(appName + " entry not defined in SP Email Text Custom Custom object.");
+            
+         } else {
+            plogger.trace("Get the custom text for op: " + op);
+            
+            if (entryObj.containsKey(op)){
+               customText = entryObj.get(op);
+            }
+         }
+      }
+      
+      plogger.trace("Have custom text: " + customText);
+      emailArgs.put("customText", customText);
+      
+      plogger.trace("Exit buildPostProvEmailArgs: " + emailArgs);
+      return emailArgs;
+   }
+   
+   public List getErrors(SailPointContext context, ProvisioningPlan plan){
+      plogger.trace("Enter getErrors for Plan");
+      List errors = new ArrayList();
+      
+      if (plan == null){
+         plogger.warn("No plan");
+         return errors;
+      }
+      
+      plogger.trace("Have plan: " + plan.toXml());
+      
+      ProvisioningResult result = plan.getResult();
+      
+      errors.addAll(getErrors(result));
+      
+      if(plan.getAccountRequests() != null) {
+         plogger.trace("Loop account requests");
+         for(AccountRequest request : plan.getAccountRequests()) {
+            result = request.getResult();
+            
+            errors.addAll(getErrors(result));
+            
+            List attrReqs = request.getAttributeRequests();
+            
+            plogger.trace("Have the attr reqs");
+            if (attrReqs != null && !attrReqs.isEmpty()){
+            
+               plogger.trace("Loop the attr reqs");
+               for (AttributeRequest attrReq : attrReqs){
+                  result = attrReq.getResult();
+                  errors.addAll(getErrors(result));
+               }
+         }
+      }
+      }
+      
+      plogger.trace("Exit getErrors for plan: " + errors);
+      return errors;
+   }
+   
+   public List getErrors(ProvisioningResult result){
+      plogger.trace("Enter getErrors for Result");
+      List errors = new ArrayList();
+      if (result == null){
+         plogger.warn("No result");
+         return errors;
+      }
+      
+      plogger.trace("Have request result: " + result.toXml());
+      
+      if(result.getErrors() != null){
+         plogger.trace("Loop the request errors");
+         for (Message msg : result.getErrors()){
+            plogger.trace("Add error: " + msg.getMessage());
+            errors.add(msg.getMessage());
+         }
+      }
+      
+      if(result.getWarnings() != null){
+         plogger.trace("loop the request warnings");
+         for (Message msg : result.getWarnings()){
+            plogger.trace("Add warning: " + msg.getMessage());
+            errors.add(msg.getMessage());
+         }
+      }
+            
+      plogger.trace("Exit getErrors for Result: " + errors);
+      return errors;
+   }
+   
+   public List getErrors(SailPointContext context, ProvisioningProject project){
+      plogger.trace("Enter getErrors for Project");
+      List errors = new ArrayList();
+      
+      List plans = project.getPlans();
+      
+      if (plans == null || plans.isEmpty()){
+         plogger.warn("No plans to evaluate");
+         return errors;
+      }
+      
+      for (ProvisioningPlan plan : plans){
+         List e = getErrors(context, plan);
+         
+         if (e != null && !e.isEmpty()){
+            errors.addAll(e);
+         }
+      }
+      
+      plogger.trace("Exit getErrors for Project: " + errors);
+      return errors;
+   }
+   
+   public List getErrors(SailPointContext context, Workflow workflow){
+      plogger.trace("Enter getErrors for Workflow");
+      
+      ProvisioningProject project = workflow.get("project");
+      
+      if (project != null){
+         plogger.trace("Call getErrors with project");
+         return getErrors(context, project);
+      }
+      
+      return new ArrayList();
+   }
+   
+   public void setInactive(SailPointContext context, String identityName, boolean inactive){
+      plogger.trace("Enter setInactive");
+      
+      plogger.trace("The flag is: " + inactive);
+      
+      if (identityName == null){
+         plogger.warn("No identityName");
+         return;
+      }
+      
+      Identity identity = context.getObject(Identity.class, identityName);
+      
+      if (identity == null){
+         plogger.warn("No identity for " + identityName);
+         return;
+      }
+   
+      plogger.trace("Set the flag");
+      
+      ProvisioningPlan inactivePlan = new ProvisioningPlan();
+      inactivePlan.setIdentity(identity);
+      AccountRequest accReq = new AccountRequest();
+      accReq.setApplication(ProvisioningPlan.APP_IIQ);
+      accReq.add(new AttributeRequest("inactive",inactive));
+      inactivePlan.add(accReq);
+      Provisioner p = new Provisioner(context);
+      p.setNoLocking(true);
+      p.execute(inactivePlan);
+   
+      plogger.trace("Exit setInactive");
+   }
+   
+   public void setIdentityAttribute(SailPointContext context, String identityName, 
+      String attrName, Object attrVal){
+      plogger.trace("Enter setIdentityAttribute");
+      
+      plogger.trace("The attrName is: " + attrName + ", attrVal: " + attrVal);
+      
+      if (identityName == null){
+         plogger.warn("No identityName");
+         return;
+      }
+      
+      Identity identity = context.getObject(Identity.class, identityName);
+      
+      if (identity == null){
+         plogger.warn("No identity for " + identityName);
+         return;
+      }
+   
+      plogger.trace("Set the attribute");
+      ProvisioningPlan setAttPlan = new ProvisioningPlan();
+      setAttPlan.setIdentity(identity);
+      AccountRequest accReq = new AccountRequest();
+      accReq.setApplication(ProvisioningPlan.APP_IIQ);
+      accReq.add(new AttributeRequest(attrName, attrVal));
+      setAttPlan.add(accReq);
+      Provisioner p = new Provisioner(context);
+      p.setNoLocking(true);
+      p.execute(setAttPlan);
+   
+      plogger.trace("Exit setIdentityAttribute");
+   }
+   
+   private HashMap getBaseAcctReqArgs(SailPointContext context, AccountRequest acctReq){
+      plogger.trace("Enter getBaseAcctReqArgs");
+      HashMap emailArgs = new HashMap();
+      ProvisioningPlan.AccountRequest.Operation op = acctReq.getOperation();
+         String opString = op.toString();
+         String nativeId = acctReq.getNativeIdentity();
+         String appName = acctReq.getApplication();
+
+      emailArgs.put("op", opString);
+      emailArgs.put("accountName", appName);
+      emailArgs.put("nativeId", nativeId);
+      
+      plogger.trace("Exist getBaseAcctReqArgs: " + emailArgs);
+      return emailArgs;
+   }
+   
+   private void addAttributeRequests(HashMap emailArgs, AccountRequest acctReq){
+      plogger.trace("Enter addAttributeRequests");
+      List attrReqs = acctReq.getAttributeRequests();
+      List attrs = new ArrayList();
+      List attrDisplayNames = new ArrayList();
+      HashMap attrMap = new HashMap();
+      
+      //Application app = acctReq.getApplication(context);
+                  
+      //TODO:  do we want to remove password on failures or non creates?
+      if (attrReqs != null){
+         plogger.trace("Loop attribute requests");
+         for (AttributeRequest attrReq : attrReqs){
+            ProvisioningPlan.Operation attrOp = attrReq.getOperation();
+            String attrOpStr = "";
+            
+            if (attrOp != null){
+               attrOpStr = attrOp.toString();
+            }
+            
+            plogger.trace("Get attr name & value");
+            
+            String attrName = attrReq.getName();
+            Object attrVal = attrReq.getValue();
+            
+            String attr = attrOpStr + " Attribute:  " + attrName + " = " + attrVal;
+            
+            plogger.trace("Adding attribute: " + attr);
+            attrs.add(attr);
+            
+            //TODO:  Logic could be added to use the app and schema to get the display name
+            attrMap.put(attrName,attrVal);
+            attrDisplayNames.add(attrName);
+         }
+      }
+      
+      emailArgs.put("attributeMap", attrMap);
+      emailArgs.put("attributes", attrs);
+      emailArgs.put("attrDisplayNames", attrDisplayNames);
+      plogger.trace("Exit addAttributeRequests");
+   
+   }
+   
+   public Custom getEmailTextsMappingObject(SailPointContext context){
+      plogger.trace("Enter getEmailTextsMappingObject");
+      
+      Custom mappingObj = context.getObjectByName(Custom.class, "SPCONF Email Text Mappings Custom");
+      plogger.trace("Exit getEmailTextsMappingObject: " + mappingObj);
+      return mappingObj;
+   }
+   
+   public String getPolicyPassword(SailPointContext context, Identity identity, String appName){
+      plogger.trace("Enter getPolicyPassword");
+      String password = "";
+      PasswordGenerator pg = new PasswordGenerator(context);
+      
+        try {
+        
+         boolean isGood = false;
+         
+         while (!isGood){
+               if (identity != null && appName != null) {
+                   plogger.trace(" generatePolicyPassword : id " + identity.getName() + " and app: " + appName);
+                   Application app = (Application) context.getObjectByName(Application.class, appName);
+                   password = pg.generatePassword(identity, app);
+               } else {
+                   Identity idAdmin = (Identity) context.getObjectByName(Identity.class, "spadmin");
+                   plogger.trace(" generatePolicyPassword : Get the password driven " +
+                      "off of the sys config.");
+                   password = pg.generatePassword(idAdmin);
+               }
+               
+               
+               // SOME SPECIAL PROCESSING THAT IS LIKELY NOT NEEDED
+               /* 
+               String numChars = "0123456789";
+            String specialChars = "~!@#$%^&*()_+`-={}|\\][:\"\';<>?,./";
+            String passChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            String onlyChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0";
+               char[] charArray = password.toCharArray();
+               password = "";
+               plogger.trace("Loop over array");
+               for (int i = 0; i < charArray.length; i++) {
+                   char checkChar = charArray[i];
+                   if (specialChars.indexOf(checkChar) > -1 ) {
+                       plogger.trace("generatePolicyPassword :Found special char :"  + checkChar);
+                       checkChar = getRandomChar(passChars);
+                   }
+                   password += checkChar;
+               }
+   
+               // password = "4" + password;
+               plogger.trace("generatePolicyPassword :Password after removing specials is:"
+                       + password);
+               String firstChar = password.substring(0, 1);
+               
+               if ((numChars.indexOf(firstChar) > -1) || (specialChars.indexOf(firstChar) > -1) ) {
+                   char newChar = getRandomChar(onlyChars);
+                   password = newChar + password.substring(1);
+                   plogger.trace("generatePolicyPassword :newChar :" + newChar);
+               } 
+               
+               */
+               
+               
+               String numChars = "0123456789";
+            String specialChars = "~!@#$%^&*()_+`-={}|\\][:\"\';<>?,./";
+            String passChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            String onlyChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0";
+               char[] charArray = password.toCharArray();
+               
+               plogger.trace("Loop over array");
+               
+               String firstChar = password.substring(0, 1);
+               
+               if (! (specialChars.indexOf(firstChar) > -1) ) {
+                   isGood = true;
+               } 
+            }
+            
+      } catch (Exception e){
+         plogger.trace("Exception " + e.toString());
+      }
+      
+      plogger.trace("Exit getPolicyPassword");
+      return password;
+   }
+   
+   public Object runFrameworkRule(SailPointContext context, String ruleName, Map params){
+      plogger.trace("Enter runFrameworkRule: " + ruleName);
+      Object retVal = null;
+      boolean runRule = true;
+      
+      if (ruleName.indexOf(":") > 0){
+         String[] split = ruleName.split(":");
+         
+         String pref = split[0];
+         
+         if ("method".equalsIgnoreCase(pref)){
+            runRule = false;
+         }
+         
+         if ("method".equalsIgnoreCase(pref)  || "rule".equalsIgnoreCase(pref)){
+            ruleName = split[1];
+         }
+      }
+      
+      
+      if (runRule){
+      
+         Rule rule = context.getObjectByName(Rule.class, ruleName);
+         
+         if (rule == null){
+            plogger.trace("No rule object found for: " + ruleName);
+            return null;
+         }
+         
+         plogger.trace("Run the rule");
+         if(params == null){
+            plogger.trace("Params is null!");
+         }
+         else{
+            plogger.trace("Params is not null!");
+            plogger.trace("params = " + params.toString());
+         }
+   
+         retVal = context.runRule(rule, params);
+         if(retVal == null){
+            plogger.trace("retVal is null.");
+         }
+   
+         context.decache(rule);
+      
+      }else {
+      
+         Object[] methodParams = {context, params};
+         
+         
+         try {
+            plogger.trace("Dynamically invoke method: " + ruleName);
+            retVal = this.invokeMethod(ruleName, methodParams);
+         } catch (Exception e){
+            plogger.error("Exception with value of " + ruleName + ": " + e);
+            retVal = null;
+         }
+      }
+      
+      
+      plogger.trace("Have the return value: " + retVal);
+      plogger.trace("Exit runFrameworkRule: " + ruleName);
+      return retVal;
+   }
+   
+   
+   public void executeSQL(SailPointContext context, String appName, String sql){
+      plogger.trace("Enter executeSQL");
+   
+        try {
+           Application app = context.getObjectByName(Application.class, appName);
+           
+           String driver = app.getAttributeValue("driverClass");
+           String pref = "mysql";
+           String url = app.getAttributeValue("url");
+           String user = app.getAttributeValue("user");
+           String password = app.getAttributeValue("password");
+           
+           password = context.decrypt(password);
+           
+           Connection con = JdbcUtil.getConnection(driver, pref, url, user, password);
+           
+           plogger.trace("Build statements with sql: "+ sql);
+           
+           PreparedStatement stmt = con.prepareStatement(sql);
+           stmt.execute();    
+           plogger.trace("Execute statement");
+           stmt.close();
+           con.close();
+        } catch (Exception e){
+         plogger.trace("Error executing sql: " + e.toString());
+        }
+      
+      plogger.trace("Exit executeSQL");
+   }
+   
+   public Object getAttributeRequestValue(SailPointContext context, AccountRequest acctReq, String attrName, boolean blankDefault){
+      plogger.trace("Enter getAttributeRequestValue");
+      Object val = null;
+      AttributeRequest attrReq = acctReq.getAttributeRequest(attrName);
+      
+      plogger.trace("Have attrReq: " + attrReq);
+      
+      if (attrReq != null){
+         val = attrReq.getValue();
+      } 
+      
+      if (val == null && blankDefault){
+         val = "";
+      }
+      
+      plogger.trace("Exit getAttributeRequestValue: " + val);
+      return val;
+   }
+   
+   
+   ]]>
+   </Source>
+</Rule>

@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Form hidden="true" name="User Activity Report Form" type="Report">
+  <Section columns="2" label="rept_identity_roles_section_props" name="Identity Properties">
+    <Field columnSpan="1" displayName="report_filter_ids" helpKey="rept_input_app_activity_report_identities" multi="true" name="identities" type="Identity" value="ref:identities"/>
+    <Field columnSpan="1" displayName="report_filter_apps" helpKey="rept_input_app_activity_report_apps" multi="true" name="applications" type="Application" value="ref:applications"/>
+    <Field columnSpan="1" displayName="start_date" helpKey="rept_input_app_activity_report_start_date" name="startDate" type="date" value="ref:startDate"/>
+    <Field columnSpan="1" displayName="end_date" helpKey="rept_input_app_activity_report_end_date" name="endDate" type="date" value="ref:endDate">
+      <Attributes>
+        <Map>
+          <entry key="endDate" value="true"/>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field columnSpan="1" displayName="label_action" helpKey="rept_input_app_activity_report_action" multi="true" name="action" type="string" value="ref:action">
+      <AllowedValuesDefinition>
+        <Script>
+          <Source>
+                    import sailpoint.object.*;
+
+                    List items = new ArrayList();
+                    for(ApplicationActivity.Action action : ApplicationActivity.Action.values()) {
+                      List l2 = new ArrayList();
+                      l2.add(action.toString());
+                      l2.add(action.getMessageKey());
+                      items.add(l2);
+                    }
+                    return items;
+                </Source>
+        </Script>
+      </AllowedValuesDefinition>
+    </Field>
+    <Field columnSpan="1" displayName="result" helpKey="rept_input_app_activity_report_result" multi="true" name="result" type="string" value="ref:result">
+      <AllowedValuesDefinition>
+        <Script>
+          <Source>
+                    import sailpoint.object.*;
+
+                    List items = new ArrayList();
+                    for(ApplicationActivity.Result result : ApplicationActivity.Result.values()) {
+                      List l2 = new ArrayList();
+                      l2.add(result.toString());
+                      l2.add(result.getMessageKey());
+                      items.add(l2);
+                    }
+                    return items;
+                </Source>
+        </Script>
+      </AllowedValuesDefinition>
+    </Field>
+    <Field columnSpan="1" displayName="label_target" helpKey="rept_input_app_activity_report_target" name="target" value="ref:target"/>
+  </Section>
+</Form>
+</sailpoint>

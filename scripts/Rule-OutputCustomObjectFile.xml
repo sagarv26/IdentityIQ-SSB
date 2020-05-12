@@ -1,0 +1,164 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="OutputCustomObjectFile">
+   <Source>
+   <![CDATA[
+		import java.util.Iterator;
+		import java.util.List;
+		import java.util.Map;
+        import java.util.HashMap;
+        import java.util.ArrayList;
+        
+        import java.io.BufferedWriter;
+        import java.io.File;
+        import java.io.FileWriter;
+        import java.io.IOException;
+
+        import sailpoint.tools.Util;
+		import sailpoint.api.SailPointContext;
+		import sailpoint.api.certification.BaseCertificationBuilder;
+		import sailpoint.tools.GeneralException;
+        import sailpoint.object.*;
+        import sailpoint.integration.RequestResult;
+        import sailpoint.integration.JsonUtil;
+        import sailpoint.integration.ProvisioningPlan;
+
+        import org.apache.commons.logging.Log;
+        import org.apache.commons.logging.LogFactory;
+
+        import sailpoint.api.CertificationContext;
+        import sailpoint.api.IdentityHistoryService;
+        import sailpoint.api.ObjectUtil;
+        import sailpoint.api.SailPointContext;
+        import sailpoint.api.DatabaseVersionException;
+        import sailpoint.api.SailPointFactory;
+        import sailpoint.integration.IntegrationExecutor;
+        import sailpoint.integration.IntegrationManager;
+        import sailpoint.object.IntegrationConfig;
+        import sailpoint.tools.GeneralException;
+        import sailpoint.tools.Util;
+        import sailpoint.tools.xml.XMLObjectFactory;
+        import java.text.SimpleDateFormat;
+        import java.util.GregorianCalendar;
+        import java.util.Properties;
+        import java.util.TimeZone;
+        import java.text.ParseException;
+
+        import java.lang.StackTraceElement;
+        
+    public List getSailPointObjectClasses() throws GeneralException {
+    
+        List spClasses = new ArrayList();
+    
+        List xmlClasses = XMLObjectFactory.getAnnotatedClasses();
+        for (Class clazz : xmlClasses) {
+            if (SailPointObject.class.isAssignableFrom(clazz)) {
+
+                Class spClass = clazz.asSubclass(SailPointObject.class);
+    
+                try {
+                    SailPointObject obj = spClass.newInstance();
+                    if (!obj.isXml() && obj.hasAssignedScope()) {
+                        spClasses.add(spClass);
+                    }
+                }
+                catch (Exception e) {
+                    throw new GeneralException(e);
+                }
+            }
+        }
+        
+        return spClasses;
+    }   
+        
+        String result = "";
+        String outputByReturn = "";
+        
+        //modify the install date of your system to filter out objects that are part of the original install, remove ignored classes
+        //if you need to export
+        Date installDate = Util.stringToDate("%%INSTALL_DATE%%");
+        String listOfIgnoredClasses = "AccountGroup,ActivityConstraint,ActivityDataSource,ApplicationActivity,ApplicationScorecard,ArchivedCertificationEntity,ArchivedCertificationItem,AuditConfig,AuditEvent,AuthenticationQuestion,Bundle,BundleArchive,Capability,Category,Certification,CertificationAction,CertificationArchive,CertificationChallenge,CertificationDefinition,CertificationDelegation,CertificationEntity,CertificationGroup,CertificationItem,SPRight,DashboardContent,DashboardLayout,DashboardReference,Dictionary,DictionaryTerm,EntitlementGroup,Form,GenericConstraint,GroupFactory,GroupDefinition,GroupIndex,Identity,IdentityArchive,IdentityDashboard,IdentitySnapshot,IdentityHistory,IdentityRequest,IdentityTrigger,JasperTemplate,JasperResult,Link,ManagedAttribute,MiningConfig,MitigationExpiration,MessageTemplate,Policy,PolicyViolation,Process,ProcessLog,Profile,ProvisioningRequest,RemediationItem,Request,RequestDefinition,RightConfig,RoleIndex,RoleMetadata,RoleMiningResult,RoleScorecard,RuleRegistry,Schema,Scope,ScoreConfig,Scorecard,SignOffHistory,SODConstraint,Tag,Target,TargetAssociation,TargetSource,TaskResult,TaskSchedule,TimePeriod,WorkflowCase,WorkflowTarget,WorkItem,WorkItemArchive,WorkItemConfig";
+        
+        
+        List classesToIgnore = Util.csvToList(listOfIgnoredClasses);
+
+        Calendar fuzzCalendar = Calendar.getInstance();
+        fuzzCalendar.setTime(installDate);
+        
+        //fuzzCalendar.add(Calendar.DAY_OF_YEAR, 1);
+        
+        
+        try {
+            
+            List objectTypes = getSailPointObjectClasses();
+            
+            String objectTypesString = "ObjectTypes=";
+            for (Class clazz : objectTypes) {
+                String qualifiedClassName = clazz.getName();
+                int idx = qualifiedClassName.lastIndexOf(".");
+                String shortClassName = null;
+                if(idx != -1) {
+                    shortClassName = qualifiedClassName.substring(idx + 1, qualifiedClassName.length());
+                }
+                
+                if(!classesToIgnore.contains(shortClassName)) {
+                    objectTypesString = objectTypesString + shortClassName + ",";
+                }
+            }
+            
+            objectTypesString = objectTypesString.substring(0, objectTypesString.length() - 1);
+            outputByReturn = outputByReturn + objectTypesString + "\n";
+                        
+            for (Class clazz : objectTypes) {
+                String qualifiedClassName = clazz.getName();
+                int idx = qualifiedClassName.lastIndexOf(".");
+                String shortClassName = null;
+                if(idx != -1) {
+                    shortClassName = qualifiedClassName.substring(idx + 1, qualifiedClassName.length());
+                }
+                
+                if(!classesToIgnore.contains(shortClassName)) {
+                
+                    List objects = context.getObjects(clazz);
+                    outputByReturn = outputByReturn + shortClassName + "=";
+                    
+                    String outputObjectNames = "";
+                    
+                    for(SailPointObject objectToCheck : objects) {
+                        Date created = objectToCheck.getCreated();
+                        Date modified = objectToCheck.getModified();
+                        Date cutoff = fuzzCalendar.getTime();
+                        String objectName = objectToCheck.getName();
+                        
+                        if( ((created != null) && (created.after(cutoff)))  || ((modified != null) && (modified.after(cutoff))) )  {
+                            outputObjectNames = outputObjectNames + objectName + ",";
+                        }
+                        context.decache(objectToCheck);
+                    }
+                    
+                    if(outputObjectNames.length() > 0) {
+                        outputObjectNames = outputObjectNames.substring(0, outputObjectNames.length() - 1);
+                        outputByReturn = outputByReturn + outputObjectNames;
+                    }
+                    
+                    outputByReturn  = outputByReturn + "\n";
+                }
+            }
+
+        }  catch (Throwable th) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            th.printStackTrace(pw);
+            if(sw != null) {
+                result += "\n" + sw.toString();
+            }
+        }
+
+        return outputByReturn;
+
+
+   ]]>
+   </Source>
+</Rule>
+</sailpoint>
