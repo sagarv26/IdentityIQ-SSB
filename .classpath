@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="externaltools/SST_JUnitIdentityIQHelper/src"/>
+	<classpathentry kind="src" path="servicestools"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="externaltools/SST_JUnitIdentityIQHelper/jar/IdentityIQJUnitHelper.jar"/>
+	<classpathentry kind="lib" path="lib/ant-contrib-1.0b3.jar"/>
+	<classpathentry kind="lib" path="lib/ant/etc/ant-bootstrap.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-antlr.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-apache-bcel.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-apache-bsf.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-apache-log4j.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-apache-oro.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-apache-regexp.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-apache-resolver.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-apache-xalan2.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-commons-logging.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-commons-net.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-jai.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-javamail.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-jdepend.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-jmf.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-jsch.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-junit.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-junit4.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-launcher.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-netrexx.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-swing.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant-testutil.jar"/>
+	<classpathentry kind="lib" path="lib/ant/lib/ant.jar"/>
+	<classpathentry kind="lib" path="lib/AntelopeTasks_3.5.3.jar"/>
+	<classpathentry kind="lib" path="lib/catalina-ant.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang-2.6.jar"/>
+	<classpathentry kind="lib" path="lib/services-tools.jar"/>
+	<classpathentry kind="lib" path="lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="SSDDeployer.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/ssb-plugin-importer.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/activation.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/ant.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/antlr-2.7.6.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/arial.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/asm-3.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/aspectjrt-1.8.9.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/axiom-api-1.2.12.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/axiom-dom-1.2.12.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/axiom-impl-1.2.12.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/axis.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/axis2-adb-1.6.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/axis2-kernel-1.6.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/axis2-saaj-1.6.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/axis2-transport-http-1.6.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/axis2-transport-local-1.6.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/batik-awt-util-1.6-1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/batik-ext-1.6-1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/batik-gui-util-1.6-1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/batik-util-1.6-1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/bcpkix-jdk15on-1.56.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/bcprov-ext-jdk15on-156.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/bcprov-jdk15on-1.56.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/bsf.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/bsh-2.1.8.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/cerner.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/cglib-2.2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-beanutils.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-beanutils-bean-collections.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-beanutils-core.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-codec-1.9.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-collections-3.2.2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-dbcp-1.4.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-digester-1.7.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-discovery-0.2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-fileupload-1.3.2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-httpclient.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-io-1.4.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-javaflow-20060411.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-lang-2.6.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-logging-1.1.3.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-logging-adapters-1.1.3.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-logging-api-1.1.3.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-net-1.4.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-pool-1.6.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/commons-validator-1.3.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/connectorBundle.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/cssparser-0.9.7.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/easymock.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/easymockclassextension.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/ehcache-1.6.0-beta3.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/esapi-2.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/flexjson-2.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/ganymed-ssh2-build209-1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/gdata-appsforyourdomain-1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/gdata-client-1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/gdata-core-1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/geronimo-annotation_1.1_spec-1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/geronimo-stax-api_1.0_spec-1.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/GMCClientApp.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/grac_request_details.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/grac_risk_analysis_wout_no_ws.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/grac_user_access.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/grc_audit_log.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/gson-2.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/guava-11.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/guice-3.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/hibernate-3.5.2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/hk2-api-2.4.0-b34.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/hk2-locator-2.4.0-b34.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/hk2-utils-2.4.0-b34.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/httpclient-4.3.6.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/httpcore-4.3.3.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/Human_ResourcesService.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/identityiq.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/IDMfw.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/IntegrationService24.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/iText-2.1.6.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/j2ssh-ant-0.2.9.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/j2ssh-common-0.2.9.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/j2ssh-core-0.2.9.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/j2ssh-daemon-0.2.9.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jackson-core-asl-1.8.9.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jackson-mapper-asl-1.8.9.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jakarta-oro-2.0.8.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jasperreports-javaflow-4.5.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/javassist.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/javax.annotation-api-1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/javax.faces-2.1.26.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/javax.inject-1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/javax.jms.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jawr-2.6.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jaxb-api-2.2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jaxb-impl-2.2.1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jaxen-1.1.3.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jaxrpc.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jaxrs-ri-2.22.2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jcommon-1.0.17.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jdt-compiler-3.1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jersey-apache-connector-2.17.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jersey-guava-2.22.2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jersey-media-multipart-2.22.2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jfreechart-1.0.14.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jline-0.9.94.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jms.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/joda-time-1.6.2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jose4j-0.5.5.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jpa.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/js.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/json.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/json-path-2.2.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jstl-1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jt400.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jta-1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/jtidy-r938.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/juniversalchardet-1.0.3.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/ldapbp.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/lucene-core-3.5.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/lucene-demo-3.5.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/mail.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/mex-1.6.1-impl.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/mimepull-1.9.6.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/mysql-connector-java-5.1.28-bin.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/NCSO.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/neethi-3.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/netsuite.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/ojdbc6.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/okhttp-2.0.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/okio-1.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/opensaml-2.5.3.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/openws-1.4.4.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/owasp-java-html-sanitizer-20170515.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/p6spy.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/quartz-2.2.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/rampart-core-1.6.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/rampart-policy-1.6.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/rampart-trust-1.6.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/relaxngDatatype-2.2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/richfaces-components-api-4.3.2.Final.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/richfaces-components-ui-4.3.2.Final.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/richfaces-core-api-4.3.2.Final.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/richfaces-core-impl-4.3.2.Final.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/rsa-ws-7.1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/rsa-ws-8.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/rsa-ws-8.2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/saaj.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/sac-1.3.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/sapidoc3.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/scim-common.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/scim-sdk-1.8.14.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/scim-server.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/sigar.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/slf4j-api-1.5.11.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/slf4j-log4j12-1.5.11.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/soap.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/spring-aop-4.3.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/spring-beans-4.3.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/spring-context-4.3.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/spring-core-4.3.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/spring-dao-2.0.8.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/spring-expression-4.3.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/spring-jdbc-4.3.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/spring-jms-4.3.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/spring-orm-4.3.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/spring-support-2.0.8.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/spring-web-4.3.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/sqljdbc4.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/stax-api-1.0-2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/TenroxStub.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/Text_JDBC40.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/tomahawk20-1.1.14.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/tools.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/twilio-java-sdk-3.4.1.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/validation-api-1.1.0.Final.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/velocity-1.5.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/woden-api-1.0M9.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/woden-impl-commons-1.0M9.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/woden-impl-dom-1.0M9.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/workflow.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/wsdl4j-1.6.2.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/wss4j-1.5.12.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/wssdk.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/wstx-asl-3.2.9.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/xalan-2.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/XmlSchema-1.4.7.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/xmlsec-1.4.6.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/xmltooling-1.3.4.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/xmlunit-1.3.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/xpp3.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/xsom-20081112.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Apache Software Foundation/Tomcat 8.5/webapps/identityiq/WEB-INF/lib/yuicompressor-2.4.2.jar"/>
+	<classpathentry kind="lib" path="D:/Drivers/hamcrest-core-1.3.jar"/>
+	<classpathentry kind="lib" path="D:/Drivers/junit-4.12.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

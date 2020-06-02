@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Decrypt">
+  <Source>
+import java.util.*;
+import sailpoint.object.*;
+
+
+String data = "1:nbZ1jQGAlhhtDW7kpGiVaw==";
+
+return context.decrypt(data);
+ </Source>
+</Rule>
+</sailpoint>

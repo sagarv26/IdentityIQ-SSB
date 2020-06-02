@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Report Completion Notification" type="TaskEventRule">
+  <Description>
+    This rule sends a notification email when a report is completed.
+  </Description>
+  <Signature returnType="Map">
+    <Inputs>
+      <Argument name="taskResult">
+        <Description>
+          The TaskResult object
+        </Description>
+      </Argument>
+      <Argument name="event">
+        <Description>
+          The TaskEvent object
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="taskResult">
+        <Description>The resulting task result object, or null if no update is required.</Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+      
+        import sailpoint.object.*;
+        import java.util.*;
+
+        String identity = (String)event.getAttribute(TaskEvent.ATTR_EMAIL_RECIP);
+
+        if (identity != null){
+
+          Identity identity = context.getObjectByName(Identity.class, identity);
+          if (identity == null)
+            return result;
+
+          List emailAddresses = new ArrayList();
+          emailAddresses.add(identity.getEmail());
+          EmailOptions options = new EmailOptions(emailAddresses, null);
+          options.setSendImmediate(true);
+
+          Map emailVars = new HashMap();
+          emailVars.put("reportName", taskResult.getName());
+          options.setVariables(emailVars);
+
+          String templateName = (String)context.getConfiguration().get(Configuration.REPORT_COMPLETION_EMAIL_TEMPLATE);
+          EmailTemplate et = context.getObjectByName(EmailTemplate.class, templateName);
+
+          context.sendEmailNotification(et, options);
+        }
+
+        return null;
+      
+</Source>
+</Rule>
+</sailpoint>

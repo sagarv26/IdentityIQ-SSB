@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="All Objects" type="RequestObjectSelector">
+  <Description>Allows all objects to be selected (no filtering)</Description>
+  <Signature returnType="sailpoint.object.Filter">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="requestor" type="sailpoint.object.Identity">
+        <Description>
+          Identity that is making the Life Cycle Manager request.
+        </Description>
+      </Argument>
+      <Argument name="requestee" type="sailpoint.object.Identity">
+        <Description>
+          Identity on whose behalf the Life Cycle Manager request is being made.  In the case of bulk requests,
+          this argument will be set to null when determining the roles that are visible to the requestor.
+          It will be provided once a selection has been made in order to determine whether or not the given requestee
+          should have access to the selected role.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="filter">
+        <Description>
+          A Filter object that will be used to search for accessible request objects.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>import sailpoint.object.QueryInfo;
+
+return new QueryInfo(null, false);</Source>
+</Rule>
+</sailpoint>

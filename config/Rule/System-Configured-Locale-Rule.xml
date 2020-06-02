@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="System Configured Locale Rule" type="FieldValue">
+  <Description>
+    This rule returns the locales configured in the System Configuration.
+  </Description>
+  <Signature returnType="java.util.List">
+    <Inputs>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="locales">
+        <Description>
+          A list containing the locales found in the System Configuration.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+      import java.util.*;
+     Map sysConfig = context.getConfiguration().getAttributes();
+     List locales = sysConfig.get("supportedLanguages");
+     return locales;
+</Source>
+</Rule>
+</sailpoint>

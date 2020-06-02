@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="CEFTransformRule" type="ActivityTransformer">
+  <Description>ActivityTransformation Rules are used by the LogFileCollector to transform fields parsed from a text file into our ApplicationActivity model.</Description>
+  <Signature returnType="String">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="action">
+        <Description>
+          The field named action, which is the raw parsed.
+          action field.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="mappedAction">
+        <Description>
+          A normalized ApplicationActivity.Action object.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>import sailpoint.object.ApplicationActivity.Action;
+import sailpoint.object.ApplicationActivity.Result;
+import java.text.SimpleDateFormat;
+import java.io;
+import sailpoint.object.Configuration;
+import java.util.List;
+
+activity.setAction(Action.Grant);
+activity.setResult(Result.Success);
+
+//Dump out all params from CEF log entry to console
+//System.out.println("CEFTransformRule: In rule");        
+//System.out.println("CEFTransformRule: Timestamp=" +cef_timestamp);
+//System.out.println("CEFTransformRule: Host=" +cef_host);
+//System.out.println("CEFTransformRule: CEFVersion=" + cef_cefversion);
+//System.out.println("CEFTransformRule: Vendor=" + cef_vendor);
+//System.out.println("CEFTransformRule: Product=" + cef_product);
+//System.out.println("CEFTransformRule: Version=" + cef_version);
+//System.out.println("CEFTransformRule: Signature=" + cef_signature);
+//System.out.println("CEFTransformRule: Name=" + cef_name);
+//System.out.println("CEFTransformRule: Severity=" + cef_severity);
+//System.out.println("CEFTransformRule: Explanation=" + cef_explanation);
+
+//Find the user parameter in CEF Explanation field
+//System.out.println("CEFTransformRule: Breaking down the parameter list.....:");
+
+Object o= Configuration.getSystemConfig().getList(Configuration.ATT_CEF_USER_NAME);
+List cefUserNames = null;
+if (o instanceof List) {
+            cefUserNames = (List)o;
+}
+
+for (String paramPair: cef_explanation.split("\\s(?=\\S*(?&lt;!\\\\)=)", 0)){
+//	System.out.println("CEFTransformRule: Parameter pair found " + paramPair);
+    for(String cefUser: cefUserNames){
+        String cefUserParam = cefUser.concat("=.*");
+        if (paramPair.matches(cefUserParam)) {
+            cef_user = paramPair.split("=",2)[1];
+//            System.out.println("CEFTransformRule: duser parameter found! " + cef_user);
+        }
+    }   
+}
+
+// Set activity values
+activity.setUser(cef_user);
+activity.setAction(Action.Login);
+activity.setResult(Result.Success);
+activity.setInfo("vendor=" + cef_vendor + " host=" + cef_host + " " + cef_explanation + " severity=" + cef_severity + " product=" + cef_product);
+activity.setTarget(cef_name);
+
+// Set timestamp from CEF header, but add current year as this is not supplied
+SimpleDateFormat f = new SimpleDateFormat("MMM dd hh:mm:ss yyyy");
+defaultYear = Calendar.getInstance().get(Calendar.YEAR);
+Date date = date = f.parse(cef_timestamp + " " + defaultYear);
+activity.setTimeStamp(date);
+
+return activity;</Source>
+</Rule>
+</sailpoint>

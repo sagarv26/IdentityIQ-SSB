@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Privileged Access Report Validation Rule" type="ReportValidator">
+  <Description>
+      This rule validates the Privileged Access Report Form
+    </Description>
+  <Signature returnType="java.util.List">
+    <Inputs>
+      <Argument name="context">
+        <Description>
+            A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+          </Description>
+      </Argument>
+      <Argument name="report">
+        <Description>
+            The report object
+          </Description>
+      </Argument>
+      <Argument name="form">
+        <Description>
+            The submitted sailpoint Form object.
+          </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="messages">
+        <Description>
+            A list of error messages.
+          </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+      
+       import java.util.*;
+       import sailpoint.object.*;
+       import sailpoint.tools.Message;
+       List messages = new ArrayList();
+
+       Form.Section section = form.getSection("Privileged Account Attributes");
+       if (section != null) {
+         boolean found = false;
+         for(FormItem item : section.getItems()){
+           Field field = (Field)item;
+           if(field.getValue() != null &amp;&amp; !field.getValue().equals("") &amp;&amp; !field.getValue().equals("null")) {
+             found = true;
+           }
+         }
+
+         if (!found) {
+           messages.add(Message.localize("rept_priv_access_err_no_attr"));
+         }
+       } else {
+         messages.add(Message.localize("rept_priv_attr_setup_needed"));
+       }
+
+       return messages;
+      
+  </Source>
+</Rule>
+</sailpoint>

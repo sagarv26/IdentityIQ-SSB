@@ -7,12 +7,12 @@
       <entry key="SQL" value="SELECT * FROM `hr_emp`"/>
       <entry key="acctAggregationEnd">
         <value>
-          <Date>1530701521937</Date>
+          <Date>1588580535878</Date>
         </value>
       </entry>
       <entry key="acctAggregationStart">
         <value>
-          <Date>1530701520046</Date>
+          <Date>1588580533596</Date>
         </value>
       </entry>
       <entry key="afterProvisioningRule"/>

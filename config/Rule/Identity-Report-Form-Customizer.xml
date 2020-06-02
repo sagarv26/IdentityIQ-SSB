@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Identity Report Form Customizer" type="ReportCustomizer">
+  <Description>
+    This rule populates a form with fields for the standard and extended identity attributes.
+  </Description>
+  <Signature returnType="Map">
+    <Inputs>
+      <Argument name="locale">
+        <Description>
+          The current user's locale
+        </Description>
+      </Argument>
+      <Argument name="report">
+        <Description>
+          The base report
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>
+       
+        import sailpoint.object.*;
+        import sailpoint.reporting.ReportingLibrary;
+
+        ObjectConfig identityConfig = ObjectConfig.getObjectConfig(Identity.class);
+        List standardAttributes = new ArrayList();
+        standardAttributes.add(identityConfig.getObjectAttributeMap().get("firstname"));
+        standardAttributes.add(identityConfig.getObjectAttributeMap().get("lastname"));
+        standardAttributes.add(identityConfig.getObjectAttributeMap().get("displayName"));
+        standardAttributes.add(identityConfig.getObjectAttributeMap().get("email"));
+        standardAttributes.add(identityConfig.getObjectAttributeMap().get("manager"));
+        standardAttributes.add(identityConfig.getObjectAttributeMap().get("inactive"));
+
+        ReportingLibrary.addAttributes(context, report, Identity.class, standardAttributes, null,
+          "Identity Attributes", locale, "id");
+
+        List extendedAttrs = new ArrayList();
+        for(ObjectAttribute att : identityConfig.getSearchableAttributes()){
+          if (!att.isStandard())
+            extendedAttrs.add(att);
+        }
+
+        for(ObjectAttribute att : identityConfig.getMultiAttributeList()){
+            extendedAttrs.add(att);
+        }
+
+        ReportingLibrary.addAttributes(context, report, Identity.class, extendedAttrs, null,
+          "Identity Extended Attributes", locale, "id");
+
+
+       
+</Source>
+</Rule>
+</sailpoint>

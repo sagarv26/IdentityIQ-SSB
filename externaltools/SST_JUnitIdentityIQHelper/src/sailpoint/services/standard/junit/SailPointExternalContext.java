@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 
 import sailpoint.api.SailPointContext;
 import sailpoint.api.SailPointFactory;
+import sailpoint.connector.ExpiredPasswordException;
 import sailpoint.launch.Launcher;
 import sailpoint.spring.SpringStarter;
 import sailpoint.tools.BrandingServiceFactory;
@@ -156,7 +157,7 @@ public class SailPointExternalContext {
 	}
 
 	public SailPointContext getSailPointContext(String username, String password)
-			throws GeneralException {
+			throws GeneralException, ExpiredPasswordException {
 
 		setUsername(username);
 		setPassword(password);
@@ -165,7 +166,7 @@ public class SailPointExternalContext {
 	}
 	
 
-	public SailPointContext getSailPointContext() throws GeneralException {
+	public SailPointContext getSailPointContext() throws GeneralException, ExpiredPasswordException {
 		
 		if (context == null) {
 			if (log.isDebugEnabled())log.debug("Creating a context.");

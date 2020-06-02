@@ -1,0 +1,193 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="WindowsActivityRuleLibrary">
+  <Source>
+    
+      import java.util.HashMap;
+      import java.util.ArrayList;
+      import java.util.List;
+      import sailpoint.object.ApplicationActivity;
+      import sailpoint.object.ApplicationActivity.Action;
+      import sailpoint.tools.xml.*;
+
+      public static String ACCESSES = "Accesses";
+      public static String PRIVS = "Privileges";
+
+      /**
+       * Build a name,value Map pairing of the data found
+       * in the Message field of the windows event.
+       * Most of the low-level data is usually stored 
+       * there using a "name : value \n" format, so parse
+       * out those values so we can use them when 
+       * building our activity.
+       */
+      public HashMap buildMapFromMessage(String message) {
+  
+          HashMap attributeMap = new HashMap();
+          if ( message == null ) return attributeMap;
+
+          StringTokenizer st = new StringTokenizer(message, "\n");
+          int tokenNum = 0;
+          while ( st.hasMoreTokens() ) {
+              tokenNum++;
+              String token = st.nextToken();
+//System.out.println("token :" + token);
+              String[] values = token.split(":");
+              if ( values == null ) continue;
+              if ( values.length == 2 ) {
+                  String name = values[0];
+                  String value = values[1];
+                  if ( ( name != null ) &amp;&amp; ( value != null ) ) {
+//System.out.println("name: " + name.trim() + " value: " + value.trim());
+                      attributeMap.put(name.trim(), value.trim());
+                  }
+              } else 
+              if ( (values.length == 1) &amp;&amp; (tokenNum == 1) ) {
+                  String name = values[0];
+                  attributeMap.put("action", name.trim());
+              }
+          }
+          // Parse out privs 
+          addPrivileges(attributeMap, message); 
+
+          return attributeMap;
+      }
+
+      /** 
+       * Some events, mostly Object Access events contain
+       * Accesses, Privleges that need to be parsed further.
+       * This is called, when we build a Map if the Message.
+       */
+      public void addPrivileges(HashMap extraInfo, String message) {
+
+          if ( message== null ) return;
+          int i = message.indexOf(ACCESSES);
+          if ( i == -1 ) {
+//System.out.println(ACCESSES + " not found");
+              return;
+          }
+          int j = message.indexOf(PRIVS);
+          if ( j == -1 ) {
+//System.out.println(PRIVS + " not found");
+              return;
+          }
+
+          List accesses = new ArrayList();
+          String lastBlock = message.substring(i+ACCESSES.length(), j-1);
+          if ( lastBlock != null ) {
+//System.out.println("***lastBlock: " + lastBlock);
+              StringTokenizer st = new StringTokenizer(lastBlock, "\n");
+              while ( st.hasMoreTokens() ) {
+                  String access = st.nextToken();
+                  if ( access != null ) {
+                      String trimed = access.trim();
+                      if ( trimed.length() &gt; 0 ) {
+//System.out.println("access: '" + trimed + "'");
+                          accesses.add(trimed);
+                      }
+                  }
+              }
+          }
+
+          if ( accesses.size() &gt; 0 ) {
+              extraInfo.put(ACCESSES, accesses);
+          }
+      }
+
+      /**
+       * Given the eventCode from the native windows event
+       * map it to our Action.
+       */
+      public Action resolveAction(Integer eventCode, HashMap extraInfo) {
+          Action action = null;
+
+          if ( eventCode == null ) {
+              return;
+          }
+
+          try {
+              switch(eventCode) {
+                  case 538:
+                      // logout
+                      action = Action.Logout;
+                      break;
+                  case 528:
+                  case 540:
+                      // login
+                      action = Action.Login;
+                      break;
+                  case 564:
+                      // object delted
+                      action = Action.Delete;
+                      break;
+                  case 560:
+                      // object open
+                      // Very generic must dig in an check permissions
+                      if (containsAccess("WriteAttributes", extraInfo))
+                          action = Action.Update;
+                      else
+                      if ( containsAccess("DELETE", extraInfo) ) 
+                          action = Action.Delete;
+                      else 
+                          action = Action.Read;
+                      break;
+                  default: 
+                      // not sure we should even have a default case?
+                      action = Action.Read;
+                      break;
+              }
+          } catch(Exception e) {
+              action = null;
+          }
+          return action;
+      }
+
+      /** 
+       * Using the resolved action, use the data in the extraInfo
+       * map to come up with a target. ( the thing that was acted upon)
+       */
+      public String resolveTarget(Action action, HashMap extraInfo) {
+
+          String target = null;    
+          if ( ( action == null ) || ( extraInfo == null )  ) {
+              return target;
+          }
+
+          if ( ( action.equals(Action.Login) ) ||
+               ( action.equals(Action.Logout) ) ) {
+              target = (String)extraInfo.get("Domain");
+          } else {
+              target = (String)extraInfo.get("Object Name");
+          }
+
+          if ( target == null ) target = "unResolved";
+          return target;
+      }
+
+
+      /** 
+       * Dig into the extra info and see if the event has referece to 
+       * the past in access. 
+       */
+      private boolean containsAccess(String access, HashMap extraInfo) {
+
+          boolean contains = false;
+          if ( extraInfo == null ) return contains;
+
+          ArrayList accesses = (ArrayList)extraInfo.get(ACCESSES); 
+          if ( accesses != null ) {
+              for ( String access: accesses ) {
+                  if ( access != null ) {
+                      if ( access.compareTo(access) == 0 ) {
+                          return true;
+                      }
+                  }
+              }        
+          }
+          return contains;
+      }
+    
+  </Source>
+</Rule>
+</sailpoint>

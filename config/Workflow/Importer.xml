@@ -1,0 +1,165 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Workflow explicitTransitions="true" name="Importer" type="">
+<Variable name="result" output="true"/>
+<Variable name="transient" initializer="true"/>
+<Variable input="true" name="resource"/>
+<Variable input="true" name="operation"/>
+<Variable name="payload" type="java.lang.Object" output="true"/>
+<Step icon="Start" name="Start" posX="67" posY="354">
+<Script>
+<Source>
+<![CDATA[
+serilog=org.apache.commons.logging.LogFactory.getLog("sailpoint.iiqda.Importer"); serilog.debug("operation="+operation);
+]]>
+</Source>
+</Script>
+<Transition to="Import">
+<Script>
+<Source>
+<![CDATA[ return "Import".equals(operation); ]]>
+</Source>
+</Script>
+</Transition>
+<Transition to="Get Object Types">
+<Script>
+<Source>
+<![CDATA[ return "getObjectTypes".equals(operation); ]]>
+</Source>
+</Script>
+</Transition>
+<Transition to="Get Objects" when="getObjects.equals(operation);"/>
+<Transition to="Get Latest Objects" when="getLatestObjects.equals(operation);"/>
+<Transition to="Get Object" when="getObject.equals(operation);"/>
+<Transition to="Get Jar Size" when="jarSize.equals(operation);"/>
+<Transition to="Get Jar Data" when="jarData.equals(operation);"/>
+<Transition to="Get Task List" when="getTaskList.equals(operation);"/>
+<Transition to="Run Task" when="runTask.equals(operation);"/>
+<Transition to="Terminate Task" when="terminateTask.equals(operation);"/>
+<Transition to="Get Task Result" when="getTaskResult.equals(operation);"/>
+<Transition to="Invalid operation"/>
+</Step>
+<Step icon="Provision" name="Import" posX="352" posY="121" resultVariable="payload">
+<Script>
+<Source>
+<![CDATA[
+import sailpoint.server.Importer; import sailpoint.tools.GeneralException; import sailpoint.web.system.ImportBean.ImportMonitor; serilog=org.apache.commons.logging.LogFactory.getLog("sailpoint.iiqda.Importer"); serilog.debug("--"); String fileData = workflow.get("resource"); serilog.debug("fileData="+fileData); ImportMonitor _monitor = new ImportMonitor(); Importer importer = new Importer(context, _monitor); serilog.debug("got importer"); try { importer.importXml(fileData); context.commitTransaction(); workflow.put("result", "success"); } catch (Exception ex) { serilog.error("Exception :"+ex); workflow.put("result", "failure"); if (ex instanceof GeneralException) { GeneralException ge = (GeneralException) ex; return ge.getMessageInstance(); } else { return ex.getLocalizedMessage(); } } return "";
+]]>
+</Source>
+</Script>
+<Transition to="Stop"/>
+</Step>
+<Step icon="Default" name="Get Object Types" posX="354" posY="194" resultVariable="payload">
+<Script>
+<Source>
+<![CDATA[
+import sailpoint.object.ClassLists; List l = new ArrayList(); for (Class clazz: ClassLists.MajorClasses) { l.add(clazz.getSimpleName()); } // Add this in, its a special type of Identity l.add("Workgroup"); Collections.sort(l); workflow.put("result", "success"); return l;
+]]>
+</Source>
+</Script>
+<Transition to="Stop"/>
+</Step>
+<Step icon="Default" name="Invalid operation" posX="354" posY="44" resultVariable="payload">
+<Script>
+<Source>
+<![CDATA[
+workflow.put("result", "failure"); return "Invalid Operation";
+]]>
+</Source>
+</Script>
+<Transition to="Stop"/>
+</Step>
+<Step icon="Stop" name="Stop" posX="509" posY="351"/>
+<Step icon="Default" name="Get Objects" posX="355" posY="272" resultVariable="payload">
+<Script>
+<Source>
+<![CDATA[
+// objectType is a 'simple' class name (no package) // look it up in ClassList import sailpoint.object.ClassLists; import sailpoint.object.QueryOptions; import sailpoint.object.Filter; // Expect: java.lang.String objectType // Expect: java.lang.String objectName Class theClass=null; boolean isWorkgroup=false; if("Workgroup".equals(objectType)) { objectType="Identity"; isWorkgroup=true; } for (Class clazz: ClassLists.MajorClasses) { if(clazz.getSimpleName().equals(objectType) ){ theClass=clazz; break; } } if(theClass==null) { workflow.put("result", "failure"); return "Could not find object type '"+objectType+"'"; } QueryOptions qo=new QueryOptions(); if (isWorkgroup) { qo.addFilter(Filter.eq("workgroup", Boolean.TRUE)); } String searchField="name"; if ("TaskSchedule".equals(objectType)) { searchField="id"; } Iterator iter=context.search(theClass, qo, searchField); List objects=new ArrayList(); while(iter.hasNext()) { Object[] obj=iter.next(); objects.add(obj[0]); } workflow.put("result", "success"); return objects;
+]]>
+</Source>
+</Script>
+<Transition to="Stop"/>
+</Step>
+<Step icon="Default" name="Get Task List" posX="355" posY="272" resultVariable="payload">
+<Script>
+<Source>
+<![CDATA[
+import sailpoint.object.TaskDefinition; serilog=org.apache.commons.logging.LogFactory.getLog("sailpoint.iiqda.Importer.GetTaskList"); List tasks=context.getObjects(TaskDefinition.class); serilog.debug("got "+tasks.size()); List objects=new ArrayList(); for (TaskDefinition td: tasks) { if(!td.isHidden() && !td.isTemplate() ){ objects.add(td.getName()); } } workflow.put("result", "success"); serilog.debug("returning "+objects.size()+" tasks"); return objects;
+]]>
+</Source>
+</Script>
+<Transition to="Stop"/>
+</Step>
+<Step icon="Default" name="Run Task" posX="355" posY="272" resultVariable="payload">
+<Script>
+<Source>
+<![CDATA[
+import sailpoint.object.TaskDefinition; import sailpoint.api.TaskManager; import sailpoint.object.TaskSchedule; import sailpoint.object.TaskResult; // Expect: java.lang.String taskName serilog=org.apache.commons.logging.LogFactory.getLog("sailpoint.iiqda.Importer.RunTask"); serilog.debug("Run Task: "+taskName); TaskManager tm = new TaskManager(context); Map args=new HashMap(); TaskDefinition td=context.getObjectByName(TaskDefinition.class, taskName); if(td==null) { workflow.put("result", "failure"); return "Task '"+taskName+"' not found"; } TaskSchedule ts=tm.run(td, args); TaskResult tr=null; while (tr==null) { tr=ts.getLatestResult(); serilog.debug("task result="+tr); } workflow.put("result", "success"); return tr.getId();
+]]>
+</Source>
+</Script>
+<Transition to="Stop"/>
+</Step>
+<Step icon="Default" name="Terminate Task" posX="355" posY="272" resultVariable="payload">
+<Script>
+<Source>
+<![CDATA[
+import sailpoint.api.TaskManager; import sailpoint.object.TaskResult; // Expect: java.lang.String taskName // Expect: java.lang.String taskId serilog=org.apache.commons.logging.LogFactory.getLog("sailpoint.iiqda.Importer.TerminateTask"); serilog.debug("Terminate Task: "+taskId); TaskResult tr=context.getObjectById(TaskResult.class, taskId); if(tr==null) { workflow.put("result", "failure"); return "taskId "+taskId+" not found"; } TaskManager tm=new TaskManager(context); tm.terminate(tr); workflow.put("result", "success"); return tr.getId();
+]]>
+</Source>
+</Script>
+<Transition to="Stop"/>
+</Step>
+<Step icon="Default" name="Get Task Result" posX="355" posY="272" resultVariable="payload">
+<Script>
+<Source>
+<![CDATA[
+import sailpoint.object.Attributes; import sailpoint.object.TaskResult; import sailpoint.tools.Internationalizer; import sailpoint.tools.Message; // Expect: java.lang.String taskId serilog=org.apache.commons.logging.LogFactory.getLog("sailpoint.iiqda.Importer.GetTaskResult"); serilog.debug("Get Task Result: "+taskId); if(taskId==null) { workflow.put("result", "failure"); return "Must specify taskId"; } TaskResult tr=context.getObjectById(TaskResult.class, taskId); if(tr==null) { workflow.put("result", "failure"); return "taskId "+taskId+" not found"; } Map result=new HashMap(); result.put("name", tr.getName()); result.put("description", tr.getDefinition().getDescription().trim()); if (tr.getCompletionStatus()==null) { result.put("status", "pending.."); } else { String statusKey=tr.getCompletionStatus().getMessageKey(); result.put("status", Internationalizer.getMessage(statusKey, Locale.ENGLISH)); } result.put("progress", tr.getProgress()); result.put("started", tr.getLaunched().toString()); if(tr.getCompleted()!=null) { result.put("completed", tr.getCompleted().toString()); } List errors=tr.getMessages(); if (errors!=null) { List flatErrors=new ArrayList(); for (Message message: errors) { flatErrors.add(message.getLocalizedMessage()); } result.put("errors", flatErrors); } Attributes attrs=tr.getAttributes(); if (attrs!=null) { Map flatAttrs=new HashMap(); for (String key: attrs.getKeys()) { flatAttrs.put(key, attrs.getString(key)); } result.put("attributes", flatAttrs); } workflow.put("result", "success"); return result;
+]]>
+</Source>
+</Script>
+<Transition to="Stop"/>
+</Step>
+<Step icon="Default" name="Get Object" posX="353" posY="350" resultVariable="payload">
+<Script>
+<Source>
+<![CDATA[
+// objectType is a 'simple' class name (no package) // look it up in ClassList import sailpoint.object.ClassLists; import sailpoint.object.SailPointObject; // Expect: java.lang.String objectType // Expect: java.lang.String objectName serilog=org.apache.commons.logging.LogFactory.getLog("sailpoint.iiqda.Importer.getObject"); serilog.debug("objectType="+objectType); serilog.debug("objectName="+objectName); Class theClass=null; if ("Workgroup".equals(objectType)) { objectType="Identity"; } for (Class clazz: ClassLists.MajorClasses) { if(clazz.getSimpleName().equals(objectType) ){ theClass=clazz; break; } } if(theClass==null) { workflow.put("result", "failure"); return "Could not find object type '"+objectType+"'"; } SailPointObject obj=context.getObjectByName(theClass, objectName); if(obj==null) { workflow.put("result", "failure"); return "Could not find "+objectType+" '"+objectName+"'"; } serilog.debug("obj="+obj); workflow.put("result", "success"); return obj.toXml();
+]]>
+</Source>
+</Script>
+<Transition to="Stop"/>
+</Step>
+<Step icon="Default" name="Get Jar Size" posX="356" posY="434" resultVariable="payload">
+<Script>
+<Source>
+<![CDATA[
+// jarName is the name of a jar in WEB-INF/lib // return a JSON string of the binary import java.io.File; import java.io.InputStream; import org.apache.commons.io.IOUtils; import org.apache.commons.codec.binary.Base64; import sailpoint.object.ClassLists; import sailpoint.object.SailPointObject; serilog=org.apache.commons.logging.LogFactory.getLog("sailpoint.iiqda.Importer.jarSize"); serilog.debug("jar="+jar); if(jar==null||jar==void) { workflow.put("result", "failure"); return("No JAR Specified"); } URL url=this.getClass().getResource("/../lib/"+jar); serilog.debug("url="+url); if(url==null) { workflow.put("result", "failure"); return("JAR '"+jar+"' not found"); } serilog.debug("got URL"); File file=new File(url.toURI()); workflow.put("result", "success"); String ret=Long.toString(file.length()); serilog.debug("returning "+ret); return ret
+]]>
+</Source>
+</Script>
+<Transition to="Stop"/>
+</Step>
+<Step icon="Default" name="Get Jar Data" posX="356" posY="515" resultVariable="payload">
+<Script>
+<Source>
+<![CDATA[
+// jarName is the name of a jar in WEB-INF/lib // return a JSON string of the binary import java.io.File; import java.io.InputStream; import org.apache.commons.codec.binary.Base64; import sailpoint.object.ClassLists; import sailpoint.object.SailPointObject; serilog=org.apache.commons.logging.LogFactory.getLog("sailpoint.iiqda.Importer.getJarData"); serilog.trace("jar="+jar); serilog.trace("start="+start); serilog.trace("length="+length); iStart=Integer.parseInt(start); iLength=Integer.parseInt(length); if(jar==null||jar==void) { workflow.put("result", "failure"); return("No JAR Specified"); } URL url=this.getClass().getResource("/../lib/"+jar); serilog.trace("url="+url); if(url==null) { workflow.put("result", "failure"); return("JAR '"+jar+"' not found"); } File file=new File(url.toURI()); RandomAccessFile raFile=new RandomAccessFile(file, "r"); serilog.debug("skipping "+iStart+" bytes"); raFile.skipBytes(iStart); byte[] buffer=new byte[iLength]; int bytesRead=raFile.read(buffer, 0, iLength); serilog.trace("read "+bytesRead+" bytes"); if(bytesRead<iLength) { serilog.debug("eof: found "+bytesRead+" bytes, not "+iLength); byte[] buf=new byte[bytesRead]; System.arraycopy(buffer, 0, buf, 0, bytesRead); buffer=buf; } String out=Base64.encodeBase64String(buffer); workflow.put("result", "success"); serilog.trace("returning "+out); return out;
+]]>
+</Source>
+</Script>
+<Transition to="Stop"/>
+</Step>
+<Step icon="Default" name="Get Latest Objects" posX="360" posY="599" resultVariable="payload">
+<Script>
+<Source>
+<![CDATA[
+import java.text.*; import sailpoint.object.*; // Expect: java.lang.String classes // classes is a CSV list of the selected classes in the UI // Declare a logger class for us to isolate these messages during aggregation. serilog=org.apache.commons.logging.LogFactory.getLog("sailpoint.iiqda.importer.getLatestObjects"); // log.setLevel(Level.DEBUG); // The maximuim number of objects to return back to the querying item. int maxObjectsToReturn = 100; // We return back a sorted array list of objects that were recently modified. // Format of each CSV entry, with exampels below a header line: // objectType, objectName, modifiedDate // Application, AD-CorpDomain, 2014-09-17 14:35:15 // Rule, AD-Correlation, 2014-09-16 14:34:46 // etc. // This workflow passes this list back to the caller. ArrayList recentlyModifiedCSVStrings = new ArrayList(); // We decalre a TreeSet to store the recently modified records. This allows // us to keep track of the "maxObjectsToReturn" most recently modified objects. TreeSet objStrTreeSet = new TreeSet(); // Certain classes do not contain modified dates, which is yucky. // Mainually maintain a list of classes here that we know do not have // modified dates. We skip these classes from the import/export list. // Some are missing the 'name' property as well, those get added here too. ArrayList skipClasses = new ArrayList(); skipClasses.add("ApplicationActivity"); skipClasses.add("ApplicationScorecard"); skipClasses.add("AuditEvent"); skipClasses.add("AuthenticationQuestion"); skipClasses.add("BatchRequest"); skipClasses.add("DatabaseVersion"); skipClasses.add("GroupIndex"); skipClasses.add("Identity"); // We don't want to export each Id. skipClasses.add("IdentityEntitlement"); skipClasses.add("IdentityHistoryItem"); skipClasses.add("IdentitySnapshot"); // We don't export Identity Snapshots. skipClasses.add("JasperTemplate"); skipClasses.add("JasperResult"); skipClasses.add("ManagedAttribute"); skipClasses.add("MitigationExpiration"); skipClasses.add("PolicyViolation"); // We don't export Policy Violations. skipClasses.add("Profile"); skipClasses.add("ProcessLog"); skipClasses.add("ProvisioningRequest"); skipClasses.add("QuickLinkOptions"); skipClasses.add("ResourceEvent"); skipClasses.add("RoleChangeEvent"); skipClasses.add("RoleIndex"); skipClasses.add("RoleMetadata"); skipClasses.add("RoleScorecard"); skipClasses.add("Scorecard"); skipClasses.add("Server"); // Skip the Server objects. skipClasses.add("SyslogEvent"); skipClasses.add("TargetAssociation"); skipClasses.add("TaskSchedule"); // Included for invalid query options. skipClasses.add("TaskResult"); // We don't export TaskResult. skipClasses.add("UIPreferences"); List majClasses = new ArrayList(); if (classes==null) { // Ask sailpoint.object.ClassLists for what major classes are defined. for (Class clazz: ClassLists.MajorClasses) { String simpleName = clazz.getSimpleName(); if ( !skipClasses.contains(simpleName) ) { majClasses.add(clazz.getSimpleName()); } } majClasses.add("Workgroup"); } else { String[] strClasses=classes.split(","); majClasses=Arrays.asList(strClasses); } Collections.sort(majClasses); // We now have a list of all the major configurable IdentityIQ classes. // Next we need to projection query pull back name, created, modified time // for each item. // Use a projection query to initially pull back only the columns we need. ArrayList resultColumns = new ArrayList(); resultColumns.add("id"); resultColumns.add("name"); resultColumns.add("created"); resultColumns.add("modified"); QueryOptions qo = new QueryOptions(); qo.setResultLimit(maxObjectsToReturn); ArrayList orderings = new ArrayList(); orderings.add( new QueryOptions.Ordering( "modified", false ) ); orderings.add( new QueryOptions.Ordering( "created", false ) ); qo.setOrderings(orderings); for (String className : majClasses) { boolean isWorkgroup=false; String fullClassName = "sailpoint.object." + className; if("Workgroup".equals(className)) { isWorkgroup=true; } serilog.debug("Examining class: " + fullClassName); Iterator it=null; if (isWorkgroup) { QueryOptions wgQo=new QueryOptions(qo); wgQo.addFilter(Filter.eq("workgroup", Boolean.TRUE)); it = context.search(Identity.class, wgQo, resultColumns); } else { Class clazz = Class.forName(fullClassName); if (null == clazz) { serilog.error("could not load class forName: " + fullClassName); continue; } it = context.search(clazz, qo, resultColumns); } while (it.hasNext()) { Object [] result = it.next(); String id = (String) result[0]; String name = (String) result[1]; Date createdDate = (java.util.Date) result[2]; Date modifiedDate = (java.util.Date) result[3]; // If no modified date substituting if (null == createdDate) { createdDate = new Date(); } // If no modified date substituting if (null == modifiedDate) { modifiedDate = createdDate; } String created = createdDate.toString(); String modified = modifiedDate.toString(); // Create a date string sortable by string operations. DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); String createdSortable = formatter.format(createdDate); String modifiedSortable = formatter.format(modifiedDate); // We buld a sortable delimited string, with the modified date first so // that the date primarily controls the sorting. The format of the string: // modifiedDate,className,objectName,objectId // Once we have the sortable string we put that in a TreeSet so that // we can monitor the size of the tree set and only keep the N most // recently created/modified objects in the tree. String sortableString = modifiedSortable + "," + className + "," + name + "," + id; serilog.debug("object:" + sortableString); // serilog.debug("Class: " + className + " id:" + id + " modified:" + modifiedSortable + " name:" + name); serilog.debug("objStrTreeSet.size(): " + objStrTreeSet.size()); if (objStrTreeSet.size() < maxObjectsToReturn) { // We have not added the max objects to the tree set, add this one. objStrTreeSet.add(sortableString); } else { // The tree set has the full number of objects. If this new // object's modified date is older than the oldest in the tree set // then do not add it. Otherwise, add it to the tree set // and then remove the lowest modified date from the tree set. String leastRecentlyModified = objStrTreeSet.first(); if ( 0 > sortableString.compareTo(leastRecentlyModified) ) { serilog.debug("older than oldest: skipping"); // The current objects modified date is earlier than the oldest // in the tree set. Do not add the current object to the tree set. } else { serilog.debug("newer than oldest: adding to list"); // The current object is more recently modified than at least one // object in the tree set. Add the current object to the tree set // and remove the lowest object in the tree set. objStrTreeSet.add(sortableString); objStrTreeSet.remove(leastRecentlyModified); } } } } // At this point we have a populated TreeSet of objStrTreeSet size. This // has the objStrTreeSet most recently modified objects in the IdentityIQ // system. Convert that to an ArrayList of strings and return that to // the caller for passing back to Eclipse or other external tooling. while ( 0 != objStrTreeSet.size() ) { String mostRecentlyModified = objStrTreeSet.last(); recentlyModifiedCSVStrings.add(mostRecentlyModified); objStrTreeSet.remove(mostRecentlyModified); } workflow.put("result", "success"); return recentlyModifiedCSVStrings;
+]]>
+</Source>
+</Script>
+<Transition to="Stop"/>
+</Step>
+</Workflow>
+</sailpoint>

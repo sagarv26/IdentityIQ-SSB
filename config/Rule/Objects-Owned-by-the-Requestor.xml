@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Objects Owned by the Requestor" type="RequestObjectSelector">
+  <Description>This rule returns a Filter that restricts objects to those that the requestor or one of their workgroups owns</Description>
+  <Signature returnType="sailpoint.object.QueryInfo">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="requestor" type="sailpoint.object.Identity">
+        <Description>
+          Identity that is making the Life Cycle Manager request.
+        </Description>
+      </Argument>
+      <Argument name="requestee" type="sailpoint.object.Identity">
+        <Description>
+          Identity on whose behalf the Life Cycle Manager request is being made.  In the case of bulk requests,
+          this argument will be set to null when determining the objects that are visible to the requestor.
+          It will be provided once a selection has been made in order to determine whether or not the given requestee
+          should have access to the selected object.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="filter">
+        <Description>
+          A Filter object that will be used to search for accessible Objects.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+    
+      import sailpoint.object.Filter;
+      import sailpoint.object.Identity;
+      import sailpoint.object.QueryOptions;
+      import sailpoint.object.QueryInfo; 
+      return new QueryInfo(QueryOptions.getOwnerScopeFilter(requestor, "owner"), false);
+    
+  </Source>
+</Rule>
+</sailpoint>

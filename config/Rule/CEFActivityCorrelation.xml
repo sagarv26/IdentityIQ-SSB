@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="CEFActivityCorrelation" type="ActivityCorrelation">
+  <Description>Rule to show how an CEF activity might be correlated back to an identity. In most cases, this rule will be providing enought information to the correlator so that it can find the Application link. In some cases, it might also be desireable to return something that points back to an Identity, which is also supported.</Description>
+  <Signature returnType="Map">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application where the activity was generated.
+          An application may have more then one data source.
+        </Description>
+      </Argument>
+      <Argument name="datasource">
+        <Description>
+          The data source that returned the activity.
+        </Description>
+      </Argument>
+      <Argument name="activity">
+        <Description>
+          The activity object that was normalized by
+          the data source and that we are trying to
+          correlate back to one of our Identities.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="linkIdentity">
+        <Description>
+          A string that represents the link's identity attribute.
+        </Description>
+      </Argument>
+      <Argument name="linkName">
+        <Description>
+          A string that represents the link's displayName attribute.
+        </Description>
+      </Argument>
+      <Argument name="linkAttributeName">
+        <Description>
+          A string that represents the NAME of an attribute that
+          can be used to find the Link that maps back to this
+          activity.  This attribute must also be supplied
+          with the linkAttributeValue variable.
+        </Description>
+      </Argument>
+      <Argument name="linkAttributeValue">
+        <Description>
+          A string that represents the VALUE of an attribute that
+          can be used to find the Link that maps back to this
+          activity. This attribute must also be supplied
+          with the linkAttributeName variable.
+        </Description>
+      </Argument>
+      <Argument name="identityName">
+        <Description>
+          The name of an Identity object.
+        </Description>
+      </Argument>
+      <Argument name="identity">
+        <Description>
+          A fully resolved Identity object in case the rule wants
+          to do its own queries to locate the identity.
+        </Description>
+      </Argument>
+      <Argument name="identityAttributeName">
+        <Description>
+          The name of the extended attribute that can be used
+          to locate an existing identity.
+        </Description>
+      </Argument>
+      <Argument name="identityAttributeValue">
+        <Description>
+          The value of the named extended attribute that can be used
+          to locate an existing identity. This attribute is used
+          together with the identityAttributeName argument.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>import sailpoint.object.ApplicationActivity;
+  import sailpoint.object.Configuration;
+	
+//  System.out.println("CEFActivityCorrelation: In Correlation Rule");
+
+    Map returnMap = new HashMap();
+    String user = activity.getUser();
+	String cefLinkAttributeName = Configuration.getSystemConfig().getString(Configuration.ATT_CEF_LINK_ATTRIBUTE_NAME);
+	
+    if ( user != null ) {
+//		System.out.println("CEFActivityCorrelation: Matching for user " + user);
+        returnMap.put("linkAttributeName", cefLinkAttributeName);
+        returnMap.put("linkAttributeValue", user);
+//        System.out.println("returnMap " + returnMap);
+    }
+
+    return returnMap;</Source>
+</Rule>
+</sailpoint>

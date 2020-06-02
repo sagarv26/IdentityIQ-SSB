@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Account Report Form Customizer" type="ReportCustomizer">
+  <Description>
+    This rule populates a form with fields for all searchable account fields.
+  </Description>
+  <Signature returnType="Map">
+    <Inputs>
+      <Argument name="locale">
+        <Description>
+          The current user's locale
+        </Description>
+      </Argument>
+      <Argument name="report">
+        <Description>
+          The base report
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>
+       
+        import sailpoint.object.*;
+        import sailpoint.reporting.ReportingLibrary;
+
+        ObjectConfig linkConfig = ObjectConfig.getObjectConfig(Link.class);
+        ReportingLibrary.addAttributes(context, report, Link.class, linkConfig.getSearchableAttributes(), null,
+          "Account Properties", locale);
+       
+</Source>
+</Rule>
+</sailpoint>

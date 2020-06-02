@@ -16,6 +16,7 @@ import bsh.Interpreter;
 import sailpoint.api.SailPointContext;
 import sailpoint.api.TaskManager;
 import sailpoint.api.Terminator;
+import sailpoint.connector.ExpiredPasswordException;
 import sailpoint.object.Filter;
 import sailpoint.object.QueryOptions;
 import sailpoint.object.Rule;
@@ -129,8 +130,9 @@ public class SailPointJUnitTestHelper {
 	 * 
 	 * @return
 	 * @throws GeneralException
+	 * @throws ExpiredPasswordException 
 	 */
-	public SailPointContext getContext() throws GeneralException {
+	public SailPointContext getContext() throws GeneralException, ExpiredPasswordException {
 		return ctx.getSailPointContext();
 	}
 

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Certification Report Customizer" type="ReportCustomizer">
+  <Source>
+       
+        import sailpoint.object.*;
+        import sailpoint.tools.Util;
+        import sailpoint.web.messages.MessageKeys;
+        if (Util.otob(taskDefinition.getArgument("exclusions"))){
+          report.setDisablePreview(true);
+          report.setDisablePreviewMessage(MessageKeys.REPT_CERT_PREVIEW_DISABLED_EXCLUSIONS);
+        } else {
+          report.setDisablePreview(false);
+          report.setDisablePreviewMessage(null);
+        }
+
+       
+</Source>
+</Rule>
+</sailpoint>

@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Privileged Access Report Customizer" type="ReportCustomizer">
+  <Description>
+    This rule populates a form with fields for the standard and extended identity attributes as well as
+    a form for defining the 'privileged' identity attribute.
+  </Description>
+  <Signature returnType="Map">
+    <Inputs>
+      <Argument name="locale">
+        <Description>
+          The current user's locale
+        </Description>
+      </Argument>
+      <Argument name="report">
+        <Description>
+          The base report
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>
+       
+        import sailpoint.object.*;
+        import sailpoint.reporting.ReportingLibrary;
+
+        ObjectConfig linkConfig = ObjectConfig.getObjectConfig(Link.class);
+        ReportingLibrary.addAttributes(context, report, Link.class, linkConfig.getSearchableAttributes(), null,
+          "Privileged Account Attributes", locale, "id");
+
+
+        ObjectConfig identityConfig = ObjectConfig.getObjectConfig(Identity.class);
+        List standardAttributes = new ArrayList();
+        standardAttributes.add(identityConfig.getObjectAttributeMap().get("firstname"));
+        standardAttributes.add(identityConfig.getObjectAttributeMap().get("lastname"));
+        standardAttributes.add(identityConfig.getObjectAttributeMap().get("displayName"));
+        standardAttributes.add(identityConfig.getObjectAttributeMap().get("email"));
+        standardAttributes.add(identityConfig.getObjectAttributeMap().get("manager"));
+        standardAttributes.add(identityConfig.getObjectAttributeMap().get("inactive"));
+
+        ReportingLibrary.addAttributes(context, report, Identity.class, standardAttributes, "identity",
+          "Identity Properties", locale, "id");
+
+        List extendedAttrs = new ArrayList();
+        for(ObjectAttribute att : identityConfig.getSearchableAttributes()){
+          if (!att.isStandard())
+            extendedAttrs.add(att);
+        }
+
+        for(ObjectAttribute att : identityConfig.getMultiAttributeList()){
+            extendedAttrs.add(att);
+        }
+
+        ReportingLibrary.addAttributes(context, report, Identity.class, extendedAttrs, "identity",
+          "Identity Extended Properties", locale, "id");
+       
+</Source>
+</Rule>
+</sailpoint>
