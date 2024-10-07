@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Configuration name="ApplicationTargetCollectorRegistry">
+  <Attributes>
+    <Map>
+      <entry key="ACF2 - Full">
+        <value>
+          <List>
+            <String>PE2 ACF2Collector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="AIX - Direct">
+        <value>
+          <List>
+            <String>Unix Collector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="Active Directory - Direct">
+        <value>
+          <List>
+            <String>Windows FileShare Collector</String>
+            <String>SecurityIQ Collector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="IBM Tivoli Access Manager">
+        <value>
+          <List>
+            <String>TAM Collector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="Linux - Direct">
+        <value>
+          <List>
+            <String>Unix Collector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="Microsoft SharePoint">
+        <value>
+          <List>
+            <String>SecurityIQ Collector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="Microsoft SharePoint Online">
+        <value>
+          <List>
+            <String>SharePoint Online Collector</String>
+            <String>SecurityIQ Collector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="RACF - Full">
+        <value>
+          <List>
+            <String>PE2 RACFCollector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="Solaris - Direct">
+        <value>
+          <List>
+            <String>Unix Collector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="TAM">
+        <value>
+          <List>
+            <String>TAM Collector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="TopSecret - Full">
+        <value>
+          <List>
+            <String>PE2 TSSCOLLECTOR</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="Windows Local - Direct">
+        <value>
+          <List>
+            <String>Windows FileShare Collector</String>
+            <String>SecurityIQ Collector</String>
+          </List>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+</Configuration>
+</sailpoint>

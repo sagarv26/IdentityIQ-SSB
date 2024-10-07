@@ -1,0 +1,457 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Configuration name="IdentitySelectorConfiguration">
+  <Attributes>
+    <Map>
+      <entry key="identityFilters">
+        <value>
+          <Map>
+            <entry key="CustomAttribute">
+              <value>
+                <IdentityFilter name="CustomAttribute" order="Ascending">
+                  <IncludedFilterReferences>
+                    <String>IncludeWorkGroups</String>
+                  </IncludedFilterReferences>
+                  <OrderBy>
+                    <String>firstname</String>
+                    <String>lastname</String>
+                    <String>name</String>
+                    <String>id</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="DelegationRecipient">
+              <value>
+                <IdentityFilter name="DelegationRecipient" order="Ascending">
+                  <FilterScript>
+                    <Script>
+                      <Source>
+                          return sailpoint.api.IdentityService.getDelegationRecipientSuggestQueryOptions(context, itemId, query);
+                        </Source>
+                    </Script>
+                  </FilterScript>
+                  <OrderBy>
+                    <String>firstname</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="EntitlementOwner">
+              <value>
+                <IdentityFilter name="EntitlementOwner" order="Ascending">
+                  <FilterSrc>
+                    <FilterSource>
+                      <BasicFilter>
+                        <Filter joinProperty="ManagedAttribute.owner.id" operation="JOIN" property="id"/>
+                      </BasicFilter>
+                    </FilterSource>
+                  </FilterSrc>
+                  <IncludedFilterReferences>
+                    <String>IncludeWorkGroups</String>
+                  </IncludedFilterReferences>
+                  <OrderBy>
+                    <String>firstname</String>
+                    <String>lastname</String>
+                    <String>name</String>
+                    <String>id</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="ExcludeSelf">
+              <value>
+                <IdentityFilter name="ExcludeSelf" order="Ascending">
+                  <FilterSrc>
+                    <FilterSource>
+                      <ParameterizedFilter>
+                        <FilterTemplate>
+                          <FilterParameters>
+                            <String>loggedInUser</String>
+                            <String>loggedInUserWorkgroups</String>
+                          </FilterParameters>
+                          <FilterString>
+                              
+                              id != "$loggedInUser"
+                              #if($loggedInUserWorkgroups)
+                                &amp;&amp; !(id.in({$loggedInUserWorkgroups}))
+                              #end
+                              
+                            </FilterString>
+                        </FilterTemplate>
+                      </ParameterizedFilter>
+                    </FilterSource>
+                  </FilterSrc>
+                  <IncludedFilterReferences>
+                    <String>IncludeWorkGroups</String>
+                  </IncludedFilterReferences>
+                  <OrderBy>
+                    <String>firstname</String>
+                    <String>lastname</String>
+                    <String>name</String>
+                    <String>id</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="Global">
+              <value>
+                <IdentityFilter ignoreGlobal="true" name="Global" order="Ascending">
+                  <FilterSrc>
+                    <FilterSource>
+                      <ParameterizedFilter>
+                        <FilterTemplate>
+                          <FilterParameters>
+                            <String>parts</String>
+                          </FilterParameters>
+                          <FilterString>
+                              
+                              #if($parts.size() == 1)
+                                firstname.startsWithIgnoreCase("$parts.get(0)") ||
+                                  lastname.startsWithIgnoreCase("$parts.get(0)") ||
+                                  name.startsWithIgnoreCase("$parts.get(0)") ||
+                                  displayName.startsWithIgnoreCase("$parts.get(0)")
+                              #elseif($parts.size() == 2)
+                                (firstname.startsWithIgnoreCase("$parts.get(0)") &amp;&amp; lastname.startsWithIgnoreCase("$parts.get(1)")) ||
+                                  (firstname.startsWithIgnoreCase("$parts.get(1)") &amp;&amp; lastname.startsWithIgnoreCase("$parts.get(0)")) ||
+                                  displayName.startsWithIgnoreCase("$parts.get(0) $parts.get(1)") ||
+                                  firstname.startsWithIgnoreCase("$parts.get(0) $parts.get(1)") || name.startsWithIgnoreCase("$parts.get(0) $parts.get(1)")
+                              #elseif($parts.size() &gt; 2)
+                                #foreach($part in $parts)
+                                    firstname.startsWithIgnoreCase("$part") ||
+                                      lastname.startsWithIgnoreCase("$part") ||
+                                      name.startsWithIgnoreCase("$part") ||
+                                      displayName.startsWithIgnoreCase("$part")
+                                    #if($velocityCount &lt; $parts.size())
+                                       ||
+                                    #end
+                                #end
+                              #end
+                              
+                            </FilterString>
+                        </FilterTemplate>
+                      </ParameterizedFilter>
+                    </FilterSource>
+                  </FilterSrc>
+                  <OrderBy>
+                    <String>displayName</String>
+                    <String>firstname</String>
+                    <String>lastname</String>
+                    <String>name</String>
+                    <String>id</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="IdentityAttribute">
+              <value>
+                <IdentityFilter name="IdentityAttribute" order="Ascending">
+                  <IncludedFilterReferences>
+                    <String>IncludeWorkGroups</String>
+                  </IncludedFilterReferences>
+                  <OrderBy>
+                    <String>firstname</String>
+                    <String>lastname</String>
+                    <String>name</String>
+                    <String>id</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="IdentityManagerAttribute">
+              <value>
+                <IdentityFilter name="IdentityManagerAttribute" order="Ascending">
+                  <OrderBy>
+                    <String>firstname</String>
+                    <String>lastname</String>
+                    <String>name</String>
+                    <String>id</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="IncludeWorkGroups">
+              <value>
+                <IdentityFilter name="IncludeWorkGroups" order="Ascending">
+                  <FilterSrc>
+                    <FilterSource>
+                      <BasicFilter>
+                        <Filter operation="IN" property="workgroup">
+                          <Value>
+                            <List>
+                              <Boolean>true</Boolean>
+                              <Boolean/>
+                            </List>
+                          </Value>
+                        </Filter>
+                      </BasicFilter>
+                    </FilterSource>
+                  </FilterSrc>
+                  <OrderBy>
+                    <String>firstname</String>
+                    <String>lastname</String>
+                    <String>name</String>
+                    <String>id</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="LcmPopulation">
+              <value>
+                <IdentityFilter name="LcmPopulation" order="Ascending">
+                  <FilterScript>
+                    <Script>
+                      <Source>
+                            import sailpoint.object.Identity;
+                            import sailpoint.service.LCMConfigService;
+    
+                            Identity identity = context.getObjectById(Identity.class, loggedInUser);
+                            LCMConfigService svc = new LCMConfigService(context);
+                            return svc.getConfiguredIdentityQueryOptions(identity, null);
+                          </Source>
+                    </Script>
+                  </FilterScript>
+                  <OrderBy>
+                    <String>firstname</String>
+                    <String>lastname</String>
+                    <String>name</String>
+                    <String>id</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="LcmPopulationManager">
+              <value>
+                <IdentityFilter name="LcmPopulationManager" order="Ascending">
+                  <FilterScript>
+                    <Script>
+                      <Source>
+                            import sailpoint.object.Filter;
+                            import sailpoint.object.Identity;
+                            import sailpoint.object.QueryOptions;
+                            import sailpoint.service.LCMConfigService;
+                            import sailpoint.tools.Util;
+    
+                            QueryOptions qo = new QueryOptions();
+
+                            Identity identity = context.getObjectById(Identity.class, loggedInUser);
+                            LCMConfigService svc = new LCMConfigService(context);
+                            QueryOptions popQueryOptions = svc.getConfiguredIdentityQueryOptions(identity, null);
+                            
+                            // Null QueryOptions means that the logged in user can't request for any
+                            // users.  We need a way to return this from IdentityFilters.  Currently,
+                            // this is filter config is only used when we know that the logged in user
+                            // is able to request for others, so we won't worry about it yet.
+                            if ((null != popQueryOptions) &amp;&amp; !Util.isEmpty(popQueryOptions.getRestrictions())) {
+                                List popFilters = popQueryOptions.getRestrictions();
+                                Filter subFilter =
+                                    (popFilters.size() &gt; 0) ? Filter.and(popFilters)
+                                                            : (Filter) popFilters.get(0);
+                                Filter f = Filter.subquery("id", Identity.class, "manager.id", subFilter);
+                                qo.addFilter(f);
+                            } else {
+                                qo.addFilter(Filter.eq("managerStatus", true));
+                            }
+                              
+                            return qo;
+                          
+                          </Source>
+                    </Script>
+                  </FilterScript>
+                  <OrderBy>
+                    <String>firstname</String>
+                    <String>lastname</String>
+                    <String>name</String>
+                    <String>id</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="Manager">
+              <value>
+                <IdentityFilter name="Manager" order="Ascending">
+                  <FilterSrc>
+                    <FilterSource>
+                      <BasicFilter>
+                        <Filter operation="EQ" property="managerStatus">
+                          <Value>
+                            <Boolean>true</Boolean>
+                          </Value>
+                        </Filter>
+                      </BasicFilter>
+                    </FilterSource>
+                  </FilterSrc>
+                  <OrderBy>
+                    <String>firstname</String>
+                    <String>lastname</String>
+                    <String>name</String>
+                    <String>id</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="OnlyWorkgroups">
+              <value>
+                <IdentityFilter name="OnlyWorkgroups" order="Ascending">
+                  <FilterSrc>
+                    <FilterSource>
+                      <BasicFilter>
+                        <Filter operation="EQ" property="workgroup">
+                          <Value>
+                            <Boolean>true</Boolean>
+                          </Value>
+                        </Filter>
+                      </BasicFilter>
+                    </FilterSource>
+                  </FilterSrc>
+                  <OrderBy>
+                    <String>firstname</String>
+                    <String>lastname</String>
+                    <String>name</String>
+                    <String>id</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="Owner">
+              <value>
+                <IdentityFilter name="Owner" order="Ascending">
+                  <IncludedFilterReferences>
+                    <String>IncludeWorkGroups</String>
+                  </IncludedFilterReferences>
+                  <OrderBy>
+                    <String>firstname</String>
+                    <String>lastname</String>
+                    <String>name</String>
+                    <String>id</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="QuickAssign">
+              <value>
+                <IdentityFilter ignoreGlobal="true" name="QuickAssign" order="Ascending">
+                  <FilterScript>
+                    <Script>
+                      <Source>
+                            import sailpoint.object.*;
+                            import java.util.ArrayList;
+                            import java.util.List;
+                            QueryOptions qo = new QueryOptions();
+                            qo.addFilter(Filter.eq("name", query));
+                            List booleans = new ArrayList();
+                            booleans.add(true);
+                            booleans.add(false);
+                            qo.addFilter(Filter.in("workgroup", booleans));
+                            qo.setScopeResults(true);
+                            qo.addOrdering("firstname", true);
+                            qo.addOrdering("lastname", true);
+                            qo.addOrdering("name", true);
+                            qo.addOrdering("id", true);
+                            return qo;
+                          </Source>
+                    </Script>
+                  </FilterScript>
+                  <OrderBy>
+                    <String>firstname</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="SelfWithWorkgroups">
+              <value>
+                <IdentityFilter name="SelfWithWorkgroups" order="Ascending">
+                  <FilterSrc>
+                    <FilterSource>
+                      <ParameterizedFilter>
+                        <FilterTemplate>
+                          <FilterParameters>
+                            <String>loggedInUser</String>
+                            <String>loggedInUserWorkgroups</String>
+                          </FilterParameters>
+                          <FilterString>
+                                
+                                id == "$loggedInUser"
+                                #if($loggedInUserWorkgroups)
+                                  || (id.in({$loggedInUserWorkgroups}))
+                                #end
+                                
+                              </FilterString>
+                        </FilterTemplate>
+                      </ParameterizedFilter>
+                    </FilterSource>
+                  </FilterSrc>
+                  <IncludedFilterReferences>
+                    <String>IncludeWorkGroups</String>
+                  </IncludedFilterReferences>
+                  <OrderBy>
+                    <String>firstname</String>
+                    <String>lastname</String>
+                    <String>name</String>
+                    <String>id</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="WorkgroupMembers">
+              <value>
+                <IdentityFilter name="WorkgroupMembers" order="Ascending">
+                  <FilterScript>
+                    <Script>
+                      <Source>
+                              import sailpoint.object.*;
+                              QueryOptions qo = new QueryOptions();
+                              qo.addFilter( Filter.or(Filter.eq("workgroups.id", workgroup), Filter.eq("workgroups.name", workgroup)) );
+                              qo.setScopeResults(true); // Set to false to allow workgroup members to see other members in the same group.
+                              qo.addOrdering("firstname", true);
+                              return qo;
+                            </Source>
+                    </Script>
+                  </FilterScript>
+                  <OrderBy>
+                    <String>firstname</String>
+                    <String>lastname</String>
+                    <String>name</String>
+                    <String>id</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="delegationAssignee">
+              <value>
+                <IdentityFilter name="delegationAssignee" order="Ascending">
+                  <IncludedFilterReferences>
+                    <String>IncludeWorkGroups</String>
+                  </IncludedFilterReferences>
+                  <OrderBy>
+                    <String>firstname</String>
+                    <String>lastname</String>
+                    <String>name</String>
+                    <String>id</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+            <entry key="reassignAssignee">
+              <value>
+                <IdentityFilter name="reassignAssignee" order="Ascending">
+                  <IncludedFilterReferences>
+                    <String>IncludeWorkGroups</String>
+                  </IncludedFilterReferences>
+                  <OrderBy>
+                    <String>firstname</String>
+                    <String>lastname</String>
+                    <String>name</String>
+                    <String>id</String>
+                  </OrderBy>
+                </IdentityFilter>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+</Configuration>
+</sailpoint>

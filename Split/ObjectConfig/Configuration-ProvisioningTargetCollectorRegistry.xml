@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Configuration name="ProvisioningTargetCollectorRegistry">
+  <Attributes>
+    <Map>
+      <entry key="ACF2 - Full">
+        <value>
+          <List>
+            <String>sailpoint.unstructured.PE2TargetCollector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="AIX - Direct">
+        <value>
+          <List>
+            <String>sailpoint.unstructured.UnixRWTargetCollector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="Active Directory - Direct">
+        <value>
+          <List>
+            <String>sailpoint.unstructured.WindowsTargetCollector</String>
+            <String>sailpoint.unstructured.SharePointRWTargetCollector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="IBM Tivoli Access Manager">
+        <value>
+          <List>
+            <String>sailpoint.unstructured.TAMTargetCollector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="Linux - Direct">
+        <value>
+          <List>
+            <String>sailpoint.unstructured.UnixRWTargetCollector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="Microsoft SharePoint">
+        <value>
+          <List>
+            <String>sailpoint.unstructured.SharePointRWTargetCollector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="Microsoft SharePoint Online">
+        <value>
+          <List>
+            <String>sailpoint.unstructured.SharePointRWTargetCollector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="RACF - Full">
+        <value>
+          <List>
+            <String>sailpoint.unstructured.PE2TargetCollector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="Solaris - Direct">
+        <value>
+          <List>
+            <String>sailpoint.unstructured.UnixRWTargetCollector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="TAM">
+        <value>
+          <List>
+            <String>sailpoint.unstructured.TAMTargetCollector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="TopSecret - Full">
+        <value>
+          <List>
+            <String>sailpoint.unstructured.PE2TargetCollector</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="Windows Local - Direct">
+        <value>
+          <List>
+            <String>sailpoint.unstructured.WindowsTargetCollector</String>
+          </List>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+</Configuration>
+</sailpoint>

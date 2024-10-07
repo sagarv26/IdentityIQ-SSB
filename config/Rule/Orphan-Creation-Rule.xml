@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Orphan Creation Rule" type="IdentityCreation">
+  <Description>Identity creation rules are used to set attributes on new Identity objects when they are created.  New identities may be 	created during the aggregation of application accounts, or optionally created after pass-through authentication. One common operation is to change the name property of the identity when the default application name is complex (such as a directory DN). Another common operation is to assign a set of initial capabilities based on the attributes pulled from the application account.</Description>
+  <Signature returnType="void">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="environment" type="Map">
+        <Description>
+          Arguments passed to the aggregation task.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          Application being aggregated.
+        </Description>
+      </Argument>
+      <Argument name="account" type="ResourceObject">
+        <Description>
+          The resource account for the identity being created.
+        </Description>
+      </Argument>
+      <Argument name="identity" type="Identity">
+        <Description>
+          The identity that is being created.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>
+	import sailpoint.object.Identity;
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory; 
+	import sailpoint.object.Filter;
+	import sailpoint.object.Filter.FilterCompiler;
+	import java.util.Map;
+	import java.util.List;
+	import java.util.ArrayList;
+	import java.util.Iterator;
+	import sailpoint.object.QueryOptions;
+	import sailpoint.object.Link;
+	
+	import sailpoint.api.Correlator;
+	import sailpoint.object.Application;
+
+	String appShortName = application.getStringAttributeValue("ShortName");
+	String uid = account.getStringAttribute("uid");
+	String employeeType = account.getStringAttribute("employeeType");
+	
+	//set orphan account name unique per app
+	if(appShortName == null || appShortName.equals("")) {
+		identity.setName(uid);
+	} else {
+		identity.setName(appShortName + "-" + uid);
+	}
+
+	//set employeeType for service accounts
+	if(employeeType != null &amp;&amp; employeeType.equalsIgnoreCase("Service")){
+		identity.setAttribute("employeeType", "Service");
+	}
+</Source>
+</Rule>

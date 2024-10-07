@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Exclude Composite Accounts"
+      type="CertificationExclusion">
+  <Description>
+  This rule splits the certifiables in the items and itemsToExclude list based on
+ whether the certifiable is an "Exception" on an account that is a part of a
+ composite account.  If we determine that the account is part of a composite
+ account, the item is removed from the items list and added to the
+ itemsToExclude list.
+  </Description>
+  <Signature>
+  </Signature>
+  <Source>
+      import sailpoint.object.Application;
+      import sailpoint.object.Certifiable;
+      import sailpoint.object.Entitlements;
+      import sailpoint.object.Link;
+
+      StringBuffer explanation = new StringBuffer();
+      Collection explainedAccounts = new HashSet();
+
+      for (Iterator it = items.iterator(); it.hasNext(); ) {
+          Certifiable certifiable = (Certifiable) it.next();
+          if (certifiable instanceof Entitlements) {
+              Entitlements ents = (Entitlements) certifiable;
+              Application app = ents.getApplicationObject(context);
+              String nativeIdentity = ents.getNativeIdentity();
+
+              Link composite = identity.getOwningCompositeLink(app, nativeIdentity);
+
+              // Non-null means that this is a component of a composite
+              // link, so we will exclude it.
+              if (null != composite) {
+                  it.remove();
+                  itemsToExclude.add(certifiable);
+
+                  String acct = app.getName() + "-" + nativeIdentity;
+                  if (!explainedAccounts.contains(acct)) {
+                      explainedAccounts.add(acct);
+
+                      if (explanation.length() > 0) {
+                          explanation.append("  ");
+                      }
+                      explanation.append("Account " + nativeIdentity + " on " + app.getName() +
+                                         " excluded because it is part of a composite account.");
+                  }
+              }
+          }
+      }
+
+      return (0 != explanation.length()) ? explanation.toString() : null;
+  </Source>
+</Rule>

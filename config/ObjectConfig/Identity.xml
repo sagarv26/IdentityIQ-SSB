@@ -40,7 +40,7 @@
     </AttributeSource>
     <AttributeSource name="mail">
       <ApplicationRef>
-        <Reference class="sailpoint.object.Application" name="HR System Employees"/>
+        <Reference class="sailpoint.object.Application" name="HR System"/>
       </ApplicationRef>
     </AttributeSource>
   </ObjectAttribute>
@@ -52,7 +52,7 @@
     </AttributeSource>
     <AttributeSource name="givenName">
       <ApplicationRef>
-        <Reference class="sailpoint.object.Application" name="HR System Employees"/>
+        <Reference class="sailpoint.object.Application" name="HR System"/>
       </ApplicationRef>
     </AttributeSource>
   </ObjectAttribute>
@@ -64,31 +64,7 @@
     </AttributeSource>
     <AttributeSource name="sn">
       <ApplicationRef>
-        <Reference class="sailpoint.object.Application" name="HR System Employees"/>
-      </ApplicationRef>
-    </AttributeSource>
-  </ObjectAttribute>
-  <ObjectAttribute displayName="Department" editMode="ReadOnly" name="department" type="string">
-    <AttributeSource name="Department">
-      <ApplicationRef>
-        <Reference class="sailpoint.object.Application" name="Contractor System Employee"/>
-      </ApplicationRef>
-    </AttributeSource>
-    <AttributeSource name="Department">
-      <ApplicationRef>
-        <Reference class="sailpoint.object.Application" name="HR System Employees"/>
-      </ApplicationRef>
-    </AttributeSource>
-  </ObjectAttribute>
-  <ObjectAttribute displayName="Office" editMode="ReadOnly" name="office" type="string">
-    <AttributeSource name="office">
-      <ApplicationRef>
-        <Reference class="sailpoint.object.Application" name="Contractor System Employee"/>
-      </ApplicationRef>
-    </AttributeSource>
-    <AttributeSource name="office">
-      <ApplicationRef>
-        <Reference class="sailpoint.object.Application" name="HR System Employees"/>
+        <Reference class="sailpoint.object.Application" name="HR System"/>
       </ApplicationRef>
     </AttributeSource>
   </ObjectAttribute>
@@ -100,7 +76,7 @@
     </AttributeSource>
     <AttributeSource name="employeenumber">
       <ApplicationRef>
-        <Reference class="sailpoint.object.Application" name="HR System Employees"/>
+        <Reference class="sailpoint.object.Application" name="HR System"/>
       </ApplicationRef>
     </AttributeSource>
   </ObjectAttribute>
@@ -112,7 +88,7 @@
     </AttributeSource>
     <AttributeSource name="title">
       <ApplicationRef>
-        <Reference class="sailpoint.object.Application" name="HR System Employees"/>
+        <Reference class="sailpoint.object.Application" name="HR System"/>
       </ApplicationRef>
     </AttributeSource>
   </ObjectAttribute>
@@ -124,7 +100,7 @@
     </AttributeSource>
     <AttributeSource name="info">
       <ApplicationRef>
-        <Reference class="sailpoint.object.Application" name="HR System Employees"/>
+        <Reference class="sailpoint.object.Application" name="HR System"/>
       </ApplicationRef>
     </AttributeSource>
   </ObjectAttribute>
@@ -136,14 +112,14 @@
     </AttributeSource>
     <AttributeSource name="Description">
       <ApplicationRef>
-        <Reference class="sailpoint.object.Application" name="HR System Employees"/>
+        <Reference class="sailpoint.object.Application" name="HR System"/>
       </ApplicationRef>
     </AttributeSource>
   </ObjectAttribute>
   <ObjectAttribute displayName="Status" editMode="ReadOnly" name="status" type="string">
-    <AttributeSource name="AppRule: Identity_Attribute_Employee HR System Employees">
+    <AttributeSource name="AppRule: Identity_Attribute_Employee HR System">
       <ApplicationRef>
-        <Reference class="sailpoint.object.Application" name="HR System Employees"/>
+        <Reference class="sailpoint.object.Application" name="HR System"/>
       </ApplicationRef>
       <RuleRef>
         <Reference class="sailpoint.object.Rule" name="Identity_Attribute_Employee"/>
@@ -166,11 +142,11 @@
     </AttributeSource>
     <AttributeSource name="enabled">
       <ApplicationRef>
-        <Reference class="sailpoint.object.Application" name="HR System Employees"/>
+        <Reference class="sailpoint.object.Application" name="HR System"/>
       </ApplicationRef>
     </AttributeSource>
   </ObjectAttribute>
-  <ObjectAttribute displayName="EmployeeID" editMode="ReadOnly" extendedNumber="1" name="employeeid" type="string">
+  <ObjectAttribute displayName="UID" editMode="ReadOnly" extendedNumber="1" name="uid" type="string">
     <AttributeSource name="EmployeeID">
       <ApplicationRef>
         <Reference class="sailpoint.object.Application" name="Contractor System Employee"/>
@@ -178,7 +154,7 @@
     </AttributeSource>
     <AttributeSource name="EmployeeID">
       <ApplicationRef>
-        <Reference class="sailpoint.object.Application" name="HR System Employees"/>
+        <Reference class="sailpoint.object.Application" name="HR System"/>
       </ApplicationRef>
     </AttributeSource>
   </ObjectAttribute>
@@ -190,7 +166,7 @@
     </AttributeSource>
     <AttributeSource name="manager">
       <ApplicationRef>
-        <Reference class="sailpoint.object.Application" name="HR System Employees"/>
+        <Reference class="sailpoint.object.Application" name="HR System"/>
       </ApplicationRef>
     </AttributeSource>
   </ObjectAttribute>
@@ -202,8 +178,18 @@
     </AttributeSource>
     <AttributeSource name="city">
       <ApplicationRef>
-        <Reference class="sailpoint.object.Application" name="HR System Employees"/>
+        <Reference class="sailpoint.object.Application" name="HR System"/>
       </ApplicationRef>
+    </AttributeSource>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="EmployeeType" editMode="ReadOnly" extendedNumber="4" name="employeeType" type="string">
+    <AttributeSource name="AppRule: Identity_Attribute_Contractor Contractor System Employee">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Contractor System Employee"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Identity_Attribute_Contractor"/>
+      </RuleRef>
     </AttributeSource>
   </ObjectAttribute>
 </ObjectConfig>

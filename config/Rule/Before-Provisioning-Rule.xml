@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Before Provisioning Rule" type="BeforeProvisioning">
+	<Description>An IdentityIQ server-side rule that is executed before the connector's provisioning method is called. This gives the customer the ability to customize or react to anything in the ProvisioningPlan BEFORE it is sent to the underlying connectors used in provisioning. This rule will be called for any application found in a plan that also has a configured 'beforeProvisioningRule' configured.  
+
+	The plan can be updated directly in the rule by reference and does not need to return the plan.</Description>
+  <Signature>
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="plan">
+        <Description>
+          The ProvisioningPlan object on its way to the Connector.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application object that references this before/after script.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>
+  
+	import org.apache.log4j.Logger;
+	import org.apache.log4j.Level;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+	import sailpoint.object.ProvisioningPlan;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.Identity;
+
+
+	if(plan != null){
+
+	String identityName = plan.getNativeIdentity().toString();
+
+	Identity identity = context.getObjectByName(Identity.class, identityName);
+
+	List acctRequests = plan.getAccountRequests("Application Name");
+
+	for(AccountRequest accountRequest:acctRequests ){
+		AccountRequest.Operation op = accountRequest.getOperation();
+
+		if(op == AccountRequest.Operation.Modify || op == AccountRequest.Operation.Disable || op == AccountRequest.Operation.Enable || op == AccountRequest.Operation.Delete){
+
+
+			AttributeRequest email = accountRequest.getAttributeRequest("emails.primary.value");
+			AttributeRequest givenName= accountRequest.getAttributeRequest("givenName");
+			AttributeRequest familyName= accountRequest.getAttributeRequest("familyName");
+			AttributeRequest group= accountRequest.getAttributeRequest("Group");
+
+			if(group != null &amp;&amp; group.getOperation() != null &amp;&amp; group.getOperation().equals(ProvisioningPlan.Operation.Remove))
+			{
+				accountRequest.setOperation(ProvisioningPlan.AccountRequest.Operation.Disable);
+			}
+			if(op == AccountRequest.Operation.Delete){
+	             accountRequest.setOperation(ProvisioningPlan.AccountRequest.Operation.Disable);
+	        }
+			if(email == null)
+			{
+				AttributeRequest attremail = new AttributeRequest("emails.primary.value", ProvisioningPlan.Operation.Add, identity.getEmail());
+
+				accountRequest.add(attremail);
+			}
+
+
+			if(givenName== null)
+			{
+				AttributeRequest attrgivenName = new AttributeRequest("givenName", ProvisioningPlan.Operation.Add, identity.getLastname());
+				accountRequest.add(attrgivenName);
+			}
+
+			if(familyName== null)
+			{
+				AttributeRequest attrfamilyName = new AttributeRequest("familyName", ProvisioningPlan.Operation.Add, identity.getFirstname());
+				accountRequest.add(attrfamilyName );
+			}
+		}
+	}
+}
+
+
+</Source>
+</Rule>

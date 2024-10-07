@@ -1,0 +1,194 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Certification Predelegation Rule" type="CertificationPreDelegation">
+  <Description>Rule to reasign Access Reviews for inactive certifiers, certifiers without email, and C-Level executives to the Certification Admin Workgroup.</Description>
+  <Signature returnType="Map">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="certification">
+        <Description>
+          The sailpoint.object.Certification being created.
+        </Description>
+      </Argument>
+      <Argument name="entity">
+        <Description>
+          The sailpoint.object.CertificationEntity to possibly pre-delegate.
+        </Description>
+      </Argument>
+      <Argument name="certContext">
+        <Description>
+          The sailpoint.api.CertificationContext generating this certification.
+        </Description>
+      </Argument>
+      <Argument name="state">
+        <Description>
+          A Map containing state information.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="recipientName">
+        <Description>
+        The name of the Identity that should certify this entity.  Either
+        this or 'recipient' should be non-null if pre-delegation should be
+        performed.
+        </Description>
+      </Argument>
+      <Argument name="recipient">
+        <Description>
+        The Identity that should certify this entity.  Either this or
+        'recipientName' should be non-null if pre-delegation should be
+        performed.
+        </Description>
+      </Argument>
+      <Argument name="description">
+        <Description>
+        Optional description to set on the delegation WorkItem.  If null, a
+        default description of 'Certify [entity name]' is used.
+        </Description>
+      </Argument>
+      <Argument name="comments">
+        <Description>
+        Optional comments to set on the delegation WorkItems.
+        </Description>
+      </Argument>
+      <Argument name="reassign">
+        <Description>
+        Optional boolean to specify to reassign rather than delegate.
+        </Description>
+      </Argument>
+      <Argument name="certificationName">
+        <Description>
+        Optional String to specify the name for the reassignment certification
+        if creating a new certification for reassignment.  This is ignored for
+        delegations.
+        </Description>
+      </Argument>
+    </Returns>
+	</Signature>
+	<Source>
+  
+	import sailpoint.api.SailPointContext;
+	import sailpoint.api.ObjectUtil;
+
+	import sailpoint.object.Certification;
+	import sailpoint.object.CertificationEntity;
+	import sailpoint.object.Identity;
+	import sailpoint.object.Attributes;
+	  
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+
+	/**
+	 * System configuration entry for the certification admin workgroup name.  This entry needs to be on SystemConfiguration
+	 * in the format &lt;entry key="cofCertificationAdminWorkgroup" value="Certification Admin Workgroup"/>
+	 */
+	String SYS_CONFIG_CERTIFICATION_ADMIN_WORKGROUP = "CertificationAdminWorkgroup";
+
+	Map returnMap = new HashMap();
+	String certificationName = certification.getName();
+	List certifierNames = certification.getCertifiers();
+	String certifierName = (String) certifierNames.get(0);
+	Identity certifier = context.getObjectByName(Identity.class, certifierName);
+
+
+	if (certifier != null) {
+
+		boolean flagForReassignment = false;
+		boolean isInactive = certifier.isInactive();
+		boolean missingEmail = false;
+		boolean isCLevel = false;
+		String identityCLevel = (String)certifier.getAttribute("ManagerLevel");
+		String identityEmail = certifier.getEmail();
+		String inactiveComment = "This Access Review has been reassigned because the original certifier [" + certifierName + "] was inactive";
+		String cLevelComment = "This Access Review has been reassigned because the original certifier [" + certifierName + "] is a C-Level Executive";
+		String noEmailComment = "This Access Review has been reassigned because the original certifier [" + certifierName + "] did not have an email address";
+		String certificationAdminWorkgroupName = (String) state.get("certificationAdminWorkgroupName");
+
+		//if certificationAdminWorkgroupName was not on the state Map, get it from sys config and add it to the state Map
+		if (certificationAdminWorkgroupName == null) {
+			certificationAdminWorkgroupName = context.getConfiguration().getString(SYS_CONFIG_CERTIFICATION_ADMIN_WORKGROUP);
+			state.put("certificationAdminWorkgroupName", certificationAdminWorkgroupName);
+		}
+
+		//initialize missingEmail and isCLevel
+		if(!(identityEmail instanceof String) || identityEmail.isEmpty()){
+			
+			//if the certifier is a workgroup, check if there are any effective email addresses
+			if(certifier.isWorkgroup()){
+				Identity.WorkgroupNotificationOption notificationOption = certifier.getNotificationOption();
+
+				//if workgroup does not have emails disabled and there are no effective emails, set missingEmail to true
+				if(!Identity.WorkgroupNotificationOption.Disabled.equals(notificationOption)){
+					List emails = ObjectUtil.getEffectiveEmails(context, certifier);
+					if(emails == null || emails.isEmpty()){
+						missingEmail = true;
+					}
+				}
+			} else{
+				missingEmail = true;
+			}
+		}
+		if(identityCLevel != null){
+			int managerLevel = 0;
+			try{
+				managerLevel = Integer.parseInt(identityCLevel);
+				if(managerLevel >= 95){
+					isCLevel = true;
+				}
+			} catch (NumberFormatException nfe){
+				isCLevel = false;
+			}
+		}
+
+		/*
+		 * If identity is inactive, identity is c-level executive, or identity does not have an email, set the
+		 * appropriate comment for the certification and flag for reassignemnt
+		 */
+		if (isInactive) {
+			flagForReassignment = true;
+			returnMap.put("comments", inactiveComment);
+		}
+		/*
+		 * removing C-Level check due to change in requirements
+		 *
+		if (isCLevel) {
+			flagForReassignment = true;
+			returnMap.put("comments", cLevelComment);
+		}
+		*/
+		if (missingEmail) {
+			flagForReassignment = true;
+			returnMap.put("comments", noEmailComment);
+		}
+
+		if (flagForReassignment) {
+			//send this certification to the certificationAdminWorkgroup
+			returnMap.put("recipient", context.getObjectByName(Identity.class, certificationAdminWorkgroupName));
+
+			//set this as a reassignment, not a delegation
+			returnMap.put("reassign", true);
+
+			//add the original certification name
+			//returnMap.put("certificationName", certificationName);
+		}
+		else{
+			//certificaiton does not need to be reassigned so return an empty Map
+			returnMap = new HashMap();
+		}
+
+	}
+
+	return returnMap;
+  </Source>
+</Rule>

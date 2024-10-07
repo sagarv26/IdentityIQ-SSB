@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Test Rule">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Rule Library"/>
+  </ReferencedRules>
+  <Source>
+  import java.util.*;
+  import sailpoint.object.*;
+  import sailpoint.api.Provisioner;
+  import sailpoint.api.*;
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.object.ProvisioningPlan.Operation;
+  import sailpoint.object.ProvisioningPlan.AccountRequest.Operation;
+
+  
+	return getNewUID(context);
+
+
+  </Source>
+</Rule>

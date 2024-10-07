@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="After Provisioning Rule.xml" type="AfterProvisioning">
+  <Description>An IdentityIQ server-side rule that is executed after the connector's provisioning method is called. This gives the customer the ability to customize or react to anything in the ProvisioningPlan AFTER it has been sent out to the specific applications.
+    This rule will be called for any application found in a plan that also has a configured 'afterProvisioningRule' configured.</Description>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="COF ServiceDog IncidentCreate Rule"/>
+    <Reference class="sailpoint.object.Rule" name="COF CyberArk PAM Server password retrieval rule"/>
+    <Reference class="sailpoint.object.Rule" name="COF CyberArk SCIM API Rule Library"/>
+    <Reference class="sailpoint.object.Rule" name="COF CyberArk Password Vault Rule"/>
+  </ReferencedRules>
+  <Signature>
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="plan">
+        <Description>
+          The ProvisioningPlan object on its way to the Connector.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application object that references this before/after script.
+        </Description>
+      </Argument>
+      <Argument name="result">
+        <Description>
+          The ProvisioningResult object returned by the connectors provision method. This can be null and in many cases the connector will  not return a result and instead will annotate the plan's ProvisioningResult either at the plan or account level.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	import sailpoint.object.Application;
+	import sailpoint.object.Attributes;
+	import sailpoint.object.Identity;
+	import sailpoint.object.ProvisioningPlan;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.ProvisioningResult;
+	import sailpoint.object.EmailOptions;
+	import sailpoint.object.EmailTemplate;
+
+	boolean isPassPost;
+	String passwordValue=null;
+	String sendEmailTo=null;
+	String passwordAttribute= "pwd";
+	String emailAttribute="email";
+
+	//The email template for the email which will be sent to end user
+	EmailTemplate template = context.getObjectByName(EmailTemplate.class, "Account Create Notification");
+
+	EmailOptions emailOptions;
+
+	//The email will only be sent if the result is committed.
+	if((result.isCommitted() || result.isSubmitted()) &amp;&amp; plan!=null &amp;&amp; application!=null)
+	{
+
+		List accountRequestList=plan.getAccountRequests(application.getName());
+
+		if(accountRequestList!=null &amp;&amp; !accountRequestList.isEmpty())
+		{
+
+		for(AccountRequest accountRequestValue:accountRequestList)
+		{
+
+			String nativeIdentityName=accountRequestValue.getNativeIdentity();
+
+			if(accountRequestValue.getOperation().toString().equalsIgnoreCase("Create"))
+			{
+
+			if(accountRequestValue.getAttributeRequest(passwordAttribute)!=null)
+			{
+
+				passwordValue= accountRequestValue.getAttributeRequest(passwordAttribute).getValue();
+				String identityRequestId = null;
+
+				if(plan.getArguments()!=null) {
+					Map arguments = plan.getArguments();
+
+					if(arguments != null &amp;&amp; arguments.get("identityRequestId") != null) {
+						identityRequestId = (String) arguments.get("identityRequestId");
+					}
+				}
+			
+				Identity identity = plan.getIdentity();
+				String identityName = identity.getName();
+  
+				String appName = application.getName();
+				Identity sendToIdentity=context.getObjectByName(Identity.class,nativeIdentityName.toUpperCase());
+
+				sendEmailTo= accountRequestValue.getAttributeRequest(emailAttribute).getValue();
+				if(sendEmailTo!=null &amp;&amp; sendToIdentity!=null)
+				{
+
+					Map argument = new HashMap();
+
+					//Set the arguments for email template
+					argument.put("To", sendEmailTo);
+					argument.put("owner",sendToIdentity);
+					argument.put("appName",application.getName());
+					argument.put("password",passwordValue);
+
+					//Setting the arguments and email receiver for email template
+					emailOptions = new EmailOptions(sendEmailTo, argument);
+
+					//Send out the email
+					context.sendEmailNotification(template, emailOptions);
+
+				}
+				else
+				{
+                //if we were not able to find email id, add a warning to the ProvisioningResult
+                result.addWarning("Unable to send email for " + nativeIdentityName);
+				}
+            }
+          }
+        }
+      }
+    }
+  }
+
+  </Source>
+</Rule>

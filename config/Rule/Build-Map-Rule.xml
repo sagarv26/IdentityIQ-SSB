@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Build Map Rule" type="BuildMap">
+  <Description>This rule is used by the delimited file connector to build a map representation of the delimited data.</Description>
+  <Signature returnType="Map">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application whose data file is being processed.
+        </Description>
+      </Argument>
+      <Argument name="schema">
+        <Description>
+          The Schema currently in use.
+        </Description>
+      </Argument>
+      <Argument name="state">
+        <Description>
+          A Map containing state information.
+        </Description>
+      </Argument>
+      <Argument name="record">
+        <Description>
+          A List of data tokens parsed from the current line of the data file.
+        </Description>
+      </Argument>
+      <Argument name="cols">
+        <Description>
+          A List of the columns to use.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="map">
+        <Description>
+          A Map of the resource object assembled from the data.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+  
+	import sailpoint.object.Schema;
+	import sailpoint.connector.Connector;
+	import sailpoint.connector.DelimitedFileConnector;
+	import sailpoint.connector.AbstractConnector;
+	import sailpoint.object.*;
+	import sailpoint.tools.*;
+	import sailpoint.api.*;
+	import java.util.*;
+	import sailpoint.tools.GeneralException;
+	import java.lang.*;
+	import java.io.*;
+	import java.util.List;
+
+ 
+		//Set the map with the next iterator for account/group
+		Map map = DelimitedFileConnector.defaultBuildMap(cols, record); 
+ 
+        //Process Accounts
+        if ( schema.getObjectType().compareTo(Connector.TYPE_ACCOUNT) == 0 ) {
+			
+			//Get all of the string values we want to manipulate
+            String groupname = (String)map.get("Group");
+			
+			//Split up the groups
+            List groups = new ArrayList();
+            if (groupname != null &amp;&amp; !groupname.equals("") ) {
+               String[] items = groupname.split(",");
+               for (int i = 0; i &lt; items.length ; i++ ) {
+                    String item = items[i].trim();
+                    if ((item != null) &amp;&amp; (! item.equals(""))) {
+                          groups.add(item);
+                      }          
+               }
+            }
+            map.put("Group", groups);
+                 
+		}  
+        
+		//Return the resulting "map"
+		return map;
+  
+  </Source>
+</Rule>

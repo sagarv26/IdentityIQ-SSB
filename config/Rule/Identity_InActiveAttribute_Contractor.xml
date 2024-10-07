@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Identity_InActiveAttribute_Contractor" type="IdentityAttribute">
+  <Description>Identity attribute rules are used when the value is not simply a copy of an application account attribute value.  A transformation may be necessary on the account attribute, or several account attributes may need to be combined to produce the identity attribute.
+
+    This rule can be called in two ways: as a global mapping rule and an application mapping rule.  A global mapping rule is called whenever the identity is refreshed.  The rule can look at any account attributes.  An application mapping rule is called only when the identity contains an account link for that application, this link is passed in the "link" argument which is not passed in global mapping rules.</Description>
+  <Signature returnType="String">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="environment" type="Map">
+        <Description>
+          Arguments passed to the aggregation or refresh task.
+        </Description>
+      </Argument>
+      <Argument name="identity">
+        <Description>
+          The Identity object that represents the user
+          that is being aggregated.
+        </Description>
+      </Argument>
+      <Argument name="attributeDefinition">
+        <Description>
+          The AttributeDefinition object for this attribute.
+        </Description>
+      </Argument>
+      <Argument name="link">
+        <Description>
+          The Link object from the Identity, if this is an application
+          mapping rule.  For global mapping rules this will be void.
+        </Description>
+      </Argument>
+      <Argument name="attributeSource">
+        <Description>
+          The AttributeSource object.
+        </Description>
+      </Argument>
+      <Argument name="oldValue">
+        <Description>
+          The original value of the application account attribute.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="attributeValue">
+        <Description>
+          The value of the attribute that should be populated.
+          The rule should return this value.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+
+	boolean active = false;
+	if(link != null &amp;&amp; link.getAttribute("enabled") != null){
+
+		active = link.getAttribute("enabled");
+
+		if(active){
+		  return "Active"
+		} else {
+		  return "InActive"
+		}
+
+	}
+
+
+  </Source>
+</Rule>

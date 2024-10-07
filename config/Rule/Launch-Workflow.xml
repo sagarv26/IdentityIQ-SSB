@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Launch Workflow" type="Workflow">
+  <Description>A rule used by a Workflow to determine a step action or variable value.
+	Note that an Attributes map of all variables from the current WorkflowContext, merged with the arguments from the Step, is also passed into the workflow rule.</Description>
+	<Signature returnType="Object">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="wfcontext">
+        <Description>
+          The current WorkflowContext.
+        </Description>
+      </Argument>
+      <Argument name="handler">
+        <Description>
+          The workflow handler associated with the current WorkflowContext.
+        </Description>
+      </Argument>
+      <Argument name="workflow">
+        <Description>
+          The current Workflow definition.
+        </Description>
+      </Argument>
+      <Argument name="step">
+        <Description>
+          The current Step.
+        </Description>
+      </Argument>
+      <Argument name="approval">
+        <Description>
+          The current Approval.
+        </Description>
+      </Argument>
+      <Argument name="item">
+        <Description>
+          The WorkItem being processed.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="Object">
+        <Description>
+          The result of the workflow rule; dependent on the rule itself.
+        </Description>
+      </Argument>
+    </Returns>
+	</Signature>
+	<Source>
+	import java.util.ArrayList;
+	import java.util.Collections;
+	import java.util.HashMap;
+	import java.util.List;
+
+	import org.apache.log4j.Logger;
+
+	import sailpoint.api.Workflower;
+	import sailpoint.object.Attributes;
+	import sailpoint.object.Identity;
+	import sailpoint.object.ProvisioningPlan;
+	import sailpoint.object.Workflow;
+	import sailpoint.object.WorkflowLaunch;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.Filter;
+	import sailpoint.object.QueryOptions;
+	import sailpoint.object.Link;
+	import sailpoint.object.Application;
+	import sailpoint.api.IdentityService;		  
+
+	String identityName = "";
+	String workflow = "";
+	HashMap 	launchArgsMap = new HashMap();
+	launchArgsMap.put("identityName", identityName);
+	launchArgsMap.put("launcher", "spadmin"); 
+	launchArgsMap.put("flow", "Leaver");
+	
+	//Create WorkflowLaunch and set values
+	WorkflowLaunch wfLaunch = new WorkflowLaunch();
+	Workflow wf = (Workflow)context.getObjectByName(Workflow.class, workflow);
+	wfLaunch.setWorkflowName(wf.getName());
+	wfLaunch.setWorkflowRef(wf.getName());
+	//wfLaunch.setCaseName("LCM Leaver for "+ identityName));
+	wfLaunch.setVariables(launchArgsMap);
+
+	//Create Workflower and launch workflow from WorkflowLaunch
+	Workflower workflower = new Workflower(context);
+	WorkflowLaunch launch = workflower.launch(wfLaunch); 
+	</Source>
+</Rule>

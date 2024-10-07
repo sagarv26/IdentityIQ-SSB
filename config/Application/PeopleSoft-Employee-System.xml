@@ -102,28 +102,13 @@
       <AttributeDefinition name="manager" type="string">
         <Description/>
       </AttributeDefinition>
-      <AttributeDefinition name="Department" type="string">
-        <Description/>
-      </AttributeDefinition>
-      <AttributeDefinition name="city" type="string">
-        <Description/>
-      </AttributeDefinition>
-      <AttributeDefinition name="office" type="string">
-        <Description/>
-      </AttributeDefinition>
       <AttributeDefinition name="employeenumber" type="string">
         <Description/>
       </AttributeDefinition>
       <AttributeDefinition name="enabled" type="string">
         <Description/>
       </AttributeDefinition>
-      <AttributeDefinition name="Description" type="string">
-        <Description/>
-      </AttributeDefinition>
       <AttributeDefinition name="title" type="string">
-        <Description/>
-      </AttributeDefinition>
-      <AttributeDefinition name="info" type="string">
         <Description/>
       </AttributeDefinition>
       <AttributeDefinition name="mail" type="string">

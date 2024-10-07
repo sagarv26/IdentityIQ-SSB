@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="UID Custom Object">
+  <Attributes>
+    <Map>
+      <entry key="prefix" value="aaa"/>
+      <entry key="suffix" value="1"/>    
+    </Map>
+  </Attributes>
+</Custom>

@@ -24,6 +24,9 @@
   <Variable name="plan">
     <Description>The provisioning plan, which is built by a service method. </Description>
   </Variable>
+  <Variable initializer="string:Leaver" name="flow">
+    <Description>The name of the identity.</Description>
+  </Variable>
   <Variable editable="true" initializer="false" name="optimisticProvisioning">
     <Description>
       Set to true to enable optimistic provisioning.  This will cause
@@ -96,12 +99,134 @@
   <RuleLibraries>
     <Reference class="sailpoint.object.Rule" name="LCM Workflow Library"/>
   </RuleLibraries>
-  <Step action="call:buildEventPlan" icon="Start" name="Build Provisioning Plan" posX="50" posY="10" resultVariable="plan">
-    <Arg name="identityName" value="ref:identityName"/>
-    <Arg name="op" value="Disable"/>
-    <Arg name="event" value="ref:event"/>
-    <Arg name="trigger" value="ref:trigger"/>
-    <Description>Go through all of the user's links and build a plan.</Description>
+  <Step icon="Start" name="Start" posX="28" posY="10">
+	<Transition to="ResetPassword"/>
+  </Step>
+  <Step icon="Message" name="ResetPassword" posX="148" posY="10" resultVariable="plan">
+    <Description>Process the user that joined.</Description>
+    <Script>
+      <Source>
+		import sailpoint.object.Identity;;
+
+		Identity identity = context.getObjectByName(Identity.class, identityName);
+		identity.setPassword("TermUser@123");
+		context.saveObject(identity);
+		context.commitTransaction();
+		
+		
+      </Source>
+    </Script>
+    <Transition to="Build Plan"/>
+  </Step>
+  <Step icon="Message" name="Build Plan" posX="148" posY="10" resultVariable="plan">
+    <Description>Process the user that joined.</Description>
+    <Script>
+      <Source>
+		import org.apache.commons.logging.Log;
+		import org.apache.commons.logging.LogFactory;
+		import org.apache.commons.lang.StringUtils;
+		import sailpoint.object.AttributeAssignment;
+		import sailpoint.api.IdentityService;
+		import sailpoint.api.ObjectUtil;
+		import sailpoint.api.SailPointContext;
+		import sailpoint.api.SailPointFactory;
+		import sailpoint.api.Provisioner;
+		import sailpoint.api.*;
+		import java.util.Calendar;
+		import sailpoint.object.IdentityEntitlement;
+		import sailpoint.object.ApprovalItem.ProvisioningState;
+		import sailpoint.object.Application;
+		import sailpoint.object.ApprovalItem;
+		import sailpoint.object.AuditEvent;
+		import sailpoint.object.Attributes;
+		import sailpoint.object.AuthenticationAnswer;
+		import sailpoint.object.AuthenticationQuestion;
+		import sailpoint.object.Bundle;
+		import sailpoint.object.Certification;
+		import sailpoint.object.CertificationEntity;
+		import sailpoint.object.Custom;
+		import sailpoint.object.EmailOptions;
+		import sailpoint.object.EmailTemplate;
+		import sailpoint.object.Filter;
+		import sailpoint.object.Form;
+		import sailpoint.object.Identity;
+		import sailpoint.object.IdentityRequest;
+		import sailpoint.object.IdentityRequestItem;
+		import sailpoint.object.Link;
+		import sailpoint.object.ManagedAttribute;
+		import sailpoint.object.ProvisioningPlan;
+		import sailpoint.object.ProvisioningPlan.AccountRequest;
+		import sailpoint.object.ProvisioningPlan.AttributeRequest;
+		import sailpoint.object.ProvisioningPlan.Operation;
+		import sailpoint.object.ProvisioningPlan.AccountRequest.Operation;
+		import sailpoint.object.ProvisioningProject;
+		import sailpoint.object.ProvisioningResult;
+		import sailpoint.object.QueryOptions;
+		import sailpoint.object.RoleAssignment;
+		import sailpoint.object.Field;
+		import sailpoint.object.Filter;
+		import sailpoint.object.Form;
+		import sailpoint.object.WorkItem;
+		import sailpoint.object.Form.Section;
+		import sailpoint.object.*;
+		import sailpoint.object.Request;
+		import sailpoint.object.Filter.LeafFilter;
+		import sailpoint.object.Filter.CompositeFilter;
+		import sailpoint.object.Profile;
+		import sailpoint.workflow.WorkflowContext;
+
+
+		import sailpoint.tools.GeneralException;
+		import sailpoint.tools.Message;
+		import sailpoint.tools.Util;
+		import sailpoint.tools.xml.XMLObjectFactory;
+
+		import java.util.ArrayList;
+		import java.util.HashMap;
+		import java.util.Iterator;
+		import java.util.List;
+		import java.util.Map;
+		import java.util.Arrays;
+		
+		System.out.println("User getting terminated from the system: " + event.getObject().getDisplayableName());
+	  
+		Identity identity = context.getObjectByName(Identity.class, identityName);
+		
+		ProvisioningPlan plan = new ProvisioningPlan();
+		// Set identity to the plan
+		plan.setIdentity(identity);
+		
+		List acctReqs = new ArrayList();
+		
+		List links = identity.getLinks();
+
+		for(Iterator iterator = links.iterator(); iterator.hasNext();){
+			Link link = (Link) iterator.next();
+			if(link.getApplicationName().equalsIgnoreCase("LDAP")){
+				AccountRequest ldapAcctReq = new AccountRequest();
+				ldapAcctReq.setOperation(AccountRequest.Operation.Disable);
+				ldapAcctReq.setNativeIdentity(link.getNativeIdentity());
+				ldapAcctReq.setApplication("LDAP");
+				acctReqs.add(ldapAcctReq);
+			}
+			
+			if(link.getApplicationName().equalsIgnoreCase("JDBC")){
+				AccountRequest jdbcAcctReq = new AccountRequest();
+				jdbcAcctReq.setOperation(AccountRequest.Operation.Disable);
+				jdbcAcctReq.setNativeIdentity(link.getNativeIdentity());
+				jdbcAcctReq.setApplication("HR System");
+				acctReqs.add(jdbcAcctReq);
+			}
+		}
+		
+		
+		plan.setAccountRequests(acctReqs);
+		
+		workflow.put("plan", plan);
+		
+		return plan;
+      </Source>
+    </Script>
     <Transition to="Initialize"/>
   </Step>
   <Step icon="Task" name="Initialize" posX="170" posY="10">

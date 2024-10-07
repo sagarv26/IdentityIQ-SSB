@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="Entitlement Certification Exclusion Rule" type="CertificationExclusion">
+  <Description>This rule is an example Certification Exclusion rule that removes all of the certifiable items from a certification if the identity being certified is marked as inactive.</Description>
+  <Signature returnType="String">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="entity" type="AbstractCertifiableEntity">
+        <Description>
+          The AbstractCertifiableEntity that is part of the certification.
+          Currently, this is either an Identity, ManagedAttribute, or Bundle.
+        </Description>
+      </Argument>
+      <Argument name="certification" type="Certification">
+        <Description>
+          The certification that this identity is part of.
+        </Description>
+      </Argument>
+      <Argument name="certContext" type="CertificationContext">
+        <Description>
+          The CertificationContext that is being used to generate the
+          certification.
+        </Description>
+      </Argument>
+      <Argument name="items" type="List">
+        <Description>
+          List of Certifiable items that are currently part of the
+          certification for this identity.  Any items that should be excluded
+          from the certification should be deleted from this list and added
+          to the itemsToExclude list.
+        </Description>
+      </Argument>
+      <Argument name="itemsToExclude" type="List">
+        <Description>
+          A List of Certifiable items that should not be included in the
+          certification.  This list will be empty when the rule is executed
+          and any items that should not be part of the certification should
+          be moved from the items list to the itemsToExclude list.
+        </Description>
+      </Argument>
+      <Argument name="state">
+        <Description>
+          A Map containing state information.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="explanation" type="String">
+        <Description>
+          An optional explanation describing why the items were excluded.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+	import java.util.ArrayList;
+	import java.util.HashMap;
+	import java.util.Iterator;
+	import java.util.List;
+	import java.util.Map;
+
+	import sailpoint.object.Certifiable;
+	import sailpoint.object.Custom;
+	import sailpoint.object.EntitlementSnapshot;
+
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	Certifiable certifiable = null;
+	Custom excludedEntitlementCustom = new Custom();
+	EntitlementSnapshot entitlementSnap = new EntitlementSnapshot();  
+	List entitlementNameList = new ArrayList();
+	List excludedEntitlementList=new ArrayList();        
+	Map excludedEntitlementMap = new HashMap();
+	Map excludedEntitlementMapFinal = new HashMap();
+	String applicationName = null;
+	String attributeNameFromCustom = null;
+	String explanation = "No Entitlement Excluded";
+	String name = null;
+
+	String APPLICATION_NAME = "application";
+	String EXCLUSION_CUSTOM = "Entitlement Certification Exclusion Rule Custom";
+	String ENTITLEMENTS_TO_BE_EXCLUDED = "entitlementsToBeExcluded";
+  
+  
+	Custom certExclusionCustomObject = (Custom) state.get("certExclusionCustomObject");  
+	if(certExclusionCustomObject == null){    
+		certExclusionCustomObject = context.getObjectByName(Custom.class,EXCLUSION_CUSTOM);
+		if(certExclusionCustomObject != null){	
+		
+			state.put("certExclusionCustomObject",certExclusionCustomObject); 
+			
+		}else{
+			throw new GeneralException("Exclusion Custom Object Not Found: "+EXCLUSION_CUSTOM);
+		}
+	}
+    
+  	excludedEntitlementMap = certExclusionCustomObject.get(ENTITLEMENTS_TO_BE_EXCLUDED);				 
+    
+  
+    Iterator it = items.iterator();
+    while(it.hasNext()){    
+        certifiable = (Certifiable) it.next();   
+        if (certifiable instanceof sailpoint.api.certification.DataOwnerCertificationBuilder$DataOwnerCertifiable &amp;&amp; excludedEntitlementMap != null &amp;&amp; excludedEntitlementMap.size()>0) {						
+            entitlementSnap = certifiable.getEntitlements();
+			
+			if(entitlementSnap != null &amp;&amp; entitlementSnap.getApplicationName() != null &amp;&amp; excludedEntitlementMap.containsKey(entitlementSnap.getApplicationName())){
+				applicationName = entitlementSnap.getApplicationName();
+
+				Set keyset  = excludedEntitlementMap.get(applicationName).keySet();
+				Iterator iter=keyset.iterator();
+				while(iter.hasNext()){
+					attributeNameFromCustom=(String)iter.next();
+				}                    
+				name = entitlementSnap.getAttributes().getString(attributeNameFromCustom);    
+                excludedEntitlementMapFinal = (Map)excludedEntitlementMap.get(applicationName);
+				excludedEntitlementList=(List)excludedEntitlementMapFinal.get(attributeNameFromCustom);		
+				if(excludedEntitlementList != null &amp;&amp; excludedEntitlementList.contains(name)){				
+					it.remove();
+					itemsToExclude.add(certifiable);
+					explanation = "Items are excluded due to Generic behaviour";					
+				}
+			}
+		}
+	}
+
+	return explanation;
+
+</Source>
+</Rule>

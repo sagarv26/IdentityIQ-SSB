@@ -1,0 +1,215 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Application PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Application connector="sailpoint.connector.LDAPConnector" featuresString="AUTHENTICATE, MANAGER_LOOKUP, SEARCH, PROVISIONING, SYNC_PROVISIONING" icon="directory2Icon" name="LDAP" profileClass="" type="LDAP">
+  <Attributes>
+    <Map>
+      <entry key="afterProvisioningRule"/>
+      <entry key="authSearchAttributes">
+        <value>
+          <List>
+            <String>cn</String>
+            <String>uid</String>
+            <String>mail</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="authorizationType" value="simple"/>
+      <entry key="beforeProvisioningRule"/>
+      <entry key="compositeDefinition"/>
+      <entry key="group.filterString"/>
+      <entry key="group.iterateSearchFilter"/>
+      <entry key="group.searchDN" value="ou=group,o=Company"/>
+      <entry key="group.searchScope" value="SUBTREE"/>
+      <entry key="groupEntitlementAttr" value="groups"/>
+      <entry key="host" value="localhost"/>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="pageSize" value="100"/>
+      <entry key="password" value="1:iJvf3BP6eWVG4Wf7C46QVw=="/>
+      <entry key="passwordAttr" value="userPassword"/>
+      <entry key="port" value="10389"/>
+      <entry key="searchDN" value="ou=user,o=Company"/>
+      <entry key="searchScope" value="SUBTREE"/>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="LDAP Template"/>
+      <entry key="useSSL">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="user" value="uid=admin,ou=system"/>
+    </Map>
+  </Attributes>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <ProvisioningForms>
+    <Form name="Account" objectType="account" type="Create">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="Account"/>
+        </Map>
+      </Attributes>
+      <Section>
+        <Field displayName="con_prov_policy_ldap_user_DN" helpKey="help_con_prov_policy_ldap_user_DN" name="dn" required="true" type="string">
+		<Script>
+          <Source>return "uid=" + identity.getAttribute("uid").toLowerCase() +",ou=user,o=Company";</Source>
+        </Script>
+		</Field>
+        <Field displayName="con_prov_policy_ldap_password" helpKey="help_con_prov_policy_ldap_password" name="password" required="true" type="secret">
+		<Script>
+          <Source>return "Iiq12345";</Source>
+        </Script>
+		</Field>
+        <Field displayName="con_prov_policy_ldap_full_name" helpKey="help_con_prov_policy_ldap_full_name" name="CN" required="true" type="string">
+		<Script>
+          <Source>return identity.getLastname().toLowerCase() + "," + identity.getFirstname().toLowerCase(); </Source>
+        </Script>
+		</Field>
+        <Field displayName="con_prov_policy_ldap_first_name" helpKey="help_con_prov_policy_ldap_first_name" name="givenName" required="true" type="string">
+		<Script>
+          <Source>return identity.getFirstname().toLowerCase();</Source>
+        </Script>
+		</Field>
+        <Field displayName="con_prov_policy_ldap_last_name" helpKey="help_con_prov_policy_ldap_last_name" name="SN" required="true" type="string">
+		<Script>
+          <Source>return identity.getLastname().toLowerCase();</Source>
+        </Script>
+		</Field>
+		<Field displayName="employeeNumber" name="employeeNumber" required="true" type="string">
+		<Script>
+          <Source>return identity.getAttribute("employeenumber");</Source>
+        </Script>
+		</Field>
+		<Field displayName="employeeType" name="employeeType" required="true" type="string">
+		<Script>
+          <Source>return identity.getAttribute("employeeType");</Source>
+        </Script>
+		</Field>
+		<Field displayName="title" name="title" required="true" type="string">
+		<Script>
+          <Source>return identity.getAttribute("title");</Source>
+        </Script>
+		</Field>
+		<Field displayName="uid" name="uid" required="true" type="string">
+		<Script>
+          <Source>return identity.getAttribute("uid");</Source>
+        </Script>
+		</Field>
+		<Field displayName="mail" name="mail" required="true" type="string">
+		<Script>
+          <Source>return identity.getAttribute("email");</Source>
+        </Script>
+		</Field>
+      </Section>
+    </Form>
+    <Form name="Create Group" objectType="group" type="Create">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="Create Group"/>
+        </Map>
+      </Attributes>
+      <Section>
+        <Field displayName="con_prov_policy_ldap_group_DN" helpKey="help_con_prov_policy_ldap_group_DN" name="dn" required="true" reviewRequired="true" type="string"/>
+        <Field displayName="con_prov_policy_ldap_description" helpKey="help_con_prov_policy_ldap_description" name="description" reviewRequired="true" type="string"/>
+      </Section>
+    </Form>
+    <Form name="Update Group" objectType="group" type="Update">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="Update Group"/>
+        </Map>
+      </Attributes>
+      <Section>
+        <Field displayName="con_prov_policy_ldap_owner" name="owner" type="string"/>
+        <Field displayName="con_prov_policy_ldap_common_name" name="cn" type="string"/>
+        <Field displayName="con_prov_policy_ldap_object_class" multi="true" name="objectClass" type="string"/>
+        <Field displayName="con_prov_policy_ldap_description" name="description" type="string"/>
+      </Section>
+    </Form>
+  </ProvisioningForms>
+  <Schemas>
+    <Schema displayAttribute="cn" identityAttribute="dn" instanceAttribute="" nativeObjectType="inetOrgPerson" objectType="account">
+      <AttributeDefinition name="cn" type="string">
+        <Description>common name(s) for which the entity is known by</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="dn" type="string">
+        <Description>distinguished name for which the entity is known by</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="displayName" type="string">
+        <Description>preferred name to be used when displaying entries</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="employeeNumber" type="string">
+        <Description>numerically identifies an employee within an organization</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="employeeType" type="string">
+        <Description>type of employment for a person</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="givenName" type="string">
+        <Description>first name(s) for which the entity is known by</Description>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" managed="true" multi="true" name="groups" schemaObjectType="group" type="string">
+        <Description>List of groups a user is a member</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="mail" type="string">
+        <Description>RFC822 Mailbox</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="manager" type="string">
+        <Description>DN of manager</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="mobile" type="string">
+        <Description>mobile telephone number</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="sn" type="string">
+        <Description>last (family) name(s) for which the entity is known by</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="title" type="string">
+        <Description>title associated with the entity</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="uid" type="string">
+        <Description>user identifier</Description>
+      </AttributeDefinition>
+      <AttributeDefinition multi="true" name="objectClass" type="string">
+        <Description>object classes of the entity</Description>
+      </AttributeDefinition>
+    </Schema>
+    <Schema displayAttribute="cn" featuresString="PROVISIONING" identityAttribute="dn" instanceAttribute="" nativeObjectType="groupOfUniqueNames" objectType="group">
+      <AttributeDefinition name="cn" type="string">
+        <Description>common name(s) for which the entity is known by</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="dn" type="string">
+        <Description>Directory Path</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="o" type="string">
+        <Description>organization this object belongs to</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="ou" type="string">
+        <Description>organizational unit this object belongs to</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="owner" type="string">
+        <Description>owner (of the object)</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="description" type="string">
+        <Description>descriptive information</Description>
+      </AttributeDefinition>
+      <Attributes>
+        <Map>
+          <entry key="groupMemberAttribute" value="uniqueMember"/>
+        </Map>
+      </Attributes>
+    </Schema>
+  </Schemas>
+  <ApplicationScorecard/>
+</Application>

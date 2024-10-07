@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Configuration name="IdentityAIConfiguration">
+  <Attributes>
+    <Map>
+      <entry key="connectTimeoutSeconds" value="10"/>
+      <entry key="readTimeoutSeconds" value="60"/>
+      <entry key="recommendationsEndpoint" value="beta/recommendations/request"/>
+    </Map>
+  </Attributes>
+</Configuration>
+</sailpoint>

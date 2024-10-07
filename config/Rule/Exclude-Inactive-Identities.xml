@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Exclude Inactive Identities" type="CertificationExclusion">
+  <Description>
+    This rule is an example Certification Exclusion rule that removes all
+    of the certifiable items from a certification if the identity being
+    certified is marked as inactive.
+  </Description>
+  <Signature returnType='String'>
+    <Inputs>
+      <Argument name='context' type='SailPointContext'>
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query
+          the system or execute other SailPointContext services.
+        </Description>
+      </Argument>
+      <Argument name='entity' type='AbstractCertifiableEntity'>
+        <Description>
+          The AbstractCertifiableEntity that is part of the certification.
+          Currently, this is either an Identity, AccountGroup, or Bundle.
+        </Description>
+      </Argument>
+      <Argument name='certification' type='Certification'>
+        <Description>
+          The certification that this identity is part of.
+        </Description>
+      </Argument>
+      <Argument name='certContext' type='CertificationContext'>
+        <Description>
+          The CertificationContext that is being used to generate the
+          certification.
+        </Description>
+      </Argument>
+      <Argument name='items' type='List'>
+        <Description>
+          List of Certifiable items that are currently part of the
+          certification for this identity.  Any items that should be excluded
+          from the certification should be deleted from this list and added
+          to the itemsToExclude list.
+        </Description>
+      </Argument>
+      <Argument name='itemsToExclude' type='List'>
+        <Description>
+          A List of Certifiable items that should not be included in the
+          certification.  This list will be empty when the rule is executed
+          and any items that should not be part of the certification should
+          be moved from the items list to the itemsToExclude list.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name='explanation' type='String'>
+        <Description>
+          An optional explanation describing why the items were excluded.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+	// if the identity is inactive, then add all of the items to the
+    // exclude list
+    if ( identity.isInactive() ) {
+      itemsToExclude.addAll(items);
+      items.clear();
+    }
+
+    // No explanation.
+    return null;
+  </Source>
+</Rule>

@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="JDBC Provisioning Rule" type="JDBCOperationProvisioning">
+  <Description>This rule is used by the JDBC connector to do provisioning of the data .</Description>
+  <Signature returnType="ProvisioningResult"/>
+  <Source>
+  <![CDATA[
+	import sailpoint.object.Identity;
+	import java.sql.PreparedStatement;
+	import java.util.Date;
+	import sailpoint.object.ProvisioningResult;
+
+
+	String sql = "insert into hr_emp(EmployeeID, givenName, sn, name, manager, mail, employeeNumber, enabled, title, info) values (?,?,?,?,?,?,?,?,?,?)";
+
+	Identity identity = plan.getIdentity();
+	String eid = plan.getIdentity().getAttribute("uid");
+	if(eid==null && identity.getAttribute("uid")!=null ){
+		eid=(String) identity.getAttribute("uid").toString();
+	}
+
+	String firstName = identity.getFirstname();
+	if(firstName == null && identity.getAttribute("firstname") != null){
+		firstName = (String) identity.getAttribute("firstname").toString();
+	}
+	
+	String lastName = identity.getLastname();
+	if(lastName == null && identity.getAttribute("lastname") != null){
+		lastName = (String) identity.getAttribute("lastname").toString();
+	}
+	
+	String email = identity.getEmail();
+	if(email == null && identity.getAttribute("email") != null){
+		email = (String) identity.getAttribute("email").toString();
+	}
+	
+	String fullName = "";
+	if(identity.getAttribute("displayName") != null){
+		fullName = (String) identity.getAttribute("displayName").toString();
+	}
+	
+	String manager = "";
+	if(identity.getManager() != null && identity.getManager().getAttribute("uid") != null){
+		manager = (String) identity.getManager().getAttribute("uid").toString();
+	}
+	
+	String employeeNumber = "";
+	if(identity.getAttribute("employeenumber") != null){
+		employeeNumber = (String) identity.getAttribute("employeenumber").toString();
+	}
+	
+	String title = "";
+	if(identity.getAttribute("title") != null){
+		title = (String) identity.getAttribute("title").toString();
+	}
+	
+	String employeeType = "";
+	if(identity.getAttribute("employeeType") != null){
+		employeeType = (String) identity.getAttribute("employeeType").toString();
+	}
+
+	PreparedStatement ps = connection.prepareStatement(sql);
+	ps.setString(1, eid);
+	ps.setString(2, firstName);
+	ps.setString(3, lastName);
+	ps.setString(4, fullName);
+	ps.setString(5, manager);
+	ps.setString(6, email);
+	ps.setString(7, employeeNumber);
+	ps.setString(8, "TRUE");
+	ps.setString(9, title);
+	ps.setString(10, employeeType);
+	
+	int updateStatus = 0;
+	try{
+		updateStatus = ps.executeUpdate();
+	}catch(SQLException){
+		// if the user account exists in target system and account does not exists in IIQ, existing account will be updated.
+		/**String sql = "update hr_emp set EmployeeID = ?, givenName = ?, sn = ?, name = ?, manager = ?, mail = ?, employeeNumber = ?, enabled = ?, titlr = ?, info = ? where EmployeeID = ?";
+		ps.setString(1, eid);
+		ps.setString(2, firstName);
+		ps.setString(3, lastName);
+		ps.setString(4, fullName);
+		ps.setString(5, manager);
+		ps.setString(6, email);
+		ps.setString(7, employeeNumber);
+		ps.setString(8, "TRUE");
+		ps.setString(9, title);
+		ps.setString(10, employeeType);
+		ps.setString(11, eid);
+		updateStatus = ps.executeUpdate();**/
+	}
+	log.debug(".........request...." +updateStatus);
+	if(updateStatus > 0){
+		ProvisioningResult result = new ProvisioningResult();
+		result.setStatus(ProvisioningResult.STATUS_COMMITTED);
+		plan.setResult(result);
+	}
+	]]>
+</Source>
+</Rule>

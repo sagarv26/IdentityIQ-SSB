@@ -2,6 +2,9 @@
 <!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
 <sailpoint>
 <Application authoritative="true" connector="sailpoint.connector.DelimitedFileConnector" featuresString="DIRECT_PERMISSIONS, NO_RANDOM_ACCESS, DISCOVER_SCHEMA" icon="enterpriseIcon" name="Contractor System Employee" profileClass="" type="DelimitedFile">
+  <AccountCorrelationConfig>
+    <Reference class="sailpoint.object.CorrelationConfig" name="Contractor Correlation"/>
+  </AccountCorrelationConfig>
   <Attributes>
     <Map>
       <entry key="acctAggregationEnd">
@@ -49,7 +52,7 @@
       </entry>
       <entry key="managerCorrelationFilter">
         <value>
-          <Filter operation="EQ" property="employeeid" value="manager"/>
+          <Filter operation="EQ" property="employeenumber" value="manager"/>
         </value>
       </entry>
       <entry key="mergeRows">
@@ -85,11 +88,14 @@
   <CreationRule>
     <Reference class="sailpoint.object.Rule" name="Creation_SetPassword"/>
   </CreationRule>
+  <CustomizationRule>
+    <Reference class="sailpoint.object.Rule" name="Contractor Customization Rule"/>
+  </CustomizationRule>
   <Owner>
     <Reference class="sailpoint.object.Identity" name="spadmin"/>
   </Owner>
   <Schemas>
-    <Schema displayAttribute="name" identityAttribute="EmployeeID" instanceAttribute="" nativeObjectType="account" objectType="account" permissionsRemediationModificationType="None">
+    <Schema displayAttribute="employeenumber" identityAttribute="employeenumber" instanceAttribute="" nativeObjectType="account" objectType="account" permissionsRemediationModificationType="None">
       <AttributeDefinition name="EmployeeID" type="string">
         <Description/>
       </AttributeDefinition>
@@ -102,34 +108,19 @@
       <AttributeDefinition name="name" type="string">
         <Description/>
       </AttributeDefinition>
-      <AttributeDefinition name="manager" type="string">
-        <Description/>
-      </AttributeDefinition>
       <AttributeDefinition name="mail" type="string">
-        <Description/>
-      </AttributeDefinition>
-      <AttributeDefinition name="Department" type="string">
-        <Description/>
-      </AttributeDefinition>
-      <AttributeDefinition name="city" type="string">
-        <Description/>
-      </AttributeDefinition>
-      <AttributeDefinition name="office" type="string">
         <Description/>
       </AttributeDefinition>
       <AttributeDefinition name="employeenumber" type="string">
         <Description/>
       </AttributeDefinition>
-      <AttributeDefinition name="enabled" type="string">
-        <Description/>
-      </AttributeDefinition>
-      <AttributeDefinition name="Description" type="string">
+      <AttributeDefinition name="inactive" type="boolean">
         <Description/>
       </AttributeDefinition>
       <AttributeDefinition name="title" type="string">
         <Description/>
       </AttributeDefinition>
-      <AttributeDefinition name="info" type="string">
+	  <AttributeDefinition name="manager" type="string">
         <Description/>
       </AttributeDefinition>
     </Schema>
