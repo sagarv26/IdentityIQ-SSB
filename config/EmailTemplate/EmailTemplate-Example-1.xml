@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate  name="EmailTemplate Example 1">
+  <Body>
+&lt;html>
+&lt;body>
+#set($spctx=$spTools.class.forName("sailpoint.api.SailPointFactory").getMethod("getFactory", null).invoke(null, null).getCurrentContext())
+#set( $identityRequest = $spctx.getObjectByName($spTools.class.forName("sailpoint.object.IdentityRequest"), $identityRequestId) )
+
+#set( $identity = $spctx.getObjectByName($spTools.class.forName("sailpoint.object.Identity"), $identityName) )
+
+ &lt;p>
+ &lt;b>Requester $identityRequest.requesterDisplayName&lt;/b>
+ &lt;/p>
+ 
+ &lt;p>
+ User: $identity.displayableName
+ &lt;/p>
+ 
+
+&lt;/body>
+&lt;/html>
+
+</Body>
+  <Subject>Sample Email</Subject>
+  <Signature>
+    <Inputs>
+      <Argument name="identityRequest" type="String"/>
+	  <Argument name="identityName" type="String"/>
+    </Inputs>
+  </Signature>
+</EmailTemplate>

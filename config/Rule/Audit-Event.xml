@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Audit Event">
+ <Description>Debugging Tool - Sends a sample email out via the email
+server.</Description>
+ <Signature returnType="Map">
+ <Inputs>
+ <Argument name="log">
+ <Description>
+ The log object associated with the SailPointContext.
+ </Description>
+ </Argument>
+ <Argument name="context">
+ <Description>
+ A sailpoint.api.SailPointContext object that can be used to query the database
+if necessary.
+ </Description>
+ </Argument>
+ </Inputs>
+ </Signature>
+ <Source>
+	import sailpoint.object.*;
+	import java.util.*;
+	import sailpoint.api.*;
+	import sailpoint.tools.*;
+	import sailpoint.server.Auditor;
+		
+	
+	AuditEvent audit = new AuditEvent();
+	audit.setApplication("LDAP");
+	audit.setSource("Identity Attribute Update");
+	audit.setAction("Modify");
+	audit.setTarget("2020013");
+	audit.setAccountName("user2,test");
+	audit.setString1("Test Audit Event");
+	
+	
+	context.saveObject(audit);
+	context.commitTransaction();
+ </Source>
+ </Rule>
+</sailpoint>

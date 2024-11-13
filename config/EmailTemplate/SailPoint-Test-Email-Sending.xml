@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate name="SailPoint - Test Email Sending">
+  <Body>Sample EmailTemplate $testField1
+    </Body>
+  <Description>
+      Sample Email.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="testField1" type="String"/>
+    </Inputs>
+  </Signature>
+  <Subject>Sample Email</Subject>
+</EmailTemplate>

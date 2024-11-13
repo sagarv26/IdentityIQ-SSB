@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Update Identity Attribute">
+  <Source>
+  import java.io.*;
+  import java.util.*;
+  import sailpoint.object.*;
+  import sailpoint.tools.Message;
+
+    String user = "";
+    String attr = "";
+    String value = "";
+
+    if(null != user &amp;&amp; null != group){
+      Identity identity = context.getObjectByName(Identity.class,user);
+
+      if(null != identity){
+        identity.setAttribute(attr, value);
+        context.saveObject(identity);
+        context.commitTransaction();
+        context.decache(identity);
+      }
+    }
+
+    
+
+
+  return "Success";
+  </Source>
+</Rule>

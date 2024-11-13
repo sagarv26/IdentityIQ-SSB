@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="GetManagedAttribute">
+  <Description>This rule will create approval summary to upadate in 'Interaction' section of 'Access Request Page'</Description>
+  <Signature>
+    <Inputs>
+      <Argument name="managedAttributeValue"/>
+    </Inputs>
+	<Returns>
+      <Argument name="managedAttribute"/>
+    </Returns>
+  </Signature>
+  <Source>
+
+ 
+	import sailpoint.object.Identity; 
+	import java.util.List;
+	import java.util.ArrayList;
+	import sailpoint.object.WorkItem;
+	import sailpoint.object.IdentityRequest;
+	import sailpoint.object.*;
+	import sailpoint.object.WorkflowSummary.ApprovalSummary;
+	import sailpoint.api.*;
+	import sailpoint.object.QueryOptions;
+	import sailpoint.object.Filter;
+	import sailpoint.tools.GeneralException;
+
+
+    QueryOptions ops = new QueryOptions();
+  
+	Filter f1 = Filter.eq("application.name", "LDAP");
+	Filter f2 = Filter.and(f1, Filter.ignoreCase(Filter.eq("value", managedAttributeValue)));
+	ops.addFilter(f2);
+
+	Iterator iterator = context.search(ManagedAttribute.class, ops);
+	if(null != iterator &amp;&amp; iterator.hasNext()){
+		ManagedAttribute managedAttribute = (ManagedAttribute) iterator.next();
+		return managedAttribute;
+	}
+
+  </Source>
+</Rule>

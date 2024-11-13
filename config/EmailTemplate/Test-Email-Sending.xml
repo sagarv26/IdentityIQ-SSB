@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate name="Test Email Sending">
+	<Body>
+	&lt;html&gt;
+		&lt;body&gt;
+		#set($spctx=$spTools.class.forName("sailpoint.api.SailPointFactory").getMethod("getFactory", null).invoke(null, null).getCurrentContext())
+		#set ($rule = $spctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "GetManagedAttribute") ) 
+		#set ($ruleArgs=$spTools.class.forName("java.util.HashMap").newInstance())
+   
+		#set ($wfcontext = $ruleArgs.put("managedAttributeValue", "cn=admins,ou=group,o=Company") )
+		#set( $ruleOutput = $spctx.runRule($rule, $ruleArgs) ) 
+   
+		&lt;p&gt; &lt;b&gt; $ruleOutput&lt;/b&gt; &lt;/p&gt;
+    
+
+		&lt;/body&gt;
+	&lt;/html&gt;
+	</Body>
+	<Signature>
+  </Signature>
+  <Subject>Sample Email Sending</Subject>
+</EmailTemplate>

@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="Test Email Sending" type="BuildMap">
+ <Description>Debugging Tool - Sends a sample email out via the email
+server.</Description>
+ <Signature returnType="Map">
+ <Inputs>
+ <Argument name="log">
+ <Description>
+ The log object associated with the SailPointContext.
+ </Description>
+ </Argument>
+ <Argument name="context">
+ <Description>
+ A sailpoint.api.SailPointContext object that can be used to query the database
+if necessary.
+ </Description>
+ </Argument>
+ </Inputs>
+ </Signature>
+ <Source>
+ // Library inclusions for BeanShell
+import sailpoint.api.*;
+import sailpoint.object.*;
+import sailpoint.tools.*;
+import java.util.*;
+import java.lang.*;
+import java.text.*;
+
+// Point this to the "To" email address
+String emailDest = "Test.User@sweinc.com";
+// Specify the email template name in tplName
+String tplName = "SailPoint - Test Email Sending";
+EmailTemplate template = context.getObjectByName(EmailTemplate.class, tplName);
+if (null == template) {
+ log.error("ERROR: could not find email template [ " + tplName + "]");
+ return;
+}
+template = (EmailTemplate) template.deepCopy(context);
+if (null == template) {
+ log.error("ERROR: failed to deepCopy template [ " + tplName + "]");
+ return;
+}
+Map args = new HashMap();
+// Add all args needed by the template like this
+args.put("testField1", "This is a test of template parameters.");
+
+EmailOptions ops = new EmailOptions(emailDest, args);
+context.sendEmailNotification(template, ops);
+return;
+ </Source>
+ </Rule>
+</sailpoint>

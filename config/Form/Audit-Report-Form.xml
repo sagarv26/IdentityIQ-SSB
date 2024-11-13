@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Form PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Form name="Audit Report Form">
+  <Section columns="2" label="Audit Properties" name="customProperties">
+    <Field displayName="Creation Start Date" helpKey="Include all AuditEvents created after this date" name="creationDateStart" type="date" value="ref:creationDateStart"/>
+    <Field displayName="Creation End Date" helpKey="Include all AuditEvents created before this date" name="creationDateEnd" type="date" value="ref:creationDateEnd"/>
+  </Section>
+</Form>

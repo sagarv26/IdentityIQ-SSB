@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="Application Custom Object">
+  <Attributes>
+    <Map>
+      <entry key="ApplicationList">
+        <value>
+          <List>
+            <String>LDAP</String>
+            <String>HR System</String>
+            <String>Contractor System Employee</String>
+          </List>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+</Custom>

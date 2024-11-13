@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Form PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Form name="Terminate User Form" type="Workflow">
+  <Attributes>
+    <Map>
+      <entry key="pageTitle" value="Immediate Termination"/>
+    </Map>
+  </Attributes>
+  <Section type="text">
+	<Attributes>
+    <Map>
+      <entry key="subTitle" value="Please review the following selected user you wish to terminate"/>
+    </Map>
+	</Attributes>
+    <Field value=" "/>
+  </Section>
+  <Section name="userDetails">
+    <Field displayName="User Name" name="user" dynamic="true" postBack="true" required="true" type="identity">
+		<Attributes>
+		<Map>
+		<entry key="hidden">
+          <value>
+            <Script>
+              <Source>
+				import sailpoint.object.*;
+				
+				String idStr = form.getField("user").getValue();
+				Identity id = null;
+                if(null != idStr) {
+					id = context.getObjectByName(Identity.class, idStr);
+					
+					System.out.println("id "+id);
+                } 
+				
+				return false;
+              </Source>
+            </Script>
+          </value>
+        </entry>
+		</Map>
+		</Attributes>
+	</Field>
+  </Section>
+  <Button action="next" label="Terminate Now"/>
+  <Button action="cancel" label="Cancel"/>
+</Form>

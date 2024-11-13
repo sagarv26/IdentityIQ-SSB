@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Require LDAP Account Policy Rule" type="Policy">
+  <Description>This rule is used to determine if a Policy has been violated.</Description>
+  <Signature returnType="PolicyViolation">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity">
+        <Description>
+          The Identity being inspected.
+        </Description>
+      </Argument>
+      <Argument name="policy">
+        <Description>
+          The Policy being evaluated.
+        </Description>
+      </Argument>
+      <Argument name="constraint">
+        <Description>
+          The Constraint being evaluated.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="violation">
+        <Description>
+          The PolicyViolation object.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+	import java.util.List;
+	import java.util.ArrayList;
+	import sailpoint.object.*;
+	import sailpoint.api.*;
+	import sailpoint.object.PolicyViolation;
+	import sailpoint.object.PolicyViolation.Status;
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	Log log = LogFactory.getLog("com.swe.serviceaccountPolicyRule"); 
+	log.info("Entering serviceaccountPolicyRule:"+identity);
+	
+    Application application = context.getObject(Application.class,"LDAP");
+	
+	IdentityService service = new IdentityService(context);
+
+	List ldapLinks = service.getLinks(identity, application);
+	
+	if(ldapLinks.size() == 0){
+		violation = new PolicyViolation();
+		violation.setActive(true);
+		violation.setIdentity(identity);
+		violation.setPolicy(policy);
+		violation.setConstraint(constraint);
+		violation.setDescription("Require LDAP Account");
+		violation.setStatus(sailpoint.object.PolicyViolation.Status.Open);
+	}
+
+
+	return violation;
+  </Source>
+</Rule>

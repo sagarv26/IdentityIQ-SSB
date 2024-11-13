@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="Access Request Details" progressMode="Percentage" resultAction="Rename" subType="Lifecycle Manager Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="IdentityRequest Report">
+            <DataSource type="Hql">
+              <Query>from IdentityRequest rid where rid.type in ('Joiner', 'Leaver')</Query>              
+            </DataSource>
+            <Columns>
+              <ReportColumnConfig field="RequestID" header="Request ID" property="rid.name" width="110"/>
+              <ReportColumnConfig field="Requester" header="Requester" property="rid.requesterDisplayName" width="110"/>
+			  <ReportColumnConfig field="Requestee" header="Requestee" property="rid.targetDisplayName" width="110"/>
+			  <ReportColumnConfig field="Requestee EmployeeType" header="Requestee EmployeeType" property="rid.targetId" width="110">
+			  <RenderScript>
+			  <Source>
+				import sailpoint.object.*; 
+				
+				if(value != null){
+				Identity identity =  context.getObjectById( Identity.class, value );
+				return identity.getAttribute("employeeType");
+				
+				}else {
+				return "NA";
+				}
+			  
+			  </Source>
+			  </RenderScript>
+			  </ReportColumnConfig>
+            </Columns>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>Displays IR Info</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessAccountGroupMembershipReport"/>
+  </RequiredRights>
+</TaskDefinition>
+</sailpoint>

@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Get Custom Object Rule">
+  <Source>
+  import java.util.ArrayList;
+  import java.util.Iterator;
+  import java.util.List;
+
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.Custom;
+  import sailpoint.object.Application;
+  import sailpoint.object.Rule;
+  import sailpoint.object.Filter;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.TaskDefinition;
+  import sailpoint.object.TaskResult;
+  import sailpoint.object.TaskResult.CompletionStatus;
+  import sailpoint.tools.Util;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import sailpoint.tools.GeneralException;
+  
+  Log log = LogFactory.getLog("com.cof.rap.COFCheckPromoteManagedAttributeRule");
+
+	try {
+		Custom custom = context.getObject(Custom.class, "Application Custom Object");
+		if (custom != null &amp;&amp; custom.getList("ApplicationList") != null &amp;&amp; !custom.getList("ApplicationList").isEmpty()) {
+			List list = (List) custom.get("ApplicationList");
+			Filter eq = Filter.eq("type", "AccountAggregation");
+			QueryOptions options = new QueryOptions();
+			options.addFilter(eq);
+			Iterator search = context.search(TaskDefinition.class, options);
+			while (search.hasNext()) {
+				TaskDefinition definition = (TaskDefinition) search.next();
+				String applications = (String) definition.getArgument("applications");
+				if (Util.isNotNullOrEmpty(applications)) {
+					List apps = new ArrayList();
+					if (applications.contains(",")) {
+						apps = Util.csvToList(applications);
+					} else {
+						apps.add(applications);
+					}
+				}
+			}
+
+
+		}
+	} catch(GeneralException e){
+		log.error("Error " + e.getMessage());
+    } catch(Exception ex){
+		log.error("Error " + ex.getMessage());
+    } finally {
+		context.commitTransaction();
+	}
+
+	return "Success";
+
+  </Source>
+</Rule>

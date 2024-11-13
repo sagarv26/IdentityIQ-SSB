@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="Audit Detail Report" progressMode="Percentage" resultAction="Rename" subType="Audit Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+ <value>
+ <LiveReport title="Audit Report">
+ <DataSource objectType="AuditEvent" type="Filter">
+ <QueryParameters>
+ <Parameter argument="creationDateStart" operation="GT" property="created"/>
+ <Parameter argument="creationDateEnd" operation="LT" property="created"/>
+ </QueryParameters>
+ </DataSource>
+ <ReportForm>
+              <Reference class="sailpoint.object.Form" name="Audit Report Form"/>
+ </ReportForm>
+ <Columns>
+ <ReportColumnConfig field="created" header="Date" property="created" sortable="true" />
+ <ReportColumnConfig field="action" header="Action" property="action" sortable="true" />            
+ <ReportColumnConfig field="source" header="Source" property="source" sortable="true" />
+ <ReportColumnConfig field="target" header="Target" property="target" sortable="true" />
+ <ReportColumnConfig field="string1" header="String 1" property="string1" sortable="true" />
+ <ReportColumnConfig field="string2" header="String 2" property="string2" sortable="true" />
+              <ReportColumnConfig field="string3" header="String 3" property="string3" sortable="true" />
+ <ReportColumnConfig field="string4" header="String 4" property="string4" sortable="true" />
+ </Columns>
+ </LiveReport>
+        </value>
+      </entry>
+    </Map>
+ </Attributes>
+ <Description>Displays audit records generated between specified dates.</Description>
+ <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessWorkItemReport"/>
+ </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument name="creationDateStart" type="date">
+ <Description>rept_input_cert_report_create_dt_start</Description>
+ </Argument>
+      <Argument name="creationDateEnd" type="date">
+ <Description>rept_input_cert_report_create_dt_end</Description>
+ </Argument>
+     </Inputs>
+  </Signature>
+</TaskDefinition>

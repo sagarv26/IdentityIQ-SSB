@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="BeanShell Example">
+  <Source>
+  import java.util.*;
+  import sailpoint.object.*;
+
+  System.out.println("Simple Beanshell...");
+  String identityName = "2020009";
+  System.out.println("Searching User: "+identityName);
+  Identity identity = context.getObjectByName(Identity.class, identityName);
+
+
+  //Condtion ex1
+  if(identity == null){
+    System.out.println("No User Found... ");
+    return;
+  }
+
+  //Condtion ex2
+  if(identity != null &amp;&amp; identity.getLinks() != void){
+    System.out.println("User Links: "+identity.getLinks());
+
+    //loop ex1
+    for(Link link : identity.getLinks()){
+      System.out.println("User Link: "+link.getApplication());
+
+    }
+
+    //return identity.getLinks();
+
+  }
+
+  /*if(identity != null @and identity.getLinks() @lt 0){
+  }*/
+
+  //loop ex2
+  QueryOptions options = new QueryOptions();
+  List identityList = context.getObjects(Identity.class, options);
+  List idList = new ArrayList();
+  if (null != identityList) {
+
+    for (Identity id : identityList) {
+      idList.add(id.getDisplayName());
+    }
+
+  }
+
+  return idList;
+  //return identity.getDisplayName();
+
+
+
+  </Source>
+</Rule>

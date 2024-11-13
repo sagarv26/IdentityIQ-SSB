@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE QuickLink PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<QuickLink action="workflow" category="Manage" messageKey="Immediate Termination" name="Immediate Termination" ordering="1">
+  <Attributes>
+    <Map>
+      <entry key="requester">
+        <value>
+          <Script>
+            <Source> return currentUser.getName();</Source>
+          </Script>
+        </value>
+      </entry>
+	  <entry key="requesterName">
+        <value>
+          <Script>
+            <Source> return currentUser.getDisplayName();</Source>
+          </Script>
+        </value>
+      </entry>
+      <entry key="workflowName" value="Immediate Termination"/>
+      <entry key="workflowSuccess" value="Workflow Successfully launched"/>
+    </Map>
+  </Attributes>
+  <QuickLinkOptions allowSelf="true" >
+    <DynamicScopeRef>
+      <Reference class="sailpoint.object.DynamicScope" name="User Mainenance"/>
+    </DynamicScopeRef>
+  </QuickLinkOptions>
+</QuickLink>

@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="QueryOptions Example Rule">
+  <Source>
+	import java.util.*;
+	import sailpoint.object.*;
+	import sailpoint.api.Provisioner;
+	import sailpoint.api.*;
+	import sailpoint.object.QueryOptions;
+	import sailpoint.object.Filter;
+	import sailpoint.tools.Util;
+	import sailpoint.tools.GeneralException;
+
+
+	//SQL Query
+	String query = "sql: SELECT name, extended1 FROM IDENTITYIQ.SPT_IDENTITY";
+
+	//HQL Query
+	//String query = "select name, displayName FROM Identity";
+	Iterator results = null;
+   
+	try{
+
+		QueryOptions qo = new QueryOptions();
+		qo.setCloneResults(true);
+		qo.setQuery(sqlQuery);
+		results = context.search(sqlQuery, null, qo);
+
+		while(results.hasNext()){
+
+			Object[] resultValues = results.next();
+
+			String val1 = resultValues[0];
+			String val2 = resultValues[1];
+			
+			System.out.println("Name: "+val1);
+			System.out.println("UID: "+val2);
+
+		}
+	}  catch(GeneralException ex){
+		log.error("GeneralException occured " + ex.getMessage());
+	} catch(Exception ex){
+		log.error("Exception occured " + ex.getMessage());
+	}finally {
+		if(null!=results) Util.flushIterator(results);
+	}
+
+
+  </Source>
+</Rule>

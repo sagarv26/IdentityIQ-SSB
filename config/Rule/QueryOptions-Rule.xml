@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="QueryOptions Rule">
+  <Source>
+  import java.util.*;
+  import sailpoint.object.*;
+  import sailpoint.api.Provisioner;
+  import sailpoint.api.*;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.Filter;
+
+
+  /* QueryOptions ops = new QueryOptions();
+  Application app = null;
+  //#1
+  Filter myFilter = Filter.eq("name", "LDAP");
+  //ops.addFilter(myFilter);
+
+
+  //#2
+  ops.addFilter(Filter.eq("name", "LDAP"));
+
+  Iterator iterator = context.search(Application.class, ops);
+  if(null != iterator &amp;&amp; iterator.hasNext()){
+    app = (Application) iterator.next();
+  }
+
+ // return app.getName();*/
+
+  //#3
+  Identity identity = null;
+  List filterList = new ArrayList();
+
+
+  filterList.add(Filter.ignoreCase(Filter.eq("uid", "aaa0011")));
+  filterList.add(Filter.ignoreCase(Filter.eq("employeenumber", "2020009")));
+  filterList.add(Filter.ignoreCase(Filter.eq("email", "tlconn001@sweinc.com")));
+
+  QueryOptions options = new QueryOptions();
+
+  if(filterList.size() > 0){
+    //options.addFilter(Filter.or(filterList));
+    Iterator iterator = context.search(Identity.class, options);
+    if(null != iterator &amp;&amp; iterator.hasNext()){
+      identity = (Identity) iterator.next();
+    }
+  }
+
+  //return identity.getDisplayName();
+
+  //#4
+  //options.addFilter(Filter.and(filterList));
+  List identityList = context.getObjects(Identity.class, options);
+  List idList = new ArrayList();
+  if (null != identityList) {
+
+    for (Identity id : identityList) {
+      idList.add(id.getDisplayName());
+    }
+
+  }
+
+  //return idList;
+
+  //#5
+  int count = context.countObjects(Identity.class, options);
+  //return count;
+
+
+  QueryOptions ops = new QueryOptions();
+  ops.addFilter(Filter.isnull("manager"));
+  //ops.addFilter(Filter.notnull("manager"));
+  List identityList = context.getObjects(Identity.class, ops);
+  List idList = new ArrayList();
+  if (null != identityList) {
+    for (Identity id : identityList) {
+      idList.add(id.getDisplayName());
+    }
+
+  }
+
+  return idList;
+
+
+  </Source>
+</Rule>

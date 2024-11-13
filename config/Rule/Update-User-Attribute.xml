@@ -1,11 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
 <sailpoint>
-<Rule language="beanshell" name="Add Users to Workgroup" type="Correlation">
+<Rule language="beanshell" name="Update User Attribute">
   <Source>
 	import java.io.*;
 	import java.util.*;
 	import sailpoint.object.*;
+	import sailpoint.tools.Message;
 
 
 	String tskMsg = "";
@@ -32,19 +33,18 @@
 	System.out.print(l+"\n"); 
 
 	String user = l.split(",")[0];
-	String group = l.split(",")[1];
+	String attr = l.split(",")[1];
+	String value = l.split(",")[2];
 
 	if(null != user &amp;&amp; null != group){
 		Identity identity = context.getObjectByName(Identity.class,user);
-		Identity workgroupIdentity = context.getObjectByName(Identity.class,group);
 					
-		if(null != identity &amp;&amp; null != workgroupIdentity){
-		  tskMsg = tskMsg + "user: "+user+" to workgroup: "+group+"\r\n";
-		  identity.add(workgroupIdentity);
+		if(null != identity){
+		  tskMsg = tskMsg + "Updating user: "+user+" attribute: "+attr+" with "+value+"\r\n";
+		  identity.setAttribute(attr, value);
 		  context.saveObject(identity);
 		  context.commitTransaction();
 		  context.decache(identity);
-		  context.decache(workgroupIdentity);
 		}
 	}
 
@@ -57,6 +57,7 @@
 
 	taskResult.addMessage(new Message(Message.Type.Info, tskMsg, null));
 	taskResult.setProgress("Done launching task: "+tskMsg);
+	taskResult.setAttribute("msg",tskMsg);
     taskResult.setCompletionStatus(TaskResult.CompletionStatus.Success);
     context.saveObject(taskResult); 	
 	
