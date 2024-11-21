@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="PreIterate Delimited File Applications" type="PreIterate">
+  <Description>This rule is called before the connector processes the data in a file.</Description>
+  <Signature returnType="void">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          Application being iterated.
+        </Description>
+      </Argument>
+      <Argument name="schema">
+        <Description>
+          Schema representing the data being iterated.
+        </Description>
+      </Argument>
+      <Argument name="stats">
+        <Description>
+          A map passed by the connector of the stats for the file about to be iterated.
+          Contains keys:
+            fileName : (String) filename of the file about to be processed
+            absolutePath : (String) absolute filename
+            length : (Long) length in bytes
+            lastModified : (Long) last time the file was updated Java GMT
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Date;
+import sailpoint.connector.Connector;
+import sailpoint.connector.DelimitedFileConnector;
+import sailpoint.object.Schema;
+import sailpoint.api.SailPointFactory;
+import sailpoint.api.SailPointContext;
+import sailpoint.tools.GeneralException;
+import sailpoint.tools.xml.XMLObjectFactory;
+import sailpoint.object.Configuration;
+  
+import org.apache.commons.io.FilenameUtils;
+
+// Get the directory that contains the extract files for this application
+String absPath = (String) stats.get("absolutePath");
+String fileName = (String) stats.get("fileName");
+String fileNameWithoutExtension = (String) FilenameUtils.removeExtension(fileName); 
+  
+log.debug("Current path: " + absPath);
+log.debug("Current fileName: " + fileName);
+log.debug("Current fileNameWithoutExt: " + fileNameWithoutExtension);
+
+String directoryPath = absPath.replace(fileName, "");
+    
+// Find the last modified (most recent) file in this directory that contains the fileName in its name
+  String latestFileName = "";
+  if (absPath != null ){
+    File directory = new File(directoryPath);
+    File [] filesInDir = directory.listFiles();
+    Date temp_date = new  Date(0);  
+    
+    if  ( filesInDir != null ) {
+      
+					 int length = filesInDir.length; 
+					 for  ( int i = 0; i  &lt;  length; ++i ) {   
+							 
+             File f = filesInDir [i];
+             if ( f.getName().toLowerCase().contains(fileNameWithoutExtension.toLowerCase())){ 
+             
+               Long lastModified = f.lastModified();
+               Date date = new  Date(lastModified);
+
+               if  ( f.isFile( ) ) {  
+                    if  ( date.after(temp_date) ) {
+                        temp_date = date;
+                        latestFileName = f.getName();
+                    }                             
+                 }
+             }
+             
+					 }
+         
+			  }
+     
+      // Open a new input stream for the most recent file and return it
+      // PreIterate rule lets you optionally return InputStream that will overwrite the stream it opens originally
+    	String completeAbsPath = directoryPath + latestFileName;
+      log.debug("Latest File : " + latestFileName);
+			log.debug("Abs Dir : " + completeAbsPath);
+    
+      InputStream in = null;
+    if (!latestFileName.equals("")){
+        try {
+          in = new FileInputStream(completeAbsPath);
+          log.debug("File stream opened");
+        } catch (IOException e){
+          log.error(e); 
+        }
+    }
+    
+    return in;
+    
+  }</Source>
+</Rule>

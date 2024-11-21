@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="WebServiceAfter Operation Rule" type="WebServiceAfterOperationRule">
+  <Description>This rule is used by the  Web Services connector to update parsed resource object. Create List of Objects  which will later converted to Resource object</Description>
+  <Signature returnType="Object">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>The application whose data file is being processed.</Description>
+      </Argument>
+      <Argument name="requestEndPoint">
+        <Description>The current request information contain header, body ,response object</Description>
+      </Argument>
+      <Argument name="processedResponseObject">
+        <Description>Response Object processed by the Web services connector</Description>
+      </Argument>
+      <Argument name="rawResponseObject">
+        <Description>Response Object returned from the end system</Description>
+      </Argument>
+      <Argument name="restClient">
+        <Description>REST Client Object</Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="Update Account/Group List">
+        <Description>Update information Map contains parsed list of accounts</Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+	import org.apache.log4j.Logger;
+	import org.apache.log4j.Level;
+	import org.json.simple.JSONArray; 
+	import org.json.simple.JSONObject;
+	import org.json.simple.parser.JSONParser; 
+	
+	Logger log = Logger.getLogger("com.cof.rap.AutomationAnywhere.COF AutiomationAnywhereAfterOperationRule");  
+	//log.setLevel(Level.DEBUG);  
+	log.debug("AFTER::: " + rawResponseObject);
+	
+	//Get the current amount of recoreds pulled
+	Integer fetchedRecordsCount = 0;
+	if(null != processedResponseObject) 
+	{
+		fetchedRecordsCount = ((List) processedResponseObject).size();
+	}
+	
+	//Get the offset and total from the reponse (this total includes the filter search)
+    JSONParser parser = new JSONParser(); 
+    JSONObject jsonReponse = (JSONObject) parser.parse(rawResponseObject);
+    JSONObject offsetINFO = jsonReponse.get("page");
+    Long offsetLong = offsetINFO.get("offset");  
+    Long totalFilterLong = offsetINFO.get("totalFilter");   
+    log.debug("Current OFFSET" + offsetLong);	
+    
+    //Is there more?
+    Long newStart = offsetLong + fetchedRecordsCount;
+    boolean hasMore = false;
+    if(newStart < totalFilterLong)
+    {
+    	hasMore = true;
+    }
+    
+    //Set the hasmore flag and store the new offset value...
+	Map transientValues = application.getAttributeValue("transientValues");
+	if(transientValues == null) 
+	{
+		transientValues = new HashMap();
+		application.setAttribute("transientValues", transientValues);
+	}
+	transientValues.put("hasMore", hasMore);    
+   
+	if (hasMore) 
+	{
+		if(null != offset) 
+		{
+			log.debug("AFTER RULE: New Offset ==> " + newStart);
+			transientValues.put("offset", String.valueOf(newStart));
+		}
+	}   
+   
+   ]]></Source>
+</Rule>

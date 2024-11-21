@@ -1,0 +1,119 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Common Delimited PostIterate Rule" type="PostIterate">
+  <Description>This rule is called after the connector processes the data in a file.
+
+Stats is a Map passed in by the connector with the information it has gathered. Custom keys can be added here if necessary for validation.</Description>
+  <Signature returnType="void">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          Application being iterated.
+        </Description>
+      </Argument>
+      <Argument name="schema">
+        <Description>
+          Schema requested during iteration.
+        </Description>
+      </Argument>
+      <Argument name="stats">
+        <Description>
+          A map of the stats for the current file that was just iterated.
+          Contains keys:
+            fileName : (String) filename of the file about to be processed
+            absolutePath : (String) absolute filename
+            length : (Long) length in bytes
+            lastModified : (Long) last time the file was updated Java GMT
+            columnNames : (List) column names that were used during the iteration
+            objectsIterated : (Long) total number of objects iterated during this run
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>
+  <![CDATA[
+ 
+import java.io.File;
+import java.io.IOException;
+  
+import sailpoint.object.Schema;
+import sailpoint.object.Application;
+    
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+
+  
+Log log = LogFactory.getLog("com.cof.rap.rule.DDE.PostIterate");
+  
+   String objectType="";
+   if (schema !=null)
+   {
+     objectType=(String) schema.getObjectType();
+   }
+  
+  
+  try{
+	if(!objectType.equals("") && objectType.equals("account") && objectType !=null)
+		{
+			log.debug("The schema is account");
+			String path = application.getAttributes().get("file");
+			if(path!=null)
+			{
+				log.debug("Path is::: "+ path);
+				File file = new File(path);
+				log.debug("File is::: "+ file);
+				if(file.exists())
+				{
+					log.debug("Delete");
+					file.delete();
+				}
+				else
+				{
+				log.debug("File does not exist");
+				}
+			}
+   
+		}
+		
+		else if(!objectType.equals("") && objectType.equals("group") && objectType !=null)
+		{  
+			log.debug("The schema is group");
+			String path = application.getAttributes().get("group.file");
+			if(path!=null)
+			{
+				log.debug("Group Path is::: "+ path);
+				File file = new File(path);
+				log.debug("Group File is::: "+ file);
+				if(file.exists())
+				{
+					log.debug("Group file Delete");
+					file.delete();
+				}
+				else
+				{
+				log.debug("Group File does not exist");
+				}
+			}
+   
+		}
+  }
+  catch(Exception e)
+  {
+  	log.debug(e);
+  }
+    log.debug("The aggregation isSuccessful: Exiting postIterate Rule");
+
+  ]]>
+  </Source>
+</Rule>
