@@ -79,6 +79,16 @@
 
 	Log log = LogFactory.getLog("com.rules.RuleLibrary");
 	
+	public AccountRequest createAR(SailPointContext context, String app)
+	{
+	
+			AccountRequest ar = new AccountRequest();
+			ar.setOperation(AccountRequest.Operation.Create);
+			ar.setApplication(app);
+			
+			return ar;
+	}
+	
 	/***
 	Get new UID
 	***/

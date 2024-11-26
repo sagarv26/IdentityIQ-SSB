@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="QueryOptions Example Rule 2">
+  <Source>
+	import java.util.*;
+	import sailpoint.object.*;
+	import sailpoint.api.Provisioner;
+	import sailpoint.api.*;
+	import sailpoint.object.QueryOptions;
+	import sailpoint.object.Filter;
+	import sailpoint.tools.Util;
+	import sailpoint.tools.GeneralException;
+
+
+	Custom custom = context.getObjectByName(Custom.class,"Managed Attribute Non-Requestable Custom");
+	List list = custom.getAttributes().get("NonRequestableApps");
+	for(String li: list){
+	QueryOptions qo = new QueryOptions();
+    log.debug("**************** The application is***********" + li);
+	Filter f = Filter.eq("application.name",li);
+	f = Filter.and(f,Filter.eq("requestable",true));
+	qo.addFilter(f);
+	
+	List att = context.getObjects(ManagedAttribute.class,qo);
+	for(ManagedAttribute mattr: att){
+		log.debug("*****************The managedAttribute display name is*******************" +mattr.getDisplayableName());
+		log.debug("*****************The managedAttribute status is*******************" +mattr.isRequestable());
+        
+		mattr.setRequestable(false);
+		context.saveObject(mattr);  
+		context.commitTransaction();  
+        
+		AuditEvent event = new AuditEvent();
+		event.setSource(context.getUserName());
+		event.setTarget(mattr.getDisplayName());
+		event.setAction("Requestable");
+		event.setString1("Modify Requestable to Non Requestable");
+
+
+		context.saveObject(event);
+		context.commitTransaction();
+		Auditor.log(event);
+
+	}
+	} 
+
+
+  </Source>
+</Rule>

@@ -66,6 +66,9 @@
  
 		//Set the map with the next iterator for account/group
 		Map map = DelimitedFileConnector.defaultBuildMap(cols, record); 
+		
+		//name,Group
+		//12345,group1-group2-group3
  
         //Process Accounts
         if ( schema.getObjectType().compareTo(Connector.TYPE_ACCOUNT) == 0 ) {
@@ -76,7 +79,7 @@
 			//Split up the groups
             List groups = new ArrayList();
             if (groupname != null &amp;&amp; !groupname.equals("") ) {
-               String[] items = groupname.split(",");
+               String[] items = groupname.split("-");
                for (int i = 0; i &lt; items.length ; i++ ) {
                     String item = items[i].trim();
                     if ((item != null) &amp;&amp; (! item.equals(""))) {

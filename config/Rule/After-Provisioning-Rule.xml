@@ -4,11 +4,8 @@
   <Description>An IdentityIQ server-side rule that is executed after the connector's provisioning method is called. This gives the customer the ability to customize or react to anything in the ProvisioningPlan AFTER it has been sent out to the specific applications.
     This rule will be called for any application found in a plan that also has a configured 'afterProvisioningRule' configured.</Description>
   <ReferencedRules>
-    <Reference class="sailpoint.object.Rule" name="COF ServiceDog IncidentCreate Rule"/>
-    <Reference class="sailpoint.object.Rule" name="COF CyberArk PAM Server password retrieval rule"/>
-    <Reference class="sailpoint.object.Rule" name="COF CyberArk SCIM API Rule Library"/>
-    <Reference class="sailpoint.object.Rule" name="COF CyberArk Password Vault Rule"/>
-  </ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Rule Library"/>
+    </ReferencedRules>
   <Signature>
     <Inputs>
       <Argument name="log">

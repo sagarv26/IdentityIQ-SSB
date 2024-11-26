@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="QueryOptions Example Rule 4">
+  <Source>
+	<Source>
+	import sailpoint.api.Certificationer;
+	import sailpoint.object.QueryOptions;
+	import sailpoint.object.Filter;
+	import sailpoint.object.Certification;
+	import sailpoint.object.Certification.Phase;
+	import sailpoint.object.CertificationGroup;
+	import sailpoint.object.CertificationGroup.Status;
+	import sailpoint.task.AbstractTaskExecutor; 
+	import sailpoint.task.TaskMonitor;  
+	import sailpoint.tools.Message;
+	import sailpoint.tools.xml.XMLObjectFactory; 
+	import sailpoint.tools.xml.XMLReferenceResolver;
+	import java.util.ArrayList; 
+	import java.util.List;
+	import java.util.Date;
+	import java.text.SimpleDateFormat;
+
+	import java.net.InetAddress;
+
+	import org.apache.log4j.Logger;  
+	import org.apache.log4j.Level;
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory; 
+
+	//Logger logObj = Logger.getLogger("CertActivate");
+	//logObj.setLevel((Level) Level.DEBUG);  // TODO: Remove this in production rules.
+  
+	Log logObj = LogFactory.getLog("CertActivate");
+
+  
+	// Sanity checking to make sure we were passed a valid workItem String.
+	if ((void == workItem) || (null == workItem)) {
+		logObj.error("Received a null or void workItem string.");
+		return;
+	}
+	if ( !(workItem instanceof String) ) {
+		logObj.error("Received a workItem that is not a String.");
+		return;
+	} 
+
+
+	try
+	{
+		Certificationer certificationer = new Certificationer(context);
+		Certification cert = context.getObjectById(Certification.class,workItem);
+
+		QueryOptions ops = new QueryOptions();
+		ops.addFilter(Filter.join("id","Certification.certificationGroups.id"));
+		ops.addFilter(Filter.eq("Certification.id",workItem));
+		//ops.addFilter(Filter.eq("Certification.tags.name","SWE-Cert"));
+		ops.setDistinct(true);
+
+		List props = new ArrayList();
+		props.add("id");
+
+		//logObj.debug("Current Phase is :"+cert.getPhase().getMessageKey());    
+		//logObj.debug("Setting phase to Active on certification: "+cert.getName());
+
+
+		if(null != cert)
+		{
+			logObj.debug("Activating the certification : "+cert.getName());
+			certificationer.activate(workItem);
+			logObj.info("Activated the certification : "+cert.getName());
+      
+			Iterator it = context.search(CertificationGroup.class, ops, props);
+			while (it.hasNext()) 
+			{
+				Object [] result = it.next();
+				String cgId = (String) result[0];
+				CertificationGroup cg = context.getObjectById(CertificationGroup.class,cgId);
+
+				if (cg != null)
+				{
+					logObj.debug("Activating cert group: "+ cg.getName());
+					cg.setStatus(CertificationGroup.Status.valueOf("Active"));
+					context.saveObject(cg);
+					context.commitTransaction();
+					logObj.info("Activated cert group: "+ cg.getName());
+				}
+			}
+      
+      
+			//context.saveObject(cert);
+			//context.commitTransaction();
+		}
+
+	}
+	catch(Exception e)
+	{
+		logObj.error("Caught error while activating the certification: "+workItem,e); 
+	}
+
+	return "Success";
+  </Source>
+</Rule>

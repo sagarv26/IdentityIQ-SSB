@@ -1,0 +1,181 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="QueryOptions Example Rule 5">
+  <Source>
+	<Source>
+	 import java.lang.Runtime;
+  import java.lang.management.ManagementFactory;
+  import java.text.SimpleDateFormat;
+  import java.net.InetAddress;
+  import java.util.ArrayList; 
+  import java.util.List;
+  import java.util.Date;
+  import java.util.concurrent.ConcurrentHashMap;
+ 
+  import sailpoint.api.SailPointFactory;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.Filter;
+  import sailpoint.object.TaskResult;
+  import sailpoint.object.Certification;
+  import sailpoint.object.Certification.Phase;
+  import sailpoint.object.CertificationGroup;
+
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory; 
+
+  import org.apache.log4j.Logger;
+  import org.apache.log4j.Level;
+
+ // Logger logObj = Logger.getLogger("MTCertActivate");
+ Log logObj = LogFactory.getLog("MTCertActivate");
+ // logObj.setLevel((Level) Level.DEBUG);  // TODO: Remove this in production rules.
+
+
+  // Sanity checking to make sure we were passed a valid workQueue reference.
+  if ((void == workQueue) || (null == workQueue)) {
+    logObj.error("Received a null or void workQueue reference.");
+    return;
+  }
+  if ( !(workQueue instanceof java.util.concurrent.BlockingQueue) ) {
+    logObj.error("Received a workQueue that is not a BlockingQueue.");
+    logObj.error("Data type for workQueue is: " + workQueue.getClass().getName());
+    return;
+  }  
+
+  // Sanity checking to make sure we were passed a valid shared thread state.
+  if ((void == sharedThreadState) || (null == sharedThreadState)) {
+    logObj.error("Received a null or void sharedThreadState.");
+    return;
+  }
+  if ( !(sharedThreadState instanceof ConcurrentHashMap) ) {
+    logObj.error("Received a sharedThreadState that is not a ConcurrentHashMap.");
+    return;
+  } 
+
+  String computerName = InetAddress.getLocalHost().getHostName();
+
+
+  logObj.debug("Running on machine: "+computerName);
+
+  int serverCount = 0;
+
+  if (void != taskServers &amp;&amp; null != taskServers)
+  {
+    serverCount = taskServers.size();
+  }
+
+  logObj.debug("serverCount: "+serverCount);
+  logObj.debug("serverCount: "+serverCount);
+  if (serverCount == 0)
+  {
+    logObj.fatal("Server Count in args.xml is either set to zero or not properly set. please Correctly indicate the number of task servers and rerun the rule");
+    logObj.debug("Server Count in args.xml is either set to zero or not properly set. please Correctly indicate the number of task servers and rerun the rule");
+    return;
+  }
+  else if((taskServers.get(computerName)) == null)
+  {
+    logObj.fatal("current machine: "+computerName+" isn't configured to run the cert generation. Modify the args.xml to indicate the index of the server as per readme.txt");
+    logObj.debug("current machine: "+computerName+" isn't configured to run the cert generation. Modify the args.xml to indicate the index of the server as per readme.txt");
+    return;
+  }
+
+  //logObj.debug("serverCount: "+serverCount);
+  //logObj.debug("TaskServers in args.xml: "+taskServers);
+  logObj.info("TaskServers in args.xml: "+taskServers);
+
+  int currentIndex = Integer.parseInt(taskServers.get(computerName));
+  //logObj.debug("current Index: "+currentIndex);
+  logObj.info("current Index: "+currentIndex);
+
+  int[] totals = new int[serverCount];
+
+
+	QueryOptions ops = new QueryOptions();
+  //ops.addFilter(Filter.join("id","Certification.certificationGroups.id"));
+  ops.addFilter(Filter.eq("phase","Staged"));
+  ops.setDistinct(true);
+
+  //ops.addFilter(Filter.notnull("completed"));
+  //ops.addFilter(Filter.eq("pendingSignoffs", Integer.valueOf(0)));
+  //ops.addFilter(Filter.or(Filter.isnull("expiration"), Filter.eq("expiration", zero)));
+  //ops.addFilter(Filter.isnull("report"));   // Lets skip the report TaskResults
+  //ops.addFilter(Filter.le("created", threshold));
+  //ops.addFilter(Filter.eq());
+  //ops.addFilter(Filter.like("name","20170202",Filter.MatchMode.ANYWHERE));
+
+
+
+  List props = new ArrayList();
+  props.add("id");
+
+  String tagText = "";
+  if(void == config || null == config)
+  {
+
+    tagText = tags!=null?tags:"";
+  }
+  else
+  {
+
+    tagText = config.get("tags")!=null?config.get("tags"):"";
+
+  }
+
+  logObj.debug("tagText: "+tagText);
+  tagText = tagText.trim();
+  String[] tags = tagText.split(",");
+  logObj.debug("tags.length: "+tags.length);
+  if (tags.length > 0 &amp;&amp; tagText.length() > 0) 
+  {
+
+    for (String tag : tags)
+    {
+      ops.addFilter(Filter.eq("tags.name", tag));
+      logObj.info("Added the tag '"+tag+"' as filter.");
+    }
+  }
+
+  
+
+
+  logObj.debug("Using query filter string : "+ ops.toString());
+  //logObj.debug("Using query filter query : "+ ops.getQuery());
+
+  
+  Iterator it = context.search(Certification.class, ops, props);
+  //Iterator it = context.search(TaskSchedule.class, ops, props);
+  //Iterator it = context.search(TaskResult.class, ops, props);
+  while (it.hasNext()) 
+  {
+
+    //String id = (String)(it.next()[0]);
+    Object [] result = it.next();
+    String id = (String) result[0];
+    //logObj.debug("found CG:"+id);
+    long hashCode = Math.abs(id.hashCode());
+    //logObj.debug("hashcode of cg: "+id+" is "+hashCode);
+    int index = Math.abs(hashCode % serverCount);
+
+    if(index == currentIndex)
+    {
+      //logObj.debug("hashcode of cg: "+id+" is "+hashCode+ " and index is "+index);
+      totals[index]++;
+      workQueue.add(id);
+
+    }
+
+  }
+  
+  sailpoint.tools.Util.flushIterator(it);
+
+  logObj.info("no. of workitems in queue: " + workQueue.size());
+  logObj.info("CurrentIndex total: " + totals[currentIndex]);
+  sharedThreadState.put("totalItems",totals[currentIndex]);
+
+  logObj.debug("Completed QueueBuilder Rule.");
+
+  return;
+
+  </Source>
+</Rule>

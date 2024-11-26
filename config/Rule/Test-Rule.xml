@@ -17,6 +17,17 @@
 
   
 	return getNewUID(context);
+	
+	Identity id = context.getObjectByName(Identity.class, "");
+	
+	id.getName();
+	String email= id.getAttribute("email");
+	List links = id.getLinks();
+	
+	
+	id.setAttribute("email", "xyz@gamil.com");
+	
+	app.setOwner();
 
 
   </Source>

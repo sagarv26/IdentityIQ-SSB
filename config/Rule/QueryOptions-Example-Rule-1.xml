@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="QueryOptions Example Rule 1">
+  <Source>
+	import java.util.*;
+	import sailpoint.object.*;
+	import sailpoint.api.Provisioner;
+	import sailpoint.api.*;
+	import sailpoint.object.QueryOptions;
+	import sailpoint.object.Filter;
+	import sailpoint.tools.Util;
+	import sailpoint.tools.GeneralException;
+
+
+	QueryOptions qo = new QueryOptions();
+    qo.addFilter(Filter.eq("type", "Logical"));
+    Iterator logicalAppIter = context.search(Application.class, qo);
+        
+    // Iterate through each app and write its attributes to the properties file
+    while(logicalAppIter.hasNext()){
+		Application curApp = (Application) logicalAppIter.next();
+		String curAppName = curApp.getName();
+	}
+
+
+  </Source>
+</Rule>

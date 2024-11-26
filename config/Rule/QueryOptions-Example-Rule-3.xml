@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="QueryOptions Example Rule">
+  <Source>
+	import java.util.*;
+	import sailpoint.object.*;
+	import sailpoint.api.Provisioner;
+	import sailpoint.api.*;
+	import sailpoint.object.QueryOptions;
+	import sailpoint.object.Filter;
+	import sailpoint.tools.Util;
+	import sailpoint.tools.GeneralException;
+
+
+	
+	
+	
+	
+	public void removeOldDummyTasks()
+	{
+	//The taskDefinition and taskResult can only be delete only if the task result is done.
+	//Otherwise deleting taskdefinition will remove any pending tasks.
+	QueryOptions qo = new QueryOptions();
+	Filter f1 = Filter.like("name","Monitoring Task", Filter.MatchMode.START);
+	qo.addFilter(f1);
+	List dummySequentialTasks = context.getObjects(TaskResult.class, qo);
+	if(dummySequentialTasks!= null &amp;&amp; !dummySequentialTasks.isEmpty())
+	{
+		for (TaskResult tasResult : dummySequentialTasks)
+		{
+			if(tasResult.isComplete())
+			{
+			TaskDefinition taskDef = context.getObject(TaskDefinition.class, tasResult.getName());
+			Terminator term = new Terminator(context);
+			term.deleteObject(tasResult);
+			if(taskDef!=null)
+			{				
+				term.deleteObject(taskDef);
+			}
+				context.commitTransaction();
+			}
+		}
+	
+	}
+	}
+	
+	
+	//To get the list of application that were modified on a time range
+	public List getApplicationList()
+	{  
+	try{
+ 
+		String createdDate = "";
+		String source = "";
+		String appName = "";
+		String soxFlag = "";
+    
+		QueryOptions ops = new QueryOptions();
+		Date date = new Date(new Date().getTime() - 3900000);
+
+		List filterss = new ArrayList ();
+		filterss.add(Filter.ne("source", "RequestHandler"));
+		filterss.add(Filter.ne("source", "Scheduler"));
+		filterss.add(Filter.ne("source", "CMDB Sync"));
+		filterss.add(Filter.ne("source", "SRVC_IIQ_ADMSUPT_01"));
+		filterss.add(Filter.ne("source","Services"));
+		filterss.add(Filter.like("target", "Application:",Filter.MatchMode.START));
+		filterss.add(Filter.gt("created",date));
+
+		Filter myFilter = Filter.and(filterss);
+		ops.addFilter(myFilter);
+
+		List dataList = new ArrayList();
+		List auditListEvent = context.getObjects(AuditEvent.class,ops);
+		for(AuditEvent event : auditListEvent)
+		{
+		Map map = new HashMap();
+		//	createdDate = (String) new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(event.getCreated());
+		createdDate = event.getCreated().getTime().toString();
+		String ap = event.getTarget();
+		appName = ap.substring("Application:".length(),ap.length());
+        log.debug(appName + "modified dates is " + createdDate +  " :: " +event.getCreated());
+
+		Application app = context.getObjectByName(Application.class,appName);
+		if(app!=null)
+		{
+		   if(app.getType() != null &amp;&amp; app.getType().equalsIgnoreCase("RelatedApplication") &amp;&amp; (event.getAction().equalsIgnoreCase("Create") || event.getAction().equalsIgnoreCase("Update") ) )
+		   {
+			   
+		   }
+		   else 
+		   {
+	
+      	if(app.getAttributeValue("cofAppSOX")!=null)
+        {
+				soxFlag = String.valueOf(app.getAttributeValue("cofAppSOX"));
+        }
+      	else
+        {
+        soxFlag = "false";
+        }
+      	log.debug("SOX flag for " + appName + " is: " + soxFlag);
+		
+		source = (String) event.getSource();
+		action = (String) event.getAction();
+    
+		map.put("soxFlag",soxFlag);
+		map.put("createdDate",createdDate);
+		map.put("source",source);
+		map.put("action",action);
+		map.put("application",appName);
+		dataList.add(map);
+		// log.debug("Application details is "+ map);
+		}
+		}
+		}
+		log.debug("Datalist is " + dataList );
+		return dataList;
+		}
+		catch(Exception e)
+		{
+		log.error(e);
+		}
+	}  
+
+  </Source>
+</Rule>

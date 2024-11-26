@@ -4,16 +4,24 @@
   <Source>
   import java.util.*;
   import sailpoint.object.*;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+  private static Log log = LogFactory.getLog("rule.TestRule");
 
   System.out.println("Simple Beanshell...");
   String identityName = "2020009";
   System.out.println("Searching User: "+identityName);
   Identity identity = context.getObjectByName(Identity.class, identityName);
 
-
+ Object obj = context.getObjectByName(Object.class, objectName);
+  Object obj = context.getObjectById(Object.class, objectId);
+ 
+ 
   //Condtion ex1
   if(identity == null){
     System.out.println("No User Found... ");
+    log.error("No User Found...");
     return;
   }
 
@@ -31,7 +39,16 @@
 
   }
 
+	if(identity.getName().equals("12345")){
+	} else {
+	}
+	
+	
   /*if(identity != null @and identity.getLinks() @lt 0){
+  }*/
+  
+  
+  /*if(identity != null  &amp;&amp; identity.getLinks() &lt; 0){
   }*/
 
   //loop ex2

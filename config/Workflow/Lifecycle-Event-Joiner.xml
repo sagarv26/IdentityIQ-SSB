@@ -275,6 +275,11 @@
 			acctReqs.add(ldapAcctReq);
 		}
 		
+		//AccountRequest acctReq = createAR(context, "LDAP");
+		//acctReqs.add(acctReq);
+		//AccountRequest acctReq = createAR(context, "HR System");
+		//acctReqs.add(acctReq);
+		
 		if(jdbcLink == null){
 			AccountRequest jdbcAcctReq = new AccountRequest();
 			jdbcAcctReq.setOperation(AccountRequest.Operation.Create);
