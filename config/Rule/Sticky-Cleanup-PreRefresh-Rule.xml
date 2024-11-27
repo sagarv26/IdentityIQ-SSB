@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Sticky Cleanup PreRefresh Rule">
+  <Description>This rule is used to test the application Connections</Description>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>
+  import sailpoint.api.IdentityService;
+        import sailpoint.object.*;
+        import sailpoint.object.AttributeAssignment;
+        import sailpoint.object.Link;
+        import sailpoint.tools.Util;
+ 
+		//Identity identity = context.getObject(Identity.class, "sample user");
+        // Sniff the AttributeAssignments and look for any pointing to a Link that doesn't exist. Set the nativeIdentity to null on said assignment
+        // and let it fall away naturally
+        IdentityService iSvc = new IdentityService(context);
+        boolean dirty = false;
+        List assignments = identity.getAttributeAssignments();
+        if (!Util.isEmpty(assignments)) {
+            for (Object assignmentObj : assignments) {
+                AttributeAssignment assignment = (AttributeAssignment)assignmentObj;
+                Link matched = null;
+                Application assApp = null;
+                if (assignment.getApplicationId() != null) {
+                    assApp = context.getObject(Application.class, assignment.getApplicationId());
+                }
+                String instance = assignment.getInstance();
+                String nativeIdentity = assignment.getNativeIdentity();
+                if (nativeIdentity != null &amp;&amp; !"".equals(nativeIdentity.trim()) &amp;&amp; assApp != null) {
+                    matched = iSvc.getLink(identity, assApp, instance, nativeIdentity);
+                }
+               //as we wanted to clean all attribute assignments if (matched == null) {
+                    assignment.setNativeIdentity(null);
+                    dirty = true;
+               // }
+            }
+        }
+       
+        if (dirty) {
+            context.saveObject(identity);
+            context.commitTransaction();
+        }
+    
+</Source>
+</Rule>

@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule   language="beanshell"  name="Account Selector Rule" type="AccountSelector">
+  <Description>Account Selector Rule</Description>
+  <Signature returnType="Link">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="source">
+        <Description>
+            The application doing the provisioning.
+          </Description>
+      </Argument>
+      <Argument name="role">
+        <Description>
+            The IT role being provisioned.
+          </Description>
+      </Argument>
+      <Argument name="identity">
+        <Description>
+            The target identity.
+          </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+            The target application.
+          </Description>
+      </Argument>
+      <Argument name="links">
+        <Description>
+            A list of the possible target Links.
+          </Description>
+      </Argument>
+      <Argument name="isSecondary">
+        <Description>
+            True if this is not the first assignment.
+          </Description>
+      </Argument>
+      <Argument name="project">
+        <Description>
+            The provisioning project.
+          </Description>
+      </Argument>
+      <Argument name="accountRequest">
+        <Description>
+            The account request.
+          </Description>
+      </Argument>
+      <Argument name="allowCreate">
+        <Description>
+            True if account creation is allowed.
+          </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="selection">
+        <Description>
+            A Link instance that represents the selection. Value can be:
+            null - indicates that no automatic selection can be made
+            Link - the selected Link from the list of possible target Links
+            a new Link instance - indicates that a new account must be created with the identity specified by the
+            create policy, or manually; in this case, the Link instance returned will have a null nativeIdentity attribute
+          </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+		import sailpoint.object.Link;
+		import org.apache.commons.logging.Log;
+		import org.apache.commons.logging.LogFactory;
+
+		Log log = LogFactory.getLog("com.ADAccountSelectorRule");
+		log.info("COF Active Directory Account Selector Rule");
+		
+		String sAMAccountName;
+		String eid = identity.getName();
+		log.debug("inside 1 - AD Primary Link Selector");
+		if(links == null)
+		{
+		 log.debug("links is null - AD Primary Link Selector");
+		   return null;
+		}   
+		if(links != null)
+		{
+			for(Link link: links)
+			{
+				log.debug("inside - AD Primary Link Selector");
+				sAMAccountName = link.getAttribute("sAMAccountName");
+				if(eid != null &amp;&amp; sAMAccountName != null){
+					log.debug("sAMAccountName :"+sAMAccountName);
+					if(sAMAccountName.equalsIgnoreCase(eid)){
+						log.debug("sAMAccountName : link "+link.getNativeIdentity());
+						return link;
+					}
+				}
+			}
+		}
+		log.debug("returning prompt - AD Primary Link Selector");
+		return "prompt";
+	</Source>
+</Rule>

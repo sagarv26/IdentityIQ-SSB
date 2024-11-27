@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Managed Attribute Customization Rule" type="ManagedAttributePromotion">
+  <Description>ManagedAttributePromotion rule is called when ManagedAttributes are automatically created during aggregation, refresh, or from the missing entitlement descriptions task. This rule sets the attribute to non-requestable.</Description>
+  <Signature>
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="attribute">
+        <Description>
+          The sailpoint.object.ManagedAttribute to modify during promotion.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The sailpoint.object.Application the managed attribute is from.
+        </Description>
+      </Argument>
+      <Argument name="state" type="Map">
+        <Description>
+          A Map that contains managed attribute promotion shared state during a task run.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+	import sailpoint.object.Application;
+	
+
+	attribute.setRequestable(false);</Source>
+</Rule>
