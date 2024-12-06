@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Certification EmailRecipient rule" type="EmailRecipient">
+  <Description>This rule is used to select an identity or a list of identities who will receive email.</Description>
+  <Signature returnType="String or List of Strings">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="item">
+        <Description>
+          The sailpoint.object.Notifiable Interface for objects that can be reminded, escalated, and expired. 
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="identity name or names">
+        <Description>
+        You can return an identity name or a list of identity names.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	import sailpoint.object.Identity;
+	import sailpoint.object.WorkItem;
+	  
+	import sailpoint.object.Certification;
+	import sailpoint.object.CertificationEntity;
+
+ 
+	import java.util.regex.Matcher;
+	import java.util.regex.Pattern;
+
+	Log logObj = LogFactory.getLog("com.CertificationCcManagerRule");
+	logObj.debug("Enter Certification Cc Manager Rule");
+
+	Identity owner = item.getNotificationOwner(context);
+	List recipientList = new ArrayList(); //list of identity names to whom this notification should be sent  
+
+	if(owner != null){
+		//add the current owner to the owner list
+		String ownerName = owner.getName();
+		recipientList.add(ownerName);
+
+		if(!owner.isWorkgroup()){
+			Identity manager = owner.getManager();
+			if(manager != null){
+				String managerName = manager.getName();
+				if(logObj.isDebugEnabled())
+					logObj.debug("adding [" + managerName + "] to recipient list");
+				recipientList.add(managerName);
+
+			}else{
+				if(logObj.isDebugEnabled())
+					logObj.debug("Identity [" + owner.getName() + "] does not have a manager");
+			}
+		}
+	} else{
+		logObj.error("could not find owner for work item");
+	}
+
+	logObj.info("Exit COF Certification Cc Manager Rule");
+	return recipientList;
+	</Source>
+</Rule>

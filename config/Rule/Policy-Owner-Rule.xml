@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Policy Owner Rule" type="PolicyOwner">
+  <Description>
+    This example simply returns admin as an owner.
+  </Description>
+  <Signature returnType="Identity">
+    <Inputs>
+      <Argument name="environment" type="java.util.Map" required="true">
+        <Description>
+          The task arguments passed to the aggregation or refresh task.
+        </Description>
+      </Argument>
+      <Argument name="policy">
+        <Description>
+          The Policy being evaluated.
+        </Description>
+      </Argument>
+      <Argument name="constraint">
+        <Description>
+          The Constraint associated with the violation. Provided if available, it is possible for this to be null.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="identity">   
+        <Description>
+        The return value for the policy owner may be:
+        
+           String - identity name;
+           Identity - identity object;
+           List&lt;String&gt; - list of identity names;
+           List&lt;identity&gt; - list of identity objects;
+           Map containing key "identity" whose value is an Identity object;
+           Map containing key "identityName" whose value is a String         
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+	import sailpoint.object.Identity;
+	
+	Identity owner = identity.getManager();
+	if (null == owner){
+		owner = context.getObject(Identity.class, "Admin");
+	}
+	
+	return owner;
+  </Source>
+</Rule>

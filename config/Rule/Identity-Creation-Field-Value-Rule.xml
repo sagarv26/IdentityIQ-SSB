@@ -1,0 +1,179 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Identity Creation Field Value Rule" type="FieldValue">
+  <Description>This rule can be used to generate a field value (eg - Access Level) based on the role selected in the request.</Description>
+  <Signature returnType="String">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity" type="Identity">
+        <Description>
+          The Identity object that represents the user needing the field value.
+        </Description>
+      </Argument>
+      <Argument name="link" type="Link">
+        <Description>
+          The sailpoint.object.Link that is being acted upon. If the link is not applicable,
+          this value will be null.
+        </Description>
+      </Argument>
+      <Argument name="group" type="ManagedAttribute">
+        <Description>
+          The sailpoint.object.ManagedAttribute that is being acted upon. If the managed attribute
+          is not applicable, the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="project" type="ProvisioningProject">
+        <Description>
+          The provisioning project being acted upon. If a provisioning project is not applicable,
+          the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="accountRequest" type="ProvisioningPlan.AccountRequest">
+        <Description>
+          The account request. If an account request is not applicable, the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="objectRequest" type="ProvisioningPlan.ObjectRequest">
+        <Description>
+          The object request. If an object request is not applicable, the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="role" type="Bundle">
+        <Description>
+          The role with the template we are compiling. If the role is
+          not applicable, the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="application" type="Application">
+        <Description>
+          The sailpont.object.Application with the template we are compiling. If the application
+          is not applicable, the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="template" type="Template">
+        <Description>
+          The Template that contains this field.
+        </Description>
+      </Argument>
+      <Argument name="field" type="Field">
+        <Description>
+          The current field being computed.
+        </Description>
+      </Argument>
+      <Argument name="current" type="Object">
+        <Description>
+          The current value corresponding to the identity or account attribute that the field represents.
+          If no current value is set, this value will be null.
+        </Description>
+      </Argument>
+      <Argument name="operation" type="ProvisioningPlan.Operation">
+        <Description>
+          The operation being performed.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="value">
+        <Description>
+          The string value created.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+	import java.lang.String;
+	import java.util.List;
+	import java.util.ArrayList;
+	import java.util.Map;
+	import java.util.HashMap;
+
+	import sailpoint.object.Identity;
+	import sailpoint.object.Field;
+
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+  
+	Log log = LogFactory.getLog("com.IdentityCreationFieldValueRule");
+	log.info("Enter rule Identity Creation Field Value Rule");
+
+	String FIELD_NAME_FIRSTNAME =  "firstname";
+	String FIELD_NAME_LASTNAME=  "lastname";
+	String FIELD_NAME_DISPLAYNAME=  "displayName";
+	String FIELD_NAME_MANAGEDBY=  "cofManagedBy";
+	//String FIELD_NAME_MANAGER=  "manager";
+
+	String fieldName = null;
+
+	if(field != null)
+	{
+        fieldName = field.getName();
+        fieldName = fieldName.substring(fieldName.lastIndexOf(':') + 1);
+    }  
+
+	log.error("fieldName = " + fieldName);
+
+	Field nameField = form.getField("name");
+	String name = null;
+	String eid = null;
+	if(nameField != null){
+		name = nameField.getValue();
+		if(name!=null)
+			eid = name.substring(0,6);
+		log.error("Get eid : " + eid);
+	}
+	
+	Identity id = context.getObjectByName(Identity.class, eid);
+	if(id!=null){
+
+	//First Name Field
+	if(FIELD_NAME_FIRSTNAME.equals(fieldName)){
+		log.error("***********return first name: " + id.getFirstname());
+		return id.getFirstname();
+	}
+	//Last Name Field
+	else if(FIELD_NAME_LASTNAME.equals(fieldName)){
+	log.error("***********return last name: " + id.getLastname());
+		return id.getLastname();
+	}
+
+	//Display Name Field
+	else if(FIELD_NAME_DISPLAYNAME.equals(fieldName)){
+	log.error("***********return display name: " + id.getDisplayName());
+		return id.getDisplayName();
+	}
+
+	//Managed By Field
+	else if(FIELD_NAME_MANAGEDBY.equals(fieldName)){
+	log.error("***********return managed by : " + eid);
+		return eid;
+	}
+	/*
+	//Manager field
+	else if(FIELD_NAME_MANAGER.equals(fieldName)){
+		Identity manager = id.getManager();
+		String managerId = null;
+		
+		log.error("***********return manager : [" + manager + "]");
+		if(manager != null)
+			managerId = manager.getId();
+		
+		return managerId;
+	}
+	*/
+	}
+	
+	return null;
+
+	log.info("Exit rule COF Service Identity Creation Field Value Rule");
+
+</Source>
+</Rule>

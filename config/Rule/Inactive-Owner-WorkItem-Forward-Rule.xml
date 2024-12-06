@@ -1,0 +1,166 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Inactive Owner WorkItem Forward Rule" type="Escalation">
+  <Description>
+    Escalation rule that triggers when a workitem owner becomes inactive. 
+  </Description>
+  <Signature returnType="Object">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="item">
+        <Description>
+          The WorkItem being opened or forwarded.
+        </Description>
+      </Argument>
+      <Argument name="owner">
+        <Description>
+          The Identity that currently owns the work item.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="newOwner">
+        <Description>
+          An Identity that should own the work item.  Alternatively, this can
+          be a String that is the name or id of the Identity.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+	import sailpoint.object.Application;
+	import sailpoint.object.Certification;
+	import sailpoint.object.Identity;
+	import sailpoint.object.RemediationItem;
+	import sailpoint.object.WorkItem;
+
+	import sailpoint.api.ObjectUtil;
+	import sailpoint.api.SailPointContext;
+
+	import sailpoint.tools.Util;
+
+	import java.util.ArrayList;
+	import java.util.HashMap;
+	import java.util.Map;
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory; 
+
+	import org.apache.log4j.Logger;
+	import org.apache.log4j.Level;
+
+	//Log log = LogFactory.getLog("com..rap.globalWorkItemForwardRule");
+
+	Logger log = Logger.getLogger("com..rap.InactiveOwnerWorkItemForwardRule");
+	log.setLevel((Level) Level.TRACE);  // TODO: Remove this in production rules.
+
+	//Method to pull the proper owner for the identity regardless of its type.
+	public Identity getTheOwner(Identity iden) {
+		log.debug("InactiveOwnerWorkItemForwardRule getTheOwner method :: start");
+		log.debug("InactiveOwnerWorkItemForwardRule getTheOwner method :: identity "+iden);
+		if(iden != null){
+			if(!iden.isWorkgroup()){
+				log.debug("InactiveOwnerWorkItemForwardRule getTheOwner method :: identity is not a workgroup");
+			return iden;
+		} else {
+			log.debug("InactiveOwnerWorkItemForwardRule getTheOwner method :: identity is a workgroup");
+			Iterator worgroupMembers = ObjectUtil.getWorkgroupMembers(context, iden, new ArrayList());
+			while(worgroupMembers.hasNext()){
+				Identity wgMember = (Identity) worgroupMembers.next()[0];
+				log.debug("InactiveOwnerWorkItemForwardRule getTheOwner method :: identity in workgroup "+wgMember);
+				return wgMember;
+			}
+		}
+		}
+		return null;
+	}
+  
+	/*MAIN METHOD STARTS HERE*/
+	if(WorkItem.Type.Certification.equals(item.getType()))
+	{
+		log.debug("owner before we start any thing " +owner);
+		//Getting owner through the method to process items owned by workgroup properly
+		Identity owner = getTheOwner(item.getOwner());
+		String ADMIN_WORKGROUP = context.getConfiguration().getString("AdminWorkgroupName");
+		String SYS_CONFIG_CERTIFICATION_ADMIN_WORKGROUP = "CertificationAdminWorkgroup";
+		String CERT_ADMIN_WORKGROUP = context.getConfiguration().getString(SYS_CONFIG_CERTIFICATION_ADMIN_WORKGROUP);
+
+		Identity newOwner = owner;
+		boolean isTerminated = false;
+
+		newOwner = owner.getManager();
+
+		if(newOwner != null)
+		{
+			String immediateOffBoard = newOwner.getAttribute("ImmediateOffboard");
+			if("true".equals(immediateOffBoard))
+				isTerminated = true;
+		}
+
+		//enclose the entire code block in a try catch and return the fall back workgroup if anything goes wrong
+		try
+		{
+			
+			boolean isRoleCertification = false;
+			boolean isIdentityCertification = false;
+			if(item.isCertificationRelated()) 
+			{  
+				Certification cert = context.getObjectById(Certification.class, item.getCertification());  
+				if(cert != null) {  
+					if(cert.getType() == Certification.Type.BusinessRoleComposition || cert.getType() == Certification.Type.BusinessRoleMembership) {  
+						if(item.getType() == WorkItem.Type.Remediation) {
+							isRoleCertification = true;
+						}  
+					} else if(cert.getType() == Certification.Type.ApplicationOwner || cert.getType() ==  Certification.Type.Identity || cert.getType() ==  Certification.Type.Manager){
+						isIdentityCertification = true;
+					}
+				}  
+			}
+		
+			//forward to fallback approver if inactive or null
+			if (newOwner == null || newOwner.isInactive() || isTerminated){
+				if(isIdentityCertification){
+					Identity certificationAdminWorkgroup = context.getObjectByName(Identity.class, CERT_ADMIN_WORKGROUP);
+					if(newOwner != null){
+						newOwner = certificationAdminWorkgroup;
+						log.debug("newOwner is null or inactive. Certification newOwner: " + newOwner);
+					} else{
+						log.debug("newOwner is null or inactive.  newOwner: " + newOwner);
+						newOwner = context.getObjectByName(Identity.class, ADMIN_WORKGROUP);
+					}
+				} else{
+					log.debug("newOwner is null or inactive.  newOwner: " + newOwner);
+					newOwner = context.getObjectByName(Identity.class, ADMIN_WORKGROUP);
+				}
+			}
+			//forward to Certification Admin Workgroup if this is a remediation from a role certification
+			else if(isRoleCertification)
+			{
+				Identity certificationAdminWorkgroup = context.getObjectByName(Identity.class, CERT_ADMIN_WORKGROUP);   
+				newOwner = certificationAdminWorkgroup;
+			}
+		//return fallback approver if anything goes wrong during the rule
+		} catch (Exception e){
+			newOwner = context.getObjectByName(Identity.class, ADMIN_WORKGROUP); 
+			if(newOwner != null){
+				log.error("encountered exception in work item forward rule.  Returning fall back approver [" + newOwner.getName() + "]");
+				log.error(e);
+			} else {
+				log.error("Encountered exception in work item forward rule.  Attempted to return fall back approver, but cannot find fall back approver [" + ADMIN_WORKGROUP + "]");
+			}
+		}
+			log.info("Exiting work item forward rule newOwner = " +newOwner.getName());
+			return newOwner;
+	} else
+		return null;
+  
+  </Source>
+</Rule>

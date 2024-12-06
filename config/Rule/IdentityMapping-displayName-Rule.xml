@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
-<Rule language="beanshell" name="Identity_InActiveAttribute_Contractor" type="IdentityAttribute">
+<Rule language="beanshell" name="IdentityMapping displayName Rule" type="IdentityAttribute">
   <Description>Identity attribute rules are used when the value is not simply a copy of an application account attribute value.  A transformation may be necessary on the account attribute, or several account attributes may need to be combined to produce the identity attribute.
 
-    This rule can be called in two ways: as a global mapping rule and an application mapping rule.  A global mapping rule is called whenever the identity is refreshed.  The rule can look at any account attributes.  An application mapping rule is called only when the identity contains an account link for that application, this link is passed in the "link" argument which is not passed in global mapping rules.</Description>
+This rule can be called in two ways: as a global mapping rule and an application mapping rule.  A global mapping rule is called whenever the identity is refreshed.  The rule can look at any account attributes.  An application mapping rule is called only when the identity contains an account link for that application, this link is passed in the "link" argument which is not passed in global mapping rules.</Description>
   <Signature returnType="String">
     <Inputs>
       <Argument name="log">
@@ -18,24 +18,24 @@
       </Argument>
       <Argument name="environment" type="Map">
         <Description>
-          Arguments passed to the aggregation or refresh task.
+           Arguments passed to the aggregation or refresh task.
         </Description>
       </Argument>
       <Argument name="identity">
         <Description>
-          The Identity object that represents the user
-          that is being aggregated.
+           The Identity object that represents the user
+           that is being aggregated.
         </Description>
       </Argument>
       <Argument name="attributeDefinition">
         <Description>
-          The AttributeDefinition object for this attribute.
+           The AttributeDefinition object for this attribute.
         </Description>
       </Argument>
       <Argument name="link">
         <Description>
-          The Link object from the Identity, if this is an application
-          mapping rule.  For global mapping rules this will be void.
+           The Link object from the Identity, if this is an application
+           mapping rule.  For global mapping rules this will be void.
         </Description>
       </Argument>
       <Argument name="attributeSource">
@@ -58,32 +58,14 @@
       </Argument>
     </Returns>
   </Signature>
-  <Source>
+  <Source>String first = (String)link.getAttribute("FIRSTNAME");
+String last = (String)link.getAttribute("LASTNAME");
+String middle = (String)link.getAttribute("MIDDLENAME");
 
-	boolean active = false;
-	//String status = "";
-	if(link != null &amp;&amp; link.getAttribute("enabled") != null){
+//null checking
+first = first == null ? "" : first + " ";
+middle = middle == null ? "" : middle + " ";
+last = last == null ? "" : last;
 
-		active = link.getAttribute("enabled");
-		
-		//status = link.getAttribute("enabled");
-		
-		if(active){
-		  return "Active";
-		} else {
-		  return "InActive";
-		}
-		
-		/**
-		if(status.equalsIgnoreCase("Active")){
-		  return true;
-		} else {
-		  return false;
-		}
-		**/
-
-	}
-
-
-  </Source>
+return first + middle + last;</Source>
 </Rule>

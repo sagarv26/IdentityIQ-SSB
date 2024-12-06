@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Identity Selector Rule" type="IdentitySelector">
+  <Description>This rule is used to select an Identity that is related to the given Identity</Description>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity" type="Identity">
+        <Description>
+          The identity.
+        </Description>
+      </Argument>
+      <Argument name="roleName" type="String">
+        <Description>
+          The name of the sailpoint.object.Bundle (role) that is being selected for the Identity.
+          If roles are not applicable to this Identity selection, this value will be void.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="success">
+        <Description>
+          True if the selection was successful; false otherwise.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+  import sailpoint.object.*;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.Application;
+  import sailpoint.object.Filter;
+  import sailpoint.object.Identity;
+  import sailpoint.api.IdentityService;
+  import sailpoint.api.*;
+  import sailpoint.object.Link;
+  import sailpoint.object.QueryOptions;
+
+  import sailpoint.tools.GeneralException;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+  import java.util.ArrayList;
+
+  import java.util.Iterator;
+  import java.util.LinkedList;
+  import java.util.List;
+  
+	IdentityService idService = new IdentityService(context);
+	String immediateOffboard = (String) identity.getAttribute("immediateOffboard");
+
+	boolean hasWAccount = false;
+	boolean inactiveStatus = identity.isInactive();
+	boolean result = false;
+
+	String ADAppName = "Active Directory";
+	List adAccountList = new ArrayList();
+
+	Application adAppObject = context.getObjectByName(Application.class, ADAppName);
+	List links = identity.getLinks();
+	List adLinks = idService.getLinks(identity, adAppObject);
+
+	if(adLinks==null || adLinks.size() &lt;= 0){
+		return false;
+	} else{
+		for (Link link: adLinks) {   
+			if(!link.isDisabled() &amp;&amp; link.getNativeIdentity()!=null &amp;&amp; 			(link.getNativeIdentity().toLowerCase().contains("cn=w-")) ){
+				hasWAccount = true;
+				break;
+			}
+		}
+	}
+
+ 
+	if (immediateOffboard == null &amp;&amp; !inactiveStatus  &amp;&amp; hasWAccount)
+	{ 
+		result = true;
+	}
+
+  return result;</Source>
+</Rule>

@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="System Account LinkAttribute Rule" type="LinkAttribute">
+  <Description>This rule is used when promoting account attributes from Links during aggregation.</Description>
+  <Signature returnType="Object">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="environment">
+        <Description>
+          The optional arguments passed from the task executor, if the rule is running within a task.
+        </Description>
+      </Argument>
+      <Argument name="link">
+        <Description>
+          The Link whose attribute is being promoted.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="value">
+        <Description>
+          An Object to be used as the attribute value.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+  import sailpoint.object.Identity;
+  import sailpoint.object.Link;
+
+	if(link != null){
+		if(link.getAttribute("acctSystem") != null){
+			boolean sysAcct = (boolean) link.getAttribute("acctSystem");
+			if(sysAcct)
+				return true;
+		}
+		Identity identity = link.getIdentity();
+		if(identity != null)
+		{
+			String cofAccountType = (String) identity.getAttribute("accountType");
+			if(cofAccountType != null &amp;&amp; "System".equals(accountType)){
+				return true;
+			}
+		}
+	}
+	return false;
+	</Source>
+</Rule>

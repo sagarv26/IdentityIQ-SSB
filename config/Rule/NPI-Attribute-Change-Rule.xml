@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="NPI Attribute Change Rule" type="Listener">
+  <Description>This rule can be used when the ObjectAttribute being listened to has changed.</Description>
+  <Signature returnType="void">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="environment">
+        <Description>
+          Optional arguments passed from the task executor, if the rule is running within a task.
+        </Description>
+      </Argument>
+      <Argument name="identity">
+        <Description>
+          The identity which owns the attribute.
+        </Description>
+      </Argument>
+      <Argument name="attributeDefinition">
+        <Description>
+          The definition of the ObjectAttribute.
+        </Description>
+      </Argument>
+      <Argument name="attributeName">
+        <Description>
+          The name of the ObjectAttribute.
+        </Description>
+      </Argument>
+      <Argument name="oldValue">
+        <Description>
+          The original value of the ObjectAttribute.
+        </Description>
+      </Argument>
+      <Argument name="newValue">
+        <Description>
+          The new value of the ObjectAttribute.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import sailpoint.api.SailPointContext;
+import sailpoint.object.AuthenticationAnswer;
+import sailpoint.object.AuthenticationQuestion;
+import sailpoint.object.Filter;
+import sailpoint.object.Identity;
+import sailpoint.object.ObjectAttribute;
+import sailpoint.object.QueryOptions;
+import sailpoint.tools.GeneralException;
+import sailpoint.tools.Util;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+  
+
+	public Log log = LogFactory.getLog("com.NPI Attribute Change Rule");
+	// Identity attributes
+	public static String IDENTITY_ATT_DOB = "BirthDate";
+	public static String IDENTITY_ATT_POB = "BirthCity";
+	public static String IDENTITY_ATT_SSN = "NationalID";
+	// Questions
+	public String COF_AUTH_QUESTION_DOB = "auth_question_dob";
+	public String COF_AUTH_QUESTION_POB = "auth_question_place_of_birth";
+	public String COF_AUTH_QUESTION_SSN = "auth_question_ssn";
+  
+
+		
+		
+	public void updateAuthAnswer(String questionStr, Identity identity,
+			String answer) {
+		log.debug("Enter updateAuthAnswer()");
+		
+		QueryOptions option = new QueryOptions();
+		option.addFilter(Filter.eq("question", questionStr));
+		Iterator questionIt = context.search(AuthenticationQuestion.class, option);
+		if (questionIt.hasNext()) {
+			AuthenticationQuestion question = questionIt.next();
+			log.info("question:" + question.getQuestion());
+			List answers = identity.getAuthenticationAnswers();
+			log.info("answers:" + answers);
+			
+			if (answers == null) {
+				answers = new ArrayList();
+			}
+			
+			Iterator answersIter = answers.iterator();
+			while (answersIter.hasNext()) {
+
+				AuthenticationAnswer oldAnswer = answersIter.next();
+				if (oldAnswer.getQuestion().getId().equals(question.getId())) {
+					answersIter.remove();
+					break;
+				}
+			}
+
+			if (answer != null &amp;&amp; answer.trim().length() != 0) {
+				AuthenticationAnswer newAnswer = new AuthenticationAnswer();
+				newAnswer.setQuestion(question);
+				newAnswer.setAnswer(answer);
+				answers.add(newAnswer);
+				identity.assignAuthenticationAnswers(answers);
+			}
+		}
+		if(questionIt != null)
+			Util.flushIterator(questionIt);
+		log.debug("Exit updateAuthAnswer()");
+	
+	}
+
+		log.debug("Enter NPI Attribute Change Rule");
+		log.info("attributeName:" + attributeName);
+		log.info("oldValue:" + oldValue);
+		log.info("newValue:" + newValue);
+
+		if (attributeName.equals(IDENTITY_ATT_DOB)) {
+			updateAuthAnswer(AUTH_QUESTION_DOB, identity, newValue);
+		} else if (attributeName.equals(IDENTITY_ATT_POB)) {
+			updateAuthAnswer(COF_AUTH_QUESTION_POB, identity, newValue);
+		} else if (attributeName.equals(IDENTITY_ATT_SSN)) {
+			updateAuthAnswer(COF_AUTH_QUESTION_SSN, identity, newValue);
+		}
+
+		log.debug("Exit COF NPI Attribute Change Rule");
+		
+
+return;]]></Source>
+</Rule>

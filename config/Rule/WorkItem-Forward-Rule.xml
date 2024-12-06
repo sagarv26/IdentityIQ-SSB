@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="WorkItem Forward Rule" type="WorkItemForward">
+  <Signature>
+    <Inputs>
+      <Argument name="context" type="SailPointContext">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query
+          the system or execute other SailPointContext services.
+        </Description>
+      </Argument>
+      <Argument name="item">
+        <Description>
+          The WorkItem being opened or forwarded.
+        </Description>
+      </Argument>
+      <Argument name="owner">
+        <Description>
+          The Identity that currently owns the work item.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="newOwner">
+        <Description>
+          An Identity that should own the work item.  Alternatively, this can
+          be a String that is the name or id of the Identity.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+        import sailpoint.object.Identity;
+
+		Identity workGroupIdentity = context.getObjectByName(Identity.class, "Admin");
+        Identity newOwner = workGroupIdentity;
+
+        String email = owner.getEmail();
+        if ( email == null || email.length() == 0 ) {
+            newOwner = workGroupIdentity;
+        }
+
+
+        return newOwner;
+  </Source>
+</Rule>

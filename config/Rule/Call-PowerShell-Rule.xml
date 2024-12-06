@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Call PowerShell Rule">
+	<Source>
+    
+	import sailpoint.object.Identity;
+	 
+	import java.util.List;
+	import java.util.ArrayList;
+	import java.util.HashMap;
+	import java.util.Map;
+
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	import sailpoint.object.RpcRequest;
+	import sailpoint.object.RpcResponse;
+	import sailpoint.connector.RPCService;
+
+	Map data = new HashMap();
+	data.put("postScript", "Powershell Rule");
+
+	Application ad = context.getObjectByName(Application.class, "Active Directory");
+	data.put("Application", ad.getAttributes());
+
+	AccountRequest accountRequest = new AccountRequest();
+	accountRequest.setApplication("IIQ");
+	accountRequest.setNativeIdentity(identityName);
+	accountRequest.setOperation(AccountRequest.Operation.Modify);
+
+	accountRequest.add(new AttributeRequest("email", ProvisioningPlan.Operation.Add, "test@gmail.com"));
+
+	// Add to the IQService params
+	data.put("Request", accountRequest);
+
+
+	RPCService service = new RPCService("iqServiceHost", "iqServicePort", false, useTLS); 
+	RpcRequest request = new RpcRequest("ScriptExecutor", "runAfterScript", data);
+	RpcResponse response = service.execute(request);
+
+	Map res = response.getResultAttributes();
+
+	if(res.getMessages() != null &amp;&amp; res.getMessages().size() > 0){
+
+		if(res.getMessages().get(0).equals("Success")){
+			if(res.get("user") != null){
+			
+			}
+		}
+
+	}
+
+    
+  </Source>
+</Rule>

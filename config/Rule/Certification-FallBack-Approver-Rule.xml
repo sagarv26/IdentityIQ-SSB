@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Certification FallBack Approver Rule" type="FallbackWorkItemForward">
+  <Description>A rule used to pick a fallback owner for a work item in case current owner will cause self-certification.</Description>
+  <Signature returnType="Object">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="item" type="WorkItem">
+        <Description>The WorkItem being opened. Note that the not all of the WorkItem arguments may be set.</Description>
+      </Argument>
+      <Argument name="owner" type="Identity">
+        <Description>The Identity that currently owns the work item.</Description>
+      </Argument>
+      <Argument name="creator" type="String">
+        <Description>The name of identity that created the certification belonging to the work item.</Description>
+      </Argument>
+      <Argument name="certifiers" type="List&lt;String>">
+        <Description>A list of certifier names for the certification belonging to the work item.</Description>
+      </Argument>
+      <Argument name="name" type="String">
+        <Description>The name of the certification belonging to the work item. It may be null if certification is not created yet.</Description>
+      </Argument>
+      <Argument name="type" type="Certification.Type">
+        <Description>The type of the certification belonging to the work item.</Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="newOwner">
+        <Description>An Identity that should own the work item.  Alternatively, this can be a String that is the name or id of the Identity.</Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+	import sailpoint.api.SailPointContext;
+	import sailpoint.api.ObjectUtil;
+
+	import sailpoint.object.Certification;
+	import sailpoint.object.CertificationDefinition;
+	import sailpoint.object.CertificationEntity;
+	import sailpoint.object.Identity;
+	import sailpoint.object.Attributes;
+	import sailpoint.object.WorkItem;
+
+	import org.apache.log4j.Logger;
+	import org.apache.log4j.Level;
+	
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory; 
+  
+	Log logObj = LogFactory.getLog("com..rap.Certification_Fall_Back_Approver_Rule");
+
+	try
+	{
+		if(WorkItem.Type.Certification.equals(item.getType()))
+		{
+			Certification certification = context.getObjectById(Certification.class, item.getCertification());  
+
+			String certID = certification.getId();
+			String DEFAULT_CERTIFIER = "All Access Admin Workgroup";
+			String SYS_CONFIG_CERTIFICATION_ADMIN_WORKGROUP = "CertificationAdminWorkgroup";
+			String CERT_ADMIN_WORKGROUP = context.getConfiguration().getString(SYS_CONFIG_CERTIFICATION_ADMIN_WORKGROUP);
+
+			String certifierName = "";
+			if (owner != null) 
+			{
+				certifierName = owner.getName();
+				List certifierNameList=certification.getCertifiers();
+        
+				Certification.Type certType = certification.getType();
+				Identity certifierIdentity = null;
+			if(certType == Certification.Type.Manager)
+			{
+				certifierIdentity = context.getObjectByName(Identity.class,certification.getManager());
+			}
+			else if(certType == Certification.Type.Identity)
+				{
+				CertificationDefinition cd = context.getObjectById(CertificationDefinition.class,certification.getCertificationDefinitionId());
+				if(null == cd)
+				{
+					return owner;
+				}
+				Attributes attb = cd.getAttributes();
+				if(null == attb)
+				{
+					return owner;
+				}
+				String certifierType = attb.get("certifierType");
+
+				if(null != certifierType &amp;&amp; certifierType.equalsIgnoreCase("Manager"))
+				{            
+					String identityName = attb.get("identities");
+					Identity certifiedIdentity = context.getObjectByName(Identity.class,identityName);
+					certifierIdentity = certifiedIdentity.getManager();
+					
+					if(null == certifierIdentity)
+					{
+						certifierIdentity = context.getObjectByName(Identity.class,attb.get("certifier"));
+					}
+				} else if(null != certifierType &amp;&amp; certifierType.equalsIgnoreCase("Manual"))
+				{
+					certifierIdentity = context.getObjectByName(Identity.class,attb.get("certifier"));
+					if(null == certifierIdentity)
+					{
+						certifierIdentity = context.getObjectByName(Identity.class,attb.get("owners"));
+					}
+				}
+			}
+				
+				if( null == certifierIdentity)
+				{
+					logObj.debug("couldn't figure out the fall back approver. returning the owner as "+owner);
+					return owner;
+				}
+		
+			}
+
+    }
+	}
+	catch(Exception e)
+	{
+		logObj.error("Exception : ",e);
+	}
+  
+	return owner;
+
+    </Source>
+</Rule>

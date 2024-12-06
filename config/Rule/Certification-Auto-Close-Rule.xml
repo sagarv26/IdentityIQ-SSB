@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell"  name="Certification Auto Close Rule" type="CertificationAutomaticClosing">
+  <Description>This rule is run when the certification is automatically closed.</Description>
+  <Signature returnType="void">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="certification">
+        <Description>
+          The sailpoint.object.Certification being certified.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>
+	import java.util.List;
+	import sailpoint.api.IdentityService;
+	import sailpoint.api.Provisioner;
+	import sailpoint.api.SailPointContext;
+	import sailpoint.object.Application;
+	import sailpoint.object.Link;
+	import sailpoint.object.ProvisioningPlan;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.ProvisioningProject;
+	import sailpoint.object.*;
+	import sailpoint.object.Identity;
+	import java.util.*;
+	import sailpoint.object.Certification; 
+	import sailpoint.object.CertificationAction; 
+	import sailpoint.object.CertificationEntity; 
+	import sailpoint.object.CertificationItem;  
+	import sailpoint.api.Certificationer; 
+	import sailpoint.api.certification.RemediationManager;
+	import sailpoint.tools.GeneralException; 
+	import sailpoint.tools.Message; 
+	import sailpoint.tools.Util;  
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+	import org.apache.log4j.Logger;
+	import org.apache.log4j.Level;
+
+		Log logObj = LogFactory.getLog("com.Certification-Auto-Close-Rule");
+		logObj.info("Entering Certification Auto Close Rule");
+		try{ 
+			List entities = certification.getEntities();
+			for(entity : entities)
+			{
+				if(!entity.isComplete()) 
+				{
+					Identity identObj=entity.getIdentity(context); // Get userID for Entity
+					Application activeDirectoryApp = context.getObjectByName(Application.class, "Active Directory");
+
+					Link link = null;
+					String sAMAccountName = "";
+					String distinguishedName="";
+					IdentityService IS=new IdentityService(context); 
+       
+					List linkList = IS.getLinks(identObj, activeDirectoryApp);
+					for(Link eachLink: linkList)
+					{
+						// find the primary account
+						if(null != eachLink &amp;&amp; null != eachLink.getNativeIdentity() &amp;&amp; eachLink.getNativeIdentity().toLowerCase().contains("cn="+identObj.getName().toLowerCase()))
+						{
+							link=eachLink;
+							logObj.debug("Found Primary Link"+ link);
+							break;
+						}
+					}
+					
+					if(link != null) 
+					{
+						sAMAccountName = (String) link.getAttribute("sAMAccountName");
+						if(sAMAccountName.equalsIgnoreCase(identObj.getName())) 
+						{
+							distinguishedName = link.getAttribute("distinguishedName");
+							List requests = new ArrayList();
+
+							ProvisioningPlan plan = new ProvisioningPlan();
+							ProvisioningProject project=new ProvisioningProject();
+
+							AccountRequest accReq = new AccountRequest();
+							accReq.setOperation(AccountRequest.Operation.Disable); 
+							accReq.setApplication(link.getApplicationName());
+							accReq.setNativeIdentity(distinguishedName);
+							requests.add(accReq);
+							plan.setIdentity(identObj);
+							plan.put("requester","Certification Admin Workgroup"); 
+
+							plan.setAccountRequests(requests);
+
+							Provisioner provisioner = new Provisioner(context);
+							project = provisioner.compile(plan);
+							provisioner.execute(project);
+							
+							AuditEvent auditEvent=new AuditEvent();
+							auditEvent.setApplication("Active Directory");
+							auditEvent.setAccountName(distinguishedName);
+							auditEvent.setAction("Disabling unactioned identity's AD Account");
+							auditEvent.setTarget(identObj.getId());
+							auditEvent.setSource("Certification Auto Close Rule");
+							auditEvent.setString1("Certification :"+ certification.getId());
+							auditEvent.setString2("Identity :"+ identObj.getId());
+							context.saveObject(auditEvent);
+							context.commitTransaction();
+						}
+					}
+				}
+		}
+	} catch(Exception e) {
+		e.printStackTrace();
+	}
+  </Source>
+</Rule>

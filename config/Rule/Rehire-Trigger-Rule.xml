@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell"  name="Rehire Trigger Rule" type="IdentityTrigger">
+  <Description></Description>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="previousIdentity">
+        <Description>
+          The identity before the refresh/aggregation (this will be null when an
+          identity is created).
+        </Description>
+      </Argument>
+      <Argument name="newIdentity">
+        <Description>
+          The identity after the refresh/aggregation (this will be null when an
+          identity is deleted).
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="result">
+        <Description>
+          A boolean describing the result of the rule.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+		boolean result = false;
+		log.info("Enter rehireTrigger");
+
+		if (previousIdentity == null || previousIdentity == void) {
+			log.warn("Identity objects are null");
+			return result;
+		}
+
+		if (newIdentity == null || newIdentity == void) {
+			log.warn("Identity objects are null");
+			return result;
+		}
+		
+		String accountType = (String) newIdentity
+				.getAttribute("accountType");
+
+		result = (previousIdentity.isInactive() &amp;&amp; !(newIdentity.isInactive())
+				&amp;&amp; accountType != null &amp;&amp; accountType.equalsIgnoreCase("User"));
+		log.info("Exit rehireTrigger");
+		log.debug("Rehire Result:"+result);
+		return result;
+  </Source>
+</Rule>
+</sailpoint>

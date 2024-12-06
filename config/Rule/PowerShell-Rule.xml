@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Powershell Rule" type="ConnectorAfterCreate">
+  <Attributes>
+    <Map>
+      <entry key="ObjectOrientedScript" value="true"/>
+      <entry key="disabled" value="false"/>
+      <entry key="extension" value=".ps1"/>
+      <entry key="program" value="powershell.exe"/>
+      <entry key="timeout" value="240"/>
+    </Map>
+  </Attributes>
+   <Description>
+  This example is for IQService Before Script.  This is a sample PowerShell after script which ensures that the request was processed successfully and
+creates home directory at the path specified in the request
+  </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="plan">
+        <Description>
+          The ProvisioningPlan object on its way to the Connector.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application object that references this before/after script.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>
+        Add-type -path utils.dll
+        # Read the environment variables
+        $sReader = New-Object System.IO.StringReader([System.String]$env:Request);
+        $sResult = New-Object System.IO.StringReader([System.String]$env:Result);
+        # Form the xml reader objects
+        $xmlReader = [System.xml.XmlTextReader]([sailpoint.utils.xml.XmlUtil]::getReader($sReader));
+        $xmlReader_Result = [System.xml.XmlTextReader]([sailpoint.utils.xml.XmlUtil]::getReader($sResult));
+        # Create SailPoint objects
+        $requestObject = New-Object Sailpoint.Utils.objects.AccountRequest($xmlReader);
+        $resultObject = New-Object Sailpoint.Utils.objects.ServiceResult($xmlReader_Result);
+		
+        $attributes = @{}
+		foreach ($attribute in $requestObject.AttributeRequests){
+			$attributes[$attribute.Name] = $attribute.Value;
+		}
+		
+		$email = $attributes["email"]
+		
+		$user = Get-ADUser -Filter "EmailAddress -eq $email" -Properties EmailAddress 
+		
+		Try {
+			# Handle input and do stuff here
+			$resultObject.Messages.add("Success!");
+			$resultObject.Attribute["user"] = $user
+		} catch [Exception] {   
+			# You should probably do some logging here too
+			$ErrorMessage = $_.Exception.ToString()
+			$resultObject.Errors.add($ErrorMessage);
+		} finally {
+			$resultObject.toxml() | out-file $args[0];
+		}  
+		
+		
+</Source>
+</Rule>  

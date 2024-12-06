@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="SignOff Rule" type="CertificationSignOffApprover">
+  <Description>This rule is run when each access review is signed off by certifier. If any of the certification item (entitlement or account) is revoked by certifier, it goes to secondary sign off work group to final sign off; else if all items are approved, no secondary sign off will be triggered.</Description>
+  <Signature returnType="Map">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="certification">
+        <Description>
+          The sailpoint.object.Certification that was signed.
+        </Description>
+      </Argument>
+      <Argument name="certifier">
+        <Description>
+          The sailpoint.object.Identity that signed the certification.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="identityName">
+        <Description>
+        The name of the Identity that should approve the certification.  Either
+        this or 'identity' should be non-null if certification sign off approval
+        is desired.
+        </Description>
+      </Argument>
+      <Argument name="identity">
+        <Description>
+        The Identity that should approve the certification.  Either this or
+        'identityName' should be non-null if certification sign off approval
+        is desired.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+    
+	import sailpoint.object.Certification;
+	import sailpoint.object.CertificationEntity;
+	import sailpoint.object.CertificationItem;
+	import sailpoint.object.CertificationAction;
+	import sailpoint.object.SignOffHistory;
+	import sailpoint.object.Identity;
+	 
+	import java.util.List;
+	import java.util.ArrayList;
+	import java.util.HashMap;
+	import java.util.Map;
+
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	Log log = LogFactory.getLog("com.SignOffRule");
+	log.info("Enter SignOff Rule");
+	 
+	Map results = null;
+	String identityName = "All Access Admin Workgroup";
+	Identity signer = context.getObjectByName(Identity.class, identityName);
+ 
+	if(certification!=null &amp;&amp; certifier!=null){
+		List signOffs = certification.getSignOffs();
+		if(signOffs != null &amp;&amp; signOffs.size()>1){
+			log.debug("Final SignOff already Done!");
+			return null;
+		}
+
+		if(certification!=null &amp;&amp; signer!=null){
+
+			List entities = certification.getEntities();
+			for (CertificationEntity entity : entities){
+				List items = entity.getItems();
+				for (CertificationItem item : items){
+					CertificationAction action = item.getAction();
+					if(action.isRevokeAccount() || action.isRemediation()){
+						log.debug("**** Find revoked items*****");
+						results = new HashMap();
+						results.put("identityName", identityName);
+					}                                            
+				}
+			}
+		}
+	 
+	}
+
+	log.info("Exit SignOff Rule");
+	return results;
+    
+  </Source>
+</Rule>

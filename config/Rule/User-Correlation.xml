@@ -77,6 +77,14 @@
 	
 	import sailpoint.api.Correlator;
 	import sailpoint.object.Application;
+	
+	/**
+	shortname = AD (Active Director)
+	userName = 12345
+	
+	name= AD-12345
+	
+	**/
 
 	Map correlationMap = new HashMap();
 	//get System Account Indicator from feed

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" type="Owner" name="Example Owner Rule">
+  <Description>
+    Owner Rules are used by provisioning policies to determine the owner of the
+    provisioning policy or its policy fields. 
+  </Description>
+  <Signature returnType="Object">
+    <Inputs>
+      <Argument name="identity">
+        <Description>
+          The Identity object being provisioned.
+        </Description>
+      </Argument>
+      <Argument name="role">
+        <Description>
+          The Role object involved in the provisioning processed.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The Application object being provisioned.
+        </Description>
+      </Argument>
+      <Argument name="template">
+        <Description>
+          The Template object that defines the provisioning plan.
+        </Description>
+      </Argument>
+      <Argument name="field">
+        <Description>
+          The Field object being processed.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="identity">
+        <Description>
+          Either the Identity of the owner, or the type of template used to
+          define the provisioning policy, from which the owner can be determined.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+      import sailpoint.object.Identity;
+
+		Identity owner = null;
+		if (role != null)
+			owner = role.getOwner();
+		else if (app != null)
+			owner = app.getOwner();
+		else
+			owner = identity.getManager();
+
+		if (owner == null)
+			owner = context.getObjectByName(Identity.class, "spadmin");
+
+      return owner;
+  </Source>
+</Rule>

@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Field Validation Rule" type="Validation">
+  <Description>This rule is used to validate the Field values on a provisioning plan.</Description>
+  <Signature returnType="Object">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity">
+        <Description>
+            The Identity object being provisioned.
+        </Description>
+      </Argument>
+      <Argument name="app">
+        <Description>
+            The Application object being processed.
+        </Description>
+      </Argument>
+      <Argument name="form">
+        <Description>
+            The Form object being processed.
+        </Description>
+      </Argument>
+      <Argument name="field">
+        <Description>
+            The Field object being validated.
+        </Description>
+      </Argument>
+      <Argument name="value">
+        <Description>
+            The Object representing the field value.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="value">
+        <Description>
+          An Object (possibly a Collection) of messages resulting from the
+          validation rule.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+   import sailpoint.api.PasswordPolice;
+  import sailpoint.object.Application;
+  import sailpoint.object.Identity;
+  import java.util.List;
+  import java.util.ArrayList;
+  import sailpoint.api.PasswordPolicyException;
+  import sailpoint.tools.Util;
+  import sailpoint.tools.Message;
+  import sailpoint.tools.GeneralException;
+  import sailpoint.object.*;
+
+
+	if(null != value &amp;&amp; void != value)
+	{
+		if (value.indexOf(" ")>=0) {
+			return "Missing value for required Group Name.";
+		} else if(value.length() > 8) {
+			form.getField("groupname").setValue("");
+			return "Group name must be of 8 characters or less.";
+		}
+	}
+</Source>
+</Rule>

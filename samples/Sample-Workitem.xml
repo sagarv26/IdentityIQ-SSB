@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE WorkItem PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<WorkItem created="1733376454319" handler="sailpoint.api.Workflower" id="a9fe0bbd939010d781939549ae9e017b" identityRequestId="0000000074" level="Normal" modified="1733376455046" name="0000000044" renderer="lcmWorkItemRenderer.xhtml" targetClass="sailpoint.object.Identity" targetId="a9fedb66920d105081920ee9f8d4022c" targetName="2020014" type="Approval">
+  <Attributes>
+    <Map>
+      <entry key="approvalMode" value="parallel"/>
+      <entry key="approvalScheme" value="owner"/>
+      <entry key="approvalSet">
+        <value>
+          <ApprovalSet>
+            <ApprovalItem application="LDAP" assignmentId="d7b122c9f45a476894eec44287d4f998" displayValue="admins" id="0136d3ec0333467bab26b886845752bb" name="groups" nativeIdentity="uid=aaa0014,ou=user,o=Company" operation="Add" value="cn=admins,ou=group,o=Company">
+              <Attributes>
+                <Map>
+                  <entry key="attachmentConfigList"/>
+                  <entry key="attachments"/>
+                  <entry key="flow" value="AccessRequest"/>
+                  <entry key="id" value="a9fedb66917918898191799df82c0096"/>
+                  <entry key="interface" value="LCM"/>
+                  <entry key="operation" value="EntitlementAdd"/>
+                </Map>
+              </Attributes>
+            </ApprovalItem>
+          </ApprovalSet>
+        </value>
+      </entry>
+      <entry key="approvalSplitPoint"/>
+      <entry key="clearApprovalDecisions">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="flow" value="AccessRequest"/>
+      <entry key="identityDisplayName" value="Test User3"/>
+      <entry key="identityName" value="2020014"/>
+      <entry key="identityRequestId" value="0000000074"/>
+      <entry key="launcher" value="spadmin"/>
+      <entry key="policyViolations"/>
+      <entry key="workItemDescription"/>
+      <entry key="workItemEscalationFrequency"/>
+      <entry key="workItemEscalationRule"/>
+      <entry key="workItemEscalationTemplate"/>
+      <entry key="workItemHoursBetweenReminders"/>
+      <entry key="workItemHoursTillEscalation"/>
+      <entry key="workItemMaxReminders"/>
+      <entry key="workItemPriority">
+        <value>
+          <WorkItemLevel>Normal</WorkItemLevel>
+        </value>
+      </entry>
+      <entry key="workItemReminderTemplate"/>
+    </Map>
+  </Attributes>
+  <Description>Owner Approval - Account Changes for User: Test User3</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" id="a9fe0bbd90c41bed8190d472dc1d0658" name="2020007"/>
+  </Owner>
+  <Requester>
+    <Reference class="sailpoint.object.Identity" id="4028ab1063f427af0163f428d1ca0105" name="spadmin"/>
+  </Requester>
+  <WorkflowCaseRef>
+    <Reference class="sailpoint.object.WorkflowCase" id="a9fe0bbd939010d7819395499fc80178" name="Update Identity 2020014 AccessRequest - 3"/>
+  </WorkflowCaseRef>
+</WorkItem>

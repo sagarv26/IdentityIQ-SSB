@@ -78,7 +78,7 @@
 		import org.apache.commons.logging.LogFactory;
 
 		Log log = LogFactory.getLog("com.ADAccountSelectorRule");
-		log.info("COF Active Directory Account Selector Rule");
+		log.info("Active Directory Account Selector Rule");
 		
 		String sAMAccountName;
 		String eid = identity.getName();

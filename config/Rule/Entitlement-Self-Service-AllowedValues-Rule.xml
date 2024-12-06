@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Entitlement Self-Service Allowed Values Rule" type="AllowedValues">
+  <Source>
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+	import sailpoint.object.Field;
+	import sailpoint.object.Filter;
+	import sailpoint.object.Form;
+	import sailpoint.object.Identity;
+	import sailpoint.object.ManagedAttribute;
+	import sailpoint.object.QueryOptions;
+	import sailpoint.object.Application;
+	import sailpoint.object.Schema;
+	import sailpoint.tools.Util;
+	import sailpoint.object.Application;
+
+	log = LogFactory.getLog("com.EntitlementSelfServiceAllowedValuesRule");
+	log.info("Enter Entitlement Self Service Allowed Values Rule");
+
+	List returnList = new ArrayList();
+	String applicationName = field.getApplication();
+	String fieldName = field.getName();
+
+	//sometimes IIQ will pass over the field name as application:fieldName, so we have to remove this
+	String currentField = fieldName.substring(fieldName.lastIndexOf(':') + 1);
+	log.debug("currentField = " + currentField);
+
+	if ("Attribute".equals(currentField)) {
+		log.debug("Inside aattribute");
+		Set uniqueSet = new HashSet();
+
+		//only search for attribute if application has been selected
+		if (Applications != void &amp;&amp; Applications != null &amp;&amp; !Applications.isEmpty()) {
+			log.debug("app is not null");
+			String appId = Applications;
+
+			QueryOptions queryOptions = new QueryOptions();
+			Filter filter;
+			List filterList = new ArrayList();
+			if("RelatedApplication".equalsIgnoreCase(context.getObjectById(Application.class, Applications).getType())){
+				log.debug("It is inside related app");
+				filterList.add(Filter.eq("EntRelatedApplication", context.getObjectById(Application.class, Applications).getName()));
+			}
+			else{
+				filterList.add(Filter.eq("application.id", appId));
+				log.debug("inside regular app");
+			}
+			filter = Filter.and(filterList);
+			queryOptions.addFilter(filter);
+
+			Iterator iterator = null;
+			try{
+				iterator = context.search(ManagedAttribute.class, queryOptions, "attribute");
+
+				while (iterator.hasNext()){
+					Object[] props = (Object[])iterator.next();
+					String attributeName = (String)props[0];
+					uniqueSet.add(attributeName);
+				}
+
+			}catch (Exception ex){
+				log.debug(ex);
+			}finally {
+				if(iterator != null)
+					sailpoint.tools.Util.flushIterator(iterator);
+			}
+		}
+		returnList = new ArrayList(uniqueSet);
+		return returnList;
+	} else if ("Values".equals(currentField)) {
+		if (Attribute != void &amp;&amp; Attribute != null &amp;&amp; !Attribute.isEmpty()) {
+
+			Filter filter1 = Filter.eq("ManagedAttribute.application.id", Applications);
+			Filter filter2 = Filter.eq("ManagedAttribute.attribute", Attribute);
+			QueryOptions qo = new QueryOptions();
+			qo.add(filter1);
+			qo.add(filter2);
+			iterator = context.search(ManagedAttribute.class, qo);
+			while (iterator.hasNext()) {
+				ManagedAttribute ma = new ManagedAttribute();
+				ma = iterator.next();
+				returnList.add(ma.getValue());
+			}
+		}
+		return returnList;
+	} else if ("Entitlement".equals(currentField)) {
+		if (Values != void &amp;&amp; Values != null &amp;&amp; !Values.isEmpty()) {
+			log.debug("Inside Loop");
+			Filter filter1 = Filter.eq("ManagedAttribute.application.id", Applications);
+			Filter filter2 = Filter.eq("ManagedAttribute.attribute", Attribute);
+			Filter filter3 = Filter.eq("ManagedAttribute.value", Values);
+			QueryOptions qo = new QueryOptions();
+			qo.add(filter1);
+			qo.add(filter2);
+			qo.add(filter3);
+
+			iterator = context.search(ManagedAttribute.class, qo);
+			while (iterator.hasNext()) {
+				ManagedAttribute ma = new ManagedAttribute();
+				ma = iterator.next();
+				returnList.add(ma);
+			}
+		}
+		if (Entitlement != null) {
+			returnList.add(Entitlement);
+		}
+		return returnList;
+	}
+
+	//all other cases, log an error
+	else {
+		log.debug("Unsupported Field Name " + currentField);
+		return null;
+	}
+
+	log.debug("currentField: " + currentField + " = " + returnList);
+
+	log.info("Exit Entitlement Self Service Allowed Values Rule");
+	return returnList;    
+  </Source>
+</Rule>

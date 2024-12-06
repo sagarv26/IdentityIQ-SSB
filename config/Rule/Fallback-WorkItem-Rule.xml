@@ -1,0 +1,62 @@
+<Rule name="Fallback WorkItem Rule" type="FallbackWorkItemForward">
+  <Description>This example falls back to the owner's manager as the new owner of the work item. If the owner has no manager, then fall back to the admin of the certification.</Description>
+  <Signature returnType="Object">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="item" type="WorkItem">
+        <Description>The WorkItem needing to be forwarded. The WorkItem properties may not be fully populated yet.</Description>
+      </Argument>
+      <Argument name="owner" type="Identity">
+        <Description>The Identity that currently owns the work item.</Description>
+      </Argument>
+      <Argument name="creator" type="String">
+        <Description>The name of identity that created the certification belonging to the work item.</Description>
+      </Argument>
+      <Argument name="certifiers" type="List&lt;String>">
+        <Description>A list of certifier names for the certification belonging to the work item.</Description>
+      </Argument>
+      <Argument name="name" type="String">
+          <Description>The name of the certification belonging to the work item. It may be null if certification is not created yet.</Description>
+      </Argument>
+      <Argument name="type" type="Certification.Type">
+          <Description>The type of the certification belonging to the work item.</Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="newOwner">
+        <Description>An Identity that should own the work item.  Alternatively, this can be a String that is the name or id of the Identity.</Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+	import sailpoint.object.Certification;
+
+	String SYS_CONFIG_CERTIFICATION_ADMIN_WORKGROUP = "CertificationAdminWorkgroup";
+	String CERT_ADMIN_WORKGROUP = context.getConfiguration().getString(SYS_CONFIG_CERTIFICATION_ADMIN_WORKGROUP);
+	if (Certification.Type.Manager.equals(type) ||
+		 Certification.Type.Identity.equals(type)) {
+		if (owner.getManager() != null) {
+		   newOwner = owner.getManager().getName();
+		} else { 
+		   newOwner = CERT_ADMIN_WORKGROUP;
+		}
+	} else {
+	   newOwner = owner.getName();
+	   System.out.println("Keep existing owner for cert type" + type);
+	}
+
+	System.out.println("Completed Fallback work item forward rule.");
+	System.out.println("Forwarding to " + newOwner);
+
+	return newOwner;
+	</Source>
+</Rule>

@@ -51,13 +51,24 @@
 	Log log = LogFactory.getLog("com.swe.serviceaccountPolicyRule"); 
 	log.info("Entering serviceaccountPolicyRule:"+identity);
 	
+	boolean hasAccount = false, ldapReq = false;
     Application application = context.getObject(Application.class,"LDAP");
 	
 	IdentityService service = new IdentityService(context);
 
 	List ldapLinks = service.getLinks(identity, application);
 	
-	if(ldapLinks.size() == 0){
+	for(Link link : ldapLinks){
+		if(link.getId() != null){
+			hasAccount = true;
+		}
+		
+		if(link.getId() == null){
+			ldapReq = true;
+		}
+	}
+	
+	if(!hasAccount &amp;&amp; ldapReq){
 		violation = new PolicyViolation();
 		violation.setActive(true);
 		violation.setIdentity(identity);
