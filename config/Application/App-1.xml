@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
 <sailpoint>
-<Application authoritative="true" connector="sailpoint.connector.DelimitedFileConnector" featuresString="DIRECT_PERMISSIONS, NO_RANDOM_ACCESS, DISCOVER_SCHEMA" icon="enterpriseIcon" name="PeopleSoft Employee System" profileClass="" type="DelimitedFile">
+<Application authoritative="true" connector="sailpoint.connector.DelimitedFileConnector" featuresString="DIRECT_PERMISSIONS, NO_RANDOM_ACCESS, DISCOVER_SCHEMA" icon="enterpriseIcon" name="App 1" profileClass="" type="DelimitedFile">
    <AccountCorrelationConfig>
     <Reference class="sailpoint.object.CorrelationConfig" name="PeopleSoft Correlation"/>
   </AccountCorrelationConfig>
@@ -21,7 +21,7 @@
       <entry key="beforeProvisioningRule"/>
       <entry key="compositeDefinition"/>
       <entry key="delimiter" value=","/>
-      <entry key="file" value="E:\Data\PeopleSoft.csv"/>
+      <entry key="file" value="E:\Data\App1.csv"/>
       <entry key="filetransport" value="local"/>
       <entry key="filterEmptyRecords">
         <value>
@@ -117,7 +117,7 @@
       <AttributeDefinition name="employeeid" type="string">
         <Description></Description>
       </AttributeDefinition>
-      <AttributeDefinition entitlement="true" managed="true" multi="true" name="group" type="string">
+      <AttributeDefinition managed="true" multi="true" name="group" type="string">
         <Description></Description>
       </AttributeDefinition>
     </Schema>

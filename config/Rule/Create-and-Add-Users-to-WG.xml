@@ -11,17 +11,19 @@
 	String tskMsg = "";
 	String filePath="\\\\E:\\Data\\test.csv";
 
+	/**
 	if(config.get("filePath") != null){
 	filePath =  config.get("filePath").toString();
-	}
+	}**/
 
 	File testFile = new File(filePath);
 
+	
 	if ((!testFile.exists()) || (testFile.isDirectory())) {
 		System.out.println("Unable to find file: " + filePath);
-		taskResult.addMessage(new Message(Message.Type.Info, tskMsg, null));
+		/**taskResult.addMessage(new Message(Message.Type.Info, tskMsg, null));
 		taskResult.setProgress("Done launching task: "+tskMsg);
-		taskResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+		taskResult.setCompletionStatus(TaskResult.CompletionStatus.Error);**/
 		return;
 	}
 
@@ -35,15 +37,20 @@
 	String group = l.split(",")[1];
 	String description = l.split(",")[2];
 	
+	//Create WG
 	if(group != null){
-		Identity wg = new Identity();
-
-		wg.setWorkgroup(true);
-		wg.setName(group);
-		wg.setDescription(description);
+		Identity workgroupIdentity = context.getObjectByName(Identity.class,group);
+		if(workgroupIdentity == null){
+		
+			Identity wg = new Identity();
 	
+			wg.setWorkgroup(true);
+			wg.setName(group);
+			wg.setDescription(description);
+		}
 	}
 
+	//Add User
 	if(null != user &amp;&amp; null != group){
 		Identity identity = context.getObjectByName(Identity.class,user);
 		Identity workgroupIdentity = context.getObjectByName(Identity.class,group);
@@ -65,10 +72,11 @@
 	fileIn.close(); 
 
 
+	/**
 	taskResult.addMessage(new Message(Message.Type.Info, tskMsg, null));
 	taskResult.setProgress("Done launching task: "+tskMsg);
     taskResult.setCompletionStatus(TaskResult.CompletionStatus.Success);
-    context.saveObject(taskResult); 	
+    context.saveObject(taskResult); **/	
 	
 	return "Success";
 </Source>
