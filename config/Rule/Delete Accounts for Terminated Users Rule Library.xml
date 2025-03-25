@@ -1,0 +1,198 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Delete Accounts for Terminated Users Rule Library">
+  <Source><![CDATA[
+
+  import java.util.Locale;
+  import java.util.TimeZone;
+  import java.util.Calendar;
+  import sailpoint.object.Attributes;
+  import sailpoint.object.IdentityRequest;
+  import sailpoint.object.TaskResult;
+  import sailpoint.object.WorkItem;
+  import sailpoint.object.WorkflowCase;
+  import sailpoint.api.Terminator;
+  import sailpoint.object.Custom;
+  import sailpoint.object.TaskDefinition;
+  import sailpoint.api.TaskManager;
+  import java.text.ParseException;
+  import java.text.SimpleDateFormat;
+  import java.util.ArrayList;
+  import java.util.HashMap;
+  import java.util.HashSet;
+  import java.util.List;
+  import java.util.Map;
+  import java.util.Date;
+  import java.util.Iterator;
+  import java.util.List;
+  import java.util.HashSet;
+  import sailpoint.api.IdentityService;
+  import sailpoint.api.Provisioner;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.Application;
+  import sailpoint.object.Filter;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Link;
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.ProvisioningProject;
+  import sailpoint.object.ProvisioningResult;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.tools.GeneralException;
+  import sailpoint.tools.Message;
+  import sailpoint.tools.Util;
+  import sailpoint.object.AuditEvent;
+  import sailpoint.server.Auditor;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  
+  
+  Log logger = LogFactory.getLog("DeleteAccountsRuleLibrary");
+
+
+
+
+  public static List getDisabledLinks(Identity identity, Application application) throws GeneralException {
+
+    List disabledLinks = new ArrayList();
+
+    try{
+	  logger.debug("getDisabledLinks method start");
+      IdentityService idService = new IdentityService(context);
+      List links = idService.getLinks(identity, application);
+      if(Util.nullSafeSize(links) > 0)
+      {
+        for (Link link : links) {
+          if(link != null @and link.isDisabled())
+          {
+            disabledLinks.add(link);
+          }
+        }
+      }
+	  logger.debug("getDisabledLinks method complete");
+    }
+    catch (Exception e) {
+      logger.debug("Error in getDisabledLinks method "+e.getMessage());
+    }
+
+    return disabledLinks;
+  }
+
+
+
+
+
+  public static ProvisioningPlan buildPlan(String appName, String nativeIdentity, String identityName, Identity identity) throws GeneralException {
+
+    ProvisioningPlan plan = null;
+
+    try
+    {
+	  logger.debug("buildPlan method start");
+      plan = new ProvisioningPlan();
+      plan.setIdentity(identity);
+      AccountRequest accReq = new AccountRequest();
+      accReq.setApplication(appName);
+      accReq.setOperation(AccountRequest.Operation.Delete);
+      accReq.setNativeIdentity(nativeIdentity);
+	  
+	  if(Util.nullSafeCaseInsensitiveEq(appName, "Active Directory"))
+	  {
+      Attributes attributes = new Attributes();
+      Map attrMap = new HashMap();
+      String flow = "Custom Delete AD Inactive Accounts";
+      attrMap.put("flow", flow);
+      attributes.setMap(attrMap);
+	  accReq.setArguments(attributes);
+	  }
+	  
+      
+      plan.add(accReq);
+	  logger.debug("buildPlan method complete");
+    }
+    catch (Exception e) {
+      logger.debug("Error in buildPlan method "+e.getMessage());
+    }
+
+    return plan;
+  }
+
+  public static ProvisioningResult executePlan(ProvisioningPlan plan) throws GeneralException {
+
+    ProvisioningResult result = null; 
+
+    try
+    {
+	  logger.debug("executePlan method start");
+      Provisioner provisioner = new Provisioner(context);
+      ProvisioningProject projectObject = provisioner.compile(plan);
+      provisioner.execute(projectObject);
+      
+
+      //Check Provisioning Status
+      ProvisioningPlan provisioningPlan = projectObject.getPlans().get(0);
+      if(provisioningPlan != null)
+      { 
+        result = provisioningPlan.getAccountRequests().get(0).getResult();
+      }
+	  logger.debug("executePlan method complete");
+    }
+    catch (Exception e) {
+      logger.debug("Error in executePlan method "+e.getMessage());
+    }
+
+    return result;
+  }
+
+
+
+
+  //method to create audit events with provisioning status
+  public static void createAuditEvent(String appName, String nativeIdentity, String identityName, String accountName, String provisioningStatus, String launcher) throws GeneralException {
+
+    String auditAction = "Delete Accounts for Terminated Users";
+    try
+    {
+      logger.debug("createAuditEvent method start");
+      AuditEvent ae = new AuditEvent();
+      ae.setSource("Delete Accounts for Terminated Users");
+      ae.setTarget(identityName);
+      ae.setAction(auditAction);
+      ae.setAccountName(accountName);
+      ae.setApplication(appName);
+      ae.setAttribute("Native identity", nativeIdentity);
+      ae.setAttribute("Provisioning Status",provisioningStatus);
+      Auditor.log(ae);
+      context.commitTransaction();
+      logger.debug("createAuditEvent method complete");
+    }
+    catch (Exception e) {
+      logger.debug("Error in createAuditEvent with provisioning status method "+e.getMessage());
+    }
+  }
+
+  //method to create audit events for delete-skiped users
+  public static void createAuditEvent(String appName ,String identityName, String reason)
+  {
+    String auditAction = "Custom Delete Skipped";
+    try
+    {
+      logger.debug("createAuditEvent method start");
+      AuditEvent ae = new AuditEvent();
+      ae.setTarget(identityName);
+      ae.setAction(auditAction);
+      ae.setSource("Delete Accounts for Terminated Users");
+      ae.setApplication(appName);
+      ae.setAttribute("Reason :", reason);
+      Auditor.log(ae);
+      context.commitTransaction();
+      logger.debug("createAuditEvent method complete");
+    }
+    catch (Exception e) {
+      logger.debug("Error in createAuditEvent for delete-skiped users method "+e.getMessage());
+    }
+  }
+
+]]>
+  </Source>
+</Rule>

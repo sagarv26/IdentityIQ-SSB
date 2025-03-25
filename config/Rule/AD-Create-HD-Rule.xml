@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="AD Create HD Rule">
+	<Source>Powershell
+    
+	import sailpoint.object.Identity;
+	 
+	import java.util.List;
+	import java.util.ArrayList;
+	import java.util.HashMap;
+	import java.util.Map;
+
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	import sailpoint.object.RpcRequest;
+	import sailpoint.object.RpcResponse;
+	import sailpoint.connector.RPCService;
+
+	Map data = new HashMap();
+	data.put("postScript", "AD Create HD Powershell Rule");
+
+	Application ad = context.getObjectByName(Application.class, "Active Directory");
+	data.put("Application", ad.getAttributes());
+
+	AccountRequest accountRequest = new AccountRequest();
+	accountRequest.setApplication("IIQ");
+	accountRequest.setNativeIdentity(identityName);
+	accountRequest.setOperation(AccountRequest.Operation.Modify);
+
+	accountRequest.add(new AttributeRequest("homeDirectory", ProvisioningPlan.Operation.Add, "homeDirectory"));
+	accountRequest.add(new AttributeRequest("sAMAccountName", ProvisioningPlan.Operation.Add, "sAMAccountName"));
+
+	// Add to the IQService params
+	data.put("Request", accountRequest);
+
+
+	RPCService service = new RPCService("iqServiceHost", "iqServicePort", false, useTLS); 
+	RpcRequest request = new RpcRequest("ScriptExecutor", "runAfterScript", data);
+	RpcResponse response = service.execute(request);
+
+	Map res = response.getResultAttributes();
+
+	if(res.getMessages() != null &amp;&amp; res.getMessages().size() > 0){
+
+		if(!res.getMessages().get(0).equals("Success")){
+			System.out.println("Mailbox Creation Failed");
+		}
+
+	}
+
+    
+  </Source>
+</Rule>

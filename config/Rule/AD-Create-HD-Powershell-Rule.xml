@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="AD Create HD Powershell Rule" type="ConnectorAfterCreate">
+  <Attributes>
+    <Map>
+      <entry key="ObjectOrientedScript" value="true"/>
+      <entry key="disabled" value="false"/>
+      <entry key="extension" value=".ps1"/>
+      <entry key="program" value="powershell.exe"/>
+      <entry key="timeout" value="4000"/>
+    </Map>
+  </Attributes>
+  <Description>Creates the home directory</Description>
+  <Signature>
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="plan">
+        <Description>
+          The ProvisioningPlan object on its way to the Connector.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application object that references this before/after script.
+        </Description>
+      </Argument>
+      <Argument name="result">
+        <Description>
+          The ProvisioningResult object returned by the connectors provision method. This can be null and in many cases the connector will not return a result and instead will annotate the plans ProvisioningResult either at the plan or account level.        
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>
+    
+    Import-Module ActiveDirectory
+    
+    # Refer to SailPoint class library
+    Add-type -path utils.dll
+    $logFile = "outFile.txt"
+    
+    Add-Content -Path $logFile -Value "*************************************************";
+    Add-Content -Path $logFile -Value "STARTING AD AFTER CREATE RULE";
+    Add-Content -Path $logFile -Value "**************************************************";
+    
+    # Read the environment variables
+    $sReader = New-Object System.IO.StringReader([System.String]$env:Request);
+    $sResult = New-Object System.IO.StringReader([System.String]$env:Result);
+    
+    # Form the xml reader object 
+    $xmlReader = [System.xml.XmlTextReader]([sailpoint.Utils.xml.XmlUtil]::getReader($sReader));
+    $xmlReader_res = [System.xml.XmlTextReader]([sailpoint.Utils.xml.XmlUtil]::getReader($sResult));
+    
+    # Create SailPoint Request object
+    $requestObject = New-Object Sailpoint.Utils.objects.AccountRequest($xmlReader);
+    $resultObject = New-Object Sailpoint.Utils.objects.ServiceResult($xmlReader_res);
+    
+    # variables from request
+    $homeDrive = ""
+    $sAMAccountName = ""
+    $myhd = ""
+    $fullPath = "" 
+    
+    foreach($attribute in $requestObject.AttributeRequests) {
+        
+        if($attribute.Name -eq "homeDirectory") {
+            $homeDrive = $attribute.value
+            $myhd = $attribute.value
+            Add-Content -Path $logFile -Value "***homeDirectory $myhd"
+        }
+        
+        if($attribute.Name -eq "sAMAccountName") {
+            $sAMAccountName = $attribute.value
+            Add-Content -Path $logFile -Value "***sam $sAMAccountName"
+        }
+    }
+    
+    # proceed to create home directory if all inputs are present
+    if($myhd -and $sAMAccountName) {
+        
+        Add-Content -Path $logFile -Value "******* checking that user directory doesn't exist *******"
+        $fullPath = $myhd
+        
+        try {
+            New-Item -Path "$fullPath" -ItemType Directory -ErrorAction stop
+            Add-Content -Path $logFile -Value "Successfully created Home Directory for $fullPath"
+        } catch {
+            Add-Content -Path $logFile -Value "Error: $fullPath already exists...$error[0]"
+            return
+        }
+        
+        # ACL
+        try {
+        
+            $user_acl = Get-Acl "$fullPath"		
+            
+            $userSID = New-Object System.Security.Principal.WindowsIdentity($sAMAccountName);
+            
+            #if user not found, find from preferred dc
+            if(!$userSID) {
+                $userSID = (Get-ADUser -identity $sAMAccountName -server "server1.com").sid; 
+            }
+            
+            Add-Content -Path $logFile -Value "******user object $userSID"
+            
+            $rights = [System.Security.AccessControl.FileSystemRights]::FullControl;
+            $inheritance = [System.Security.AccessControl.InheritanceFlags]"ContainerInherit,ObjectInherit";
+            $propagation = [System.Security.AccessControl.PropagationFlags]::None;
+            $allowdeny = [System.Security.AccessControl.AccessControlType]::Allow;
+            $user_accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule ($userSID.Name,$rights,$inheritance,$propagation,$allowdeny);
+            
+            $user_acl.AddAccessRule($user_accessRule)
+            
+            # $user_acl | Set-Acl "$fullPath"
+            Set-ACL -path "$fullPath" -AclObject $user_acl
+            
+            Add-Content -Path $logFile -Value "Successfully set ACL for $fullPath"
+            
+            Set-ADUser -Identity $sAMAccountName -HomeDrive 'U:' -HomeDirectory $fullPath 
+            
+            Add-Content -Path $logFile -Value "Successfully set home drive"
+            
+        } catch {
+            Add-Content -Path $logFile -Value "Error setting ACL for $fullPath ------- $error[0]"
+        }
+        
+    } else {
+        Add-Content -Path $logFile -Value "homeDrive and sAMAccountName not passed into ConnectorAfterCreate rule..."
+    }
+    
+    Add-Content -Path $logFile -Value "******* Ending Active Directory AFTER CREATE RULE *******"
+    
+</Source>
+</Rule>

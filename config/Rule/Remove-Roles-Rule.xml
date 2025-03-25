@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Remove Roles Rule">
+  <Description>Rule to de-assign role.</Description>
+  <Source>
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory; 
+	import sailpoint.object.TaskDefinition;
+	import java.io.BufferedReader;
+	import java.util.List;
+	import java.util.ArrayList;
+	import sailpoint.object.Source;
+	import sailpoint.object.Bundle;
+	import sailpoint.object.Identity;
+	import sailpoint.object.Identity;
+	import sailpoint.object.Bundle;
+	import sailpoint.object.QueryOptions;
+	import sailpoint.object.Filter;
+	import java.util.ArrayList;
+	import java.util.Iterator;
+	import java.util.List;
+	import sailpoint.object.ProvisioningPlan;
+	import sailpoint.api.Provisioner;
+	import sailpoint.server.Auditor;
+	import sailpoint.object.AuditEvent;
+
+	taskResult.addMessage("Entering Rule Remove Roles Rule");
+
+	TaskDefinition task = context.getObjectByName(TaskDefinition.class, "Remove Role Task");
+	Map config = task.getArguments();
+	String roleNames = config.get("roleNames");
+	
+	String[] Roles = roleNames.split("|");
+	
+	if(Roles!=null)
+		for(int i = 0; i&lt; Roles.length; i++){
+			String role=Roles[i];
+  
+			if(role!=null)
+			{
+				String eachrole=role.trim();
+				taskResult.addMessage("processing Role= "+eachrole);
+				Bundle eachbund=context.getObjectByName(Bundle.class,eachrole); 
+												  
+			if (eachbund!=null)
+			{      
+				try{
+					List userlist=new ArrayList();
+
+					QueryOptions qo = new QueryOptions();  
+					qo.addFilter( Filter.or(Filter.eq("assignedRoles.name",eachrole)) ); 
+					ArrayList colsToRead = new ArrayList(); 
+					colsToRead.add("name");
+					Iterator itr = context.search(Identity.class, qo, colsToRead); 
+					while (itr.hasNext()) {
+						Object [] thisRecord = itr.next(); 
+						String identityName = (String) thisRecord[0];
+						//taskResult.addMessage("identityNamee= "+identityName);
+						userlist.add(identityName);
+						try {
+							ProvisioningPlan plan = new ProvisioningPlan();  
+							Identity eachidentobj= context.getObjectByName(Identity.class,identityName);
+							plan.setIdentity(eachidentobj);  
+							plan.add("IIQ", identityName, "assignedRoles", ProvisioningPlan.Operation.Remove, eachrole);  
+							Provisioner p = new Provisioner(context);  
+							// if you want to remove the assignment without de-provisioning the entitlements set this  
+							p.setNoRoleExpansion(true); 
+							p.execute(plan);
+
+							//taskResult.addMessage("Role= "+eachrole+" unassinged users list= "+userlist);
+				 
+				 
+							AuditEvent event = new AuditEvent();
+							event.setSource("Remove Roles Rule");
+							event.setTarget(eachidentobj.getName());
+							event.setAction("BulkUnassignRole");                                                      
+							event.setString1("Role: "+eachrole);
+							event.setString2("Bulk Process unlink assignments from user with out removing access");
+							
+							context.saveObject(event);
+							context.commitTransaction();
+							Auditor.log(event);
+				 
+							context.decache(eachidentobj);  
+				
+						}catch (Exception e) {
+							taskResult.addMessage("Error while processing Role= "+eachrole+"identityNamee= "+identityName+" Exception is" + e);	
+						}    
+					} //while
+			  
+					if(userlist.size() &lt;= 0)
+						taskResult.addMessage("Role= "+eachrole+" users not found = "+userlist);
+					else
+						taskResult.addMessage("Role= "+eachrole+" successfully unassigned from users = "+userlist);
+						sailpoint.tools.Util.flushIterator(itr);
+				}catch (Exception e) {
+					taskResult.addMessage("Error while processing Role= "+eachrole+" Exception is" + e);
+				}
+				context.decache(eachbund);
+			}
+				else taskResult.addMessage("Role= "+eachrole+" not found in the system");
+		 
+			}//if
+
+		}//for
+
+		return "Completed";
+
+	</Source>
+</Rule>

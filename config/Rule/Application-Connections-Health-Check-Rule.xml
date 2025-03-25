@@ -1,0 +1,230 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Application Connections Health Check Rule" type="IdentitySelector">
+  <Description>This rule is used to test the application Connections</Description>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>
+    import sailpoint.api.SailPointContext;
+    import sailpoint.connector.Connector;
+    import sailpoint.connector.ConnectorFactory;
+
+    import sailpoint.object.*;
+    import sailpoint.object.Custom;
+    import java.lang.reflect.Constructor;
+    import java.util.Calendar;
+    import java.util.Map.Entry;
+    import java.util.HashMap;
+    import java.text.SimpleDateFormat;
+    import java.io.File;
+    import java.io.FileWriter;
+    import java.io.BufferedWriter;
+    import java.io.IOException;
+    import org.apache.commons.logging.Log;
+    import org.apache.commons.logging.LogFactory;
+    import java.sql.Connection;
+    import java.sql.PreparedStatement;
+    import java.sql.ResultSet;
+    import java.sql.SQLException;
+
+
+    public Log log = LogFactory.getLog("com.ApplicationConnectionsHealthCheckRule");
+
+    log.info("Enter Application Connections test Rule");
+
+    String message = null;
+
+    //List customApplicationList = new ArrayList();	
+
+    Map successMessage = new HashMap();
+    Map failureMessages = new HashMap();
+
+    String COMMA_DELIMITER = ","; 
+    String NEW_LINE_SEPARATOR = "\n";   
+
+
+    Calendar cal = Calendar.getInstance();
+    SimpleDateFormat format1 = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+    String formatted = format1.format(cal.getTime());  
+
+    BufferedWriter bufferedWriter = null;
+    StringBuilder emailAttachment = new StringBuilder();
+
+    String sendMail = config.get("sendMail") != null ? (String)config.get("sendMail") : "true";
+    String workGroupName = (String)config.get("workGroup");
+
+    log.info("Work group Name------>"+workGroupName);
+
+    String emailTemplate = (String)config.get("emailTemplate");
+
+
+    String APPLICATION_NAMES = "select name from identityiq.spt_application where name not like 'ACM_%' and  name not like 'us_one%' and name not like 'Factory Template%'"+
+    "and type not in ('Logical', 'DelimitedFile','Oracle Database - Direct','IdentityIQ Workgroups','RelatedApplication') and name not in('CMDB','Saturn') OR name='SWIFT'";
+
+		//to check the application connectivity
+	public void checkApplicationConnection(){
+		log.info("Enter check Application Connections method");
+		List customApplicationList = new ArrayList();	
+		customApplicationList = getApplicationList();	  
+		for(String applicationName : customApplicationList){
+			log.info("applicationName from ApplicationConnectionsHealthCheckRule---->"+applicationName);
+			Application app = context.getObjectByName(Application.class, applicationName);
+			Connector conn;
+			if (app != null) {
+
+				String appName = app.getName();
+				String appType =app.getType();
+				String  user = null;
+				String  databaseUrl = null;
+				String failedMessage = null;
+				String appDetails = null;
+
+				String connName = ((Application)app).getConnector();
+
+
+				try {
+					//fix as per 7.2
+					conn=ConnectorFactory.getConnector(app,connName);
+					conn.testConfiguration();
+					message= "Successful connection";
+					successMessage.put(applicationName,message);
+					log.info("message from ApplicationConnectionsHealthCheckRule---->"+message);
+
+				} catch (Exception e) {
+					if(appType.equals("JDBC")){
+						Attributes attribute = app.getAttributes();
+						user =  attribute.getString("user");
+						databaseUrl = attribute.getString("url");
+						log.info("databaseurl---->"+databaseUrl);
+						failedMessage = e.getMessage();
+						log.info("failedMessage--->"+failedMessage);
+						appDetails = appType+COMMA_DELIMITER+user+COMMA_DELIMITER+databaseUrl+COMMA_DELIMITER+failedMessage;
+						failureMessages.put(applicationName,appDetails);
+
+					}else{
+						user ="n/a";
+						databaseUrl = "n/a";
+						failedMessage = e.getMessage();
+						appDetails = appType+COMMA_DELIMITER+user+COMMA_DELIMITER+databaseUrl+COMMA_DELIMITER+failedMessage;
+						failureMessages.put(applicationName,appDetails);
+
+						// failureMessage.put(applicationName,e.getMessage());
+						log.error("ErrorMessage from ApplicationConnectionsHealthCheckRule---->"+applicationName+":"+e.getMessage());
+					}
+				} 
+			}  
+		}
+
+		if(failureMessages.size() >0){
+			sendEmailNotification();
+		}
+    }
+
+    //get application list
+	public List getApplicationList(){
+
+		List applicationList = new ArrayList();	
+
+		try {  
+			dbConnection = context.getJdbcConnection(); 
+			PreparedStatement prStmt = dbConnection.prepareStatement(APPLICATION_NAMES);  
+
+			ResultSet rs = prStmt.executeQuery();  
+			while(rs.next()){
+				String applicationName =  rs.getString("name");
+				log.info("applicationame----->"+applicationName);
+				applicationList.add(applicationName);
+			}
+		}catch (SQLException e) {
+			String errMsg = "Failed to get JDBC connetion from context.getJdbcConnection().";  
+			log.error(errMsg);  
+			log.error(e);
+		}finally {
+			if (dbConnection != null) {
+				try {
+					dbConnection .close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					log.error(e);
+				}
+			}
+		}
+		return applicationList;
+    }
+
+
+
+
+
+
+    //send email notification with an attachment  
+    public void sendEmailNotification(){
+
+
+
+    EmailTemplate template = (EmailTemplate) context.getContext().getObject(
+    EmailTemplate.class, emailTemplate);
+
+    Identity workgroup = context.getObjectByName(Identity.class, workGroupName);
+    String emailAddress = workgroup.getEmail();
+    log.error("EmailAddress----->"+emailAddress);
+    if (null == template) {
+
+    log.error("ApplicationConnectionsHealthCheckRule----->ERROR: could not find email template [ " + template + "]");
+    return;
+    }
+
+    template = (EmailTemplate) template.deepCopy(context);
+
+    if (null == template) {
+
+    log.error("ApplicationConnectionsHealthCheckRule---->ERROR: failed to deepCopy template [ " + template + "]");
+    return;
+    }
+
+    List appList = new ArrayList(failureMessages.keySet());
+    for (Object appIndex : appList)
+    {
+    HashMap tmpfailureMessages = new HashMap();
+    tmpfailureMessages.put(appIndex, failureMessages.get(appIndex));
+    log.error("tmpfailureMessages---->"+tmpfailureMessages);
+
+    EmailOptions ops = new EmailOptions();
+    ops.setVariable("appName",appIndex);
+    ops.setVariable("failureMessages",tmpfailureMessages);
+    ops.setTo(emailAddress);
+
+    try 
+    {
+    context.sendEmailNotification(template, ops);
+    log.error("ApplicationConnectionsHealthCheckRule---->Successfully send email notification");
+    }
+    catch (Exception e) 
+    {
+    log.error("ApplicationConnectionsHealthCheckRule------>Error Sending Email: " + e);
+    }
+    }
+
+    context.decache(template);
+    }
+
+    checkApplicationConnection();	  
+
+
+    return "";
+
+
+  </Source>
+</Rule>

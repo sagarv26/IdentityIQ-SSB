@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition  name="Remove Role Task" resultAction="Rename" subType="task_item_type_generic" type="Generic">
+  <Attributes>
+    <Map>
+      <entry key="roleNames" value="role1|role2"/>
+      <entry key="ruleName" value="Remove Roles Rule"/>
+    </Map>
+  </Attributes>
+  <Description>The purpose of this task remove the role assignment from the users before decommission to avoid access discrepencies. give the | seperated role names list.
+</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="help_task_run_rule_rule" name="ruleName" type="Rule">
+        <Prompt>label_rule</Prompt>
+      </Argument>
+      <Argument helpKey="Role Names list with comma seperated" name="roleNames" type="string">
+        <Prompt>Roles names with | separeted</Prompt>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>

@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Create AD Group">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Rule Library"/>
+  </ReferencedRules>
+  <Source>
+	import java.util.*;
+	import sailpoint.object.*;
+	import sailpoint.api.Provisioner;
+	import sailpoint.api.*;
+	import sailpoint.object.ProvisioningPlan;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.ProvisioningPlan.Operation;
+	import sailpoint.object.ProvisioningPlan.AccountRequest.Operation;
+	import sailpoint.object.ProvisioningPlan.ObjectRequest;
+	import sailpoint.object.ProvisioningResult;
+	import sailpoint.api.Provisioner;
+
+  
+	ProvisioningPlan plan = new ProvisioningPlan();
+
+	String adGroupName = "cn=TestADGroup,ou=groups,dc=swe,dc=com";
+	String adGroupDisplayName = "TestADGroup";
+	String safeOwner = "20220123";
+	String SYS_ATTRIBUTE = "memberOf";
+	String SYS_MANAGED_ATTRIBUTE_TYPE = "Group";
+	Boolean isRequestable = true;
+	String entApprovalModel = "manager,owner";
+	String description = "This group provides access to admin" ;
+	String groupType = "Global";
+	ProvisioningPlan.ObjectRequest objRequest = new ProvisioningPlan.ObjectRequest();
+	String applicationName = "Active Directory";
+	String distinguishedName = adGroupName;
+
+	objRequest.setApplication(applicationName);
+	objRequest.setNativeIdentity(distinguishedName);
+	objRequest.setOp(ObjectOperation.Create);
+	objRequest.setType("group");
+
+	objRequest.add(new AttributeRequest("sysDisplayName", ProvisioningPlan.Operation.Set, adGroupDisplayName));
+	objRequest.add(new AttributeRequest("sAMAccountName", ProvisioningPlan.Operation.Set, adGroupDisplayName));
+	objRequest.add(new AttributeRequest("sysAttribute", ProvisioningPlan.Operation.Set, SYS_ATTRIBUTE));
+	objRequest.add(new AttributeRequest("sysRequestable", ProvisioningPlan.Operation.Set, isRequestable));
+	objRequest.add(new AttributeRequest("approvalModel", ProvisioningPlan.Operation.Set,entApprovalModel));
+
+
+	//This is for the native AD application description
+	objRequest.add(new AttributeRequest("description", ProvisioningPlan.Operation.Set, description));
+	//This is for the AA description in entitlement catalog
+	Map valueMap = new HashMap();
+	valueMap.put("en_US",description);
+	objRequest.add(new AttributeRequest("sysDescriptions", ProvisioningPlan.Operation.Set,valueMap));
+	objRequest.add(new AttributeRequest("cofEntPriv", ProvisioningPlan.Operation.Set, "FALSE"));
+	objRequest.add(new AttributeRequest("sysManagedAttributeType", ProvisioningPlan.Operation.Set, SYS_MANAGED_ATTRIBUTE_TYPE));
+	objRequest.add(new AttributeRequest("distinguishedName", ProvisioningPlan.Operation.Set, distinguishedName));
+	objRequest.add(new AttributeRequest("sysOwner", ProvisioningPlan.Operation.Set, safeOwner));
+	objRequest.add(new AttributeRequest("extensionAttribute2", ProvisioningPlan.Operation.Set, safeOwner));
+	objRequest.add(new AttributeRequest("extensionAttribute3", ProvisioningPlan.Operation.Set, "AA API Managed"));
+	objRequest.add(new AttributeRequest("extensionAttribute7", ProvisioningPlan.Operation.Set, groupType));
+
+
+	plan.addObjectRequest(objReq);
+	Provisioner provisioner = new Provisioner(context);
+	provisioner.setNoLocking(true);
+	provisioner.setDoRefresh(true);
+	ProvisioningProject project =  provisioner.compile(plan);
+	provisioner.execute(project);
+
+  </Source>
+</Rule>

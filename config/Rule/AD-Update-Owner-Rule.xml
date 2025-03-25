@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="AD Update Owner Rule">
+  <Source>
+
+  import java.util.*;
+  import sailpoint.api.SailPointFactory;
+  import sailpoint.object.Application;
+  import sailpoint.object.Identity;
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.object.ProvisioningPlan.ObjectRequest;
+  import sailpoint.object.ProvisioningResult;
+  import sailpoint.tools.Message;
+  import org.apache.commons.lang.StringUtils;
+  import sailpoint.object.*;
+  import sailpoint.tools.GeneralException;
+  import sailpoint.tools.xml.XMLObjectFactory;
+  import sailpoint.api.ObjectUtil;
+  import java.lang.*;
+  import sailpoint.api.Provisioner;
+  import sailpoint.object.IdentityRequest;
+  import sailpoint.persistence.Sequencer;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.workflow.WorkflowContext;
+  import sailpoint.api.ManagedAttributer;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.http.entity.StringEntity;
+
+	Log log = LogFactory.getLog("com.ADUpdateOwnerRule");
+	//This method is used to add owner to an AD group
+
+	public boolean addOwnerAD(String adgroupName,String owner){
+
+    try{
+		log.debug("In addOwnerAD..");
+		ManagedAttribute ma = new ManagedAttribute();
+		ManagedAttributer mg = new ManagedAttributer(context);
+		ma = mg.get(context,context.getObjectByName(Application.class,"Active Directory") , null, adgroupName);;
+		if (ma==null ) {
+        log.debug("AD group "+adgroupName + " does not exist");
+        return false;
+		}
+		else{
+        log.debug("AD Group Exists");
+
+        Identity ownerIden = context.getObjectByName(Identity.class, owner);
+        if(null!=ownerIden){
+			ma.setOwner(ownerIden);
+			context.saveObject(ma);        
+			context.commitTransaction();
+			return true;
+
+        } else return false;
+
+		}
+
+    } catch(GeneralException ex)
+    {
+      throw new GeneralException("Failed to update Owner in addOwnerAD method for " + adgroupName + " with owner " + owner+ " . "+ ex.getMessage());
+      return false;
+    }
+    catch (Exception ex)
+    {
+       throw new Exception("Failed to update Owner in addOwnerAD method for " + adgroupName + " with owner " + owner+ " . "+ ex.getMessage());
+		return false;
+    }
+	}
+
+
+  </Source>
+</Rule>
