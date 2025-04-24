@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
-<sailpoint>
+<!DOCTYPE UIConfig PUBLIC "sailpoint.dtd" "sailpoint.dtd">
 <UIConfig name="UIConfig">
   <Attributes>
     <Map>
@@ -104,6 +103,16 @@
             <ColumnConfig dataIndex="identity-id" fieldOnly="true" groupProperty="identity.id" property="identity.id" sortProperty="identity.id" stateId="identity-id"/>
             <ColumnConfig dataIndex="IIQ_accountIcons" fieldOnly="true" stateId="IIQ_accountIcons"/>
             <ColumnConfig dataIndex="IIQ_status_class" fieldOnly="true" stateId="IIQ_status_class"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="applicationStatusColumns">
+        <value>
+          <List>
+            <ColumnConfig dataIndex="id" fieldOnly="true" groupProperty="id" property="id" sortProperty="id" stateId="id"/>
+            <ColumnConfig dataIndex="name" groupProperty="name" headerKey="ui_env_mon_app_grid_hdr_name" property="name" renderer="spAppStatusDetailColumn" sortProperty="name" sortable="true" stateId="name"/>
+            <ColumnConfig dataIndex="type" groupProperty="type" headerKey="ui_env_mon_app_grid_hdr_type" property="type" sortProperty="type" sortable="true" stateId="type"/>
+            <ColumnConfig dataIndex="statuses" fixed="Right" headerKey="ui_env_mon_app_grid_hdr_status" renderer="spAppsStatusColumn" stateId="statuses"/>
           </List>
         </value>
       </entry>
@@ -532,6 +541,52 @@
           </List>
         </value>
       </entry>
+      <entry key="contextualHelp">
+        <value>
+          <Map>
+            <entry key="accessReviewDetailURL">
+              <value>
+                <ContextualHelpItem enabled="true" height="600" homeUrl="certification/certification.jsf" key="accessReviewDetailURL" title="ui_access_review_detail_help" type="URL" url="ui/help/accessReview/access-review-detail-help.html" useTemplate="true" width="1024"/>
+              </value>
+            </entry>
+            <entry key="accessReviewSummaryCardURL">
+              <value>
+                <ContextualHelpItem enabled="true" height="600" homeUrl="certification/certification.jsf" key="accessReviewSummaryCardURL" title="ui_access_review_summary_card_help" type="URL" url="ui/help/accessReview/access-review-summary-card-help.html" useTemplate="true" width="1024"/>
+              </value>
+            </entry>
+            <entry key="certificationScheduleAdditionalOptionsURL">
+              <value>
+                <ContextualHelpItem enabled="true" height="600" homeUrl="certification/schedule.jsf" key="certificationScheduleAdditionalOptionsURL" title="ui_certification_schedule_additional_options_help_title" type="URL" url="ui/help/certification/schedule/certification-schedule-additional-options-help.html" useTemplate="true" width="1024"/>
+              </value>
+            </entry>
+            <entry key="certificationScheduleCertifierURL">
+              <value>
+                <ContextualHelpItem enabled="true" height="600" homeUrl="certification/schedule.jsf" key="certificationScheduleCertifierURL" title="ui_certification_schedule_certifier_help_title" type="URL" url="ui/help/certification/schedule/certification-schedule-certifier-help.html" useTemplate="true" width="1024"/>
+              </value>
+            </entry>
+            <entry key="certificationScheduleEntityURL">
+              <value>
+                <ContextualHelpItem enabled="true" height="600" homeUrl="certification/schedule.jsf" key="certificationScheduleEntityURL" title="ui_certification_schedule_entity_help_title" type="URL" url="ui/help/certification/schedule/certification-schedule-entity-help.html" useTemplate="true" width="1024"/>
+              </value>
+            </entry>
+            <entry key="certificationScheduleItemURL">
+              <value>
+                <ContextualHelpItem enabled="true" height="600" homeUrl="certification/schedule.jsf" key="certificationScheduleItemURL" title="ui_certification_schedule_item_help_title" type="URL" url="ui/help/certification/schedule/certification-schedule-item-help.html" useTemplate="true" width="1024"/>
+              </value>
+            </entry>
+            <entry key="certificationScheduleTimelineURL">
+              <value>
+                <ContextualHelpItem enabled="true" height="600" homeUrl="certification/schedule.jsf" key="certificationScheduleTimelineURL" title="ui_certification_schedule_timeline_help_title" type="URL" url="ui/help/certification/schedule/certification-schedule-timeline-help.html" useTemplate="true" width="1024"/>
+              </value>
+            </entry>
+            <entry key="manageUserAccessURL">
+              <value>
+                <ContextualHelpItem enabled="true" height="600" homeUrl="accessRequest/accessRequest.jsf" key="manageUserAccessURL" title="ui_manage_user_access_help" type="URL" url="ui/help/accessRequest/manage-user-access-help.html" useTemplate="true" width="1024"/>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
       <entry key="continuousCertificationEntityDataOwnerTableColumns">
         <value>
           <List>
@@ -606,6 +661,15 @@
             <ColumnConfig dataIndex="id" fieldOnly="true" groupProperty="id" property="id" sortProperty="id" stateId="id"/>
             <ColumnConfig dataIndex="type" fieldOnly="true" groupProperty="type" property="type" sortProperty="type" stateId="type"/>
             <ColumnConfig dataIndex="accountKey" fieldOnly="true" groupProperty="IIQ_accountKey" property="IIQ_accountKey" sortProperty="IIQ_accountKey" stateId="accountKey"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="contributingEntitlementColumns">
+        <value>
+          <List>
+            <ColumnConfig dataIndex="applicationName" groupProperty="applicationName" headerKey="source" hideable="true" property="applicationName" sortProperty="applicationName" sortable="true" stateId="applicationName"/>
+            <ColumnConfig dataIndex="type" groupProperty="ownerType" headerKey="ownerType" hideable="true" property="ownerType" sortProperty="ownerType" sortable="true" stateId="type"/>
+            <ColumnConfig dataIndex="hierarchy" groupProperty="hierarchy" headerKey="path" hideable="true" property="hierarchy" sortProperty="hierarchy" stateId="hierarchy"/>
           </List>
         </value>
       </entry>
@@ -1080,7 +1144,7 @@
         </value>
       </entry>
       <entry key="disableRoleEditorImpactAnalysis" value="false"/>
-      <entry key="disabledSuggestExtendedAttributes"/>
+      <entry key="disabledSuggestExtendedAttributes" value="city"/>
       <entry key="entitlementCatalogTableColumns">
         <value>
           <List>
@@ -1093,6 +1157,23 @@
             <ColumnConfig dataIndex="owner" groupProperty="owner.displayName" headerKey="owner" hideable="true" property="owner.displayName" sortProperty="owner.displayName" sortable="true" stateId="owner"/>
             <ColumnConfig dataIndex="requestable" groupProperty="requestable" headerKey="explanation_col_requestable" hideable="true" property="requestable" renderer="SailPoint.grid.Util.renderBoolean" sortProperty="requestable" sortable="true" stateId="requestable"/>
             <ColumnConfig dataIndex="modified" groupProperty="modified" headerKey="last_refreshed" hidden="true" hideable="true" property="modified" sortProperty="modified" sortable="true" stateId="modified"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="environmentMonitoringHostsColumns">
+        <value>
+          <List>
+            <ColumnConfig dataIndex="id" fieldOnly="true" groupProperty="id" property="id" sortProperty="id" stateId="id"/>
+            <ColumnConfig dataIndex="name" groupProperty="name" headerKey="ui_env_mon_host_grid_hdr_name" property="name" renderer="spHostDetailColumn" sortProperty="name" sortable="true" stateId="name"/>
+            <ColumnConfig dataIndex="inactive" groupProperty="inactive" headerKey="ui_env_mon_host_grid_hdr_inactive" hideable="true" property="inactive" renderer="status" sortProperty="inactive" sortable="true" stateId="inactive"/>
+            <ColumnConfig dataIndex="heartbeat" dateStyle="short" groupProperty="heartbeat" headerKey="ui_env_mon_host_grid_hdr_heartbeat" hideable="true" property="heartbeat" sortProperty="heartbeat" sortable="true" stateId="heartbeat"/>
+            <ColumnConfig dataIndex="cpuUsage" headerKey="monitor_stat_label_cpu" hideable="true" renderer="percentage" sortable="true" stateId="cpuUsage"/>
+            <ColumnConfig dataIndex="memoryUsagePercentage" headerKey="monitor_stat_label_memory_usage_percentage" hideable="true" renderer="percentage" sortable="true" stateId="memoryUsagePercentage"/>
+            <ColumnConfig dataIndex="requestThreads" headerKey="monitor_stat_label_request_proc_threads" hideable="true" sortable="true" stateId="requestThreads"/>
+            <ColumnConfig dataIndex="databaseResponseTime" headerKey="monitor_stat_label_database_response_time" hidden="true" hideable="true" renderer="milliseconds" sortable="true" stateId="databaseResponseTime"/>
+            <ColumnConfig dataIndex="taskThreads" headerKey="monitor_stat_label_quartz_threads" hidden="true" hideable="true" sortable="true" stateId="taskThreads"/>
+            <ColumnConfig dataIndex="memoryUsage" headerKey="monitor_stat_label_memory_usage" hidden="true" hideable="true" renderer="megabytes" sortable="true" stateId="memoryUsage"/>
+            <ColumnConfig dataIndex="" fixed="Right" headerKey="ui_env_mon_host_grid_hdr_actions" renderer="spHostsActionColumn" stateId=""/>
           </List>
         </value>
       </entry>
@@ -1258,16 +1339,19 @@
             <ColumnConfig dataIndex="name" groupProperty="name" headerKey="idents_grid_hdr_name" hideable="true" property="name" sortProperty="name" sortable="true" stateId="name"/>
             <ColumnConfig dataIndex="firstname" groupProperty="firstname" headerKey="idents_grid_hdr_first_name" hideable="true" property="firstname" sortProperty="firstname" sortable="true" stateId="firstname"/>
             <ColumnConfig dataIndex="lastname" groupProperty="lastname" headerKey="idents_grid_hdr_last_name" hideable="true" property="lastname" sortProperty="lastname" sortable="true" stateId="lastname"/>
-            <ColumnConfig dataIndex="manager" groupProperty="manager" headerKey="idents_grid_hdr_manager" hideable="true" property="manager" sortProperty="manager" sortable="true" stateId="manager"/>
+            <ColumnConfig dataIndex="manager-displayName" groupProperty="manager.displayName" headerKey="idents_grid_hdr_manager" hideable="true" property="manager.displayName" sortProperty="manager.displayName" sortable="true" stateId="manager-displayName"/>
             <ColumnConfig dataIndex="assignedRoleSummary" groupProperty="assignedRoleSummary" headerKey="idents_grid_hdr_assigned_roles" hideable="true" property="assignedRoleSummary" sortProperty="assignedRoleSummary" stateId="assignedRoleSummary"/>
             <ColumnConfig dataIndex="bundleSummary" groupProperty="bundleSummary" headerKey="idents_grid_hdr_detected_roles" hideable="true" property="bundleSummary" sortProperty="bundleSummary" stateId="bundleSummary"/>
             <ColumnConfig dataIndex="scorecard-compositeScore" groupProperty="scorecard.compositeScore" headerKey="idents_grid_hdr_composite_score" hideable="true" property="scorecard.compositeScore" renderer="SailPoint.Define.Grid.Identity.renderScore" sortProperty="scorecard.compositeScore" sortable="true" stateId="scorecard-compositeScore"/>
             <ColumnConfig dataIndex="lastRefresh" dateStyle="short" groupProperty="lastRefresh" headerKey="idents_grid_hdr_last_refresh" hideable="true" property="lastRefresh" sortProperty="lastRefresh" sortable="true" stateId="lastRefresh"/>
             <ColumnConfig dataIndex="managerStatus" fieldOnly="true" groupProperty="managerStatus" property="managerStatus" sortProperty="managerStatus" stateId="managerStatus"/>
+            <ColumnConfig dataIndex="type" groupProperty="type" headerKey="idents_grid_hdr_type" hideable="true" property="type" sortProperty="type" sortable="true" stateId="type"/>
+            <ColumnConfig dataIndex="softwareVersion" groupProperty="softwareVersion" headerKey="idents_grid_hdr_software_version" hidden="true" hideable="true" property="softwareVersion" sortProperty="softwareVersion" sortable="true" stateId="softwareVersion"/>
+            <ColumnConfig dataIndex="administrator-displayName" groupProperty="administrator.displayName" headerKey="idents_grid_hdr_administrator" hidden="true" hideable="true" property="administrator.displayName" sortProperty="administrator.displayName" sortable="true" stateId="administrator-displayName"/>
           </List>
         </value>
       </entry>
-      <entry key="identityViewAttributes" value="name,firstname,lastname,email,manager,city,employeeid,department,office,description,title,info,enabled,employeenumber,status"/>
+      <entry key="identityViewAttributes" value="name, firstname, lastname, email, manager, type, employeeType, administrator"/>
       <entry key="lcmCreateIdentityProvisioningPolicyRequiredFields">
         <value>
           <List>
@@ -1299,7 +1383,7 @@
             <ColumnConfig dataIndex="accountId" groupProperty="displayName" headerKey="ui_manage_accounts_account_id" property="displayName" sortProperty="displayName" sortable="true" stateId="accountId"/>
             <ColumnConfig dataIndex="status" headerKey="ui_manage_accounts_status" renderer="linkStatus" sortable="true" stateId="status"/>
             <ColumnConfig dataIndex="lastRefresh" dateStyle="short" groupProperty="lastRefresh" headerKey="ui_manage_accounts_last_refresh" property="lastRefresh" sortProperty="lastRefresh" sortable="true" stateId="lastRefresh"/>
-            <ColumnConfig dataIndex="actionStatus" headerKey="ui_manage_accounts_action_status" renderer="linkActionStatus" sortable="true" stateId="actionStatus"/>
+            <ColumnConfig dataIndex="actionStatus" headerKey="ui_manage_accounts_action_status" renderer="spLinkActionStatusColumn" sortable="true" stateId="actionStatus"/>
             <ColumnConfig dataIndex="previousAction" fieldOnly="true" stateId="previousAction"/>
             <ColumnConfig dataIndex="approvalStatus" fieldOnly="true" stateId="approvalStatus"/>
             <ColumnConfig dataIndex="errors" fieldOnly="true" stateId="errors"/>
@@ -1325,7 +1409,7 @@
             <ColumnConfig dataIndex="accountId" groupProperty="displayName" headerKey="ui_manage_passwords_account_id" property="displayName" sortProperty="displayName" sortable="true" stateId="accountId"/>
             <ColumnConfig dataIndex="status" headerKey="ui_manage_passwords_status" renderer="linkStatus" sortable="true" stateId="status"/>
             <ColumnConfig dataIndex="lastRefresh" dateStyle="short" groupProperty="lastRefresh" headerKey="ui_manage_passwords_last_refresh" property="lastRefresh" sortProperty="lastRefresh" sortable="true" stateId="lastRefresh"/>
-            <ColumnConfig dataIndex="actionStatus" headerKey="ui_manage_passwords_action_status" renderer="linkActionStatus" stateId="actionStatus"/>
+            <ColumnConfig dataIndex="actionStatus" headerKey="ui_manage_passwords_action_status" renderer="spLinkActionStatusColumn" stateId="actionStatus"/>
             <ColumnConfig dataIndex="id" fixed="Right" groupProperty="id" headerKey="ui_manage_passwords_actions" property="id" renderer="spManagePasswordActions" sortProperty="id" stateId="id"/>
           </List>
         </value>
@@ -1397,8 +1481,10 @@
             <ColumnConfig dataIndex="manager-name" groupProperty="manager.name" headerKey="identity_correlation_identity_grid_col_mgr" hideable="true" property="manager.name" sortProperty="manager.name" sortable="true" stateId="manager-name" width="130"/>
             <ColumnConfig dataIndex="email" groupProperty="email" headerKey="identity_correlation_identity_grid_col_email" hideable="true" property="email" sortProperty="email" sortable="true" stateId="email" width="290"/>
             <ColumnConfig dataIndex="inactive" groupProperty="inactive" headerKey="identity_correlation_identity_grid_col_inactive" hideable="true" property="inactive" sortProperty="inactive" sortable="true" stateId="inactive" width="100"/>
-            <ColumnConfig dataIndex="status" dateStyle="short" groupProperty="status" headerKey="Status" hideable="true" property="status" renderer="SailPoint.Date.DateTimeRenderer" sortProperty="status" sortable="true" stateId="status" width="230"/>
-            <ColumnConfig dataIndex="correlated" dateStyle="short" groupProperty="correlated" headerKey="Authoritative" hideable="true" property="correlated" renderer="SailPoint.Date.DateTimeRenderer" sortProperty="sorrelated" sortable="true" stateId="correlated" width="230"/>
+            <ColumnConfig dataIndex="lastRefresh" dateStyle="short" groupProperty="lastRefresh" headerKey="identity_correlation_identity_grid_col_last_refresh" hideable="true" property="lastRefresh" renderer="SailPoint.Date.DateTimeRenderer" sortProperty="lastRefresh" sortable="true" stateId="lastRefresh" width="230"/>
+            <ColumnConfig dataIndex="type" groupProperty="lastname" headerKey="identity_correlation_identity_grid_col_type" hideable="true" property="type" sortProperty="lastname" sortable="true" stateId="type" width="120"/>
+            <ColumnConfig dataIndex="softwareVersion" groupProperty="softwareVersion" headerKey="identity_correlation_identity_grid_col_software_version" hidden="true" hideable="true" property="softwareVersion" sortProperty="softwareVersion" sortable="true" stateId="softwareVersion" width="120"/>
+            <ColumnConfig dataIndex="administrator-name" groupProperty="administrator.name" headerKey="identity_correlation_identity_grid_col_administrator" hidden="true" hideable="true" property="administrator.name" sortProperty="administrator.name" sortable="true" stateId="administrator-name" width="120"/>
           </List>
         </value>
       </entry>
@@ -1421,6 +1507,38 @@
             <ColumnConfig dataIndex="subType" groupProperty="subType" headerKey="type" hideable="true" property="subType" sortProperty="subType" sortable="true" stateId="subType"/>
             <ColumnConfig dataIndex="owner-name" groupProperty="owner.name" headerKey="owner" hideable="true" property="owner.name" sortProperty="owner.name" sortable="true" stateId="owner-name"/>
             <ColumnConfig dataIndex="created" dateStyle="short" groupProperty="created" headerKey="created" hideable="true" property="created" sortProperty="created" sortable="true" stateId="created"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="moduleStatusColumns">
+        <value>
+          <List>
+            <ColumnConfig dataIndex="id" fieldOnly="true" groupProperty="id" property="id" sortProperty="id" stateId="id"/>
+            <ColumnConfig dataIndex="name" groupProperty="name" headerKey="ui_env_mon_module_grid_hdr_name" property="name" renderer="spModuleStatusDetailColumn" sortProperty="name" sortable="true" stateId="name"/>
+            <ColumnConfig dataIndex="description" groupProperty="description" headerKey="ui_env_mon_module_grid_hdr_desc" hideable="true" property="description" renderer="spTranslate" sortProperty="description" sortable="true" stateId="description"/>
+            <ColumnConfig dataIndex="enabled" fieldOnly="true" groupProperty="enabled" stateId="description"/>
+            <ColumnConfig dataIndex="statuses" fixed="Right" headerKey="ui_env_mon_module_grid_hdr_status" renderer="spAppsStatusColumn" stateId="statuses"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="moduleTableColumns">
+        <value>
+          <List>
+            <ColumnConfig dataIndex="name" groupProperty="name" headerKey="name" hideable="true" property="name" sortProperty="name" sortable="true" stateId="name"/>
+            <ColumnConfig dataIndex="host" headerKey="host" hideable="true" stateId="host"/>
+            <ColumnConfig dataIndex="modified" groupProperty="modified" headerKey="modified" hideable="true" property="modified" renderer="SailPoint.Date.DateTimeRenderer" sortProperty="modified" sortable="true" stateId="modified"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="monitoringStatisticColumns">
+        <value>
+          <List>
+            <ColumnConfig dataIndex="id" fieldOnly="true" groupProperty="id" property="id" sortProperty="id" stateId="id"/>
+            <ColumnConfig dataIndex="name" fieldOnly="true" groupProperty="name" property="name" sortProperty="name" stateId="name"/>
+            <ColumnConfig dataIndex="displayName" fieldOnly="true" groupProperty="displayName" property="displayName" sortProperty="displayName" stateId="displayName"/>
+            <ColumnConfig dataIndex="description" fieldOnly="true" groupProperty="description" property="description" sortProperty="description" stateId="description"/>
+            <ColumnConfig dataIndex="template" fieldOnly="true" groupProperty="template" property="template" sortProperty="template" stateId="template"/>
+            <ColumnConfig dataIndex="type" fieldOnly="true" groupProperty="type" property="type" sortProperty="type" stateId="type"/>
           </List>
         </value>
       </entry>
@@ -1474,7 +1592,7 @@
         <value>
           <List>
             <ColumnConfig dataIndex="name" groupProperty="name" headerKey="ui_oauth_grid_hdr_name" property="name" sortProperty="name" stateId="name"/>
-            <ColumnConfig dataIndex="proxyUser" groupProperty="proxyUser" headerKey="ui_oauth_grid_hdr_proxy_user" property="proxyUser" renderer="displayableName" sortProperty="proxyUser" stateId="proxyUser"/>
+            <ColumnConfig dataIndex="proxyUser" groupProperty="proxyUser" headerKey="ui_oauth_grid_hdr_proxy_user" property="proxyUser" renderer="displayableName,encodeHtml" sortProperty="proxyUser" stateId="proxyUser"/>
             <ColumnConfig dataIndex="clientId" groupProperty="clientId" headerKey="ui_oauth_grid_hdr_client_id" property="clientId" sortProperty="clientId" stateId="clientId"/>
             <ColumnConfig dataIndex="secret" groupProperty="secret" headerKey="ui_oauth_grid_hdr_secret" property="secret" renderer="spOAuthClientConfigSecretColumn" sortProperty="secret" stateId="secret"/>
             <ColumnConfig dataIndex="createDate" dateStyle="short" groupProperty="createDate" headerKey="ui_oauth_grid_hdr_create_date" property="createDate" sortProperty="createDate" stateId="createDate"/>
@@ -1883,6 +2001,25 @@
           </List>
         </value>
       </entry>
+      <entry key="serverStatisticColumns">
+        <value>
+          <List>
+            <ColumnConfig dataIndex="id" fieldOnly="true" groupProperty="id" property="id" sortProperty="id" stateId="id"/>
+            <ColumnConfig dataIndex="name" groupProperty="name" headerKey="ui_server_stat_grid_hdr_name" property="name" sortProperty="name" sortable="true" stateId="name"/>
+            <ColumnConfig dataIndex="type" groupProperty="type" headerKey="ui_server_stat_grid_hdr_type" property="monitoringStatistic.type" sortProperty="type" sortable="true" stateId="type"/>
+            <ColumnConfig dataIndex="value" groupProperty="value" headerKey="ui_server_stat_grid_hdr_value" property="value" sortProperty="value" sortable="true" stateId="value"/>
+            <ColumnConfig dataIndex="valueType" groupProperty="valueType" headerKey="ui_server_stat_grid_hdr_valueType" property="valueType" sortProperty="valueType" sortable="true" stateId="valueType"/>
+            <ColumnConfig dataIndex="displayName" groupProperty="displayName" headerKey="ui_server_stat_grid_hdr_display_name" property="monitoringStatistic.displayName" sortProperty="displayName" sortable="true" stateId="displayName"/>
+            <ColumnConfig dataIndex="target" groupProperty="target" headerKey="ui_server_stat_grid_hdr_target" property="target" sortProperty="target" sortable="true" stateId="target"/>
+            <ColumnConfig dataIndex="targetType" groupProperty="targetType" headerKey="ui_server_stat_grid_hdr_targetType" property="targetType" sortProperty="targetType" sortable="true" stateId="targetType"/>
+            <ColumnConfig dataIndex="serverName" groupProperty="serverName" headerKey="ui_server_stat_grid_hdr_server_name" property="host.name" sortProperty="serverName" sortable="true" stateId="serverName"/>
+            <ColumnConfig dataIndex="serverId" groupProperty="serverId" headerKey="ui_server_stat_grid_hdr_server_id" property="host.id" sortProperty="serverId" sortable="true" stateId="serverId"/>
+            <ColumnConfig dataIndex="snapshotName" groupProperty="snapshotName" headerKey="ui_server_stat_grid_hdr_snapshotName" property="snapshotName" sortProperty="snapshotName" sortable="true" stateId="snapshotName"/>
+            <ColumnConfig dataIndex="created" dateStyle="short" groupProperty="created" headerKey="ui_server_stat_grid_hdr_created" property="created" sortProperty="created" sortable="true" stateId="created" timeStyle="short"/>
+            <ColumnConfig dataIndex="statisticAttributes" fieldOnly="true" groupProperty="monitoringStatistic.attributes" property="monitoringStatistic.attributes" sortProperty="monitoringStatistic.attributes" stateId="statisticAttributes"/>
+          </List>
+        </value>
+      </entry>
       <entry key="subGroupDefinitionTableColumns">
         <value>
           <List>
@@ -1913,7 +2050,7 @@
             <ColumnConfig dataIndex="type" groupProperty="type" headerKey="type" hideable="true" percentWidth="5" property="type" sortProperty="type" sortable="true" stateId="type"/>
             <ColumnConfig dataIndex="launched" dateStyle="short" groupProperty="launched" headerKey="start_date" hideable="true" percentWidth="10" property="launched" secondarySort="id" sortProperty="launched" sortable="true" stateId="launched"/>
             <ColumnConfig dataIndex="completed" dateStyle="short" groupProperty="completed" headerKey="date_complete" hideable="true" percentWidth="10" property="completed" secondarySort="id" sortProperty="completed" sortable="true" stateId="completed"/>
-            <ColumnConfig dataIndex="completionStatus" fixed="Right" groupProperty="completionStatus" headerKey="result" hideable="true" percentWidth="10" property="completionStatus" renderer="completionStatus" secondarySort="id" sortProperty="completionStatus" sortable="true" stateId="completionStatus"/>
+            <ColumnConfig dataIndex="completionStatus" groupProperty="completionStatus" headerKey="result" hideable="true" percentWidth="10" property="completionStatus" renderer="completionStatus" secondarySort="id" sortProperty="completionStatus" sortable="true" stateId="completionStatus"/>
             <ColumnConfig dataIndex="launcher" groupProperty="launcher" headerKey="owner" hideable="true" percentWidth="10" property="launcher" secondarySort="id" sortProperty="launcher" sortable="true" stateId="launcher"/>
             <ColumnConfig dataIndex="statusId" fieldOnly="true" stateId="statusId"/>
             <ColumnConfig dataIndex="subtype" fieldOnly="true" stateId="subtype"/>
@@ -1922,6 +2059,8 @@
             <ColumnConfig dataIndex="runLength" groupProperty="runLength" headerKey="ui_task_management_runtime" hideable="true" percentWidth="10" property="runLength" renderer="runtime" secondarySort="id" sortProperty="runLength" sortable="true" stateId="runLength"/>
             <ColumnConfig dataIndex="runLengthDeviation" groupProperty="runLengthDeviation" headerKey="ui_task_management_diff_from_avg" hideable="true" percentWidth="5" property="runLengthDeviation" renderer="runLengthDeviation" secondarySort="id" sortProperty="runLengthDeviation" sortable="true" stateId="runLengthDeviation"/>
             <ColumnConfig dataIndex="id" fieldOnly="true" groupProperty="id" property="id" sortProperty="id" stateId="id"/>
+            <ColumnConfig dataIndex="" fixed="Right" headerKey="ui_task_management_grid_hdr_actions" percentWidth="5" renderer="spTaskManagementCompletedActionColumn" stateId=""/>
+            <ColumnConfig dataIndex="canRestart" fieldOnly="true" stateId="canRestart"/>
           </List>
         </value>
       </entry>
@@ -1971,6 +2110,7 @@
             <ColumnConfig dataIndex="statusId" fieldOnly="true" stateId="statusId"/>
             <ColumnConfig dataIndex="subtype" fieldOnly="true" stateId="subtype"/>
             <ColumnConfig dataIndex="host" groupProperty="host" headerKey="host" hideable="true" property="host" secondarySort="id" sortProperty="host" sortable="true" stateId="host"/>
+            <ColumnConfig dataIndex="canRestart" fieldOnly="true" stateId="canRestart"/>
           </List>
         </value>
       </entry>
@@ -2094,7 +2234,7 @@
             <ColumnConfig dataIndex="accountName" groupProperty="exceptionEntitlements.displayName" headerKey="cert_item_tbl_header_accountDisplayName" hidden="true" hideable="true" property="exceptionEntitlements.displayName" renderer="spCertificationAccountDisplayNameColumn" secondarySort="exceptionApplication,parent.lastname,parent.firstname,type" sortProperty="exceptionEntitlements.displayName" sortable="true" stateId="accountName"/>
             <ColumnConfig dataIndex="instance" groupProperty="exceptionEntitlements.instance" headerKey="cert_item_tbl_header_instance" hidden="true" hideable="true" property="exceptionEntitlements.instance" secondarySort="exceptionApplication,parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionEntitlements.instance" sortable="true" stateId="instance"/>
             <ColumnConfig dataIndex="application" groupProperty="exceptionApplication" headerKey="cert_item_tbl_header_application" hidden="true" hideable="true" percentWidth="10" property="exceptionApplication" secondarySort="parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionApplication" sortable="true" stateId="application"/>
-            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
+            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleEncodedColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
             <ColumnConfig dataIndex="summaryStatus" groupProperty="summaryStatus" headerKey="cert_item_tbl_header_summary_status" hidden="true" hideable="true" property="summaryStatus" renderer="certSummaryStatus" sortProperty="summaryStatus" sortable="true" stateId="summaryStatus"/>
             <ColumnConfig dataIndex="decisions" headerKey="cert_item_tbl_header_decision" renderer="spCertificationDecisionColumn" stateId="decisions"/>
             <ColumnConfig dataIndex="decisionStatus" evaluator="sailpoint.web.view.certification.CertificationItemDecisionColumn" fieldOnly="true" groupProperty="IIQ_decisionChoices" property="IIQ_decisionChoices" sortProperty="IIQ_decisionChoices" stateId="decisionStatus"/>
@@ -2121,7 +2261,7 @@
             <ColumnConfig dataIndex="accountName" groupProperty="exceptionEntitlements.displayName" headerKey="cert_item_tbl_header_accountDisplayName" hidden="true" hideable="true" property="exceptionEntitlements.displayName" renderer="spCertificationAccountDisplayNameColumn" secondarySort="exceptionApplication,parent.lastname,parent.firstname,type" sortProperty="exceptionEntitlements.displayName" sortable="true" stateId="accountName"/>
             <ColumnConfig dataIndex="instance" groupProperty="exceptionEntitlements.instance" headerKey="cert_item_tbl_header_instance" hidden="true" hideable="true" property="exceptionEntitlements.instance" secondarySort="exceptionApplication,parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionEntitlements.instance" sortable="true" stateId="instance"/>
             <ColumnConfig dataIndex="application" groupProperty="exceptionApplication" headerKey="cert_item_tbl_header_application" hidden="true" hideable="true" percentWidth="10" property="exceptionApplication" secondarySort="parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionApplication" sortable="true" stateId="application"/>
-            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
+            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleEncodedColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
             <ColumnConfig dataIndex="summaryStatus" groupProperty="summaryStatus" headerKey="cert_item_tbl_header_summary_status" hidden="true" hideable="true" property="summaryStatus" renderer="certSummaryStatus" sortProperty="summaryStatus" sortable="true" stateId="summaryStatus"/>
             <ColumnConfig dataIndex="decisions" headerKey="cert_item_tbl_header_decision" renderer="spCertificationDecisionColumn" stateId="decisions"/>
             <ColumnConfig dataIndex="decisionStatus" evaluator="sailpoint.web.view.certification.CertificationItemDecisionColumn" fieldOnly="true" groupProperty="IIQ_decisionChoices" property="IIQ_decisionChoices" sortProperty="IIQ_decisionChoices" stateId="decisionStatus"/>
@@ -2184,7 +2324,7 @@
             <ColumnConfig dataIndex="attribute" groupProperty="attribute" headerKey="attribute" hideable="true" stateId="attribute"/>
             <ColumnConfig dataIndex="value" groupProperty="value" headerKey="entitlements" hideable="true" stateId="value"/>
             <ColumnConfig dataIndex="" fixed="Right" headerKey="cert_item_tbl_header_action" renderer="spCertificationActionColumn" stateId=""/>
-            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
+            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleEncodedColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
             <ColumnConfig dataIndex="summaryStatus" groupProperty="summaryStatus" headerKey="cert_item_tbl_header_summary_status" hidden="true" hideable="true" property="summaryStatus" renderer="certSummaryStatus" sortProperty="summaryStatus" sortable="true" stateId="summaryStatus"/>
             <ColumnConfig dataIndex="decisions" headerKey="cert_item_tbl_header_decision" renderer="spCertificationDecisionColumn" stateId="decisions"/>
             <ColumnConfig dataIndex="decisionStatus" evaluator="sailpoint.web.view.certification.CertificationItemDecisionColumn" fieldOnly="true" groupProperty="IIQ_decisionChoices" property="IIQ_decisionChoices" sortProperty="IIQ_decisionChoices" stateId="decisionStatus"/>
@@ -2204,7 +2344,7 @@
             <ColumnConfig dataIndex="attribute" groupProperty="attribute" headerKey="attribute" hideable="true" stateId="attribute"/>
             <ColumnConfig dataIndex="value" groupProperty="value" headerKey="entitlements" hideable="true" stateId="value"/>
             <ColumnConfig dataIndex="" fixed="Right" headerKey="cert_item_tbl_header_action" renderer="spCertificationActionColumn" stateId=""/>
-            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
+            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleEncodedColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
             <ColumnConfig dataIndex="summaryStatus" groupProperty="summaryStatus" headerKey="cert_item_tbl_header_summary_status" hidden="true" hideable="true" property="summaryStatus" renderer="certSummaryStatus" sortProperty="summaryStatus" sortable="true" stateId="summaryStatus"/>
             <ColumnConfig dataIndex="decisions" headerKey="cert_item_tbl_header_decision" renderer="spCertificationDecisionColumn" stateId="decisions"/>
             <ColumnConfig dataIndex="decisionStatus" evaluator="sailpoint.web.view.certification.CertificationItemDecisionColumn" fieldOnly="true" groupProperty="IIQ_decisionChoices" property="IIQ_decisionChoices" sortProperty="IIQ_decisionChoices" stateId="decisionStatus"/>
@@ -2235,6 +2375,23 @@
           </List>
         </value>
       </entry>
+      <entry key="uiAcctGroupMembershipCertificationExportColumns">
+        <value>
+          <List>
+            <ColumnConfig dataIndex="Identity-displayName" groupProperty="Identity.displayName" headerKey="cert_item_tbl_header_identity" property="Identity.displayName" sortProperty="Identity.displayName" stateId="Identity-displayName"/>
+            <ColumnConfig dataIndex="Identity-firstname" groupProperty="Identity.firstname" headerKey="cert_item_tbl_header_firstname" property="Identity.firstname" sortProperty="Identity.firstname" stateId="Identity-firstname"/>
+            <ColumnConfig dataIndex="Identity-lastname" groupProperty="Identity.lastname" headerKey="cert_item_tbl_header_lastname" property="Identity.lastname" sortProperty="Identity.lastname" stateId="Identity-lastname"/>
+            <ColumnConfig dataIndex="parent-schemaObjectType" groupProperty="parent.schemaObjectType" headerKey="cert_item_tbl_header_type" property="parent.schemaObjectType" sortProperty="parent.schemaObjectType" stateId="parent-schemaObjectType"/>
+            <ColumnConfig dataIndex="description" evaluator="sailpoint.web.view.certification.CertificationItemDescriptionColumn" groupProperty="IIQ_description" headerKey="cert_item_tbl_header_description" property="IIQ_description" sortProperty="IIQ_description" stateId="description"/>
+            <ColumnConfig dataIndex="parent-accountGroup" groupProperty="parent.accountGroup" headerKey="cert_item_tbl_header_account_group" property="parent.accountGroup" sortProperty="parent.accountGroup" stateId="parent-accountGroup"/>
+            <ColumnConfig dataIndex="exceptionEntitlements-nativeIdentity" groupProperty="exceptionEntitlements.nativeIdentity" headerKey="cert_item_tbl_header_accountid" property="exceptionEntitlements.nativeIdentity" sortProperty="exceptionEntitlements.nativeIdentity" stateId="exceptionEntitlements-nativeIdentity"/>
+            <ColumnConfig dataIndex="accountName" groupProperty="exceptionEntitlements.displayName" headerKey="cert_item_tbl_header_accountDisplayName" property="exceptionEntitlements.displayName" sortProperty="exceptionEntitlements.displayName" stateId="accountName"/>
+            <ColumnConfig dataIndex="IIQ_decision" evaluator="sailpoint.web.view.certification.CertificationItemCurrentDecisionStateColumn" groupProperty="IIQ_decision" headerKey="cert_item_tbl_header_decision" property="IIQ_decision" sortProperty="IIQ_decision" stateId="IIQ_decision"/>
+            <ColumnConfig dataIndex="IIQ_decisionComment" evaluator="sailpoint.web.view.certification.CertificationItemCurrentDecisionCommentColumn" groupProperty="IIQ_decisionComment" headerKey="certification_decision_comment" property="IIQ_decisionComment" sortProperty="IIQ_decisionComment" stateId="IIQ_decisionComment"/>
+            <ColumnConfig dataIndex="Identity-manager-displayName" groupProperty="Identity.manager.displayName" headerKey="manager" property="Identity.manager.displayName" sortProperty="Identity.manager.displayName" stateId="Identity-manager-displayName"/>
+          </List>
+        </value>
+      </entry>
       <entry key="uiAcctGroupPermCertificationExportColumns">
         <value>
           <List>
@@ -2261,7 +2418,7 @@
       <entry key="uiApprovalItemsColumnsEntitlement">
         <value>
           <List>
-            <ColumnConfig dataIndex="operation" headerKey="my_approvals_action_col" renderer="operation" stateId="operation"/>
+            <ColumnConfig dataIndex="operation" headerKey="my_approvals_action_col" hidden="true" renderer="operation" stateId="operation"/>
             <ColumnConfig dataIndex="application" groupProperty="application" headerKey="my_approvals_application_col" property="application" sortProperty="application" stateId="application"/>
             <ColumnConfig dataIndex="name" groupProperty="name" headerKey="my_approvals_attribute_col" property="name" sortProperty="name" stateId="name"/>
             <ColumnConfig dataIndex="sunriseSunset" headerKey="my_approvals_dates_col" renderer="sunriseSunset" stateId="sunriseSunset"/>
@@ -2275,13 +2432,32 @@
       <entry key="uiApprovalItemsColumnsRole">
         <value>
           <List>
-            <ColumnConfig dataIndex="operation" headerKey="my_approvals_action_col" renderer="operation" stateId="operation"/>
+            <ColumnConfig dataIndex="operation" headerKey="my_approvals_action_col" hidden="true" renderer="operation" stateId="operation"/>
             <ColumnConfig dataIndex="riskScoreWeight" headerKey="my_approvals_risk_col" renderer="risk" stateId="riskScoreWeight"/>
             <ColumnConfig dataIndex="sunriseSunset" headerKey="my_approvals_dates_col" renderer="sunriseSunset" stateId="sunriseSunset"/>
             <ColumnConfig dataIndex="isNewAccount" fieldOnly="true" stateId="isNewAccount"/>
             <ColumnConfig dataIndex="sunrise" fieldOnly="true" stateId="sunrise"/>
             <ColumnConfig dataIndex="sunset" fieldOnly="true" stateId="sunset"/>
             <ColumnConfig dataIndex="hadSunriseSunset" fieldOnly="true" stateId="hadSunriseSunset"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="uiApprovalListColumns">
+        <value>
+          <List>
+            <ColumnConfig dataIndex="id" groupProperty="id" property="id" sortProperty="id" sortable="true" stateId="id"/>
+            <ColumnConfig dataIndex="created" groupProperty="created" property="created" sortProperty="created" sortable="true" stateId="created"/>
+            <ColumnConfig dataIndex="priority" groupProperty="level" property="level" sortProperty="level" sortable="true" stateId="priority"/>
+            <ColumnConfig dataIndex="accessRequestName" groupProperty="identityRequestId" property="identityRequestId" sortProperty="identityRequestId" stateId="accessRequestName"/>
+            <ColumnConfig dataIndex="requester" groupProperty="requester" property="requester" sortProperty="requester" stateId="requester"/>
+            <ColumnConfig dataIndex="owner" groupProperty="owner" property="owner" sortProperty="owner" stateId="owner"/>
+            <ColumnConfig dataIndex="workItemName" groupProperty="name" property="name" sortProperty="name" stateId="workItemName"/>
+            <ColumnConfig dataIndex="assignee" groupProperty="assignee" property="assignee" sortProperty="assignee" stateId="assignee"/>
+            <ColumnConfig dataIndex="workflowCaseId" groupProperty="workflowCase.id" property="workflowCase.id" sortProperty="workflowCase.id" stateId="workflowCaseId"/>
+            <ColumnConfig dataIndex="targetId" groupProperty="targetId" property="targetId" sortProperty="targetId" stateId="targetId"/>
+            <ColumnConfig dataIndex="target" stateId="target"/>
+            <ColumnConfig dataIndex="esigMeaning" stateId="esigMeaning"/>
+            <ColumnConfig dataIndex="commentCount" stateId="commentCount"/>
           </List>
         </value>
       </entry>
@@ -2308,9 +2484,20 @@
       <entry key="uiApprovalsWidgetColumns">
         <value>
           <List>
-            <ColumnConfig dataIndex="target" headerKey="ui_work_items_widget_approval_for" renderer="targetOrDescription,priorityFlag" stateId="target"/>
-            <ColumnConfig dataIndex="requester" headerKey="ui_work_items_widget_requester" renderer="displayableName" stateId="requester"/>
+            <ColumnConfig dataIndex="target" headerKey="ui_work_items_widget_approval_for" renderer="targetOrDescription,encodeHtml,priorityFlag" stateId="target"/>
+            <ColumnConfig dataIndex="requester" headerKey="ui_work_items_widget_requester" renderer="displayableName,encodeHtml" stateId="requester"/>
             <ColumnConfig dataIndex="created" dateStyle="short" groupProperty="created" headerKey="ui_work_items_widget_date" property="created" sortProperty="created" stateId="created"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="uiBatchRequestItemsTableColumns">
+        <value>
+          <List>
+            <ColumnConfig dataIndex="requestData" groupProperty="requestData" headerKey="ui_batch_request_items_request_data" hideable="true" property="requestData" sortProperty="requestData" sortable="true" stateId="requestData"/>
+            <ColumnConfig dataIndex="result" groupProperty="result" headerKey="ui_batch_request_items_result" hideable="true" property="result" sortProperty="result" sortable="true" stateId="result"/>
+            <ColumnConfig dataIndex="status" groupProperty="status" headerKey="ui_batch_request_items_status" hideable="true" property="status" sortProperty="status" sortable="true" stateId="status"/>
+            <ColumnConfig dataIndex="identityRequestId" groupProperty="identityRequestId" headerKey="ui_batch_request_items_identity_request_id" hideable="true" property="identityRequestId" sortProperty="identityRequestId" sortable="true" stateId="identityRequestId"/>
+            <ColumnConfig dataIndex="errorMessage" fieldOnly="true" groupProperty="errorMessage" property="errorMessage" sortProperty="errorMessage" stateId="errorMessage"/>
           </List>
         </value>
       </entry>
@@ -2343,7 +2530,7 @@
             <ColumnConfig dataIndex="decisionStatus" evaluator="sailpoint.web.view.certification.CertificationItemDecisionColumn" fieldOnly="true" groupProperty="IIQ_decisionChoices" property="IIQ_decisionChoices" sortProperty="IIQ_decisionChoices" stateId="decisionStatus"/>
             <ColumnConfig dataIndex="displayName" groupProperty="targetDisplayName" headerKey="cert_item_tbl_header_bundle" property="targetDisplayName" sortProperty="targetDisplayName" sortable="true" stateId="displayName"/>
             <ColumnConfig dataIndex="description" evaluator="sailpoint.web.view.certification.CertificationItemDescriptionColumn" groupProperty="IIQ_description" headerKey="cert_item_tbl_header_description" hideable="true" minWidth="250" percentWidth="30" property="IIQ_description" renderer="spMoreLessToggleColumn" sortProperty="IIQ_description" stateId="description"/>
-            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
+            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleEncodedColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
             <ColumnConfig dataIndex="roleApplications" groupProperty="IIQ_roleApplications" headerKey="cert_item_tbl_header_role_applications" hideable="true" property="IIQ_roleApplications" sortProperty="IIQ_roleApplications" stateId="roleApplications"/>
             <ColumnConfig dataIndex="roleAccountNames" groupProperty="IIQ_roleAccounts" headerKey="cert_item_tbl_header_role_accounts" hidden="true" hideable="true" property="IIQ_roleAccounts" sortProperty="IIQ_roleAccounts" stateId="roleAccountNames"/>
             <ColumnConfig dataIndex="riskScore" groupProperty="parent.compositeScore" headerKey="cert_item_tbl_header_compositescore" hidden="true" hideable="true" property="parent.compositeScore" secondarySort="parent.lastname,parent.firstname,bundle" sortProperty="parent.compositeScore" sortable="true" stateId="riskScore"/>
@@ -2370,7 +2557,7 @@
             <ColumnConfig dataIndex="lastName" groupProperty="parent.lastname" headerKey="cert_item_tbl_header_lastname" hideable="true" percentWidth="10" property="parent.lastname" secondarySort="parent.firstname,bundle" sortProperty="parent.lastname" sortable="true" stateId="lastName"/>
             <ColumnConfig dataIndex="displayName" groupProperty="targetDisplayName" headerKey="cert_item_tbl_header_bundle" property="targetDisplayName" sortProperty="targetDisplayName" sortable="true" stateId="displayName"/>
             <ColumnConfig dataIndex="description" evaluator="sailpoint.web.view.certification.CertificationItemDescriptionColumn" groupProperty="IIQ_description" headerKey="cert_item_tbl_header_description" hideable="true" minWidth="250" percentWidth="30" property="IIQ_description" renderer="spMoreLessToggleColumn" sortProperty="IIQ_description" stateId="description"/>
-            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
+            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleEncodedColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
             <ColumnConfig dataIndex="roleApplications" groupProperty="IIQ_roleApplications" headerKey="cert_item_tbl_header_role_applications" hideable="true" property="IIQ_roleApplications" sortProperty="IIQ_roleApplications" stateId="roleApplications"/>
             <ColumnConfig dataIndex="roleAccountNames" groupProperty="IIQ_roleAccounts" headerKey="cert_item_tbl_header_role_accounts" hidden="true" hideable="true" property="IIQ_roleAccounts" sortProperty="IIQ_roleAccounts" stateId="roleAccountNames"/>
             <ColumnConfig dataIndex="riskScore" groupProperty="parent.compositeScore" headerKey="cert_item_tbl_header_compositescore" hidden="true" hideable="true" property="parent.compositeScore" secondarySort="parent.lastname,parent.firstname,bundle" sortProperty="parent.compositeScore" sortable="true" stateId="riskScore"/>
@@ -2455,6 +2642,26 @@
           </List>
         </value>
       </entry>
+      <entry key="uiCertificationExportWithRecommendationColumns">
+        <value>
+          <List>
+            <ColumnConfig dataIndex="parent-identity" groupProperty="parent.identity" headerKey="cert_item_tbl_header_identity" property="parent.identity" sortProperty="parent.identity" stateId="parent-identity"/>
+            <ColumnConfig dataIndex="firstName" groupProperty="parent.firstname" headerKey="cert_item_tbl_header_firstname" property="parent.firstname" sortProperty="parent.firstname" stateId="firstName"/>
+            <ColumnConfig dataIndex="lastName" groupProperty="parent.lastname" headerKey="cert_item_tbl_header_lastname" property="parent.lastname" sortProperty="parent.lastname" stateId="lastName"/>
+            <ColumnConfig dataIndex="type" evaluator="sailpoint.web.view.certification.ShortItemTypeColumn" groupProperty="type" headerKey="cert_item_tbl_header_type" property="type" sortProperty="type" stateId="type"/>
+            <ColumnConfig dataIndex="displayName" evaluator="sailpoint.web.view.certification.CertificationItemDisplayNameColumn" groupProperty="IIQ_displayName" headerKey="cert_item_tbl_header_display_name" property="IIQ_displayName" sortProperty="IIQ_displayName" stateId="displayName"/>
+            <ColumnConfig dataIndex="description" evaluator="sailpoint.web.view.certification.CertificationItemDescriptionColumn" groupProperty="IIQ_description" headerKey="cert_item_tbl_header_description" property="IIQ_description" sortProperty="IIQ_description" stateId="description"/>
+            <ColumnConfig dataIndex="application" groupProperty="exceptionApplication" headerKey="cert_item_tbl_header_application" property="exceptionApplication" sortProperty="exceptionApplication" stateId="application"/>
+            <ColumnConfig dataIndex="summaryStatus" groupProperty="summaryStatus" headerKey="status" property="summaryStatus" sortProperty="summaryStatus" stateId="summaryStatus"/>
+            <ColumnConfig dataIndex="accountName" groupProperty="exceptionEntitlements.displayName" headerKey="cert_item_tbl_header_accountDisplayName" property="exceptionEntitlements.displayName" sortProperty="exceptionEntitlements.displayName" stateId="accountName"/>
+            <ColumnConfig dataIndex="IIQ_decision" evaluator="sailpoint.web.view.certification.CertificationItemCurrentDecisionStateColumn" groupProperty="IIQ_decision" headerKey="cert_item_tbl_header_decision" property="IIQ_decision" sortProperty="IIQ_decision" stateId="IIQ_decision"/>
+            <ColumnConfig dataIndex="IIQ_decisionComment" evaluator="sailpoint.web.view.certification.CertificationItemCurrentDecisionCommentColumn" groupProperty="IIQ_decisionComment" headerKey="certification_decision_comment" property="IIQ_decisionComment" sortProperty="IIQ_decisionComment" stateId="IIQ_decisionComment"/>
+            <ColumnConfig dataIndex="IIQ_recommendedDecision" evaluator="sailpoint.web.view.certification.CertificationItemRecommendationColumn" groupProperty="IIQ_recommendedDecision" headerKey="ui_recommendations" property="IIQ_recommendedDecision" sortProperty="IIQ_recommendedDecision" stateId="IIQ_recommendedDecision"/>
+            <ColumnConfig dataIndex="IIQ_recommendedDecisionReasons" evaluator="sailpoint.web.view.certification.CertificationItemRecommendationReasonsColumn" groupProperty="IIQ_recommendedDecisionReasons" headerKey="ui_recommendations_reasons" property="IIQ_recommendedDecisionReasons" sortProperty="IIQ_recommendedDecisionReasons" stateId="IIQ_recommendedDecisionReasons"/>
+            <ColumnConfig dataIndex="IIQ_recommendedDecisionTimestamp" evaluator="sailpoint.web.view.certification.CertificationItemRecommendationTimestampColumn" groupProperty="IIQ_recommendedDecisionTimestamp" headerKey="ui_recommendations_timestamp" property="IIQ_recommendedDecisionTimestamp" sortProperty="IIQ_recommendedDecisionTimestamp" stateId="IIQ_recommendedDecisionTimestamp"/>
+          </List>
+        </value>
+      </entry>
       <entry key="uiCertificationItemDetailViewColumns">
         <value>
           <List>
@@ -2514,7 +2721,7 @@
             <ColumnConfig dataIndex="typeMessageKey" groupProperty="type" headerKey="cert_item_tbl_header_type" percentWidth="10" renderer="spTranslate" sortProperty="type" sortable="true" stateId="typeMessageKey"/>
             <ColumnConfig dataIndex="displayName" evaluator="sailpoint.web.view.certification.CertificationItemDisplayNameColumn" groupProperty="type,bundle,exceptionApplication,exceptionAttributeName,exceptionAttributeValue,exceptionPermissionTarget,exceptionPermissionRight,violationSummary" headerKey="cert_item_tbl_header_display_name" hideable="true" percentWidth="15" property="IIQ_displayName" secondarySort="type" sortProperty="type,bundle,exceptionApplication,exceptionAttributeName,exceptionAttributeValue,exceptionPermissionTarget,exceptionPermissionRight,violationSummary" sortable="true" stateId="displayName"/>
             <ColumnConfig dataIndex="description" evaluator="sailpoint.web.view.certification.CertificationItemDescriptionColumn" groupProperty="IIQ_description" headerKey="cert_item_tbl_header_description" hideable="true" minWidth="250" percentWidth="30" property="IIQ_description" renderer="spMoreLessToggleColumn" sortProperty="IIQ_description" stateId="description"/>
-            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
+            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleEncodedColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
             <ColumnConfig dataIndex="application" groupProperty="exceptionApplication" headerKey="cert_item_tbl_header_application" hideable="true" percentWidth="10" property="exceptionApplication" secondarySort="type,IIQ_displayName" sortProperty="exceptionApplication" sortable="true" stateId="application"/>
             <ColumnConfig dataIndex="instance" groupProperty="exceptionEntitlements.instance" headerKey="cert_item_tbl_header_instance" hidden="true" hideable="true" property="exceptionEntitlements.instance" secondarySort="exceptionApplication,type,IIQ_displayName" sortProperty="exceptionEntitlements.instance" sortable="true" stateId="instance"/>
             <ColumnConfig dataIndex="nativeIdentity" groupProperty="exceptionEntitlements.nativeIdentity" headerKey="cert_item_tbl_header_accountid" hidden="true" hideable="true" property="exceptionEntitlements.nativeIdentity" secondarySort="exceptionApplication,type,IIQ_displayName" sortProperty="exceptionEntitlements.nativeIdentity" sortable="true" stateId="nativeIdentity"/>
@@ -2537,7 +2744,7 @@
         <value>
           <List>
             <ColumnConfig dataIndex="decisionStatus" evaluator="sailpoint.web.view.certification.CertificationItemDecisionColumn" fieldOnly="true" groupProperty="IIQ_decisionChoices" property="IIQ_decisionChoices" sortProperty="IIQ_decisionChoices" stateId="decisionStatus"/>
-            <ColumnConfig dataIndex="Identity-displayName" groupProperty="Identity.displayName" headerKey="cert_item_tbl_header_identity" hideable="true" property="Identity.displayName" sortProperty="Identity.displayName" sortable="true" stateId="Identity-displayName"/>
+            <ColumnConfig dataIndex="Identity-displayName" groupProperty="parent.targetDisplayName" headerKey="cert_item_tbl_header_identity" hideable="true" property="parent.targetDisplayName" sortProperty="parent.targetDisplayName" sortable="true" stateId="Identity-displayName"/>
             <ColumnConfig dataIndex="firstName" groupProperty="parent.firstname" headerKey="cert_item_tbl_header_firstname" hidden="true" hideable="true" property="parent.firstname" secondarySort="parent.lastname,type" sortProperty="parent.firstname" sortable="true" stateId="firstName"/>
             <ColumnConfig dataIndex="lastName" groupProperty="parent.lastname" headerKey="cert_item_tbl_header_lastname" hidden="true" hideable="true" property="parent.lastname" secondarySort="parent.firstname,type" sortProperty="parent.lastname" sortable="true" stateId="lastName"/>
             <ColumnConfig dataIndex="policyViolation.policy.name" headerKey="cert_item_tbl_header_policy_name" hideable="true" renderer="spCertificationDisplayNameColumn" stateId="policyViolation.policy.name"/>
@@ -2571,7 +2778,7 @@
             <ColumnConfig dataIndex="typeMessageKey" groupProperty="type" headerKey="cert_item_tbl_header_type" percentWidth="10" renderer="spTranslate" sortProperty="type" sortable="true" stateId="typeMessageKey"/>
             <ColumnConfig dataIndex="displayName" evaluator="sailpoint.web.view.certification.CertificationItemDisplayNameColumn" groupProperty="type,bundle,exceptionApplication,exceptionAttributeName,exceptionAttributeValue,exceptionPermissionTarget,exceptionPermissionRight,violationSummary" headerKey="cert_item_tbl_header_display_name" hideable="true" percentWidth="15" property="IIQ_displayName" secondarySort="parent.lastname,parent.firstname,type" sortProperty="type,bundle,exceptionApplication,exceptionAttributeName,exceptionAttributeValue,exceptionPermissionTarget,exceptionPermissionRight,violationSummary" sortable="true" stateId="displayName"/>
             <ColumnConfig dataIndex="description" evaluator="sailpoint.web.view.certification.CertificationItemDescriptionColumn" groupProperty="IIQ_description" headerKey="cert_item_tbl_header_description" hideable="true" minWidth="250" percentWidth="30" property="IIQ_description" renderer="spMoreLessToggleColumn" sortProperty="IIQ_description" stateId="description"/>
-            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
+            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleEncodedColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
             <ColumnConfig dataIndex="application" groupProperty="exceptionApplication" headerKey="cert_item_tbl_header_application" hideable="true" percentWidth="10" property="exceptionApplication" secondarySort="parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionApplication" sortable="true" stateId="application"/>
             <ColumnConfig dataIndex="instance" groupProperty="exceptionEntitlements.instance" headerKey="cert_item_tbl_header_instance" hidden="true" hideable="true" property="exceptionEntitlements.instance" secondarySort="exceptionApplication,parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionEntitlements.instance" sortable="true" stateId="instance"/>
             <ColumnConfig dataIndex="nativeIdentity" groupProperty="exceptionEntitlements.nativeIdentity" headerKey="cert_item_tbl_header_accountid" hidden="true" hideable="true" property="exceptionEntitlements.nativeIdentity" secondarySort="exceptionApplication,parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionEntitlements.nativeIdentity" sortable="true" stateId="nativeIdentity"/>
@@ -2595,7 +2802,7 @@
         <value>
           <List>
             <ColumnConfig dataIndex="decisionStatus" evaluator="sailpoint.web.view.certification.CertificationItemDecisionColumn" fieldOnly="true" groupProperty="IIQ_decisionChoices" property="IIQ_decisionChoices" sortProperty="IIQ_decisionChoices" stateId="decisionStatus"/>
-            <ColumnConfig dataIndex="Identity-displayName" groupProperty="Identity.displayName" headerKey="cert_item_tbl_header_identity" hideable="true" property="Identity.displayName" sortProperty="Identity.displayName" sortable="true" stateId="Identity-displayName"/>
+            <ColumnConfig dataIndex="Identity-displayName" groupProperty="parent.targetDisplayName" headerKey="cert_item_tbl_header_identity" hideable="true" property="parent.targetDisplayName" sortProperty="parent.targetDisplayName" sortable="true" stateId="Identity-displayName"/>
             <ColumnConfig dataIndex="firstName" groupProperty="parent.firstname" headerKey="cert_item_tbl_header_firstname" hidden="true" hideable="true" percentWidth="10" property="parent.firstname" secondarySort="parent.lastname,type,IIQ_displayName" sortProperty="parent.firstname" sortable="true" stateId="firstName"/>
             <ColumnConfig dataIndex="lastName" groupProperty="parent.lastname" headerKey="cert_item_tbl_header_lastname" hidden="true" hideable="true" percentWidth="10" property="parent.lastname" secondarySort="parent.firstname,type,IIQ_displayName" sortProperty="parent.lastname" sortable="true" stateId="lastName"/>
             <ColumnConfig dataIndex="typeMessageKey" groupProperty="type" headerKey="cert_item_tbl_header_type" hideable="true" percentWidth="10" renderer="spTranslate" sortProperty="type" sortable="true" stateId="typeMessageKey"/>
@@ -2739,7 +2946,7 @@
             <ColumnConfig dataIndex="instance" groupProperty="exceptionEntitlements.instance" headerKey="cert_item_tbl_header_instance" hidden="true" hideable="true" property="exceptionEntitlements.instance" secondarySort="exceptionApplication,parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionEntitlements.instance" sortable="true" stateId="instance"/>
             <ColumnConfig dataIndex="IIQ_accountKey" evaluator="sailpoint.web.view.certification.CertificationItemAccountKeyColumn" groupProperty="exceptionApplication,exceptionEntitlements.nativeIdentity,exceptionEntitlements.instance" headerKey="cert_item_tbl_header_account" hidden="true" hideable="true" property="IIQ_accountKey" renderer="certItemAccount" secondarySort="parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionEntitlements.displayName,exceptionApplication,exceptionEntitlements.instance" sortable="true" stateId="IIQ_accountKey"/>
             <ColumnConfig dataIndex="application" groupProperty="exceptionApplication" headerKey="cert_item_tbl_header_application" hidden="true" hideable="true" percentWidth="10" property="exceptionApplication" secondarySort="parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionApplication" sortable="true" stateId="application"/>
-            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
+            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleEncodedColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
             <ColumnConfig dataIndex="summaryStatus" groupProperty="summaryStatus" headerKey="cert_item_tbl_header_summary_status" hidden="true" hideable="true" property="summaryStatus" renderer="certSummaryStatus" sortProperty="summaryStatus" sortable="true" stateId="summaryStatus"/>
             <ColumnConfig dataIndex="decisions" headerKey="cert_item_tbl_header_decision" renderer="spCertificationDecisionColumn" stateId="decisions"/>
             <ColumnConfig dataIndex="decisionStatus" evaluator="sailpoint.web.view.certification.CertificationItemDecisionColumn" fieldOnly="true" groupProperty="IIQ_decisionChoices" property="IIQ_decisionChoices" sortProperty="IIQ_decisionChoices" stateId="decisionStatus"/>
@@ -2767,7 +2974,7 @@
             <ColumnConfig dataIndex="instance" groupProperty="exceptionEntitlements.instance" headerKey="cert_item_tbl_header_instance" hidden="true" hideable="true" property="exceptionEntitlements.instance" secondarySort="exceptionApplication,parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionEntitlements.instance" sortable="true" stateId="instance"/>
             <ColumnConfig dataIndex="IIQ_accountKey" evaluator="sailpoint.web.view.certification.CertificationItemAccountKeyColumn" groupProperty="exceptionApplication,exceptionEntitlements.nativeIdentity,exceptionEntitlements.instance" headerKey="cert_item_tbl_header_account" hidden="true" hideable="true" property="IIQ_accountKey" renderer="certItemAccount" secondarySort="parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionEntitlements.displayName,exceptionApplication,exceptionEntitlements.instance" sortable="true" stateId="IIQ_accountKey"/>
             <ColumnConfig dataIndex="application" groupProperty="exceptionApplication" headerKey="cert_item_tbl_header_application" hidden="true" hideable="true" percentWidth="10" property="exceptionApplication" secondarySort="parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionApplication" sortable="true" stateId="application"/>
-            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
+            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleEncodedColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
             <ColumnConfig dataIndex="summaryStatus" groupProperty="summaryStatus" headerKey="cert_item_tbl_header_summary_status" hidden="true" hideable="true" property="summaryStatus" renderer="certSummaryStatus" sortProperty="summaryStatus" sortable="true" stateId="summaryStatus"/>
             <ColumnConfig dataIndex="decisions" headerKey="cert_item_tbl_header_decision" renderer="spCertificationDecisionColumn" stateId="decisions"/>
             <ColumnConfig dataIndex="decisionStatus" evaluator="sailpoint.web.view.certification.CertificationItemDecisionColumn" fieldOnly="true" groupProperty="IIQ_decisionChoices" property="IIQ_decisionChoices" sortProperty="IIQ_decisionChoices" stateId="decisionStatus"/>
@@ -2783,7 +2990,7 @@
           <List>
             <ColumnConfig dataIndex="Identity-firstname" groupProperty="Identity.firstname" headerKey="cert_item_tbl_header_firstname" hideable="true" property="Identity.firstname" sortProperty="Identity.firstname" sortable="true" stateId="Identity-firstname"/>
             <ColumnConfig dataIndex="Identity-lastname" groupProperty="Identity.lastname" headerKey="cert_item_tbl_header_lastname" hideable="true" property="Identity.lastname" sortProperty="Identity.lastname" sortable="true" stateId="Identity-lastname"/>
-            <ColumnConfig dataIndex="exceptionAttributeValue" groupProperty="exceptionAttributeValue" headerKey="cert_item_tbl_header_display_name" hideable="true" percentWidth="10" property="exceptionAttributeValue" renderer="spCertificationDisplayNameColumn" secondarySort="parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionAttributeValue" sortable="true" stateId="exceptionAttributeValue"/>
+            <ColumnConfig dataIndex="exceptionAttributeValue" groupProperty="parent.identity" headerKey="cert_item_tbl_header_display_name" hideable="true" percentWidth="10" property="parent.identity" renderer="spCertificationDisplayNameColumn" secondarySort="parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="parent.identity" sortable="true" stateId="exceptionAttributeValue"/>
             <ColumnConfig dataIndex="exceptionAttributeName" groupProperty="exceptionAttributeName" headerKey="cert_item_tbl_header_attribute" hideable="true" percentWidth="10" property="exceptionAttributeName" secondarySort="parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionAttributeName" sortable="true" stateId="exceptionAttributeName"/>
             <ColumnConfig dataIndex="accountName" groupProperty="exceptionEntitlements.displayName" headerKey="cert_item_tbl_header_accountDisplayName" hideable="true" property="exceptionEntitlements.displayName" renderer="spCertificationAccountDisplayNameColumn" secondarySort="exceptionApplication,parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionEntitlements.displayName" sortable="true" stateId="accountName"/>
             <ColumnConfig dataIndex="description" evaluator="sailpoint.web.view.certification.CertificationItemDescriptionColumn" groupProperty="IIQ_description" headerKey="cert_item_tbl_header_description" hideable="true" minWidth="250" percentWidth="50" property="IIQ_description" renderer="spMoreLessToggleColumn" sortProperty="IIQ_description" stateId="description"/>
@@ -2817,8 +3024,8 @@
       <entry key="uiFormsWidgetColumns">
         <value>
           <List>
-            <ColumnConfig dataIndex="description" headerKey="ui_work_items_widget_name" renderer="priorityFlag" stateId="description"/>
-            <ColumnConfig dataIndex="requester" headerKey="ui_work_items_widget_requester" renderer="displayableName" stateId="requester"/>
+            <ColumnConfig dataIndex="description" headerKey="ui_work_items_widget_name" renderer="encodeHtml,priorityFlag" stateId="description"/>
+            <ColumnConfig dataIndex="requester" headerKey="ui_work_items_widget_requester" renderer="displayableName,encodeHtml" stateId="requester"/>
             <ColumnConfig dataIndex="created" dateStyle="short" groupProperty="created" headerKey="ui_work_items_widget_date" property="created" sortProperty="created" stateId="created"/>
           </List>
         </value>
@@ -2948,9 +3155,10 @@
             <ColumnConfig dataIndex="accountName" groupProperty="nativeIdentity" headerKey="ui_identity_request_item_accountName" property="nativeIdentity" renderer="spIdentityRequestItemAccount" secondarySort="application,instance,name,value,id" sortProperty="nativeIdentity" sortable="true" stateId="accountName"/>
             <ColumnConfig dataIndex="applicationName" groupProperty="application" headerKey="ui_identity_request_item_application" property="application" secondarySort="instance,nativeIdentity,name,value,id" sortProperty="application" sortable="true" stateId="applicationName"/>
             <ColumnConfig dataIndex="instance" groupProperty="instance" headerKey="ui_identity_request_item_instance" hidden="true" property="instance" secondarySort="application,nativeIdentity,name,value,id" sortProperty="instance" sortable="true" stateId="instance"/>
-            <ColumnConfig dataIndex="requesterComments" headerKey="ui_identity_request_item_comments" minWidth="150" renderer="spMoreLessToggleColumn" stateId="requesterComments"/>
+            <ColumnConfig dataIndex="requesterComments" headerKey="ui_identity_request_item_comments" minWidth="150" renderer="spMoreLessToggleEncodedColumn" stateId="requesterComments"/>
             <ColumnConfig dataIndex="approvalState" groupProperty="approvalState" headerKey="ui_identity_request_item_approvalState" property="approvalState" renderer="spIdentityRequestItemApprovalState" secondarySort="name,value,id" sortProperty="approvalState" sortable="true" stateId="approvalState"/>
             <ColumnConfig dataIndex="provisioningState" groupProperty="provisioningState" headerKey="ui_identity_request_item_provisioningState" property="provisioningState" renderer="spIdentityRequestItemProvisioningState" secondarySort="name,value,id" sortProperty="provisioningState" sortable="true" stateId="provisioningState"/>
+            <ColumnConfig dataIndex="attributes" groupProperty="attributes" headerKey="ui_identity_request_item_attachments" property="attributes" renderer="spIdentityRequestItemAttachments" sortProperty="attributes" stateId="attributes"/>
           </List>
         </value>
       </entry>
@@ -2962,7 +3170,7 @@
             <ColumnConfig dataIndex="name" groupProperty="name" headerKey="ui_identity_request_item_item" property="name" secondarySort="value,id" sortProperty="name" sortable="true" stateId="name"/>
             <ColumnConfig dataIndex="value" groupProperty="value" headerKey="ui_identity_request_item_value" property="value" secondarySort="name,id" sortProperty="value" sortable="true" stateId="value"/>
             <ColumnConfig dataIndex="displayableValue" headerKey="ui_identity_request_item_displayableValue" minWidth="100" renderer="spIdentityRequestItemDetailsLink" stateId="displayableValue"/>
-            <ColumnConfig dataIndex="requesterComments" headerKey="ui_identity_request_item_comments" minWidth="150" renderer="spMoreLessToggleColumn" stateId="requesterComments"/>
+            <ColumnConfig dataIndex="requesterComments" headerKey="ui_identity_request_item_comments" minWidth="150" renderer="spMoreLessToggleEncodedColumn" stateId="requesterComments"/>
             <ColumnConfig dataIndex="approvalState" groupProperty="approvalState" headerKey="ui_identity_request_item_approvalState" property="approvalState" renderer="spIdentityRequestItemApprovalState" secondarySort="name,value,id" sortProperty="approvalState" sortable="true" stateId="approvalState"/>
             <ColumnConfig dataIndex="provisioningState" groupProperty="provisioningState" headerKey="ui_identity_request_item_provisioningState" property="provisioningState" renderer="spIdentityRequestItemProvisioningState" secondarySort="name,value,id" sortProperty="provisioningState" sortable="true" stateId="provisioningState"/>
           </List>
@@ -2977,7 +3185,7 @@
             <ColumnConfig dataIndex="accountName" groupProperty="nativeIdentity" headerKey="ui_identity_request_item_accountName" property="nativeIdentity" renderer="spIdentityRequestItemAccount" secondarySort="application,instance,name,value,id" sortProperty="nativeIdentity" sortable="true" stateId="accountName"/>
             <ColumnConfig dataIndex="applicationName" groupProperty="application" headerKey="ui_identity_request_item_application" property="application" secondarySort="instance,nativeIdentity,name,value,id" sortProperty="application" sortable="true" stateId="applicationName"/>
             <ColumnConfig dataIndex="instance" groupProperty="instance" headerKey="ui_identity_request_item_instance" hidden="true" property="instance" secondarySort="application,nativeIdentity,name,value,id" sortProperty="instance" sortable="true" stateId="instance"/>
-            <ColumnConfig dataIndex="requesterComments" headerKey="ui_identity_request_item_comments" minWidth="150" renderer="spMoreLessToggleColumn" stateId="requesterComments"/>
+            <ColumnConfig dataIndex="requesterComments" headerKey="ui_identity_request_item_comments" minWidth="150" renderer="spMoreLessToggleEncodedColumn" stateId="requesterComments"/>
             <ColumnConfig dataIndex="approvalState" groupProperty="approvalState" headerKey="ui_identity_request_item_approvalState" property="approvalState" renderer="spIdentityRequestItemApprovalState" secondarySort="name,value,id" sortProperty="approvalState" sortable="true" stateId="approvalState"/>
             <ColumnConfig dataIndex="provisioningState" groupProperty="provisioningState" headerKey="ui_identity_request_item_provisioningState" property="provisioningState" renderer="spIdentityRequestItemProvisioningState" secondarySort="name,value,id" sortProperty="provisioningState" sortable="true" stateId="provisioningState"/>
           </List>
@@ -3106,6 +3314,7 @@
             <ColumnConfig dataIndex="profile-application" evaluator="sailpoint.web.view.certification.ProfileColumn" groupProperty="profile.application" headerKey="application" hideable="true" property="profile.application" sortProperty="profile.application" stateId="profile-application"/>
             <ColumnConfig dataIndex="profile-constraints" evaluator="sailpoint.web.view.certification.ProfileColumn" fieldOnly="true" groupProperty="profile.constraints" property="profile.constraints" sortProperty="profile.constraints" stateId="profile-constraints"/>
             <ColumnConfig dataIndex="profile-permissions" evaluator="sailpoint.web.view.certification.ProfileColumn" fieldOnly="true" groupProperty="profile.permissions" property="profile.permissions" sortProperty="profile.permissions" stateId="profile-permissions"/>
+            <ColumnConfig dataIndex="profile-objectDescription" evaluator="sailpoint.web.view.certification.ProfileColumn" groupProperty="profile.objectDescription" headerKey="cert_item_role_comp_role_profile_desc" property="profile.objectDescription" renderer="spMoreLessToggleColumn" sortProperty="profile.objectDescription" stateId="profile-objectDescription"/>
           </List>
         </value>
       </entry>
@@ -3117,7 +3326,7 @@
             <ColumnConfig dataIndex="targetName" groupProperty="targetName" headerKey="ui_role_comp_cert_name_col" hideable="true" property="targetName" renderer="spMoreLessToggleColumn" sortProperty="targetName" sortable="true" stateId="targetName"/>
             <ColumnConfig dataIndex="typeMessageKey" groupProperty="type" headerKey="ui_role_comp_cert_type_col" hideable="true" renderer="spTranslate" sortProperty="type" sortable="true" stateId="typeMessageKey"/>
             <ColumnConfig dataIndex="snapshot-objectDescription" evaluator="sailpoint.web.view.certification.RoleSnapshotColumn" groupProperty="snapshot.objectDescription" headerKey="cert_item_role_comp_related_roles_desc" hideable="true" minWidth="250" percentWidth="30" property="snapshot.objectDescription" renderer="spMoreLessToggleColumn" sortProperty="snapshot.objectDescription" stateId="snapshot-objectDescription"/>
-            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
+            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleEncodedColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
             <ColumnConfig dataIndex="profile-application" evaluator="sailpoint.web.view.certification.ProfileColumn" groupProperty="profile.application" headerKey="application" hideable="true" property="profile.application" sortProperty="profile.application" stateId="profile-application"/>
             <ColumnConfig dataIndex="decisions" headerKey="cert_item_tbl_header_decision" renderer="spCertificationDecisionColumn" stateId="decisions"/>
             <ColumnConfig dataIndex="" fixed="Right" headerKey="cert_item_tbl_header_action" renderer="spCertificationActionColumn" stateId=""/>
@@ -3127,6 +3336,7 @@
             <ColumnConfig dataIndex="challenge" fieldOnly="true" groupProperty="challenge" property="challenge" sortProperty="challenge" stateId="challenge"/>
             <ColumnConfig dataIndex="profile-constraints" evaluator="sailpoint.web.view.certification.ProfileColumn" fieldOnly="true" groupProperty="profile.constraints" property="profile.constraints" sortProperty="profile.constraints" stateId="profile-constraints"/>
             <ColumnConfig dataIndex="profile-permissions" evaluator="sailpoint.web.view.certification.ProfileColumn" fieldOnly="true" groupProperty="profile.permissions" property="profile.permissions" sortProperty="profile.permissions" stateId="profile-permissions"/>
+            <ColumnConfig dataIndex="profile-objectDescription" evaluator="sailpoint.web.view.certification.ProfileColumn" groupProperty="profile.objectDescription" headerKey="cert_item_role_comp_role_profile_desc" property="profile.objectDescription" renderer="spMoreLessToggleColumn" sortProperty="profile.objectDescription" stateId="profile-objectDescription"/>
           </List>
         </value>
       </entry>
@@ -3138,7 +3348,7 @@
             <ColumnConfig dataIndex="targetName" groupProperty="targetName" headerKey="ui_role_comp_cert_name_col" hideable="true" property="targetName" renderer="spMoreLessToggleColumn" sortProperty="targetName" sortable="true" stateId="targetName"/>
             <ColumnConfig dataIndex="typeMessageKey" groupProperty="type" headerKey="ui_role_comp_cert_type_col" hideable="true" renderer="spTranslate" sortProperty="type" sortable="true" stateId="typeMessageKey"/>
             <ColumnConfig dataIndex="snapshot-objectDescription" evaluator="sailpoint.web.view.certification.RoleSnapshotColumn" groupProperty="snapshot.objectDescription" headerKey="cert_item_role_comp_related_roles_desc" hideable="true" minWidth="250" percentWidth="30" property="snapshot.objectDescription" renderer="spMoreLessToggleColumn" sortProperty="snapshot.objectDescription" stateId="snapshot-objectDescription"/>
-            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
+            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleEncodedColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
             <ColumnConfig dataIndex="profile-application" evaluator="sailpoint.web.view.certification.ProfileColumn" groupProperty="profile.application" headerKey="application" hideable="true" property="profile.application" sortProperty="profile.application" stateId="profile-application"/>
             <ColumnConfig dataIndex="decisions" headerKey="cert_item_tbl_header_decision" renderer="spCertificationDecisionColumn" stateId="decisions"/>
             <ColumnConfig dataIndex="" fixed="Right" headerKey="cert_item_tbl_header_action" renderer="spCertificationActionColumn" stateId=""/>
@@ -3148,6 +3358,7 @@
             <ColumnConfig dataIndex="challenge" fieldOnly="true" groupProperty="challenge" property="challenge" sortProperty="challenge" stateId="challenge"/>
             <ColumnConfig dataIndex="profile-constraints" evaluator="sailpoint.web.view.certification.ProfileColumn" fieldOnly="true" groupProperty="profile.constraints" property="profile.constraints" sortProperty="profile.constraints" stateId="profile-constraints"/>
             <ColumnConfig dataIndex="profile-permissions" evaluator="sailpoint.web.view.certification.ProfileColumn" fieldOnly="true" groupProperty="profile.permissions" property="profile.permissions" sortProperty="profile.permissions" stateId="profile-permissions"/>
+            <ColumnConfig dataIndex="profile-objectDescription" evaluator="sailpoint.web.view.certification.ProfileColumn" groupProperty="profile.objectDescription" headerKey="cert_item_role_comp_role_profile_desc" property="profile.objectDescription" renderer="spMoreLessToggleColumn" sortProperty="profile.objectDescription" stateId="profile-objectDescription"/>
           </List>
         </value>
       </entry>
@@ -3167,6 +3378,118 @@
             <ColumnConfig dataIndex="profile-application" evaluator="sailpoint.web.view.certification.ProfileColumn" groupProperty="profile.application" headerKey="application" hideable="true" property="profile.application" sortProperty="profile.application" stateId="profile-application"/>
             <ColumnConfig dataIndex="profile-constraints" evaluator="sailpoint.web.view.certification.ProfileColumn" fieldOnly="true" groupProperty="profile.constraints" property="profile.constraints" sortProperty="profile.constraints" stateId="profile-constraints"/>
             <ColumnConfig dataIndex="profile-permissions" evaluator="sailpoint.web.view.certification.ProfileColumn" fieldOnly="true" groupProperty="profile.permissions" property="profile.permissions" sortProperty="profile.permissions" stateId="profile-permissions"/>
+            <ColumnConfig dataIndex="profile-objectDescription" evaluator="sailpoint.web.view.certification.ProfileColumn" groupProperty="profile.objectDescription" headerKey="cert_item_role_comp_role_profile_desc" property="profile.objectDescription" renderer="spMoreLessToggleColumn" sortProperty="profile.objectDescription" stateId="profile-objectDescription"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="uiTargetedCertificationItemDetailViewColumns">
+        <value>
+          <List>
+            <ColumnConfig dataIndex="decisionStatus" evaluator="sailpoint.web.view.certification.CertificationItemDecisionColumn" fieldOnly="true" groupProperty="IIQ_decisionChoices" property="IIQ_decisionChoices" sortProperty="IIQ_decisionChoices" stateId="decisionStatus"/>
+            <ColumnConfig dataIndex="typeMessageKey" groupProperty="type" headerKey="cert_item_tbl_header_type" percentWidth="10" renderer="spTranslate" sortProperty="type" sortable="true" stateId="typeMessageKey"/>
+            <ColumnConfig dataIndex="displayName" evaluator="sailpoint.web.view.certification.CertificationItemDisplayNameColumn" groupProperty="type,bundle,exceptionApplication,exceptionAttributeName,exceptionAttributeValue,exceptionPermissionTarget,exceptionPermissionRight,violationSummary" headerKey="cert_item_tbl_header_display_name" hideable="true" percentWidth="20" property="IIQ_displayName" renderer="spCertificationDisplayNameColumn" secondarySort="type" sortProperty="type,bundle,exceptionApplication,exceptionAttributeName,exceptionAttributeValue,exceptionPermissionTarget,exceptionPermissionRight,violationSummary" sortable="true" stateId="displayName"/>
+            <ColumnConfig dataIndex="description" evaluator="sailpoint.web.view.certification.CertificationItemDescriptionColumn" groupProperty="IIQ_description" headerKey="cert_item_tbl_header_description" hideable="true" minWidth="250" percentWidth="50" property="IIQ_description" renderer="spMoreLessToggleColumn" sortProperty="IIQ_description" stateId="description"/>
+            <ColumnConfig dataIndex="application" groupProperty="exceptionApplication" headerKey="cert_item_tbl_header_application" hideable="true" percentWidth="10" property="exceptionApplication" secondarySort="type,IIQ_displayName" sortProperty="exceptionApplication" sortable="true" stateId="application"/>
+            <ColumnConfig dataIndex="instance" groupProperty="exceptionEntitlements.instance" headerKey="cert_item_tbl_header_instance" hidden="true" hideable="true" property="exceptionEntitlements.instance" secondarySort="exceptionApplication,type,IIQ_displayName" sortProperty="exceptionEntitlements.instance" sortable="true" stateId="instance"/>
+            <ColumnConfig dataIndex="nativeIdentity" groupProperty="exceptionEntitlements.nativeIdentity" headerKey="cert_item_tbl_header_accountid" hidden="true" hideable="true" property="exceptionEntitlements.nativeIdentity" secondarySort="exceptionApplication,type,IIQ_displayName" sortProperty="exceptionEntitlements.nativeIdentity" sortable="true" stateId="nativeIdentity"/>
+            <ColumnConfig dataIndex="accountName" groupProperty="exceptionEntitlements.displayName" headerKey="cert_item_tbl_header_accountDisplayName" hideable="true" property="exceptionEntitlements.displayName" renderer="spCertificationAccountDisplayNameColumn" secondarySort="exceptionApplication,type,IIQ_displayName" sortProperty="exceptionEntitlements.displayName" sortable="true" stateId="accountName"/>
+            <ColumnConfig dataIndex="roleApplications" groupProperty="IIQ_roleApplications" headerKey="cert_item_tbl_header_role_applications" hidden="true" hideable="true" property="IIQ_roleApplications" sortProperty="IIQ_roleApplications" stateId="roleApplications"/>
+            <ColumnConfig dataIndex="roleAccountNames" groupProperty="IIQ_roleAccounts" headerKey="cert_item_tbl_header_role_accounts" hidden="true" hideable="true" property="IIQ_roleAccounts" sortProperty="IIQ_roleAccounts" stateId="roleAccountNames"/>
+            <ColumnConfig dataIndex="riskScore" groupProperty="parent.compositeScore" headerKey="cert_item_tbl_header_compositescore" hidden="true" hideable="true" property="parent.compositeScore" secondarySort="type,IIQ_displayName" sortProperty="parent.compositeScore" sortable="true" stateId="riskScore"/>
+            <ColumnConfig dataIndex="changesDetected" evaluator="sailpoint.web.view.certification.CertificationItemChangesDetectedColumn" groupProperty="parent.newUser,hasDifferences" headerKey="cert_item_tbl_header_changes_detected" hidden="true" hideable="true" property="IIQ_changesDetected" sortProperty="parent.newUser,hasDifferences" sortable="true" stateId="changesDetected"/>
+            <ColumnConfig dataIndex="" fixed="Right" headerKey="cert_item_tbl_header_decision" renderer="spCertificationActionColumn" stateId=""/>
+            <ColumnConfig dataIndex="summaryStatus" fieldOnly="true" groupProperty="summaryStatus" property="summaryStatus" renderer="certSummaryStatus" sortProperty="summaryStatus" stateId="summaryStatus"/>
+            <ColumnConfig dataIndex="entityId" fieldOnly="true" groupProperty="parent.id" property="parent.id" sortProperty="parent.id" stateId="entityId"/>
+            <ColumnConfig dataIndex="targetDisplayName" fieldOnly="true" groupProperty="parent.targetDisplayName" property="parent.targetDisplayName" sortProperty="parent.targetDisplayName" stateId="targetDisplayName"/>
+            <ColumnConfig dataIndex="targetId" fieldOnly="true" groupProperty="parent.targetId" property="parent.targetId" sortProperty="parent.targetId" stateId="targetId"/>
+            <ColumnConfig dataIndex="challenge" fieldOnly="true" groupProperty="challenge" property="challenge" sortProperty="challenge" stateId="challenge"/>
+            <ColumnConfig dataIndex="newUser" fieldOnly="true" groupProperty="parent.newUser" property="parent.newUser" sortProperty="parent.newUser" stateId="newUser"/>
+            <ColumnConfig dataIndex="hasDifferences" fieldOnly="true" groupProperty="hasDifferences" property="hasDifferences" sortProperty="hasDifferences" stateId="hasDifferences"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="uiTargetedCertificationItemDetailViewReturnedItemsColumns">
+        <value>
+          <List>
+            <ColumnConfig dataIndex="decisionStatus" evaluator="sailpoint.web.view.certification.CertificationItemDecisionColumn" fieldOnly="true" groupProperty="IIQ_decisionChoices" property="IIQ_decisionChoices" sortProperty="IIQ_decisionChoices" stateId="decisionStatus"/>
+            <ColumnConfig dataIndex="typeMessageKey" groupProperty="type" headerKey="cert_item_tbl_header_type" percentWidth="10" renderer="spTranslate" sortProperty="type" sortable="true" stateId="typeMessageKey"/>
+            <ColumnConfig dataIndex="displayName" evaluator="sailpoint.web.view.certification.CertificationItemDisplayNameColumn" groupProperty="type,bundle,exceptionApplication,exceptionAttributeName,exceptionAttributeValue,exceptionPermissionTarget,exceptionPermissionRight,violationSummary" headerKey="cert_item_tbl_header_display_name" hideable="true" percentWidth="15" property="IIQ_displayName" secondarySort="type" sortProperty="type,bundle,exceptionApplication,exceptionAttributeName,exceptionAttributeValue,exceptionPermissionTarget,exceptionPermissionRight,violationSummary" sortable="true" stateId="displayName"/>
+            <ColumnConfig dataIndex="description" evaluator="sailpoint.web.view.certification.CertificationItemDescriptionColumn" groupProperty="IIQ_description" headerKey="cert_item_tbl_header_description" hideable="true" minWidth="250" percentWidth="30" property="IIQ_description" renderer="spMoreLessToggleColumn" sortProperty="IIQ_description" stateId="description"/>
+            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleEncodedColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
+            <ColumnConfig dataIndex="application" groupProperty="exceptionApplication" headerKey="cert_item_tbl_header_application" hideable="true" percentWidth="10" property="exceptionApplication" secondarySort="type,IIQ_displayName" sortProperty="exceptionApplication" sortable="true" stateId="application"/>
+            <ColumnConfig dataIndex="instance" groupProperty="exceptionEntitlements.instance" headerKey="cert_item_tbl_header_instance" hidden="true" hideable="true" property="exceptionEntitlements.instance" secondarySort="exceptionApplication,type,IIQ_displayName" sortProperty="exceptionEntitlements.instance" sortable="true" stateId="instance"/>
+            <ColumnConfig dataIndex="nativeIdentity" groupProperty="exceptionEntitlements.nativeIdentity" headerKey="cert_item_tbl_header_accountid" hidden="true" hideable="true" property="exceptionEntitlements.nativeIdentity" secondarySort="exceptionApplication,type,IIQ_displayName" sortProperty="exceptionEntitlements.nativeIdentity" sortable="true" stateId="nativeIdentity"/>
+            <ColumnConfig dataIndex="accountName" groupProperty="exceptionEntitlements.displayName" headerKey="cert_item_tbl_header_accountDisplayName" hidden="true" hideable="true" property="exceptionEntitlements.displayName" secondarySort="exceptionApplication,type,IIQ_displayName" sortProperty="exceptionEntitlements.displayName" sortable="true" stateId="accountName"/>
+            <ColumnConfig dataIndex="roleApplications" groupProperty="IIQ_roleApplications" headerKey="cert_item_tbl_header_role_applications" hidden="true" hideable="true" property="IIQ_roleApplications" sortProperty="IIQ_roleApplications" stateId="roleApplications"/>
+            <ColumnConfig dataIndex="roleAccountNames" groupProperty="IIQ_roleAccounts" headerKey="cert_item_tbl_header_role_accounts" hidden="true" hideable="true" property="IIQ_roleAccounts" sortProperty="IIQ_roleAccounts" stateId="roleAccountNames"/>
+            <ColumnConfig dataIndex="riskScore" groupProperty="parent.compositeScore" headerKey="cert_item_tbl_header_compositescore" hidden="true" hideable="true" property="parent.compositeScore" secondarySort="type,IIQ_displayName" sortProperty="parent.compositeScore" sortable="true" stateId="riskScore"/>
+            <ColumnConfig dataIndex="summaryStatus" groupProperty="summaryStatus" headerKey="cert_item_tbl_header_summary_status" hidden="true" hideable="true" property="summaryStatus" renderer="certSummaryStatus" sortProperty="summaryStatus" sortable="true" stateId="summaryStatus"/>
+            <ColumnConfig dataIndex="changesDetected" evaluator="sailpoint.web.view.certification.CertificationItemChangesDetectedColumn" groupProperty="parent.newUser,hasDifferences" headerKey="cert_item_tbl_header_changes_detected" hidden="true" hideable="true" property="IIQ_changesDetected" sortProperty="parent.newUser,hasDifferences" sortable="true" stateId="changesDetected"/>
+            <ColumnConfig dataIndex="decisions" headerKey="cert_item_tbl_header_decision" renderer="spCertificationDecisionColumn" stateId="decisions"/>
+            <ColumnConfig dataIndex="" fixed="Right" headerKey="cert_item_tbl_header_action" renderer="spCertificationActionColumn" stateId=""/>
+            <ColumnConfig dataIndex="entityId" fieldOnly="true" groupProperty="parent.id" property="parent.id" sortProperty="parent.id" stateId="entityId"/>
+            <ColumnConfig dataIndex="challenge" fieldOnly="true" groupProperty="challenge" property="challenge" sortProperty="challenge" stateId="challenge"/>
+            <ColumnConfig dataIndex="targetDisplayName" fieldOnly="true" groupProperty="parent.targetDisplayName" property="parent.targetDisplayName" sortProperty="parent.targetDisplayName" stateId="targetDisplayName"/>
+            <ColumnConfig dataIndex="targetId" fieldOnly="true" groupProperty="parent.targetId" property="parent.targetId" sortProperty="parent.targetId" stateId="targetId"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="uiTargetedCertificationItemReturnedItemsColumns">
+        <value>
+          <List>
+            <ColumnConfig dataIndex="decisionStatus" evaluator="sailpoint.web.view.certification.CertificationItemDecisionColumn" fieldOnly="true" groupProperty="IIQ_decisionChoices" property="IIQ_decisionChoices" sortProperty="IIQ_decisionChoices" stateId="decisionStatus"/>
+            <ColumnConfig dataIndex="firstName" groupProperty="parent.firstname" headerKey="cert_item_tbl_header_firstname" hideable="true" percentWidth="10" property="parent.firstname" secondarySort="parent.lastname,type,IIQ_displayName" sortProperty="parent.firstname" sortable="true" stateId="firstName"/>
+            <ColumnConfig dataIndex="lastName" groupProperty="parent.lastname" headerKey="cert_item_tbl_header_lastname" hideable="true" percentWidth="10" property="parent.lastname" secondarySort="parent.firstname,type,IIQ_displayName" sortProperty="parent.lastname" sortable="true" stateId="lastName"/>
+            <ColumnConfig dataIndex="typeMessageKey" groupProperty="type" headerKey="cert_item_tbl_header_type" percentWidth="10" renderer="spTranslate" sortProperty="type" sortable="true" stateId="typeMessageKey"/>
+            <ColumnConfig dataIndex="displayName" evaluator="sailpoint.web.view.certification.CertificationItemDisplayNameColumn" groupProperty="type,bundle,exceptionApplication,exceptionAttributeName,exceptionAttributeValue,exceptionPermissionTarget,exceptionPermissionRight,violationSummary" headerKey="cert_item_tbl_header_display_name" hideable="true" percentWidth="15" property="IIQ_displayName" secondarySort="parent.lastname,parent.firstname,type" sortProperty="type,bundle,exceptionApplication,exceptionAttributeName,exceptionAttributeValue,exceptionPermissionTarget,exceptionPermissionRight,violationSummary" sortable="true" stateId="displayName"/>
+            <ColumnConfig dataIndex="description" evaluator="sailpoint.web.view.certification.CertificationItemDescriptionColumn" groupProperty="IIQ_description" headerKey="cert_item_tbl_header_description" hideable="true" minWidth="250" percentWidth="30" property="IIQ_description" renderer="spMoreLessToggleColumn" sortProperty="IIQ_description" stateId="description"/>
+            <ColumnConfig dataIndex="comments" evaluator="sailpoint.web.view.certification.CertificationDecisionCommentColumn" groupProperty="IIQ_decisionHistory" headerKey="cert_item_tbl_header_comment" hideable="true" percentWidth="15" property="IIQ_decisionHistory" renderer="spMoreLessToggleEncodedColumn" sortProperty="IIQ_decisionHistory" stateId="comments"/>
+            <ColumnConfig dataIndex="application" groupProperty="exceptionApplication" headerKey="cert_item_tbl_header_application" hideable="true" percentWidth="10" property="exceptionApplication" secondarySort="parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionApplication" sortable="true" stateId="application"/>
+            <ColumnConfig dataIndex="instance" groupProperty="exceptionEntitlements.instance" headerKey="cert_item_tbl_header_instance" hidden="true" hideable="true" property="exceptionEntitlements.instance" secondarySort="exceptionApplication,parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionEntitlements.instance" sortable="true" stateId="instance"/>
+            <ColumnConfig dataIndex="nativeIdentity" groupProperty="exceptionEntitlements.nativeIdentity" headerKey="cert_item_tbl_header_accountid" hidden="true" hideable="true" property="exceptionEntitlements.nativeIdentity" secondarySort="exceptionApplication,parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionEntitlements.nativeIdentity" sortable="true" stateId="nativeIdentity"/>
+            <ColumnConfig dataIndex="accountName" groupProperty="exceptionEntitlements.displayName" headerKey="cert_item_tbl_header_accountDisplayName" hidden="true" hideable="true" property="exceptionEntitlements.displayName" secondarySort="exceptionApplication,parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionEntitlements.displayName" sortable="true" stateId="accountName"/>
+            <ColumnConfig dataIndex="roleApplications" groupProperty="IIQ_roleApplications" headerKey="cert_item_tbl_header_role_applications" hidden="true" hideable="true" property="IIQ_roleApplications" sortProperty="IIQ_roleApplications" stateId="roleApplications"/>
+            <ColumnConfig dataIndex="roleAccountNames" groupProperty="IIQ_roleAccounts" headerKey="cert_item_tbl_header_role_accounts" hidden="true" hideable="true" property="IIQ_roleAccounts" sortProperty="IIQ_roleAccounts" stateId="roleAccountNames"/>
+            <ColumnConfig dataIndex="riskScore" groupProperty="parent.compositeScore" headerKey="cert_item_tbl_header_compositescore" hidden="true" hideable="true" property="parent.compositeScore" secondarySort="parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="parent.compositeScore" sortable="true" stateId="riskScore"/>
+            <ColumnConfig dataIndex="summaryStatus" groupProperty="summaryStatus" headerKey="cert_item_tbl_header_summary_status" hidden="true" hideable="true" property="summaryStatus" renderer="certSummaryStatus" sortProperty="summaryStatus" sortable="true" stateId="summaryStatus"/>
+            <ColumnConfig dataIndex="changesDetected" evaluator="sailpoint.web.view.certification.CertificationItemChangesDetectedColumn" groupProperty="parent.newUser,hasDifferences" headerKey="cert_item_tbl_header_changes_detected" hidden="true" hideable="true" property="IIQ_changesDetected" sortProperty="parent.newUser,hasDifferences" sortable="true" stateId="changesDetected"/>
+            <ColumnConfig dataIndex="parent-identity" groupProperty="parent.identity" headerKey="cert_item_tbl_header_identity" hidden="true" hideable="true" property="parent.identity" sortProperty="parent.identity" sortable="true" stateId="parent-identity"/>
+            <ColumnConfig dataIndex="decisions" headerKey="cert_item_tbl_header_decision" renderer="spCertificationDecisionColumn" stateId="decisions"/>
+            <ColumnConfig dataIndex="" fixed="Right" headerKey="cert_item_tbl_header_action" renderer="spCertificationActionColumn" stateId=""/>
+            <ColumnConfig dataIndex="entityId" fieldOnly="true" groupProperty="parent.id" property="parent.id" sortProperty="parent.id" stateId="entityId"/>
+            <ColumnConfig dataIndex="challenge" fieldOnly="true" groupProperty="challenge" property="challenge" sortProperty="challenge" stateId="challenge"/>
+            <ColumnConfig dataIndex="targetDisplayName" fieldOnly="true" groupProperty="parent.targetDisplayName" property="parent.targetDisplayName" sortProperty="parent.targetDisplayName" stateId="targetDisplayName"/>
+            <ColumnConfig dataIndex="targetId" fieldOnly="true" groupProperty="parent.targetId" property="parent.targetId" sortProperty="parent.targetId" stateId="targetId"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="uiTargetedCertificationItemWorksheetColumns">
+        <value>
+          <List>
+            <ColumnConfig dataIndex="decisionStatus" evaluator="sailpoint.web.view.certification.CertificationItemDecisionColumn" fieldOnly="true" groupProperty="IIQ_decisionChoices" property="IIQ_decisionChoices" sortProperty="IIQ_decisionChoices" stateId="decisionStatus"/>
+            <ColumnConfig dataIndex="firstName" groupProperty="parent.firstname" headerKey="cert_item_tbl_header_firstname" hidden="true" hideable="true" percentWidth="10" property="parent.firstname" secondarySort="parent.lastname,type,IIQ_displayName" sortProperty="parent.firstname" sortable="true" stateId="firstName"/>
+            <ColumnConfig dataIndex="lastName" groupProperty="parent.lastname" headerKey="cert_item_tbl_header_lastname" hidden="true" hideable="true" percentWidth="10" property="parent.lastname" secondarySort="parent.firstname,type,IIQ_displayName" sortProperty="parent.lastname" sortable="true" stateId="lastName"/>
+            <ColumnConfig dataIndex="typeMessageKey" groupProperty="type" headerKey="cert_item_tbl_header_type" hideable="true" percentWidth="10" renderer="spTranslate" sortProperty="type" sortable="true" stateId="typeMessageKey"/>
+            <ColumnConfig dataIndex="displayName" evaluator="sailpoint.web.view.certification.CertificationItemDisplayNameColumn" groupProperty="type,bundle,exceptionApplication,exceptionAttributeName,exceptionAttributeValue,exceptionPermissionTarget,exceptionPermissionRight,violationSummary" headerKey="cert_item_tbl_header_display_name" hideable="true" percentWidth="20" property="IIQ_displayName" renderer="spCertificationDisplayNameColumn" secondarySort="parent.lastname,parent.firstname,type" sortProperty="type,bundle,exceptionApplication,exceptionAttributeName,exceptionAttributeValue,exceptionPermissionTarget,exceptionPermissionRight,violationSummary" sortable="true" stateId="displayName"/>
+            <ColumnConfig dataIndex="description" evaluator="sailpoint.web.view.certification.CertificationItemDescriptionColumn" groupProperty="IIQ_description" headerKey="cert_item_tbl_header_description" hideable="true" minWidth="250" percentWidth="50" property="IIQ_description" renderer="spMoreLessToggleColumn" sortProperty="IIQ_description" stateId="description"/>
+            <ColumnConfig dataIndex="application" groupProperty="exceptionApplication" headerKey="cert_item_tbl_header_application" hideable="true" percentWidth="10" property="exceptionApplication" secondarySort="parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionApplication" sortable="true" stateId="application"/>
+            <ColumnConfig dataIndex="instance" groupProperty="exceptionEntitlements.instance" headerKey="cert_item_tbl_header_instance" hidden="true" hideable="true" property="exceptionEntitlements.instance" secondarySort="exceptionApplication,parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionEntitlements.instance" sortable="true" stateId="instance"/>
+            <ColumnConfig dataIndex="nativeIdentity" groupProperty="exceptionEntitlements.nativeIdentity" headerKey="cert_item_tbl_header_accountid" hidden="true" hideable="true" property="exceptionEntitlements.nativeIdentity" secondarySort="exceptionApplication,parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionEntitlements.nativeIdentity" sortable="true" stateId="nativeIdentity"/>
+            <ColumnConfig dataIndex="accountName" groupProperty="exceptionEntitlements.displayName" headerKey="cert_item_tbl_header_accountDisplayName" hideable="true" property="exceptionEntitlements.displayName" renderer="spCertificationAccountDisplayNameColumn" secondarySort="exceptionApplication,parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionEntitlements.displayName" sortable="true" stateId="accountName"/>
+            <ColumnConfig dataIndex="IIQ_accountKey" evaluator="sailpoint.web.view.certification.CertificationItemAccountKeyColumn" groupProperty="exceptionApplication,exceptionEntitlements.nativeIdentity,exceptionEntitlements.instance" headerKey="cert_item_tbl_header_account" hidden="true" hideable="true" property="IIQ_accountKey" renderer="certItemAccount" secondarySort="parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="exceptionEntitlements.displayName,exceptionApplication,exceptionEntitlements.instance" sortable="true" stateId="IIQ_accountKey"/>
+            <ColumnConfig dataIndex="roleApplications" groupProperty="IIQ_roleApplications" headerKey="cert_item_tbl_header_role_applications" hidden="true" hideable="true" property="IIQ_roleApplications" sortProperty="IIQ_roleApplications" stateId="roleApplications"/>
+            <ColumnConfig dataIndex="roleAccountNames" groupProperty="IIQ_roleAccounts" headerKey="cert_item_tbl_header_role_accounts" hidden="true" hideable="true" property="IIQ_roleAccounts" sortProperty="IIQ_roleAccounts" stateId="roleAccountNames"/>
+            <ColumnConfig dataIndex="riskScore" groupProperty="parent.compositeScore" headerKey="cert_item_tbl_header_compositescore" hidden="true" hideable="true" property="parent.compositeScore" secondarySort="parent.lastname,parent.firstname,type,IIQ_displayName" sortProperty="parent.compositeScore" sortable="true" stateId="riskScore"/>
+            <ColumnConfig dataIndex="changesDetected" evaluator="sailpoint.web.view.certification.CertificationItemChangesDetectedColumn" groupProperty="parent.newUser,hasDifferences" headerKey="cert_item_tbl_header_changes_detected" hidden="true" hideable="true" property="IIQ_changesDetected" sortProperty="parent.newUser,hasDifferences" sortable="true" stateId="changesDetected"/>
+            <ColumnConfig dataIndex="Identity-displayName" groupProperty="parent.targetDisplayName" headerKey="cert_item_tbl_header_identity" hideable="true" property="parent.targetDisplayName" sortProperty="parent.targetDisplayName" sortable="true" stateId="Identity-displayName"/>
+            <ColumnConfig dataIndex="" fixed="Right" headerKey="cert_item_tbl_header_decision" renderer="spCertificationActionColumn" stateId=""/>
+            <ColumnConfig dataIndex="summaryStatus" fieldOnly="true" groupProperty="summaryStatus" property="summaryStatus" renderer="certSummaryStatus" sortProperty="summaryStatus" stateId="summaryStatus"/>
+            <ColumnConfig dataIndex="entityId" fieldOnly="true" groupProperty="parent.id" property="parent.id" sortProperty="parent.id" stateId="entityId"/>
+            <ColumnConfig dataIndex="targetDisplayName" fieldOnly="true" groupProperty="parent.targetDisplayName" property="parent.targetDisplayName" sortProperty="parent.targetDisplayName" stateId="targetDisplayName"/>
+            <ColumnConfig dataIndex="targetId" fieldOnly="true" groupProperty="parent.targetId" property="parent.targetId" sortProperty="parent.targetId" stateId="targetId"/>
+            <ColumnConfig dataIndex="challenge" fieldOnly="true" groupProperty="challenge" property="challenge" sortProperty="challenge" stateId="challenge"/>
+            <ColumnConfig dataIndex="newUser" fieldOnly="true" groupProperty="parent.newUser" property="parent.newUser" sortProperty="parent.newUser" stateId="newUser"/>
+            <ColumnConfig dataIndex="hasDifferences" fieldOnly="true" groupProperty="hasDifferences" property="hasDifferences" sortProperty="hasDifferences" stateId="hasDifferences"/>
           </List>
         </value>
       </entry>
@@ -3192,9 +3515,23 @@
       <entry key="uiViolationsWidgetColumns">
         <value>
           <List>
-            <ColumnConfig dataIndex="description" headerKey="ui_work_items_widget_name" renderer="priorityFlag" stateId="description"/>
-            <ColumnConfig dataIndex="target" headerKey="ui_work_items_widget_user" renderer="displayableName" stateId="target"/>
+            <ColumnConfig dataIndex="description" headerKey="ui_work_items_widget_name" renderer="encodeHtml,priorityFlag" stateId="description"/>
+            <ColumnConfig dataIndex="target" headerKey="ui_work_items_widget_user" renderer="displayableName,encodeHtml" stateId="target"/>
             <ColumnConfig dataIndex="created" dateStyle="short" groupProperty="created" headerKey="ui_work_items_widget_date" property="created" sortProperty="created" stateId="created"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="uiWorkItemListCardColumns">
+        <value>
+          <List>
+            <ColumnConfig dataIndex="created" dateStyle="shortDate" groupProperty="created" headerKey="ui_workitems_created" property="created" secondarySort="name" sortProperty="created" sortable="true" stateId="created"/>
+            <ColumnConfig dataIndex="workItemName" groupProperty="name" headerKey="ui_workitems_column_id" property="workItemName" renderer="precedingZeroes" sortProperty="name" sortable="true" stateId="workItemName"/>
+            <ColumnConfig dataIndex="description" fieldOnly="true" groupProperty="description" headerKey="ui_workitems_column_name" property="description" secondarySort="name" sortProperty="description" sortable="true" stateId="description"/>
+            <ColumnConfig dataIndex="type" fieldOnly="true" groupProperty="type" headerKey="ui_workitems_column_type" property="type" secondarySort="name" sortProperty="type" sortable="true" stateId="type"/>
+            <ColumnConfig dataIndex="owner.displayName" groupProperty="owner.displayName" headerKey="ui_workitems_column_owner" property="owner.displayName" secondarySort="name" sortProperty="owner.displayName" sortable="true" stateId="owner.displayName"/>
+            <ColumnConfig dataIndex="requester.displayName" groupProperty="requester.displayName" headerKey="ui_workitems_column_requester" property="requester.displayName" secondarySort="name" sortProperty="requester.displayName" sortable="true" stateId="requester.displayName"/>
+            <ColumnConfig dataIndex="assignee.displayName" fieldOnly="true" groupProperty="assignee.displayName" headerKey="ui_workitems_column_assignee" property="assignee.displayName" secondarySort="owner.displayName,name" sortProperty="assignee.displayName" sortable="true" stateId="assignee.displayName"/>
+            <ColumnConfig dataIndex="priority" fieldOnly="true" groupProperty="level" headerKey="ui_workitems_column_priority" property="priority" secondarySort="name" sortProperty="level" sortable="true" stateId="priority"/>
           </List>
         </value>
       </entry>
@@ -3250,4 +3587,3 @@
     </Map>
   </Attributes>
 </UIConfig>
-</sailpoint>

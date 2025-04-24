@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE QuickLink PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<QuickLink action="workflow" category="Custom" messageKey="WorkflowCase Cleanup Quicklink" name="WorkflowCase Cleanup Quicklink">
+  <Attributes>
+    <Map>
+      <entry key="workflowName" value="WorkflowCase Cleanup Workflow"/>
+      <entry key="workflowSuccess"/>
+    </Map>
+  </Attributes>
+  <QuickLinkOptions allowSelf="true">
+    <DynamicScopeRef>
+      <Reference class="sailpoint.object.DynamicScope" name="User Mainenance"/>
+    </DynamicScopeRef>
+  </QuickLinkOptions>
+</QuickLink>

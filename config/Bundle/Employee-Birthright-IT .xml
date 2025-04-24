@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Bundle PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Bundle displayName="Employee Birthright IT" name="Employee Birthright IT" type="it">
+  <Attributes>
+    <Map>
+      <entry key="accountSelectorRules"/>
+      <entry key="allowDuplicateAccounts" value="false"/>
+      <entry key="allowMultipleAssignments" value="false"/>
+      <entry key="mergeTemplates" value="false"/>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <Profiles>
+    <Profile>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Contractor System Employee"/>
+      </ApplicationRef>
+      <Constraints>
+        <Filter operation="CONTAINS_ALL" property="Group">
+          <Value>
+            <List>
+              <String>User</String>
+            </List>
+          </Value>
+        </Filter>
+      </Constraints>
+    </Profile>
+    <Profile>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="HR System"/>
+      </ApplicationRef>
+      <Constraints>
+        <Filter operation="EQ" property="roles" value="User"/>
+      </Constraints>
+    </Profile>
+    <Profile >
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="IdentityIQ Workgroups"/>
+      </ApplicationRef>
+      <Constraints>
+        <Filter operation="CONTAINS_ALL" property="workgroups">
+          <Value>
+            <List>
+              <String>Employee_User_Workgroup</String>
+            </List>
+          </Value>
+        </Filter>
+      </Constraints>
+    </Profile>
+	<Profiles>
+    <Profile>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Active Directory"/>
+      </ApplicationRef>
+      <Constraints>
+        <Filter operation="CONTAINS_ALL" property="memberOf">
+          <Value>
+            <List>
+              <String>CN=EmployeeADGroup,OU=Groups,%%AD_DC%%</String>
+            </List>
+          </Value>
+        </Filter>
+      </Constraints>
+    </Profile>
+  </Profiles>
+  </Profiles>
+</Bundle>

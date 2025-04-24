@@ -35,7 +35,16 @@
       <entry key="allowCertificationEntityBulkApprove" value="true"/>
       <entry key="allowCertificationEntityBulkClearDecisions" value="true"/>
       <entry key="allowCertificationEntityBulkRevocation" value="true"/>
-      <entry key="allowCreatingRolesFromCertification" value="true"/>
+      <entry key="allowCreatingRolesFromCertification">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="allowDuplicateAccounts">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="allowGeneratePasswordDelegated" value="true"/>
       <entry key="allowGroupManagement" value="true"/>
       <entry key="allowIdentitySearch" value="true"/>
@@ -45,16 +54,43 @@
       <entry key="allowListViewBulkReassign" value="true"/>
       <entry key="allowListViewBulkRevoke" value="true"/>
       <entry key="allowListViewSaveCustomEntityFields" value="false"/>
-      <entry key="allowPopulationSearch" value="true"/>
-      <entry key="allowProvisioningMissingRequirements" value="false"/>
-      <entry key="allowSelfCertification">
+      <entry key="allowMultipleRoleAssignments">
         <value>
-          <SelfCertificationAllowedLevel>CertificationAdministrator</SelfCertificationAllowedLevel>
+          <Boolean></Boolean>
         </value>
       </entry>
+      <entry key="allowPopulationSearch" value="true"/>
+      <entry key="allowProvisioningMissingRequirements">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="allowRolePropagation">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="allowSelfCertification" value="CertificationAdministrator"/>
       <entry key="allowUnauthenticatedEndUserPages" value="true"/>
       <entry key="allowiFrame" value="false"/>
       <entry key="applicationTemplateAccountUsages" value="Create,Update,Delete,Enable,Disable,Unlock,ChangePassword"/>
+      <entry key="asyncCacheRefresh">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="attachmentConfigRules"/>
+      <entry key="attachmentsAllowedFileTypes" value="[&quot;txt&quot;,&quot;jpg&quot;,&quot;png&quot;]"/>
+      <entry key="attachmentsEnabled">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="attachmentsMaxFileSize">
+        <value>
+          <Integer>5</Integer>
+        </value>
+      </entry>
       <entry key="audit_extension">
         <value>
           <Map>
@@ -79,17 +115,29 @@
           <CertificationStatus>Remediated</CertificationStatus>
         </value>
       </entry>
+      <entry key="automaticClosingComments"/>
       <entry key="automaticClosingDuration">
         <value>
           <TimeDuration amount="7" scale="Day"/>
         </value>
       </entry>
+      <entry key="automaticClosingEnabled">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="automaticClosingRuleName"/>
       <entry key="automaticClosingSigner" value="spadmin"/>
       <entry key="batchRequestAccessRequest" value="LCM Provisioning"/>
       <entry key="batchRequestAccountsRequest" value="LCM Provisioning"/>
       <entry key="batchRequestIdentityCreateRequest" value="LCM Create and Update"/>
       <entry key="batchRequestIdentityEditRequest" value="LCM Create and Update"/>
       <entry key="batchRequestPasswordsRequest" value="LCM Manage Passwords"/>
+      <entry key="blockForwardWorkItemSelfCertification">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
       <entry key="bulkReassignmentEmailTemplate" value="Bulk Reassignment"/>
       <entry key="bulkSelectionCountForConfirmation" value="25"/>
       <entry key="bundlesUIDisplayLimit" value="50"/>
@@ -144,7 +192,11 @@
       </entry>
       <entry key="certificationArchiveMaxAge" value="0"/>
       <entry key="certificationDecisionChallengedEmailTemplate" value="Certification Decision Challenged Notification"/>
-      <entry key="certificationDelegationReview" value="false"/>
+      <entry key="certificationDelegationReview">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="certificationDetailedViewFilterSet" value="false"/>
       <entry key="certificationDisableDelegationForwarding" value="false"/>
       <entry key="certificationEmailTemplate" value="Certification"/>
@@ -155,16 +207,34 @@
       <entry key="certificationItemCompletionRule"/>
       <entry key="certificationItemCustomizationRule"/>
       <entry key="certificationItemDelegationEnabled" value="false"/>
-      <entry key="certificationLimitReassignments" value="false"/>
+      <entry key="certificationLimitReassignments">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="certificationMaxAge" value="0"/>
+      <entry key="certificationMitigationDeprovisionEnabled">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="certificationMitigationDuration">
         <value>
           <TimeDuration amount="1" scale="Month"/>
         </value>
       </entry>
-      <entry key="certificationMitigationEnabled" value="false"/>
-      <entry key="certificationMitigationPopupEnabled" value="false"/>
+      <entry key="certificationMitigationEnabled">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="certificationMitigationPopupEnabled">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="certificationPageListItems" value="true"/>
+      <entry key="certificationReassignmentLimit"/>
       <entry key="certificationReminderEmailTemplate" value="Certification Reminder"/>
       <entry key="certificationRequiredDuration">
         <value>
@@ -186,12 +256,34 @@
           <TimeDuration amount="1" scale="Week"/>
         </value>
       </entry>
-      <entry key="challengePeriodEnabled" value="false"/>
+      <entry key="challengePeriodEnabled">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="challengePeriodEndEmailTemplate" value="Challenge Period End"/>
       <entry key="challengePeriodStartEmailTemplate" value="Challenge Period Start"/>
       <entry key="challengeRejectedEmailTemplate" value="Challenge Rejected"/>
-      <entry key="checkPasswordsAgainstDictionary" value="false"/>
-      <entry key="checkPasswordsAgainstIdentityAttributes" value="false"/>
+      <entry key="checkCaseSensitive">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="checkPasswordTriviality">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="checkPasswordsAgainstDictionary">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="checkPasswordsAgainstIdentityAttributes">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="columnSuggestBlacklist">
         <value>
           <Map>
@@ -200,7 +292,11 @@
           </Map>
         </value>
       </entry>
-      <entry key="completeCertificationHierarchy" value="false"/>
+      <entry key="completeCertificationHierarchy">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="confirmRiskyCertificationSchedules" value="false"/>
       <entry key="continuousCertCertificationRequiredScanInterval">
         <value>
@@ -216,14 +312,17 @@
       <entry key="dashboardMaxCertPercentApplications" value="10"/>
       <entry key="dashboardMaxCertPercentGroups" value="10"/>
       <entry key="dashboardMaxCertPercents" value="5"/>
+      <entry key="defaultAssignee"/>
       <entry key="defaultElectronicSignature"/>
-      <entry key="defaultEmailFromAddress" value="admin@example.com"/>
+      <entry key="defaultEmailFromAddress" value="admin@sweinc.com"/>
       <entry key="defaultEmailGap" value="0"/>
       <entry key="defaultEmailHost" value="mail.example.com"/>
+      <entry key="defaultEmailPort"/>
       <entry key="defaultHomeWidgets" value="Approvals, Violations, Forms, DirectReports, MyAccessReviews, CertificationCampaigns, TopFiveRisks"/>
       <entry key="defaultLanguage" value="en_US"/>
       <entry key="defaultMaxReminders" value="5"/>
       <entry key="defaultQuickLinkCards" value="Policy Violations, Access Reviews, Approvals, Request Access, Track Requests"/>
+      <entry key="defaultRemediationModifiableOp"/>
       <entry key="defaultRemediator"/>
       <entry key="defaultReminderStart" value="1209600000"/>
       <entry key="defaultWakeUpInterval" value="86400000"/>
@@ -232,45 +331,144 @@
       <entry key="delegationFinishedEmailTemplate" value="Delegation Finished"/>
       <entry key="delegationRevocationEmailTemplate" value="Delegation Revocation"/>
       <entry key="disableDefaultToAppOwnerRemediation" value="false"/>
-      <entry key="disableRoleModelerTreeView" value="false"/>
-      <entry key="emailNotifierType" value="smtp"/>
+      <entry key="disableRoleModelerTreeView">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="displayEntitlementDescriptions">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="emailNotifierType" value="redirectToFile"/>
       <entry key="emailRequestDefinition" value="Email Request"/>
+      <entry key="enableAccountReassignAction">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="enableAccountRevokeAction">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="enableApproveAccountAction">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="enableAuthLockout" value="false"/>
-      <entry key="enableLocalizeApplicationDescriptions" value="true"/>
-      <entry key="enableLocalizeManagedAttributeDescriptions" value="true"/>
-      <entry key="enableLocalizePolicyDescriptions" value="true"/>
-      <entry key="enableLocalizeRoleDescriptions" value="true"/>
+      <entry key="enableContrast">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="enableLocalizeApplicationDescriptions">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="enableLocalizeManagedAttributeDescriptions">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="enableLocalizePolicyDescriptions">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="enableLocalizeRoleDescriptions">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="enableModelerMultipleAssignments">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="enableModelerProfileView" value="true"/>
-      <entry key="enableOverrideViolationDefaultRemediator" value="true"/>
-      <entry key="enableProvisioningTransactionLog" value="true"/>
-      <entry key="enableRoleSunActivate" value="false"/>
-      <entry key="enableRoleSunAssign" value="false"/>
-      <entry key="enableSyslog" value="true"/>
+      <entry key="enableOverrideViolationDefaultRemediator">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="enableProvisioningTransactionLog">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="enableRoleSunActivate">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="enableRoleSunAssign">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="enableSyslog">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
       <entry key="entitlementMiningMaxAppBuckets" value="25"/>
       <entry key="entitlementMiningMaxBuckets" value="25"/>
       <entry key="escalationEmailTemplate" value="Work Item Escalation"/>
-      <entry key="flattenCertificationManagerHierarchy" value="false"/>
+      <entry key="excludeBaseAppAccounts">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="fallbackWorkItemForwardRule"/>
+      <entry key="flattenCertificationManagerHierarchy">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="forceRoleMergeTemplate">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="formsTypeFilter">
         <value>
           <List>
             <String>Application</String>
             <String>Role</String>
             <String>Workflow</String>
+            <String>PluginConfig</String>
           </List>
         </value>
       </entry>
       <entry key="groupIndexGranule" value="month"/>
-      <entry key="hashIdentitySecrets" value="false"/>
+      <entry key="hashIdentitySecrets">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="hashingIterations" value="1000"/>
+      <entry key="helpEmail"/>
+      <entry key="htmlSanitizerPolicies">
+        <value>
+          <List>
+            <String>BLOCKS</String>
+            <String>FORMATTING</String>
+          </List>
+        </value>
+      </entry>
       <entry key="identityControlsAssignedScope">
         <value>
-          <Boolean/>
+          <Boolean></Boolean>
         </value>
       </entry>
       <entry key="identityIndexGranule" value="month"/>
       <entry key="identityMaxSearchableAttributes" value="10"/>
       <entry key="identitySnapshotInterval" value="86400"/>
-      <entry key="identitySnapshotMaxAge" value="0"/>
+      <entry key="identitySnapshotMaxAge" value="30"/>
       <entry key="identity_extension">
         <value>
           <Map>
@@ -290,11 +488,13 @@
           </Map>
         </value>
       </entry>
+      <entry key="inactiveOwnerWorkItemForwadRule"/>
       <entry key="includePasswordPolicyDetailsInHelp">
         <value>
           <Boolean>true</Boolean>
         </value>
       </entry>
+      <entry key="jasperCSVDelimiter"/>
       <entry key="lcmAllowAccessAttributesSearch" value="true"/>
       <entry key="lcmAllowAccessPercentageSlider" value="false"/>
       <entry key="lcmAllowAccessPopulationSearch" value="true"/>
@@ -356,35 +556,100 @@
       <entry key="managedAttributeStatsMaxIdentities" value="200"/>
       <entry key="maxAuthLoginFailures" value="5"/>
       <entry key="maxAuthQuestionFailures" value="3"/>
-      <entry key="mitigationExpirationAction" value="NOTHING"/>
+      <entry key="minHistoryUniqueChars"/>
+      <entry key="mitigationExpirationAction">
+        <value>
+          <MitigationExpirationAction>NOTHING</MitigationExpirationAction>
+        </value>
+      </entry>
       <entry key="mitigationExpirationActionParameters"/>
       <entry key="mitigationExpirationEmailTemplate" value="Mitigation Expiration"/>
       <entry key="mobileQuickLinkCards" value="Request Access, Manage Passwords, Manage Accounts, Mobile Access Reviews, Mobile Approvals, Forms, Mobile Violation Reviews"/>
-      <entry key="notifyRemediation" value="false"/>
+      <entry key="notifyRemediation">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="numAuthQuestionAnswersRequired" value="3"/>
       <entry key="numAuthQuestionsForAuthn" value="2"/>
+      <entry key="oAuthConfiguration">
+        <value>
+          <OAuthConfiguration accessTokenExpiresInSeconds="1200">
+            <OAuthClient clientId="1LvE1wG2i3q9dI37MiFuSwv5nvaefTeQ" createDate="1731046859902" name="IIQAPI" proxyUser="2020007" secret="tivelrarhWh2tu0B">
+              <TokenKey>1:ACP:jQE7MiykwWnuPRhBZduYjd1EqPSU01f8C2jYFEUDrf/5Q9HeVa+qCojVQKMIQWEV</TokenKey>
+            </OAuthClient>
+            <OAuthClient clientId="UyJO2rSJXunMcraEkXihi8MciEQzGHBR" createDate="1731061407161" name="TestAPI" proxyUser="2020007" secret="hYUXgsYbeNwLNvUG">
+              <TokenKey>1:ACP:7VBgBVjGdsEwo6k6XD3Qhe1ItMd9h/S+D9FhNiIEpdzH7dC+jzPKpaTAEqrz8xBo</TokenKey>
+            </OAuthClient>
+          </OAuthConfiguration>
+        </value>
+      </entry>
       <entry key="openCertsEmailTemplate" value="Open Certifications"/>
       <entry key="optinResultsDetails" value="false"/>
+      <entry key="pamApplicationName"/>
+      <entry key="pamMaxSelectableIdentities">
+        <value>
+          <Integer>0</Integer>
+        </value>
+      </entry>
+      <entry key="pamProvisioningEnabled">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="pamWorkflowIdentityProvisioning"/>
+      <entry key="passwordChangeMinDuration"/>
+      <entry key="passwordExpirationDays"/>
+      <entry key="passwordHistory"/>
+      <entry key="passwordLowerCharacters"/>
+      <entry key="passwordMaxLength"/>
+      <entry key="passwordMinAlpha"/>
+      <entry key="passwordMinCharType"/>
+      <entry key="passwordMinLength"/>
+      <entry key="passwordMinLower"/>
+      <entry key="passwordMinNumeric"/>
+      <entry key="passwordMinSpecial"/>
+      <entry key="passwordMinUpper"/>
+      <entry key="passwordNumberCharacters"/>
+      <entry key="passwordRepeatedChar"/>
+      <entry key="passwordResetExpirationDays"/>
       <entry key="passwordSpecialCharacters" value="~!@#$%^*_+-={}\\][:;?,."/>
+      <entry key="passwordUpperCharacters"/>
       <entry key="pendingRoleRequestDeleteEmailTemplate" value="Pending Role Request Deleted"/>
+      <entry key="persistentLockTimeout"/>
+      <entry key="pluginProhibitScripting">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="pluginRelaxExportDeclarationEnforcement">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="policyViolationDelegationEmailTemplate" value="Policy Violation Delegation"/>
       <entry key="policyViolationEmailTemplate" value="Policy Violation"/>
       <entry key="policyViolationWorkItemTemplate" value="Policy Violation Details"/>
       <entry key="promptForAuthQuestionAnswersAfterLogin" value="false"/>
       <entry key="provisioningRequestExpirationDays" value="7"/>
-      <entry key="provisioningTransactionLogLevel" value="Failure"/>
-      <entry key="provisioningTransactionLogPruneAge" value="0"/>
+      <entry key="provisioningTransactionLogLevel" value="Success"/>
+      <entry key="provisioningTransactionLogPruneAge">
+        <value>
+          <Integer>30</Integer>
+        </value>
+      </entry>
       <entry key="quickLinkCategories">
         <value>
           <List>
             <QuickLinkCategory cssClass="quickLinkCategoryTasks" messageKey="quicklink_category_all_tasks" name="Tasks" ordering="1"/>
             <QuickLinkCategory cssClass="quickLinkCategoryAccess" messageKey="quicklink_category_access" name="Access" ordering="2"/>
             <QuickLinkCategory cssClass="quickLinkCategoryManage" messageKey="quicklink_category_manage" name="Manage" ordering="3"/>
+            <QuickLinkCategory cssClass="quickLinkCategoryCustom" enabled="true" messageKey="quicklink_category_custom" name="Custom" ordering="4"/>
           </List>
         </value>
       </entry>
       <entry key="redirectingEmailNotifierAddress" value="admin@example.com"/>
-      <entry key="redirectingEmailNotifierFilename" value="/tmp/iiqmbox"/>
+      <entry key="redirectingEmailNotifierFilename" value="C:\Program Files\Apache Software Foundation\Tomcat 8.5\webapps\iiq\WEB-INF\email\notification.txt"/>
       <entry key="registerForm" value="Self-service Registration Form"/>
       <entry key="remediationEmailTemplate" value="Remediation Work Item"/>
       <entry key="remediationItemAssignmentEmailTemplate" value="Remediation Item Assignment"/>
@@ -395,7 +660,11 @@
           <TimeDuration amount="1" scale="Month"/>
         </value>
       </entry>
-      <entry key="remediationPeriodEnabled" value="true"/>
+      <entry key="remediationPeriodEnabled">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
       <entry key="remediationScanInterval" value="86400000"/>
       <entry key="reminderEmailTemplate" value="Work Item Reminder"/>
       <entry key="reportCompletionEmailTemplate" value="Report Completion"/>
@@ -406,10 +675,35 @@
       <entry key="requestRolesAssignableSubordinateEnabled" value="true"/>
       <entry key="requestRolesPermittedSelfEnabled" value="true"/>
       <entry key="requestRolesPermittedSubordinateEnabled" value="true"/>
+      <entry key="requireApprovalComments">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="requireBulkCertifyConfirmation" value="false"/>
       <entry key="requireDelegationCompletion" value="false"/>
-      <entry key="requireOldPasswordAtChange" value="false"/>
+      <entry key="requireMitigationComments">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="requireOldPasswordAtChange">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="requireReassignmentCompletion" value="true"/>
+      <entry key="retainAssignedEntitlementsAssignedRole">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="retainAssignedEntitlementsDetectedRole">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="roleSunsetNotificationDaysReminder" value="0"/>
       <entry key="scimSearchMaxResults" value="1000"/>
       <entry key="scopePathsDenormalized">
         <value>
@@ -627,9 +921,34 @@
             <SearchInputDefinition description="srch_input_def_application" headerKey="srch_input_def_application" ignoreCase="true" inputType="Equal" matchMode="START" name="lcm.application" propertyName="links.application.id" propertyType="Collection" searchType="LCM" suggestType="application"/>
             <SearchInputDefinition description="srch_input_def_detected_role" headerKey="srch_input_def_detected_role" ignoreCase="true" inputType="Equal" name="lcm.detectedRole" nullPropertyName="bundleSummary" nullPropertyType="String" propertyName="bundles.id" propertyType="Collection" searchType="LCM" suggestType="role"/>
             <SearchInputDefinition description="srch_input_def_assigned_role" headerKey="srch_input_def_assigned_role" ignoreCase="true" inputType="Equal" name="lcm.assignedRole" nullPropertyName="assignedRoleSummary" nullPropertyType="String" propertyName="assignedRoles.id" propertyType="Collection" searchType="LCM" suggestType="role"/>
+            <SearchInputDefinition description="srch_input_def_type" headerKey="srch_input_def_type" ignoreCase="true" inputType="Equal" name="type" propertyName="type" propertyType="String" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_software_version" headerKey="srch_input_def_software_version" ignoreCase="true" inputType="Like" matchMode="START" name="softwareVersion" propertyName="softwareVersion" propertyType="String" searchType="None"/>
+            <SearchInputDefinition description="srch_input_def_administrator" headerKey="srch_input_def_administrator" ignoreCase="true" inputType="Like" matchMode="START" name="administrator" nullPropertyName="administrator" nullPropertyType="String" propertyName="administrator.displayName" propertyType="Identity" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_type" headerKey="srch_input_def_advanced_type" ignoreCase="true" inputType="Equal" name="advanced.type" propertyName="type" propertyType="String" searchType="AdvancedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_administrator" headerKey="srch_input_def_advanced_administrator" ignoreCase="true" inputType="Like" matchMode="START" name="advanced.administrator" nullPropertyName="administrator" propertyName="administrator.name" propertyType="Identity" searchType="AdvancedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_advanced_software_version" headerKey="srch_input_def_advanced_software_version" ignoreCase="true" inputType="Like" matchMode="START" name="advanced.softwareVersion" propertyName="softwareVersion" propertyType="String" searchType="AdvancedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_audit_client_host" headerKey="srch_input_def_audit_client_host" ignoreCase="true" inputType="Equal" name="audit.clientHost" propertyName="clientHost" propertyType="String" searchType="Audit" sortIndex="16"/>
+            <SearchInputDefinition description="srch_input_def_audit_server_host" headerKey="srch_input_def_audit_server_host" ignoreCase="true" inputType="Equal" name="audit.serverHost" propertyName="serverHost" propertyType="String" searchType="Audit" sortIndex="17"/>
           </List>
         </value>
       </entry>
+      <entry key="secretProvisionAttributeNames">
+        <value>
+          <List>
+            <String>password</String>
+            <String>USER_PWD</String>
+            <String>*password*</String>
+            <String>currentPassword</String>
+            <String>racfPassword</String>
+            <String>userPassword</String>
+            <String>group.password</String>
+            <String>oauthBearerToken</String>
+            <String>IDFileCurrentPassword</String>
+            <String>tokenPIN</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="selfCertificationViolationOwner"/>
       <entry key="selfRegistrationGroup" value="SelfRegistrationWorkGroup"/>
       <entry key="serverRootPath" value="http://localhost:8080/identityiq"/>
       <entry key="showAutoRemediationDialog" value="false"/>
@@ -637,12 +956,28 @@
       <entry key="showCertificationRoleRevocationDetails" value="false"/>
       <entry key="signoffEmailTemplate" value="Task Result Signoff"/>
       <entry key="smReadTimeout" value="10"/>
-      <entry key="subordinateCertificationEnabled">
+      <entry key="smtp_encryptionType">
         <value>
-          <Boolean>true</Boolean>
+          <SmtpEncryptionType>NONE</SmtpEncryptionType>
         </value>
       </entry>
-      <entry key="subordinateCertificationPageSize" value="10"/>
+      <entry key="smtp_password"/>
+      <entry key="smtp_username"/>
+      <entry key="subordinateCertificationEnabled" value="true"/>
+      <entry key="subordinateCertificationPageSize">
+        <value>
+          <Integer>10</Integer>
+        </value>
+      </entry>
+      <entry key="suggestColumnWhitelist"/>
+      <entry key="suggestObjectWhitelist">
+        <value>
+          <List>
+            <String>Identity</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="sunsetExpirationReminderEmailTemplate" value="Sunset Expiration Reminder"/>
       <entry key="supportedLanguages">
         <value>
           <List>
@@ -650,10 +985,18 @@
           </List>
         </value>
       </entry>
-      <entry key="suppressDuplicateEmails" value="true"/>
+      <entry key="suppressDuplicateEmails">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
       <entry key="syncSchema" value="true"/>
       <entry key="syslogLevel" value="ERROR"/>
-      <entry key="syslogPurgeAge" value="0"/>
+      <entry key="syslogPurgeAge">
+        <value>
+          <Integer>0</Integer>
+        </value>
+      </entry>
       <entry key="syslog_extension">
         <value>
           <Map>
@@ -669,22 +1012,52 @@
           </Map>
         </value>
       </entry>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
       <entry key="taskCompletionEmailTemplate" value="Task Status"/>
       <entry key="taskCompletionRule" value="Task Completion Email Rule"/>
       <entry key="taskResultMaxAge" value="0"/>
+      <entry key="temporaryDirectory"/>
+      <entry key="timeMachineEnabled" value="true"/>
       <entry key="unscopedObjectsGloballyAccessible">
         <value>
           <Boolean>true</Boolean>
         </value>
       </entry>
-      <entry key="unsupportedBrowserNotification" value="true"/>
+      <entry key="unsupportedBrowserNotification">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
       <entry key="useManagedAttributesForRemediation" value="true"/>
+      <entry key="workItemArchiveTypes"/>
       <entry key="workItemAssignmentEmailTemplate" value="Work Item Assignment"/>
+      <entry key="workItemAssignmentNotification">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="workItemAssignmentNotificationRemoval">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
       <entry key="workItemAssignmentRemovalEmailTemplate" value="Work Item Assignment Removal"/>
       <entry key="workItemCommentEmailTemplate" value="Work Item Comment"/>
-      <entry key="workItemDisableForwardingFromOutbox" value="true"/>
+      <entry key="workItemDisableForwardingFromOutbox">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
       <entry key="workItemForwardEmailTemplate" value="Work Item Forward"/>
+      <entry key="workItemForwardRule"/>
       <entry key="workItemNotificationsInterval" value="300"/>
+      <entry key="workItemPriorityEditingEnabled">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="workflowIdentityCorrelation"/>
       <entry key="workflowIdentityRefresh" value="Identity Refresh"/>
       <entry key="workflowIdentityUpdate" value="Identity Update"/>
       <entry key="workflowLCMAccessRequest" value="LCM Provisioning"/>

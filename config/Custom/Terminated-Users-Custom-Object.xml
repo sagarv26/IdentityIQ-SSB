@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Custom PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Custom name="Terminated Users Custom Object">
+  <Attributes>
+    <Map>
+      <entry key="terminatedUsers">
+        <value>
+          <List>
+			<String>userId1</String>
+			<String>userId2</String>		
+          </List>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+</Custom>

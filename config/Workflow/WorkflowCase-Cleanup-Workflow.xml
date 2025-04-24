@@ -1,0 +1,292 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" name="WorkflowCase Cleanup Workflow">
+  <Variable editable="true" name="commitFrequency"/>
+  <Variable editable="true" name="deleteCap"/>
+  <Variable input="true" name="quickLinkIdentityId"/>
+  <Variable editable="true" name="daysGap"/>
+  <Variable editable="true" name="emailIdentities"/>
+  <Variable editable="true" name="simulation"/>
+  <Variable editable="true" name="identityName"/>
+  <Variable initializer="true" name="transient">
+    <Description>Makes the workflow not leave records for each run</Description>
+  </Variable>
+  <Step icon="Start" name="Start" posX="20" posY="21">
+    <Transition to="Prepare"/>
+  </Step>
+  <Step icon="Default" name="Send Form" posX="188" posY="119">
+    <Approval name="Workflow Cleanup Form" owner="ref:identityName" return="simulation,emailIdentities,daysGap,deleteCap,commitFrequency" send="">
+      <Form name="Workflow Cleanup Form">
+        <Attributes>
+          <Map>
+            <entry key="pageTitle" value="Workflow Cleanup Form"/>
+          </Map>
+        </Attributes>
+        <Section name="Workflow Cleanup Form">
+          <Field displayName="Simulation" helpKey="Simulated delete vs actual delete" name="simulation" type="boolean" value="true"/>
+          <Field displayName="Users to Notify" helpKey="Identity Names for the people who will receive the results a an emailed CSV file" multi="true" name="emailIdentities" type="sailpoint.object.Identity"/>
+          <Field displayName="Number of Days delete threshold" helpKey="The number of days in the past after which we will not be deleting workflows. If 30 is entered here, we will only delete workflowcases older than 30 days" name="daysGap" required="true" type="int">
+            <Script>
+              <Source>return 180;</Source>
+            </Script>
+          </Field>
+          <Field displayName="Delete cap (Maximum allowed at one time is 200)" helpKey="Maximum number of WorkflowCase objects to delete (Maximum allowed at one time is 200)." name="deleteCap" required="true" type="int">
+            <Script>
+              <Source>return 200;</Source>
+            </Script>
+          </Field>
+          <Field displayName="Transaction Commit Frequency" helpKey="How many iterations after which the code will commit the transaction" name="commitFrequency" required="true" type="int">
+            <Script>
+              <Source>return 200;</Source>
+            </Script>
+          </Field>
+        </Section>
+        <Button action="cancel" label="Cancel"/>
+        <Button action="next" label="Next"/>
+      </Form>
+    </Approval>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="emailIdentities" value="ref:emailIdentities"/>
+    <Arg name="simulation" value="ref:simulation"/>
+    <Arg name="deleteCap" value="ref:deleteCap"/>
+    <Arg name="daysGap" value="ref:daysGap"/>
+    <Arg name="commitFrequency" value="ref:commitFrequency"/>
+    <Transition to="Delete and Report"/>
+  </Step>
+  <Step icon="Default" name="Delete and Report" posX="283" posY="104">
+    <Arg name="emailIdentities" value="ref:emailIdentities"/>
+    <Arg name="simulation" value="ref:simulation"/>
+    <Arg name="deleteCap" value="ref:deleteCap"/>
+    <Arg name="daysGap" value="ref:daysGap"/>
+    <Arg name="commitFrequency" value="ref:commitFrequency"/>
+    <Script>
+      <Source><![CDATA[
+import sailpoint.object.QueryOptions;
+import sailpoint.object.Filter;
+import sailpoint.object.WorkflowCase;
+import sailpoint.object.AuditEvent;
+import sailpoint.object.TaskResult;
+import sailpoint.object.TaskDefinition;
+import sailpoint.object.Filter.CompositeFilter;
+import sailpoint.object.Custom;
+
+import sailpoint.api.TaskManager;
+import sailpoint.api.Terminator;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
+import java.util.*;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
+import java.lang.Exception;
+
+
+  Logger logger = Logger.getLogger("workflow.DeleteOldWorkflowCases"); // TODO: Add to log4j2.properties file and ensure this logger matches their naming convention
+  logger.debug("WorkflowCase Cleanup Workflow Start");
+
+  Terminator term = new Terminator(context);
+
+  boolean simu = simulation;
+  // The value found in the Audit so it's clear whether a delete ACTUALLY happened
+  String simString = "Deleted";
+  if(simu)
+    simString="Simulated";
+
+  logger.debug("WorkflowCase Cleanup Workflow simString: " + simString);
+  // Set this Integer to the days how long workflowCases should be kept. ex.: 1 = delete all WFCases older than 1 day // Integer.parseInt(
+  int daysGapToDelete = daysGap; 
+	logger.debug("WorkflowCase Cleanup Workflow daysGapToDelete: " + daysGapToDelete);
+  // The maximum number of workflowCase objects that should be deleted by this process in 1 run
+  int maxDeleted = -1;
+  
+  // A flag to tell us whether the delete cap configuration is set at all
+  boolean maxD = true;
+
+ // if(config.get("deleteCap") != null && !"".equals(deleteCap))
+  if(deleteCap != null)
+    maxDeleted = deleteCap; 
+  else 
+    maxDeleted = 200;
+ // else
+   // maxD = false;
+
+  // How many iterations we are spacing commits by in loops below
+  int transactionCommitFrequency = commitFrequency;
+
+  // Just to count the total
+  int countDeletedWorkflows = 0;
+
+  // Now subtract the gap days
+  Calendar cal = new GregorianCalendar();
+  cal.add(Calendar.DATE, -daysGapToDelete);
+  Date cutOffDate = cal.getTime();
+  logger.debug("WorkflowCase Cleanup Workflow cutOffDate: " + cutOffDate);
+
+  QueryOptions qo = new QueryOptions();
+  qo.addFilter(Filter.lt("created", cutOffDate ));
+  qo.setCloneResults(true);
+
+  Iterator it = context.search(WorkflowCase.class, qo, "id,name,created,targetName"); 
+
+  // Keep track of the ones we want to delete
+  List deleteList = new ArrayList();
+  List deleteTaskResultList = new ArrayList();
+        
+  // Method for generating an Audit we will use in our report, below
+  boolean generateAudit(Object[] itArray)
+  {
+      DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+      String id = (String) itArray[0];
+      String wfcName = (String) itArray[1];
+      Date wfcCreated = (Date) itArray[2];
+      String wfcTargetName = (String) itArray[3];
+
+      //logger.debug("Identity: " + wfcTargetName + " --> deleting old workflow case " + id + " - " + wfcName);
+
+      AuditEvent ae = new AuditEvent("WorkflowCleanup","Delete", wfcName);
+      ae.setString1(wfcTargetName);
+      ae.setString2(formatter.format(wfcCreated));
+      ae.setString3("Current time: " + formatter.format(new Date())); 
+      ae.setString4(simString);
+
+      context.saveObject(ae);
+
+      return true;
+  }
+
+  try{
+    // Iterate through every WorkflowCase before the time threshold
+    while(it.hasNext() && (!maxD || maxDeleted > 0)) { 
+      maxDeleted--;
+      int audits = 0;
+
+      Object[] itArray = it.next();
+      
+      generateAudit(itArray);
+
+      audits++;
+      if(audits%transactionCommitFrequency == 0)
+        context.commitTransaction();
+
+      deleteList.add((String) itArray[0]);
+      countDeletedWorkflows++;
+
+    } 
+  }
+  catch (Exception ex) {
+      logger.error("Error: " + ex.getMessage());
+  }
+  finally
+  {
+    sailpoint.tools.Util.flushIterator(it); 
+  }
+
+  logger.debug("WorkflowCase Cleanup Workflow countDeletedWorkflows: " + countDeletedWorkflows);
+  context.commitTransaction();
+
+  if(!simu){
+      try {
+        int deleted = 0;
+        // Delete the WorkflowCase objects. 
+        for(String wfcId : deleteList)
+        {
+          WorkflowCase wfCase = context.getObjectById(WorkflowCase.class, wfcId);
+          // Track TaskResult ID for delete action in the next for loop
+          String tresId = wfCase.getTaskResultId();
+          if (tresId != null)
+            deleteTaskResultList.add(tresId);
+          // The actual Delete statement 
+          term.deleteObject(wfCase);
+          // Instead of committing every transaction, we only do so after a certain number of iterations. This is better performance
+          deleted++;
+          if(deleted % transactionCommitFrequency == 0) 
+            context.commitTransaction();
+        }
+        
+        if( deleteTaskResultList != null && !deleteTaskResultList.isEmpty())
+        	logger.debug("WorkflowCase Cleanup deleteTaskResultList: " + deleteTaskResultList.size());
+        
+        logger.debug("WorkflowCase Cleanup Workflow deleted cases: " + deleted);
+        // In case we ended on a number that was not captured by our % statement we need to do one final commit
+        context.commitTransaction();
+        // Deleting the TaskResults. Terminator class should also delete all dependent objects for the WorkflowCase objects above, including TaskResult, but CapOne says they've seen this not working in their environment so we are doing an extra check
+        for(String trId : deleteTaskResultList) 
+        {
+          TaskResult tr = context.getObjectById(TaskResult.class, trId);
+          // Checking whether the TaskResult was left un-deleted by the Terminator operation above
+          if(tr != null)
+          {
+            term.deleteObject(tr);
+          // Instead of committing every transaction, we only do so after a certain number of iterations. This is better performance
+            deleted++;
+            if(deleted % transactionCommitFrequency == 0)
+              context.commitTransaction();
+          }
+        }
+        
+        logger.debug("WorkflowCase Cleanup Workflow deleted task results: " + deleted);
+        // In case we ended on a number that was not captured by our % statement we need to do one final commit
+        context.commitTransaction();
+      }
+      catch (Exception ex)
+      {
+        logger.error("Error: " + ex.getMessage());
+      }
+    } else{
+      logger.debug("Simulation is true --> no commits");
+    }
+
+
+  // The actual work is already done, the rest of the Rule is about creating the Report
+  TaskDefinition report = context.getObjectByName(TaskDefinition.class, "WorkflowCase Cleanup Audit Report");
+
+  List emailList = emailIdentities;
+
+  // Setting the list of Identities who will be emailed
+  report.setArgument("emailIdentities",emailList);
+  
+  // Definining our new filters using the old filters as a base, maybe it isn't necessary to do it this way but it isn't harmful either and if we modify in the future it might be convenient
+  CompositeFilter cf = report.getArgument("SearchReportFilters"); // TODO: Define this as a new object because there's no reason to pull the filters from the report because we're overwriting them
+
+  List newChildren = new ArrayList();
+  // Filter based on Delete action
+  newChildren.add(Filter.ignoreCase(Filter.eq("action","Delete")));
+  // Filter based on whether the source was this rule
+  newChildren.add(Filter.ignoreCase(Filter.like("source","WorkflowCleanup",Filter.MatchMode.START)));
+  // Update the startDate to only show results from the last 24 hours, usually in Prod this should only be our current run but if we've had multiple within 24 hours they may show up too. You can use Value 3 in the report to see the time the report was generated and distinguish different runs from one another
+  Calendar cal2 = new GregorianCalendar();
+  cal2.add(Calendar.DATE, -1);
+  newChildren.add(Filter.gt("created",cal2.getTime()));
+  // Sets the new filters
+  cf.setChildren(newChildren);
+  
+  report.setArgument("SearchReportFilters",cf);
+
+  TaskManager taskmanager = new TaskManager(context);
+  // Run the report
+  taskmanager.run(report, null);
+  ]]>
+      </Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="362" posY="47"/>
+  <Step icon="Default" name="Prepare" posX="69" posY="99" resultVariable="identityName">
+    <Arg name="quickLinkIdentityId" value="ref:quickLinkIdentityId"/>
+    <Script>
+      <Source>import sailpoint.object.Identity;
+
+Identity identity = context.getObjectById(Identity.class, quickLinkIdentityId);
+
+String idName = identity.getName();
+
+context.decache(identity);
+
+return idName;</Source>
+    </Script>
+    <Transition to="Send Form"/>
+  </Step>
+</Workflow>

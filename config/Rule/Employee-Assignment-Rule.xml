@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Employee Assignment Rule" type="IdentitySelector">
+  <Description>This rule is used to select an Identity that is related to the given Identity. this rule applied to enteprise wide associates and contractors</Description>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity" type="Identity">
+        <Description>
+          The identity.
+        </Description>
+      </Argument>
+      <Argument name="roleName" type="String">
+        <Description>
+          The name of the sailpoint.object.Bundle (role) that is being selected for the Identity. 
+          If roles are not applicable to this Identity selection, this value will be void.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="success">
+        <Description>
+            True if the selection was successful; false otherwise.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+
+import sailpoint.object.Application;
+import sailpoint.object.Link;
+import sailpoint.api.IdentityService;
+
+boolean activeStatus = identity.isInactive();
+String employeeType = (String) identity.getAttribute("employeeType");
+
+IdentityService identityService = new IdentityService(context);
+
+////////check if user has AD account if not don't assign/////////
+Application ADapp=context.getObjectByName(Application.class,"Active Directory");
+List ADlinks= identityService.getLinks(identity, ADapp);
+if(ADlinks==null || ADlinks.size() &lt;= 0)
+return false;
+/////////////////
+
+
+if (!activeStatus &amp;&amp; employeeType!=null &amp;&amp; employeeType.equalsIgnoreCase("Employee"))
+    return true;
+else
+return false;
+
+</Source>
+</Rule>

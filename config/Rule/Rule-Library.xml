@@ -69,13 +69,8 @@
 	import java.util.Map;
 	import java.util.Arrays;
 
-	import com.cof.rap.olad.OladPasswordUpdateClient;
-
-
-	String COF_DELEGATE_WORKGROUP_FORMAT = "cofDelegateWorkgroupFormat";//sys config entry for COF Set Delegate module
 	String[] ENTITLEMENT_CLEANUP_APPS = { "Active Directory" };
 	String[] RELATED_APPS = {"Active Directory"};
-	String[] HYPHEN_ROLES = {"COF A- Role","COF W- Role"};
 
 	Log log = LogFactory.getLog("com.rules.RuleLibrary");
 	

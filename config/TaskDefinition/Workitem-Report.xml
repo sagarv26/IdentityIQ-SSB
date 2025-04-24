@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="WorkItems-Report" progressMode="String" resultAction="Rename" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report"
+        <value>
+          <LiveReport disablePreview="true" title="WorkItem Details Report">
+            <DataSource dataSourceClass="sailpoint.reporting.datasource.WorkItemArchiveDataSource" objectType="sailpoint.object.WorkItem" type="Filter">
+              <QueryParameters>
+                <Parameter argument="createdDate">
+                  <QueryScript>
+                    <Source><![CDATA[
+                        import java.util.Date;
+                        
+                        import sailpoint.object.Filter;
+                        import sailpoint.object.Filter.MatchMode;
+                        import sailpoint.object.QueryOptions;
+  
+                        Calendar calendarStartDate = Calendar.getInstance();
+                        calendarStartDate.setTime(new Date());
+                        //Minus 30days until yesterday
+                        calendarStartDate.set(Calendar.HOUR_OF_DAY, -744); 
+                        calendarStartDate.set(Calendar.MINUTE, 0);
+                        calendarStartDate.set(Calendar.SECOND, 0);
+                        calendarStartDate.set(Calendar.MILLISECOND, 0);
+                        Date thirtythDayDate = calendarStartDate.getTime();
+
+                        Filter descriptionFilter =  Filter.like("description", "Workitem Description", MatchMode.START);
+                        Filter typeFilter =  Filter.eq("type", "Approval");
+                        Filter thirtythDayFilter =  Filter.le("created", thirtythDayDate);
+
+                        Filter finalWorkItemFilter = Filter.and(descriptionFilter, typeFilter, thirtythDayFilter);
+                        QueryOptions options = new QueryOptions();
+                        options.addFilter(finalWorkItemFilter);
+                        
+                        return options;
+                    ]]></Source>
+                  </QueryScript>
+                </Parameter>
+              </QueryParameters>
+            </DataSource>
+            <Columns>
+              <ReportColumnConfig field="Name" header="name" property="name" sortable="true" width="110"/>
+              <ReportColumnConfig field="Owner" header="owner" property="owner.name" sortable="true" width="110"/>
+              <ReportColumnConfig field="Old Owner" header="Old Owner" property="id" scriptArguments="id,name,type" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    	import java.util.ArrayList;
+                    	import java.util.List;
+                        import sailpoint.object.WorkItem;
+                    	import sailpoint.object.WorkItem.OwnerHistory;
+                    	import sailpoint.tools.Util;
+
+                    	WorkItem workitem = context.getObjectById(WorkItem.class, value);
+                   	 	List ownerList = new ArrayList();
+                    	if(workitem != null @and workitem.getOwnerHistory()!=null @and !workitem.getOwnerHistory().isEmpty()) {  				
+                        for(OwnerHistory ownerHistory : workitem.getOwnerHistory()) {
+                            ownerList.add(ownerHistory.getNewOwner());
+                        }
+                      }
+                      if(Util.nullSafeSize(ownerList) > 0) {
+                        return Util.listToCsv(ownerList);
+                      }
+                    ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="application" header="application" property="id" scriptArguments="id,name,type" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                      import sailpoint.object.WorkItem;
+
+                    	WorkItem workitem = context.getObjectById(WorkItem.class, value);
+                   	 	if(workitem != null) {
+                    	return workitem.getAttribute("application");
+                    	}
+                        ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="Entitlement Attribute" header="Entitlement Attribute" property="id" scriptArguments="id,name,type" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                      import sailpoint.object.WorkItem;
+
+                    	WorkItem workitem = context.getObjectById(WorkItem.class, value);
+                   	 	if(workitem != null) {
+                    	return workitem.getAttribute("attribute");
+                    	}
+                        ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="Entitlement Value" header="Entitlement Value" property="id" scriptArguments="id,name,type" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                      import sailpoint.object.WorkItem;
+
+                    	WorkItem workitem = context.getObjectById(WorkItem.class, value);
+                   	 	if(workitem != null) {
+                    	return workitem.getAttribute("entValue");
+                    	}
+                        ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="IdentityRequestID" header="IdentityRequestID" property="id" scriptArguments="id,name,type" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                      import sailpoint.object.WorkItem;
+
+                    	WorkItem workitem = context.getObjectById(WorkItem.class, value);
+                   	 	if(workitem != null) {
+                    	return workitem.getAttribute("identityRequestId");
+                    	}
+                        ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+            </Columns>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>Entitlement metadata workItems pending for approval for more than thirty 30 days</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessIdentityEffectiveAccessReport"/>
+  </RequiredRights>
+</TaskDefinition><?xml version='1.0' encoding='UTF-8'?>

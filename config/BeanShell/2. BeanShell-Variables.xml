@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="BeanShell Example">
+  <Source>
+  import java.util.*;
+  import sailpoint.object.*;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+  
+  String identityName = "2020009";
+  System.out.println("Searching User: "+identityName);
+  Identity identity = context.getObjectByName(Identity.class, identityName);
+
+  //Object obj = context.getObjectByName(Object.class, objectName);
+  //Object obj = context.getObjectById(Object.class, objectId);
+ 
+  QueryOptions options = new QueryOptions();
+  List identityList = context.getObjects(Identity.class, options);
+
+  </Source>
+</Rule>

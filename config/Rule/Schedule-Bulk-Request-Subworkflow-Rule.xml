@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Schedule Bulk Request Subworkflow Rule" type="Workflow">
+  <Source>
+    
+
+import java.util.*;
+import java.lang.*;
+import java.text.*;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+import sailpoint.api.*;
+import sailpoint.object.*;
+import sailpoint.workflow.*;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
+
+  String workflowName = "Bulk User Access Request Subworkflow";
+  String caseName     = "Bulk request subworkflow";
+  String requesterId  = launcher;
+
+  Workflow eventWorkflow = context.getObject(Workflow.class, workflowName);
+
+
+  Identity id = context.getObjectByName(Identity.class, requesterId);
+
+
+  long launchTime = System.currentTimeMillis() + 1000;
+  caseName = caseName + "(" + launchTime + ")";
+
+  
+  Attributes reqArgs = new Attributes();
+  reqArgs.put(StandardWorkflowHandler.ARG_REQUEST_DEFINITION, 
+              sailpoint.request.WorkflowRequestExecutor.DEFINITION_NAME);
+  reqArgs.put(sailpoint.workflow.StandardWorkflowHandler.ARG_WORKFLOW, 
+              workflowName);
+  reqArgs.put(sailpoint.workflow.StandardWorkflowHandler.ARG_REQUEST_NAME, 
+              caseName);
+  reqArgs.put( "requestName", caseName );            
+
+
+  Attributes wfArgs = new Attributes();
+
+  wfArgs.put("workflowId", eventWorkflow.getId());
+  wfArgs.put("launcher", launcher);
+  wfArgs.put("fileContentString", fileContentString);
+
+  reqArgs.putAll(wfArgs);
+
+  Request req = new Request();
+  RequestDefinition reqdef = context.getObject(RequestDefinition.class, "Workflow Request");
+  req.setDefinition(reqdef);
+  req.setEventDate( new Date( launchTime ) );
+  req.setOwner(id);
+  req.setName(caseName);
+  req.setAttributes( reqdef, reqArgs );
+
+
+  RequestManager.addRequest(context, req);
+
+return;  
+  
+  </Source>
+</Rule>

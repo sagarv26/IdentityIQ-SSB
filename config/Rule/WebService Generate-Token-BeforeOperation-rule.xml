@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="WebService Generate Token BeforeOperation rule" type="WebServiceBeforeOperationRule">
+  <Description>This rule is used by the  Web Services connector before performing any operation like testconnection, aggregation etc .</Description>
+  <Signature returnType="EndPoint">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>The application whose data file is being processed.</Description>
+      </Argument>
+      <Argument name="requestEndPoint">
+        <Description>The current request information contain header, body, context url, method type, response attribute map, 
+                successful response code
+                </Description>
+      </Argument>
+      <Argument name="oldResponseMap">
+        <Description>earlier response object </Description>
+      </Argument>
+      <Argument name="restClient">
+        <Description>REST Client Object</Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="EndPoint">
+        <Description>Updated EndPoint Object</Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[ 
+    import org.apache.commons.logging.Log;
+    import org.apache.commons.logging.LogFactory;
+    import java.util.HashMap;
+    import java.util.Map;
+    Log log = LogFactory.getLog("BeforeRule");
+
+    public String generateBearer(String username,String password){
+		String fullURL = "%%REST_LogOn_API%%";
+		org.apache.http.impl.client.CloseableHttpClient httpClient = HttpClients.createDefault();
+		String responseBody = null;
+		String concurrentSession = "True";
+		try{
+			org.apache.http.client.methods.HttpPost generateBearerRequest = new HttpPost(fullURL);
+			generateBearerRequest.addHeader("Content-Type", "application/json");
+			String payload = "{\n\"username\":\""+username+"\",\n\"password\":\""+password+"\",\n\"concurrentSession\":\""+concurrentSession+"\"\n}";
+			StringEntity entity = new StringEntity(payload,ContentType.APPLICATION_JSON);
+			generateBearerRequest.setEntity(entity);
+			org.apache.http.client.methods.CloseableHttpResponse generateBearerResponse = httpClient.execute(generateBearerRequest);
+			int responseCode = generateBearerResponse.getStatusLine().getStatusCode();
+		  
+			if(responseCode!=null &amp;&amp; responseCode==200)
+			{
+				responseBody = EntityUtils.toString(generateBearerResponse.getEntity());
+			}
+		}
+		catch(Exception ex){
+			throw new Exception("Exception in generateBearer API Call: "+ex.getMessage());
+		}
+		finally
+		{
+			httpClient.close();
+		}
+		if(responseBody!=null &amp;&amp; !responseBody.isEmpty()){
+			return responseBody.replaceAll("^\"|\"$", "");
+		}
+		else{
+			return responseBody;
+		}
+	}	
+
+
+    String auditBoardAuth = "Bearer " + generateBearer(appId, password);
+    Map auditBoardAuthMap = new HashMap();
+    auditBoardAuthMap.put("Authorization",auditBoardAuth);
+    auditBoardAuthMap.put("Accept","application/json;v=1");
+    auditBoardAuthMap.put("Content-Type","application/json");
+    requestEndPoint.setHeader(auditBoardAuthMap);
+
+    return requestEndPoint;
+    ]]></Source>
+</Rule>
