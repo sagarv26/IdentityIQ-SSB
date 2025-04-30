@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="BeanShell Example">
+  <Source>
+  import java.util.*;
+  import sailpoint.object.*;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+	try {
+	
+	//statements
+	
+	}
+	catch(Exception ex) {
+	 
+	}
+	finally{}
+  
+  public boolean addOwnerAD(String adgroupName,String owner){
+
+    try{
+		ManagedAttribute ma = new ManagedAttribute();
+		ManagedAttributer mg = new ManagedAttributer(context);
+		ma = mg.get(context,context.getObjectByName(Application.class,"Active Directory") , null, adgroupName);;
+		if (ma==null ) {
+        log.debug("AD group "+adgroupName + " does not exist");
+        return false;
+		}
+		else{
+        log.debug("AD Group Exists");
+
+        Identity ownerIden = context.getObjectByName(Identity.class, owner);
+        if(null!=ownerIden){
+			ma.setOwner(ownerIden);
+			context.saveObject(ma);        
+			context.commitTransaction();
+			return true;
+
+        } else return false;
+
+		}
+
+    } catch(GeneralException ex)
+    {
+      throw new GeneralException("Failed to update Owner in addOwnerAD method for " + adgroupName + " with owner " + owner+ " . "+ ex.getMessage());
+      return false;
+    }
+    catch (Exception ex)
+    {
+       throw new Exception("Failed to update Owner in addOwnerAD method for " + adgroupName + " with owner " + owner+ " . "+ ex.getMessage());
+		return false;
+    }
+	}
+
+
+
+  </Source>
+</Rule>

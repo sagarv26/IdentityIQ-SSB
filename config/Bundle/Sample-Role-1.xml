@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Bundle PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Bundle displayName="Sample Role 1" name="Sample Role 1" type="application">
+  <Attributes>
+    <Map>
+      <entry key="accountSelectorRules">
+        <value>
+          <AccountSelectorRules>
+            <ApplicationAccountSelectorRules>
+              <ApplicationAccountSelectorRule>
+                <ApplicationRef>
+                  <Reference class="sailpoint.object.Application" name="Active Directory"/>
+                </ApplicationRef>
+                <RuleRef>
+                  <Reference class="sailpoint.object.Rule" name="Account Selector Rule">
+                </RuleRef>
+              </ApplicationAccountSelectorRule>
+            </ApplicationAccountSelectorRules>
+          </AccountSelectorRules>
+        </value>
+      </entry>
+      <entry key="allowDuplicateAccounts" value="false"/>
+      <entry key="allowMultipleAssignments" value="false"/>
+      <entry key="mergeTemplates" value="false"/>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US" value="Sample Role 1"/>
+          </Map>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Inheritance>
+    <Reference class="sailpoint.object.Bundle" name="Organizational Role"/>
+  </Inheritance>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <Profiles>
+    <Profile>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Active Directory"/>
+      </ApplicationRef>
+      <Constraints>
+        <Filter operation="CONTAINS_ALL" property="memberOf">
+          <Value>
+            <List>
+              <String>CN=ADGroup1,OU=Groups,%%AD_DC%%</String>
+            </List>
+          </Value>
+        </Filter>
+      </Constraints>
+    </Profile>
+    <Profile>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Active Directory"/>
+      </ApplicationRef>
+      <Constraints>
+        <Filter operation="CONTAINS_ALL" property="memberOf">
+          <Value>
+            <List>
+              <String>CN=ADGroup2,OU=Groups,%%AD_DC%%</String>
+            </List>
+          </Value>
+        </Filter>
+      </Constraints>
+    </Profile>
+  </Profiles>
+</Bundle>

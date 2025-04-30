@@ -1,72 +1,106 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
-<Rule language="beanshell" name="BeanShell Example">
+<Rule language="beanshell" name="BeanShell Querying">
   <Source>
   import java.util.*;
   import sailpoint.object.*;
-  import org.apache.commons.logging.Log;
-  import org.apache.commons.logging.LogFactory;
-
-  private static Log log = LogFactory.getLog("rule.TestRule");
+  import sailpoint.tools.Util;
+  import sailpoint.tools.GeneralException;
 
   System.out.println("Simple Beanshell...");
   String identityName = "2020009";
   System.out.println("Searching User: "+identityName);
   Identity identity = context.getObjectByName(Identity.class, identityName);
+  Identity identity1 = context.getObjectById(Identity.class, identity.getId());
 
-  Object obj = context.getObjectByName(Object.class, objectName);
-  Object obj = context.getObjectById(Object.class, objectId);
- 
- 
-  //Condtion ex1
-  if(identity == null){
-    System.out.println("No User Found... ");
-    log.error("No User Found...");
-    return;
-  }
+	System.out.println("User: "+identity);
+	System.out.println("User: "+identity1);
+	
+	public void getApp(String appType)
+	{
+	
+		QueryOptions qo = new QueryOptions();
+	    qo.addFilter(Filter.eq("type", appType));
+	    Iterator appItr = context.search(Application.class, qo);
+	    List appList = new ArrayList();   
+	    // Iterate through each app and write its attributes to the properties file
+	    while(appItr.hasNext()){
+			Application curApp = (Application) appItr.next();
+			String curAppName = curApp.getName();
+			appList.add(curAppName);
+		}
+		
+		System.out.println(appList);
+	
+	}
 
-  //Condtion ex2
-  if(identity != null &amp;&amp; identity.getLinks() != void){
-    System.out.println("User Links: "+identity.getLinks());
+	getApp("DelimitedFile");
 
-    //loop ex1
-    for(Link link : identity.getLinks()){
-      System.out.println("User Link: "+link.getApplication());
-
-    }
-
-    //return identity.getLinks();
-
-  }
-
-	if(identity.getName().equals("12345")){
-	} else {
+ 	public void removeOldDummyTasks()
+	{
+	//The taskDefinition and taskResult can only be delete only if the task result is done.
+	//Otherwise deleting taskdefinition will remove any pending tasks.
+	QueryOptions qo = new QueryOptions();
+	Filter f1 = Filter.like("name","Monitoring Task", Filter.MatchMode.START);
+	qo.addFilter(f1);
+	List dummySequentialTasks = context.getObjects(TaskResult.class, qo);
+	if(dummySequentialTasks!= null &amp;&amp; !dummySequentialTasks.isEmpty())
+	{
+		for (TaskResult tasResult : dummySequentialTasks)
+		{
+			if(tasResult.isComplete())
+			{
+			TaskDefinition taskDef = context.getObject(TaskDefinition.class, tasResult.getName());
+			Terminator term = new Terminator(context);
+			term.deleteObject(tasResult);
+			if(taskDef!=null)
+			{				
+				term.deleteObject(taskDef);
+			}
+				context.commitTransaction();
+			}
+		}
+	
+	}
 	}
 	
+	public void querySQL()
+	{
+	//SQL Query
+	//String query = "sql: SELECT name, extended1 FROM IDENTITYIQ.SPT_IDENTITY";
+
+	//HQL Query
+	String query = "select name, displayName FROM Identity";
+	Iterator results = null;
+   
+	try{
+
+		QueryOptions qo = new QueryOptions();
+		qo.setCloneResults(true);
+		qo.setQuery(query);
+		results = context.search(query, null, qo);
+
+		while(results.hasNext()){
+
+			Object[] resultValues = results.next();
+
+			String val1 = resultValues[0];
+			String val2 = resultValues[1];
+			
+			System.out.println("ID: "+val1);
+			System.out.println("Full Name: "+val2);
+
+		}
+	}  catch(GeneralException ex){
+		System.out.println("GeneralException occured " + ex.getMessage());
+	} catch(Exception ex){
+		System.out.println("Exception occured " + ex.getMessage());
+	}finally {
+		if(null!=results) Util.flushIterator(results);
+	}
 	
-  /*if(identity != null @and identity.getLinks() @lt 0){
-  }*/
-  
-  
-  /*if(identity != null  &amp;&amp; identity.getLinks() &lt; 0){
-  }*/
+	}
 
-  //loop ex2
-  QueryOptions options = new QueryOptions();
-  List identityList = context.getObjects(Identity.class, options);
-  List idList = new ArrayList();
-  if (null != identityList) {
-
-    for (Identity id : identityList) {
-      idList.add(id.getDisplayName());
-    }
-
-  }
-
-  return idList;
-  //return identity.getDisplayName();
-
-
-
+	querySQL();
   </Source>
 </Rule>

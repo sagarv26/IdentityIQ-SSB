@@ -10,62 +10,15 @@
   private static Log log = LogFactory.getLog("rule.TestRule");
 
   System.out.println("Simple Beanshell...");
-  String identityName = "2020009";
-  System.out.println("Searching User: "+identityName);
-  Identity identity = context.getObjectByName(Identity.class, identityName);
-
-  Object obj = context.getObjectByName(Object.class, objectName);
-  Object obj = context.getObjectById(Object.class, objectId);
- 
- 
-  //Condtion ex1
-  if(identity == null){
-    System.out.println("No User Found... ");
-    log.error("No User Found...");
-    return;
-  }
-
-  //Condtion ex2
-  if(identity != null &amp;&amp; identity.getLinks() != void){
-    System.out.println("User Links: "+identity.getLinks());
-
-    //loop ex1
-    for(Link link : identity.getLinks()){
-      System.out.println("User Link: "+link.getApplication());
-
-    }
-
-    //return identity.getLinks();
+  {
+  		Map args = new HashMap();
+		args.put("arg1", "Argument1");
+		args.put("arg2", "Argument2");
+		 
+	    Rule rule = context.getObject( Rule.class, "Rule Name");	
+		context.runRule( rule, args );
 
   }
-
-	if(identity.getName().equals("12345")){
-	} else {
-	}
-	
-	
-  /*if(identity != null @and identity.getLinks() @lt 0){
-  }*/
-  
-  
-  /*if(identity != null  &amp;&amp; identity.getLinks() &lt; 0){
-  }*/
-
-  //loop ex2
-  QueryOptions options = new QueryOptions();
-  List identityList = context.getObjects(Identity.class, options);
-  List idList = new ArrayList();
-  if (null != identityList) {
-
-    for (Identity id : identityList) {
-      idList.add(id.getDisplayName());
-    }
-
-  }
-
-  return idList;
-  //return identity.getDisplayName();
-
 
 
   </Source>

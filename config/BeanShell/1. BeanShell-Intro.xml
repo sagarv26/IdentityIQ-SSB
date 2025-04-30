@@ -1,8 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
-<Rule language="beanshell" name="BeanShell Example">
+<Rule language="beanshell" name="BeanShell Intro">
   <Source>
   //Import
+  /*
+  Comment
+  */
   import java.util.*;
   import sailpoint.object.*;
   import org.apache.commons.logging.Log;
@@ -19,8 +22,16 @@
   String identityName = "2020009";
   System.out.println("Searching User: "+identityName);
   
+  //& <
+  //&amp; @and &lt; @lt
+  
+  <![CDATA[
+  
+  
+    ]]>
+  
 
-  return idList;
+  return identityName;
 
   </Source>
 </Rule>

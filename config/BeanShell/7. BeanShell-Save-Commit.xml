@@ -1,71 +1,57 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
-<Rule language="beanshell" name="BeanShell Example">
+<Rule language="beanshell" name="BeanShell Save Commit">
   <Source>
   import java.util.*;
   import sailpoint.object.*;
   import org.apache.commons.logging.Log;
   import org.apache.commons.logging.LogFactory;
 
-  private static Log log = LogFactory.getLog("rule.TestRule");
 
-  System.out.println("Simple Beanshell...");
-  String identityName = "2020009";
-  System.out.println("Searching User: "+identityName);
-  Identity identity = context.getObjectByName(Identity.class, identityName);
+  	System.out.println("Simple Beanshell...");
+	String user = "2020009";
+	String attr = "email";	  
+	String value = "Rahul.Dravid@swe.com";
+	System.out.println("Searching User: "+user);
 
-  Object obj = context.getObjectByName(Object.class, objectName);
-  Object obj = context.getObjectById(Object.class, objectId);
- 
- 
-  //Condtion ex1
-  if(identity == null){
-    System.out.println("No User Found... ");
-    log.error("No User Found...");
-    return;
-  }
 
-  //Condtion ex2
-  if(identity != null &amp;&amp; identity.getLinks() != void){
-    System.out.println("User Links: "+identity.getLinks());
-
-    //loop ex1
-    for(Link link : identity.getLinks()){
-      System.out.println("User Link: "+link.getApplication());
-
-    }
-
-    //return identity.getLinks();
-
-  }
-
-	if(identity.getName().equals("12345")){
-	} else {
-	}
+	if(null != user &amp;&amp; null != value){
+		Identity identity = context.getObjectByName(Identity.class, user);
 	
-	
-  /*if(identity != null @and identity.getLinks() @lt 0){
-  }*/
-  
-  
-  /*if(identity != null  &amp;&amp; identity.getLinks() &lt; 0){
-  }*/
-
-  //loop ex2
-  QueryOptions options = new QueryOptions();
-  List identityList = context.getObjects(Identity.class, options);
-  List idList = new ArrayList();
-  if (null != identityList) {
-
-    for (Identity id : identityList) {
-      idList.add(id.getDisplayName());
+		if(null != identity){
+	        	identity.setAttribute(attr, value);
+	        	context.saveObject(identity);
+	        	context.commitTransaction();
+	        	context.decache(identity);
+	    }
     }
-
-  }
-
-  return idList;
-  //return identity.getDisplayName();
-
+    
+    
+    /***
+	Get new UID
+	***/
+	Custom custom = (Custom) ObjectUtil.lockObject(context, Custom.class, null, "UID Custom Object", PersistenceManager.LOCK_TYPE_TRANSACTION);
+		
+		String prefix = custom.getString("prefix");
+		String suffix = custom.getString("suffix");
+		
+		Integer suf = Integer.valueOf(suffix);
+		
+		if(suf == 9999){
+			suf = 1;
+			incrementPrefix(prefix);
+		} else {
+			suf++;
+		}
+		
+		String suffix = String.format("%04d", new Object[] {suf});
+		custom.put("prefix", prefix);
+		custom.put("suffix", suffix);
+		
+		context.saveObject(custom);
+		context.commitTransaction();
+		
+		return prefix + suffix;
 
 
   </Source>
