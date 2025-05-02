@@ -17,14 +17,14 @@
 - [Governance and Provisioning](https://youtu.be/ER2kgz5pTVM)
 
 ## Configuration
-1. Global Setting
+- Global Setting
     - [IdentityIQ Configuration](https://youtu.be/Fft0kpBMKB0?si=hARzqojDfSXLvldE)
-- [Identity Mapping](https://youtu.be/V8U3SL72mLo?si=YwQUqWRj9jt-b4jH)
-- [Quicklink](https://youtu.be/9MGJZDrKakA)
-- [Audit Config](https://youtu.be/_mkfWyRUbKI?si=l9xaKfDkqZThKkfo)
-- [Email Configurations](https://youtu.be/R-YRVRnDgSs?si=wAjrIGUXCCPAQQdq)
+    - [Identity Mapping](https://youtu.be/V8U3SL72mLo?si=YwQUqWRj9jt-b4jH)
+    - [Quicklink](https://youtu.be/9MGJZDrKakA)
+    - [Audit Config](https://youtu.be/_mkfWyRUbKI?si=l9xaKfDkqZThKkfo)
+    - [Email Configurations](https://youtu.be/R-YRVRnDgSs?si=wAjrIGUXCCPAQQdq)
 
-2. Lifecycle Manager
+- Lifecycle Manager
 
 ## [Identity Warehouse](https://youtu.be/UrYCIxFCYX8?si=kgWSjaYCOrV4-vB6)
 
