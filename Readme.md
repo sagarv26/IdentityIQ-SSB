@@ -32,7 +32,7 @@
 
 ## [Advance Analytics](https://youtu.be/2NIYeHjDKLM?si=1otOoMrvuA2Iwxgm)
 
-## Tasks
+## [Tasks](https://youtu.be/MC8WvbTtOwY)
 - [Aggregation](https://youtu.be/2_gFCbf-fQ0?si=3LJiWLrFIlfnmIQE)
 - [Identity Refresh](https://youtu.be/xXUZOdUuimM?si=YoCWGr9y5ziqN43g)
 - Perform Maintenance Task
@@ -76,9 +76,10 @@
 - [Important Workflow Objects](https://youtu.be/kIzzBAa0GEs?si=Jlc_u5qieumpxT7e)
 - [Triggering Workflows](https://youtu.be/8IHRflQmmCU?si=WgMu1lbrvgJa564X)
 - [Workflow Types](https://youtu.be/4dmzpjmC8YI?si=deEcb2fvQV30VX4L)
-- [Workflow part 1](https://youtu.be/LwofrY4GwMk)
-- [Workflow part 2](https://youtu.be/dLiij57bNzY)
-- [Workflow part 3](https://youtu.be/p28oWlE6qAo)
+- Workflows
+    - [Workflow part 1](https://youtu.be/LwofrY4GwMk)
+    - [Workflow part 2](https://youtu.be/dLiij57bNzY)
+    - [Workflow part 3](https://youtu.be/p28oWlE6qAo)
 
 ## IIQ Console
 - [IIQ Console Part 1](https://youtu.be/KDMxPXuIOWA?si=Wo2eFgR2B6RN5O4T)
