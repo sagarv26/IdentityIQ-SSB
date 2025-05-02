@@ -18,7 +18,7 @@
 [Audit Config](https://youtu.be/_mkfWyRUbKI?si=l9xaKfDkqZThKkfo)
 [Email Configurations](https://youtu.be/R-YRVRnDgSs?si=wAjrIGUXCCPAQQdq)
 
-## #Lifecycle Manager
+### Lifecycle Manager
 
 ## [Identity Warehouse](https://youtu.be/UrYCIxFCYX8?si=kgWSjaYCOrV4-vB6)
 
@@ -27,10 +27,10 @@
 ## [Advance Analytics](https://youtu.be/2NIYeHjDKLM?si=1otOoMrvuA2Iwxgm)
 
 ## Tasks
-[Aggregation](https://youtu.be/2_gFCbf-fQ0?si=3LJiWLrFIlfnmIQE)
-[Identity Refresh](https://youtu.be/xXUZOdUuimM?si=YoCWGr9y5ziqN43g)
-### Perform Maintenance Task
-### Run Rule
+1. [Aggregation](https://youtu.be/2_gFCbf-fQ0?si=3LJiWLrFIlfnmIQE)
+2. [Identity Refresh](https://youtu.be/xXUZOdUuimM?si=YoCWGr9y5ziqN43g)
+3. Perform Maintenance Task
+4.	Run Rule
 
 ## Rules
 [Connector Rule](https://youtu.be/AVkg97S_d0k?si=KKMfuL_0ylFP3drU)
@@ -72,14 +72,14 @@
 ## [Database](https://youtu.be/d1eFt-hHU3o?si=tzuUDJfM7Q6MOv_K)
 
 ## Groups
-[Groups](https://youtu.be/Z7NyGU7Livs?si=94avaCAKTaID7zn2)
-[Population](https://youtu.be/rP8B43puovA?si=t8hXV4r8cSW7by2v)
-[Workgroups](https://youtu.be/WhJalSOZ-88?si=_wP3T5_1z9J1CGPg)
-### Capabilities
+- [Groups](https://youtu.be/Z7NyGU7Livs?si=94avaCAKTaID7zn2)
+- [Population](https://youtu.be/rP8B43puovA?si=t8hXV4r8cSW7by2v)
+- [Workgroups](https://youtu.be/WhJalSOZ-88?si=_wP3T5_1z9J1CGPg)
+- Capabilities
 
 ## [Roles](https://youtu.be/bRm_9LCV8hg?si=CwR-EDUh_JSVYF0X)
-### Types
-### Birthright Roles
+- Types
+- Birthright Roles
 
 ## [Reports](https://youtu.be/CJQJPFwoRHU?si=MsCXfO_eqbeF9RFi)
 
@@ -88,7 +88,7 @@
 ## [Workitem](https://youtu.be/q2U2b0o0b1E?si=NPX91elAzhBjJlWA)
 
 ## [Certifications](https://youtu.be/WUZTVFwDA_k?si=I_2T9Oi2Xfqk5Uk2)
-### Phases of a Certification
+1.Phases of a Certification
 ### Scheduling Certification
 
 ## [QuickLink](https://youtu.be/98jTMXuHlu0?si=mufI3zmCauRq1e3U)
@@ -121,6 +121,6 @@
 ## [QueryOptions](https://youtu.be/3GMHrQIdbjs?si=yTLb6ttVKVR3bwlc)
 ## [Provisioning Plan and Approval set](https://youtu.be/PmeJZkCPjFs?si=lDTqnaPDQPePZwJU)
 
-##[QueryOptions](https://youtu.be/3GMHrQIdbjs?si=yTLb6ttVKVR3bwlc)
-##[Provisioning Plan and Approval set](https://youtu.be/PmeJZkCPjFs?si=lDTqnaPDQPePZwJU)
+## [QueryOptions](https://youtu.be/3GMHrQIdbjs?si=yTLb6ttVKVR3bwlc)
+## [Provisioning Plan and Approval set](https://youtu.be/PmeJZkCPjFs?si=lDTqnaPDQPePZwJU)
 
