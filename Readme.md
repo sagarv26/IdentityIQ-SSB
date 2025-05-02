@@ -7,14 +7,20 @@
 - [eFix](https://youtu.be/ngC1d81hFD4?si=XnfIlSEqwbVfN95p)
 - [IQService](https://youtu.be/UPmkNqsZdow?si=2eCaM4NpJwTqC1bh)
 - [Connector Gateway](https://youtu.be/9EJ3nXq3Jpw?si=bhh7USZeuv8ow-3K)
+- [Eclipse Configuration](https://youtu.be/YIO0F-W2geI)
 
 ## [IIQ Property Files](https://youtu.be/zngeUNU9ekI?si=Hc6ljlH1JSfKJafB)
+
+## Basics of IIQ
+- [Data Collection](https://youtu.be/4lqTGPH96kI)
+- [Business Modeling](https://youtu.be/y4mHd12xRP4)
+- [Governance and Provisioning](https://youtu.be/ER2kgz5pTVM)
 
 ## Configuration
 1. Global Setting
 - [IdentityIQ Configuration](https://youtu.be/Fft0kpBMKB0?si=hARzqojDfSXLvldE)
 - [Identity Mapping](https://youtu.be/V8U3SL72mLo?si=YwQUqWRj9jt-b4jH)
-- [Quicklink](https://youtu.be/98jTMXuHlu0?si=mufI3zmCauRq1e3U)
+- [Quicklink](https://youtu.be/9MGJZDrKakA)
 - [Audit Config](https://youtu.be/_mkfWyRUbKI?si=l9xaKfDkqZThKkfo)
 - [Email Configurations](https://youtu.be/R-YRVRnDgSs?si=wAjrIGUXCCPAQQdq)
 
@@ -51,6 +57,9 @@
 ## [Forms](https://youtu.be/_iK5UJGm9W8?si=21ae6CZJOXNhUKDF)
 
 ## [Email Template](https://youtu.be/98jTMXuHlu0?si=mufI3zmCauRq1e3U)
+- [Trigger rule from emailtemplate](https://youtu.be/UWslvGSOQi4)
+- [Emailtemplate Example 1](https://youtu.be/mARXHpEsk4k)
+- [Emailtemplate Example 2](https://youtu.be/2Ji5sI1v8IU)
 
 ## [Application Onboarding](https://youtu.be/IrVGL7rF3-U?si=_6f9KOH19EC2HIu7)
 - [AD](https://youtu.be/dEGRE8ODaCE?si=LaLbwkbz8AmqzSuf)
@@ -61,9 +70,15 @@
 
 ## Business Processes (Workflows)
 - [Lifecycle Events](https://youtu.be/qdMKo_We4Oc?si=01LdPxyioGTQTJFE)
+	-[Joiner](https://youtu.be/vbBWX-cNlSw)
+	-[Leaver](https://youtu.be/933e-ZshN30
+	-[Rehire](https://youtu.be/YJSRmkpwov0)
 - [Important Workflow Objects](https://youtu.be/kIzzBAa0GEs?si=Jlc_u5qieumpxT7e)
 - [Triggering Workflows](https://youtu.be/8IHRflQmmCU?si=WgMu1lbrvgJa564X)
 - [Workflow Types](https://youtu.be/4dmzpjmC8YI?si=deEcb2fvQV30VX4L)
+- [Workflow part 1](https://youtu.be/LwofrY4GwMk)
+- [Workflow part 2](https://youtu.be/dLiij57bNzY)
+- [Workflow part 3](https://youtu.be/p28oWlE6qAo)
 
 ## IIQ Console
 - [IIQ Console Part 1](https://youtu.be/KDMxPXuIOWA?si=Wo2eFgR2B6RN5O4T)
@@ -77,24 +92,31 @@
 - [Workgroups](https://youtu.be/WhJalSOZ-88?si=_wP3T5_1z9J1CGPg)
 - Capabilities
 
-## [Roles](https://youtu.be/bRm_9LCV8hg?si=CwR-EDUh_JSVYF0X)
-- Types
-- Birthright Roles
+## Roles
+- [Roles Introduction](https://youtu.be/bRm_9LCV8hg?si=CwR-EDUh_JSVYF0X)
+- [Birthright Roles](https://youtu.be/IEJnqv7-V9Q)
 
 ## [Reports](https://youtu.be/CJQJPFwoRHU?si=MsCXfO_eqbeF9RFi)
+- [Report Example](https://youtu.be/jrMPMaTC7FQ)
+- [Report Definition](https://youtu.be/VE4XJoUNELc)
 
 ## Policy
 
 ## [Workitem](https://youtu.be/q2U2b0o0b1E?si=NPX91elAzhBjJlWA)
 
 ## [Certifications](https://youtu.be/WUZTVFwDA_k?si=I_2T9Oi2Xfqk5Uk2)
-- Phases of a Certification
+- [Phases of a Certification](https://youtu.be/9AXhF0XXRc8)
+- [Managed and Entitlement](https://youtu.be/O9X1Z0wlNIc)
 - Scheduling Certification
 
 ## [QuickLink](https://youtu.be/98jTMXuHlu0?si=mufI3zmCauRq1e3U)
+- [QuickLink Configuration]((https://youtu.be/9MGJZDrKakA)
 - DynamicScope
 
-## [Services Standard Deployment](https://youtu.be/0FyOApSSbZM?si=SrhctJs1HT6MVcyk)
+## Services Standard Deployment
+[SSB Introduction](https://youtu.be/0FyOApSSbZM?si=SrhctJs1HT6MVcyk)
+[SSB Build](https://youtu.be/JPrY2xE2WyE)
+
 
 ## [IdentityIQ REST API Integration](https://youtu.be/aJwBlzkN-Sw?si=7Cg4XAQyhyMTtW5f)
 
@@ -116,4 +138,7 @@
 - [Rule Reference](https://youtu.be/Pqfb0vyEXRI?si=133jgNse80cYd1g2)
 - [Provisioning Plan and Approval set](https://youtu.be/PmeJZkCPjFs?si=lDTqnaPDQPePZwJU)
 - [QueryOptions](https://youtu.be/3GMHrQIdbjs?si=yTLb6ttVKVR3bwlc)
+- [Execute rule from rule](https://youtu.be/Cy0ddd3wNRY)
+- [Audit using rule](https://youtu.be/FgYtc3pYpcQ)
+- [IIQ Classes](https://youtu.be/xTSHz-eXjig)
 
