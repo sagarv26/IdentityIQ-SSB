@@ -18,7 +18,7 @@
 
 ## Configuration
 1. Global Setting
-- [IdentityIQ Configuration](https://youtu.be/Fft0kpBMKB0?si=hARzqojDfSXLvldE)
+    - [IdentityIQ Configuration](https://youtu.be/Fft0kpBMKB0?si=hARzqojDfSXLvldE)
 - [Identity Mapping](https://youtu.be/V8U3SL72mLo?si=YwQUqWRj9jt-b4jH)
 - [Quicklink](https://youtu.be/9MGJZDrKakA)
 - [Audit Config](https://youtu.be/_mkfWyRUbKI?si=l9xaKfDkqZThKkfo)
@@ -70,9 +70,9 @@
 
 ## Business Processes (Workflows)
 - [Lifecycle Events](https://youtu.be/qdMKo_We4Oc?si=01LdPxyioGTQTJFE)
-    *[Joiner](https://youtu.be/vbBWX-cNlSw)
-    *[Leaver](https://youtu.be/933e-ZshN30)
-    *[Rehire](https://youtu.be/YJSRmkpwov0)
+    * [Joiner](https://youtu.be/vbBWX-cNlSw)
+    * [Leaver](https://youtu.be/933e-ZshN30)
+    * [Rehire](https://youtu.be/YJSRmkpwov0)
 - [Important Workflow Objects](https://youtu.be/kIzzBAa0GEs?si=Jlc_u5qieumpxT7e)
 - [Triggering Workflows](https://youtu.be/8IHRflQmmCU?si=WgMu1lbrvgJa564X)
 - [Workflow Types](https://youtu.be/4dmzpjmC8YI?si=deEcb2fvQV30VX4L)
@@ -110,12 +110,12 @@
 - Scheduling Certification
 
 ## [QuickLink](https://youtu.be/98jTMXuHlu0?si=mufI3zmCauRq1e3U)
-- [QuickLink Configuration]((https://youtu.be/9MGJZDrKakA)
+- [QuickLink Configuration](https://youtu.be/9MGJZDrKakA)
 - DynamicScope
 
 ## Services Standard Deployment
-[SSB Introduction](https://youtu.be/0FyOApSSbZM?si=SrhctJs1HT6MVcyk)
-[SSB Build](https://youtu.be/JPrY2xE2WyE)
+- [SSB Introduction](https://youtu.be/0FyOApSSbZM?si=SrhctJs1HT6MVcyk)
+- [SSB Build](https://youtu.be/JPrY2xE2WyE)
 
 
 ## [IdentityIQ REST API Integration](https://youtu.be/aJwBlzkN-Sw?si=7Cg4XAQyhyMTtW5f)
