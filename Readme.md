@@ -1,7 +1,7 @@
 # [IdentityIQ]("https://youtu.be/5xfPh3xOXhA?si=uUrDglkoR33QWRr9")
 
 ## Setup
-[Installation]("https://youtu.be/mYI_Iax_OMY?si=H-rMKK3SfGrepZzf")
+[Installation](https://youtu.be/mYI_Iax_OMY?si=H-rMKK3SfGrepZzf)
 [Upgrading]("https://youtu.be/af62rh4lf-0?si=YNb8q09-GWf8TX79")
 [Patching]("https://youtu.be/7F_IP3P9gag?si=SktTsjK8kLdGmHsR")
 [eFix]("https://youtu.be/ngC1d81hFD4?si=XnfIlSEqwbVfN95p")
