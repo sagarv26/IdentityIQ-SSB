@@ -1,12 +1,12 @@
 # [IdentityIQ]("https://youtu.be/5xfPh3xOXhA?si=uUrDglkoR33QWRr9")
 
 ## Setup
-	[Installation]("https://youtu.be/mYI_Iax_OMY?si=H-rMKK3SfGrepZzf")
-	[Upgrading]("https://youtu.be/af62rh4lf-0?si=YNb8q09-GWf8TX79")
-	[Patching]("https://youtu.be/7F_IP3P9gag?si=SktTsjK8kLdGmHsR")
-	[eFix]("https://youtu.be/ngC1d81hFD4?si=XnfIlSEqwbVfN95p")
-	[IQService]("https://youtu.be/UPmkNqsZdow?si=2eCaM4NpJwTqC1bh")
-	[Connector Gateway]("https://youtu.be/9EJ3nXq3Jpw?si=bhh7USZeuv8ow-3K")
+[Installation]("https://youtu.be/mYI_Iax_OMY?si=H-rMKK3SfGrepZzf")
+[Upgrading]("https://youtu.be/af62rh4lf-0?si=YNb8q09-GWf8TX79")
+[Patching]("https://youtu.be/7F_IP3P9gag?si=SktTsjK8kLdGmHsR")
+[eFix]("https://youtu.be/ngC1d81hFD4?si=XnfIlSEqwbVfN95p")
+[IQService]("https://youtu.be/UPmkNqsZdow?si=2eCaM4NpJwTqC1bh")
+[Connector Gateway]("https://youtu.be/9EJ3nXq3Jpw?si=bhh7USZeuv8ow-3K")
 
 ## [IIQ Property Files]("https://youtu.be/zngeUNU9ekI?si=Hc6ljlH1JSfKJafB")
 
