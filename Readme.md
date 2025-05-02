@@ -70,9 +70,9 @@
 
 ## Business Processes (Workflows)
 - [Lifecycle Events](https://youtu.be/qdMKo_We4Oc?si=01LdPxyioGTQTJFE)
-	-[Joiner](https://youtu.be/vbBWX-cNlSw)
-	-[Leaver](https://youtu.be/933e-ZshN30
-	-[Rehire](https://youtu.be/YJSRmkpwov0)
+    *[Joiner](https://youtu.be/vbBWX-cNlSw)
+    *[Leaver](https://youtu.be/933e-ZshN30)
+    *[Rehire](https://youtu.be/YJSRmkpwov0)
 - [Important Workflow Objects](https://youtu.be/kIzzBAa0GEs?si=Jlc_u5qieumpxT7e)
 - [Triggering Workflows](https://youtu.be/8IHRflQmmCU?si=WgMu1lbrvgJa564X)
 - [Workflow Types](https://youtu.be/4dmzpjmC8YI?si=deEcb2fvQV30VX4L)
