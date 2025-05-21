@@ -1,4 +1,11 @@
-# [IdentityIQ](https://youtu.be/5xfPh3xOXhA?si=uUrDglkoR33QWRr9)
+# IdentityIQ
+- [What is Sailpoint?](https://youtu.be/5xfPh3xOXhA?si=uUrDglkoR33QWRr9)
+
+# Sailpoint IIQ Learnings
+- [Sailpoint IIQ Roadmap](https://youtu.be/WDFDZUh9gpY?si=gX80all768w_ukJD)
+- [Technologies and Concepts required](https://youtu.be/NazyQ36kGh8?si=62srIoykufWG2w9E)
+- [Basic PowerShell Commands](https://youtu.be/rygPWHhvgLs?si=RVZyfAkKfGUOb88L)
+- [Basic Unix Commands](https://youtu.be/IG2Bj7v1NVI?si=4X13aPmZRRGV3bu3)
 
 ## Setup
 - [Installation](https://youtu.be/mYI_Iax_OMY?si=H-rMKK3SfGrepZzf)
@@ -9,14 +16,16 @@
 - [Connector Gateway](https://youtu.be/9EJ3nXq3Jpw?si=bhh7USZeuv8ow-3K)
 - [Eclipse Configuration](https://youtu.be/YIO0F-W2geI)
 
-## [IIQ Property Files](https://youtu.be/zngeUNU9ekI?si=Hc6ljlH1JSfKJafB)
-
 ## Basics of IIQ
 - [Data Collection](https://youtu.be/4lqTGPH96kI)
 - [Business Modeling](https://youtu.be/y4mHd12xRP4)
 - [Governance and Provisioning](https://youtu.be/ER2kgz5pTVM)
 
 ## Configuration
+- [IIQ Property Files](https://youtu.be/zngeUNU9ekI?si=Hc6ljlH1JSfKJafB)
+
+- [Logger](https://youtu.be/mCAYomTBUp8?si=dScQAFLUDHtZKc52)
+
 - Global Setting
     - [IdentityIQ Configuration](https://youtu.be/Fft0kpBMKB0?si=hARzqojDfSXLvldE)
     - [Identity Mapping](https://youtu.be/V8U3SL72mLo?si=YwQUqWRj9jt-b4jH)
@@ -32,7 +41,8 @@
 
 ## [Advance Analytics](https://youtu.be/2NIYeHjDKLM?si=1otOoMrvuA2Iwxgm)
 
-## [Tasks](https://youtu.be/MC8WvbTtOwY)
+## Tasks
+- [What is Tasks?](https://youtu.be/MC8WvbTtOwY)
 - [Aggregation](https://youtu.be/2_gFCbf-fQ0?si=3LJiWLrFIlfnmIQE)
 - [Identity Refresh](https://youtu.be/xXUZOdUuimM?si=YoCWGr9y5ziqN43g)
 - Perform Maintenance Task
@@ -52,21 +62,23 @@
 - [Task Completion Rule](https://youtu.be/bTOgrC0KcXk?si=FVO1RMEyZcnNNU0J)
 - [Powershell Rule](https://youtu.be/Pi-nsMQsUmE?si=-pegj0xCWtAcIWhf)
 
-## [Logger](https://youtu.be/mCAYomTBUp8?si=dScQAFLUDHtZKc52)
-
 ## [Forms](https://youtu.be/_iK5UJGm9W8?si=21ae6CZJOXNhUKDF)
 
-## [Email Template](https://youtu.be/98jTMXuHlu0?si=mufI3zmCauRq1e3U)
+## Email Template
+- [What is Email Template?](https://youtu.be/98jTMXuHlu0?si=mufI3zmCauRq1e3U)
 - [Trigger rule from emailtemplate](https://youtu.be/UWslvGSOQi4)
 - [Emailtemplate Example 1](https://youtu.be/mARXHpEsk4k)
 - [Emailtemplate Example 2](https://youtu.be/2Ji5sI1v8IU)
 
-## [Application Onboarding](https://youtu.be/IrVGL7rF3-U?si=_6f9KOH19EC2HIu7)
+## Application Onboarding
+- [Application Onboarding Process](https://youtu.be/IrVGL7rF3-U?si=_6f9KOH19EC2HIu7)
 - [AD](https://youtu.be/dEGRE8ODaCE?si=LaLbwkbz8AmqzSuf)
 - [Delimited File](https://youtu.be/yizsQLpSkUo?si=GFpqab-cOOc0nhQb)
 - [JDBC](https://youtu.be/HJtbTZnuTIY?si=wtPRUXca3969JKps)
 - [LDAP](https://youtu.be/3f0KRO7WRhw?si=0ZWutEIEHKUgQRc2)
-- [Webservice](https://youtu.be/BItZdVNrXX0?si=REVBPjiLHHUbWy_9)
+- Webservice
+	- [Webservice Basic](https://youtu.be/BItZdVNrXX0?si=REVBPjiLHHUbWy_9)
+	- [Webservice with Example](https://youtu.be/dgKG7xlmBlA?si=VUZuiL5wPAUhMmvm)
 
 ## Business Processes (Workflows)
 - [Lifecycle Events](https://youtu.be/qdMKo_We4Oc?si=01LdPxyioGTQTJFE)
@@ -126,7 +138,8 @@
 ## [Account Correlation](https://youtu.be/p4HzMUgPRcs?si=aIC-ax9q2XNRGZQk)
 
 
-## [BeanShell](https://youtu.be/NPkyzAqL9bU?si=7O6AJeje7ZBRaylu)
+## BeanShell
+- [BeanShell Complete Tutorial](https://youtu.be/NPkyzAqL9bU?si=7O6AJeje7ZBRaylu)
 - [Basic](https://youtu.be/H78Le3CEpxs?si=gvswYcJAyeKJR1rL)
 - [Error](https://youtu.be/PbfRPmxJAa8?si=662EIigO05-K2Fk4)
 - [Conditions and Loops](https://youtu.be/zU2_lO1KA94?si=8UEx7A_nnsp2ZMpj)

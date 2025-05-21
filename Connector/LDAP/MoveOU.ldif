@@ -1,0 +1,5 @@
+dn: cn=testgrp1,ou=groups,dc=example,dc=com
+changetype: moddn 
+newrdn: cn=testgrp1
+deleteoldrdn: 1
+newsuperior: ou=test,ou=groups,dc=example,dc=com

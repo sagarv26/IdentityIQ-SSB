@@ -1,0 +1,4 @@
+dn: cn=admins,ou=group,o=Company
+changetype: modify
+add: member
+member: uid=aaa0011,ou=user,o=Company

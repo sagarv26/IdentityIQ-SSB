@@ -1,0 +1,4 @@
+dn: cn=testgrp,ou=groups,dc=example,dc=com
+changetype: add
+objectClass: groupofuniquenames
+cn: testgrp
