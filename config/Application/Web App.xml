@@ -1,0 +1,422 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Application PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Application connector="sailpoint.connector.webservices.WebServicesConnector" featuresString="PROVISIONING, ENABLE, PASSWORD, AUTHENTICATE" name="Web App" profileClass="" type="Web Services">
+  <AccountCorrelationConfig>
+    <Reference class="sailpoint.object.CorrelationConfig" name="WebApp"/>
+  </AccountCorrelationConfig>
+  <Attributes>
+    <Map>
+      <entry key="acctAggregationEnd">
+        <value>
+          <Date>1747114757446</Date>
+        </value>
+      </entry>
+      <entry key="acctAggregationStart">
+        <value>
+          <Date>1747114750926</Date>
+        </value>
+      </entry>
+      <entry key="afterProvisioningRule"/>
+      <entry key="authenticationMethod" value="No Auth"/>
+      <entry key="beforeProvisioningRule"/>
+      <entry key="clientCertAuthEnabled">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="compositeDefinition"/>
+      <entry key="connectionParameters">
+        <value>
+          <List>
+            <Map>
+              <entry key="afterRule"/>
+              <entry key="beforeRule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="raw"/>
+                    <entry key="jsonBody"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="?action=getUsers"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="GET"/>
+              <entry key="operationType" value="Test Connection"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj"/>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath"/>
+              <entry key="sequenceNumberForEndpoint" value="1"/>
+              <entry key="uniqueNameForEndPoint" value="Test Connection"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+            <Map>
+              <entry key="afterRule"/>
+              <entry key="beforeRule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="raw"/>
+                    <entry key="jsonBody"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="?action=getUsers"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="GET"/>
+              <entry key="operationType" value="Account Aggregation"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj">
+                <value>
+                  <Map>
+                    <entry key="active" value="active"/>
+                    <entry key="email" value="email"/>
+                    <entry key="employeenumber" value="employeeId"/>
+                    <entry key="familyName" value="familyName"/>
+                    <entry key="fullName" value="fullName"/>
+                    <entry key="givenName" value="givenName"/>
+                    <entry key="group" value="group"/>
+                    <entry key="id" value="id"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath" value="$.user"/>
+              <entry key="sequenceNumberForEndpoint" value="2"/>
+              <entry key="uniqueNameForEndPoint" value="Account Aggregation"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+            <Map>
+              <entry key="afterRule" value="WebService Sample After Rule"/>
+              <entry key="beforeRule" value="Web Service Sample Before Rule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="formData"/>
+                    <entry key="jsonBody"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="?action=updateStatus&amp;id=$plan.nativeIdentity$&amp;active=false"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="POST"/>
+              <entry key="operationType" value="Disable Account"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj"/>
+              <entry key="rootPath"/>
+              <entry key="sequenceNumberForEndpoint" value="4"/>
+              <entry key="uniqueNameForEndPoint" value="Disable Account"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+            <Map>
+              <entry key="afterRule" value="WebService Sample After Rule"/>
+              <entry key="beforeRule" value="Web Service Sample Before Rule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="raw"/>
+                    <entry key="jsonBody"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="?action=addUser&amp;active=$plan.active$&amp;fullName=$plan.fullName$&amp;email=$plan.email$&amp;givenName=$plan.givenName$&amp;familyName=$plan.familyName$&amp;employeeId=$plan.employeenumber$&amp;id=$plan.nativeIdentity$"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="POST"/>
+              <entry key="operationType" value="Create Account"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj"/>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath"/>
+              <entry key="sequenceNumberForEndpoint" value="5"/>
+              <entry key="uniqueNameForEndPoint" value="Create Account"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+            <Map>
+              <entry key="afterRule"/>
+              <entry key="beforeRule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData">
+                      <value>
+                        <Map>
+                          <entry key="employeeId" value="$plan.nativeIdentity$"/>
+                          <entry key="group" value="Admin"/>
+                        </Map>
+                      </value>
+                    </entry>
+                    <entry key="bodyFormat" value="formData"/>
+                    <entry key="jsonBody"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="?action=updateUser&amp;id=$plan.nativeIdentity$&amp;group=$plan.group$"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="POST"/>
+              <entry key="operationType" value="Add Entitlement"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj"/>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath"/>
+              <entry key="sequenceNumberForEndpoint" value="6"/>
+              <entry key="uniqueNameForEndPoint" value="Add Entitlement"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+            <Map>
+              <entry key="afterRule"/>
+              <entry key="beforeRule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData">
+                      <value>
+                        <Map>
+                          <entry key="active" value="true"/>
+                          <entry key="employeeId" value="$plan.nativeIdentity$"/>
+                        </Map>
+                      </value>
+                    </entry>
+                    <entry key="bodyFormat" value="formData"/>
+                    <entry key="jsonBody"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="?action=updateStatus"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="POST"/>
+              <entry key="operationType" value="Enable Account"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj"/>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath"/>
+              <entry key="sequenceNumberForEndpoint" value="11"/>
+              <entry key="uniqueNameForEndPoint" value="Enable Account"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+          </List>
+        </value>
+      </entry>
+      <entry key="createAccountWithEntReq">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="enableHasMore" value="true"/>
+      <entry key="enableStatus"/>
+      <entry key="encrypted" value="accesstoken,refresh_token,oauth_token_info,client_secret,private_key,private_key_password,clientCertificate,clientKeySpec"/>
+      <entry key="genericWebServiceBaseUrl" value="https://script.google.com/macros/s/*******/exec"/>
+      <entry key="httpCookieSpecsStandard" value="true"/>
+      <entry key="isGetObjectRequiredForPTA">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="oAuthJwtHeader">
+        <value>
+          <Map>
+            <entry key="alg" value="RS256"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="oAuthJwtPayload">
+        <value>
+          <Map>
+            <entry key="aud"/>
+            <entry key="exp" value="15f"/>
+            <entry key="iss"/>
+            <entry key="sub"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="private_key_to_update"/>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="Web Services"/>
+      <entry key="throwProvBeforeRuleException">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="timeoutInSeconds"/>
+    </Map>
+  </Attributes>
+  <CustomizationRule>
+    <Reference class="sailpoint.object.Rule" name="WebService ResourceObject Custimization Rule"/>
+  </CustomizationRule>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <ProvisioningForms>
+    <Form name="WebService Create Provisioning Form" objectType="account" type="Create">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="WebService Create Provisioning Form"/>
+        </Map>
+      </Attributes>
+      <Section name="Create">
+        <Field displayName="email" name="email" required="true" type="string">
+          <Script>
+            <Source>return identity.getAttribute("email");</Source>
+          </Script>
+        </Field>
+        <Field displayName="familyName" name="familyName" required="true" type="string">
+          <Script>
+            <Source>return identity.getLastname();</Source>
+          </Script>
+        </Field>
+        <Field displayName="givenName" name="givenName" required="true" type="string">
+          <Script>
+            <Source> return identity.getAttribute("firstname");</Source>
+          </Script>
+        </Field>
+        <Field displayName="employeenumber" name="employeenumber" type="string">
+          <Script>
+            <Source>return identity.getAttribute("employeenumber");</Source>
+          </Script>
+        </Field>
+        <Field displayName="id" name="id" type="string">
+          <Script>
+            <Source>return identity.getAttribute("uid");</Source>
+          </Script>
+        </Field>
+        <Field displayName="fullName" name="fullName" required="true" type="string">
+          <Script>
+            <Source>return identity.getFirstname().toLowerCase() + " " + identity.getLastname().toLowerCase();</Source>
+          </Script>
+        </Field>
+        <Field displayName="group" name="group" required="true" type="string">
+          <Script>
+            <Source>return "User";</Source>
+          </Script>
+        </Field>
+        <Field displayName="active" name="active" required="true" type="string">
+          <Script>
+            <Source>return "true";</Source>
+          </Script>
+        </Field>
+      </Section>
+    </Form>
+  </ProvisioningForms>
+  <Schemas>
+    <Schema displayAttribute="id" identityAttribute="id" instanceAttribute="" nativeObjectType="user" objectType="account">
+      <AttributeDefinition name="id" type="string"/>
+      <AttributeDefinition name="fullName" type="string"/>
+      <AttributeDefinition name="givenName" type="string"/>
+      <AttributeDefinition name="familyName" type="string"/>
+      <AttributeDefinition entitlement="true" managed="true" name="group" schemaObjectType="group" type="string"/>
+      <AttributeDefinition name="email" type="string"/>
+      <AttributeDefinition name="employeenumber" type="string"/>
+      <AttributeDefinition name="active" type="string"/>
+    </Schema>
+    <Schema descriptionAttribute="" displayAttribute="" identityAttribute="" instanceAttribute="" nativeObjectType="group" objectType="group"/>
+  </Schemas>
+  <ApplicationScorecard/>
+</Application>

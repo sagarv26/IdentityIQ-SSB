@@ -1,0 +1,679 @@
+<Application connector="sailpoint.connector.webservices.WebServicesConnector" featuresString="PROVISIONING, ENABLE, PASSWORD, AUTHENTICATE" name="Webservice App" profileClass="" type="Web Services">
+  <Attributes>
+    <Map>
+      <entry key="afterProvisioningRule" value="WebService After Provisioning Rule"/>
+      <entry key="authenticationMethod" value="BasicLogin"/>
+      <entry key="beforeProvisioningRule" value="WebService Before Provisioning Rule"/>
+      <entry key="clientCertAuthEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="compositeDefinition"/>
+      <entry key="connectionParameters">
+        <value>
+          <List>
+            <Map>
+              <entry key="afterRule"/>
+              <entry key="beforeRule" value="WebService BeforeOperation rule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="raw"/>
+                    <entry key="jsonBody"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="/api/v1/scim/Users"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="GET"/>
+              <entry key="operationType" value="Test Connection"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj"/>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath"/>
+              <entry key="sequenceNumberForEndpoint" value="1"/>
+              <entry key="uniqueNameForEndPoint" value="Test Connection"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+            <Map>
+              <entry key="afterRule"/>
+              <entry key="beforeRule" value="WebService BeforeOperation rule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="raw"/>
+                    <entry key="jsonBody"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="/api/v1/scim/Users"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="GET"/>
+              <entry key="operationType" value="Account Aggregation"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj">
+                <value>
+                  <Map>
+                    <entry key="Group" value="groups[*].value"/>
+                    <entry key="active" value="active"/>
+                    <entry key="email" value="email"/>
+                    <entry key="emails.primary.value" value="emails[*].value"/>
+                    <entry key="familyName" value="familyName"/>
+                    <entry key="givenName" value="givenName"/>
+                    <entry key="id" value="id"/>
+                    <entry key="title" value="title"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath" value="$.Resources"/>
+              <entry key="sequenceNumberForEndpoint" value="2"/>
+              <entry key="uniqueNameForEndPoint" value="Account Aggregation"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+            <Map>
+              <entry key="afterRule"/>
+              <entry key="beforeRule" value="WebService BeforeOperation rule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="raw"/>
+                    <entry key="jsonBody"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="/api/v1/scim/$plan.nativeIdentity$"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="GET"/>
+              <entry key="operationType" value="Get Object"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj">
+                <value>
+                  <Map>
+                    <entry key="Group" value="groups[*].value"/>
+                    <entry key="active" value="active"/>
+                    <entry key="email" value="email"/>
+                    <entry key="emails.primary.value" value="emails[*].value"/>
+                    <entry key="familyName" value="name.familyName"/>
+                    <entry key="givenName" value="name.givenName"/>
+                    <entry key="id" value="id"/>
+                    <entry key="title" value="title"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath"/>
+              <entry key="sequenceNumberForEndpoint" value="3"/>
+              <entry key="uniqueNameForEndPoint" value="Get Single Identity"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+            <Map>
+              <entry key="afterRule"/>
+              <entry key="beforeRule" value="WebService BeforeOperation rule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="raw"/>
+                    <entry key="jsonBody" value="{&#xa;    &quot;schemas&quot;: [&#xa;        &quot;urn:ietf:params:scim:schemas:core:2.0:User&quot;&#xa;    ],&#xa;    &quot;emails&quot;: [&#xa;        {&#xa;            &quot;value&quot;: &quot;$plan.emails.primary.value$&quot;&#xa;        }&#xa;    ],&#xa;    &quot;name&quot;: {&#xa;        &quot;givenName&quot;: &quot;$plan.givenName$&quot;,&#xa;        &quot;familyName&quot;: &quot;$plan.familyName$&quot;&#xa;    },&#xa;    &quot;authType&quot;: &quot;no-access&quot;,&#xa;&quot;active&quot;: &quot;false&quot;&#xa;}"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="/api/v1/scim/$plan.nativeIdentity$"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="PUT"/>
+              <entry key="operationType" value="Disable Account"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj"/>
+              <entry key="rootPath"/>
+              <entry key="sequenceNumberForEndpoint" value="4"/>
+              <entry key="uniqueNameForEndPoint" value="Disable Account"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+            <Map>
+              <entry key="afterRule"/>
+              <entry key="beforeRule" value="WebService BeforeOperation rule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="raw"/>
+                    <entry key="jsonBody" value="{&#xd;&#xa;    &quot;schemas&quot;: [&#xd;&#xa;        &quot;urn:ietf:params:scim:schemas:core:2.0:User&quot;&#xd;&#xa;    ],&#xd;&#xa;    &quot;emails&quot;: [&#xd;&#xa;        {&#xd;&#xa;            &quot;value&quot;: &quot;$plan.emails.primary.value$&quot;&#xd;&#xa;        }&#xd;&#xa;    ],&#xd;&#xa;    &quot;name&quot;: {&#xd;&#xa;        &quot;givenName&quot;: &quot;$plan.givenName$&quot;,&#xd;&#xa;        &quot;familyName&quot;: &quot;$plan.familyName$&quot;&#xd;&#xa;    },&#xd;&#xa;&quot;title&quot;: &quot;$plan.title$&quot;&#xd;&#xa;}"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="/api/v1/scim/Users"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="POST"/>
+              <entry key="operationType" value="Create Account"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj">
+                <value>
+                  <Map>
+                    <entry key="Group" value="groups[*].value"/>
+                    <entry key="active" value="active"/>
+                    <entry key="email" value="email"/>
+                    <entry key="emails.primary.value" value="emails[*].value"/>
+                    <entry key="familyName" value="familyName"/>
+                    <entry key="givenName" value="givenName"/>
+                    <entry key="id" value="id"/>
+                    <entry key="title" value="title"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath"/>
+              <entry key="sequenceNumberForEndpoint" value="5"/>
+              <entry key="uniqueNameForEndPoint" value="Create Account"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+            <Map>
+              <entry key="afterRule"/>
+              <entry key="beforeRule" value="WebService BeforeOperation rule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="raw"/>
+                    <entry key="jsonBody"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="/api/v1/scim/Users/$plan.nativeIdentity$"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="GET"/>
+              <entry key="operationType" value="Add Entitlement"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj">
+                <value>
+                  <Map>
+                    <entry key="emails.primary.value" value="emails[*].value"/>
+                    <entry key="familyName" value="name.familyName"/>
+                    <entry key="givenName" value="name.givenName"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath"/>
+              <entry key="sequenceNumberForEndpoint" value="6"/>
+              <entry key="uniqueNameForEndPoint" value="Add Entitlement - GET Object"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+            <Map>
+              <entry key="afterRule"/>
+              <entry key="beforeRule" value="WebService BeforeOperation rule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="raw"/>
+                    <entry key="jsonBody" value="{&#xd;&#xa;   &quot;schemas&quot;: [&#xd;&#xa;        &quot;urn:ietf:params:scim:schemas:core:2.0:User&quot;&#xd;&#xa;    ],&#xd;&#xa;    &quot;emails&quot;: [&#xd;&#xa;        {&#xd;&#xa;            &quot;value&quot;: planemail&#xd;&#xa;        }&#xd;&#xa;    ],&#xd;&#xa;    &quot;name&quot;: {&#xd;&#xa;        &quot;givenName&quot;: plangiven,&#xd;&#xa;        &quot;familyName&quot;: planfamily&#xd;&#xa;    },&#xd;&#xa;&quot;title&quot;:&quot;$plan.title$&quot;,&#xd;&#xa;    &quot;authType&quot;: &quot;saml&quot;,&#xd;&#xa;&quot;group&quot;: &quot;$plan.Group$&quot;,&#xd;&#xa;&quot;active&quot;:true&#xd;&#xa;}"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="/api/v1/scim/$plan.nativeIdentity$"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="PUT"/>
+              <entry key="operationType" value="Add Entitlement"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj"/>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath"/>
+              <entry key="sequenceNumberForEndpoint" value="7"/>
+              <entry key="uniqueNameForEndPoint" value="Add Entitlement"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+            <Map>
+              <entry key="afterRule"/>
+              <entry key="beforeRule" value="WebService BeforeOperation rule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="raw"/>
+                    <entry key="jsonBody" value="{&#xa;    &quot;schemas&quot;: [&#xa;        &quot;urn:ietf:params:scim:schemas:core:2.0:User&quot;&#xa;    ],&#xa;    &quot;emails&quot;: [&#xa;        {&#xa;            &quot;value&quot;: &quot;$plan.emails.primary.value$&quot;&#xa;        }&#xa;    ],&#xa;    &quot;name&quot;: {&#xa;        &quot;givenName&quot;: &quot;$plan.givenName$&quot;,&#xa;        &quot;familyName&quot;: &quot;$plan.familyName$&quot;&#xa;    },&#xa;    &quot;authType&quot;: &quot;saml&quot;,&#xa;&quot;group&quot;: &quot;$plan.Group$&quot;,&#xa;&quot;title&quot;:&quot;$plan.title$&quot;&#xa;}"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="/api/v1/scim/$plan.nativeIdentity$"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="PUT"/>
+              <entry key="operationType" value="Update Account"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj"/>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath"/>
+              <entry key="sequenceNumberForEndpoint" value="8"/>
+              <entry key="uniqueNameForEndPoint" value="Update Account"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+            <Map>
+              <entry key="afterRule"/>
+              <entry key="beforeRule" value="WebService BeforeOperation rule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="raw"/>
+                    <entry key="jsonBody"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="/api/v1/scim/Users/$plan.nativeIdentity$"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="GET"/>
+              <entry key="operationType" value="Remove Entitlement"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj">
+                <value>
+                  <Map>
+                    <entry key="emails.primary.value" value="emails[*].value"/>
+                    <entry key="familyName" value="name.familyName"/>
+                    <entry key="givenName" value="name.givenName"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath"/>
+              <entry key="sequenceNumberForEndpoint" value="9"/>
+              <entry key="uniqueNameForEndPoint" value="Remove Entitlement - GET Object"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+            <Map>
+              <entry key="afterRule"/>
+              <entry key="beforeRule" value="WebService BeforeOperation rule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="raw"/>
+                    <entry key="jsonBody" value="{&#xa;    &quot;schemas&quot;: [&#xa;        &quot;urn:ietf:params:scim:schemas:core:2.0:User&quot;&#xa;    ],&#xa;    &quot;emails&quot;: [&#xa;        {&#xa;            &quot;value&quot;: &quot;planemail&quot;&#xa;        }&#xa;    ],&#xa;    &quot;name&quot;: {&#xa;        &quot;givenName&quot;: &quot;plangiven&quot;,&#xa;        &quot;familyName&quot;: &quot;planfamily&quot;&#xa;    },&#xa;    &quot;authType&quot;: &quot;no-access&quot;,&#xa;&quot;active&quot;: &quot;false&quot;&#xa;}"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="/api/v1/scim/Users/$plan.nativeIdentity$"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="PUT"/>
+              <entry key="operationType" value="Remove Entitlement"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj"/>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath"/>
+              <entry key="sequenceNumberForEndpoint" value="10"/>
+              <entry key="uniqueNameForEndPoint" value="Remove Access"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+            <Map>
+              <entry key="afterRule"/>
+              <entry key="beforeRule" value="WebService BeforeOperation rule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="raw"/>
+                    <entry key="jsonBody" value="{&#xd;&#xa;    &quot;schemas&quot;: [&#xd;&#xa;        &quot;urn:ietf:params:scim:schemas:core:2.0:User&quot;&#xd;&#xa;    ],&#xd;&#xa;    &quot;emails&quot;: [&#xd;&#xa;        {&#xd;&#xa;            &quot;value&quot;: &quot;$plan.emails.primary.value$&quot;&#xd;&#xa;        }&#xd;&#xa;    ],&#xd;&#xa;    &quot;name&quot;: {&#xd;&#xa;        &quot;givenName&quot;: &quot;$plan.givenName$&quot;,&#xd;&#xa;        &quot;familyName&quot;: &quot;$plan.familyName$&quot;&#xd;&#xa;    },&#xd;&#xa;    &quot;authType&quot;: &quot;saml&quot;,&#xd;&#xa;    &quot;group&quot;: &quot;$plan.group$&quot;&#xd;&#xa;}"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="/api/v1/scim/$plan.nativeIdentity$"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="PUT"/>
+              <entry key="operationType" value="Enable Account"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="resMappingObj"/>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath"/>
+              <entry key="sequenceNumberForEndpoint" value="11"/>
+              <entry key="uniqueNameForEndPoint" value="Enable Account"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+          </List>
+        </value>
+      </entry>
+      <entry key="createAccountWithEntReq">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="enableHasMore" value="true"/>
+      <entry key="enableStatus"/>
+      <entry key="encrypted" value="accesstoken,refresh_token,oauth_token_info,client_secret,private_key,private_key_password,clientCertificate,clientKeySpec"/>
+      <entry key="genericWebServiceBaseUrl" value="https://scriptingwithease.web.app/"/>
+      <entry key="httpCookieSpecsStandard" value="true"/>
+      <entry key="isGetObjectRequiredForPTA">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="oAuthJwtHeader">
+        <value>
+          <Map>
+            <entry key="alg" value="RS256"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="oAuthJwtPayload">
+        <value>
+          <Map>
+            <entry key="aud"/>
+            <entry key="exp" value="15f"/>
+            <entry key="iss"/>
+            <entry key="sub"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="password" value="1:ACP:e/pnNFCsw+/l2W54VvcJGR8fSmshJv3OfZ3YtseWzU0="/>
+      <entry key="private_key_to_update"/>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="Web Services"/>
+      <entry key="throwProvBeforeRuleException">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="timeoutInSeconds"/>
+      <entry key="username" value="username"/>
+    </Map>
+  </Attributes>
+  <CorrelationRule>
+    <Reference class="sailpoint.object.Rule" name="WebService Application Account Correlation Rule"/>
+  </CorrelationRule>
+  <CustomizationRule>
+    <Reference class="sailpoint.object.Rule" name="WebService ResourceObject Custimization Rule"/>
+  </CustomizationRule>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <ProvisioningForms>
+    <Form name="WebService Create Provisioning Form" objectType="account" type="Create">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="WebService Create Provisioning Form"/>
+        </Map>
+      </Attributes>
+      <Section name="Create">
+        <Field displayName="emails.primary.value" name="emails.primary.value" required="true" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="WebService Field Value Rule"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="familyName" name="familyName" required="true" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="WebService Field Value Rule"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="givenName" name="givenName" required="true" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="WebService Field Value Rule"/>
+          </RuleRef>
+        </Field>
+        <Field name="title" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="WebService Field Value Rule"/>
+          </RuleRef>
+        </Field>
+      </Section>
+    </Form>
+    <Form name="WebService Update Provisioning Form" objectType="account" type="Update">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="WebService Update Provisioning Form"/>
+        </Map>
+      </Attributes>
+      <Section name="Update">
+        <Field displayName="emails.primary.value" name="emails.primary.value" required="true" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="WebService Field Value Rule"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="familyName" name="familyName" required="true" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="WebService Field Value Rule"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="givenName" name="givenName" required="true" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="WebService Field Value Rule"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="title" name="title" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="WebService Field Value Rule"/>
+          </RuleRef>
+        </Field>
+      </Section>
+    </Form>
+    <Form name="WebService Disable Provisioning Form" objectType="account" type="Disable">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="WebService Disable Provisioning Form"/>
+        </Map>
+      </Attributes>
+      <Section name="Disable">
+        <Field displayName="active" name="active" type="string">
+          <Script>
+            <Source>return "false";</Source>
+          </Script>
+        </Field>
+      </Section>
+    </Form>
+  </ProvisioningForms>
+  <Schemas>
+    <Schema displayAttribute="email" identityAttribute="id" instanceAttribute="" nativeObjectType="user" objectType="account">
+      <AttributeDefinition name="id" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="emails.primary.value" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="givenName" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="familyName" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" managed="true" name="Group" schemaObjectType="group" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="email" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="title" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="active" type="string">
+        <Description/>
+      </AttributeDefinition>
+    </Schema>
+    <Schema descriptionAttribute="" displayAttribute="" identityAttribute="" instanceAttribute="" nativeObjectType="group" objectType="group"/>
+  </Schemas>
+  <ApplicationScorecard/>
+</Application>
