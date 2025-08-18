@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>  
+<!DOCTYPE Plugin PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Plugin certificationLevel="None" displayName="AccessRequestApprovalAddins"
+	minSystemVersion="7.3" name="AccessRequestApprovalAddins" version="2.1">
+	<Attributes>
+		<Map>
+			<entry key="minUpgradableVersion" value="1.0" />
+			<entry key="fullPage">
+				<value>
+					<FullPage title="AccessRequestApprovalAddins" />
+				</value>
+			</entry>
+			<entry key="restResources">
+				<value>
+		          <List>
+		            <String>AccessRequestApprovalAddins.swe.plugin.rest.AccessRequestApprovalAddinsUI</String>
+		          </List>
+        		</value>
+			</entry>
+
+			<entry key="settings">
+			</entry> 
+			 <entry key="snippets">
+                <value>
+                    <List> 
+                        <Snippet regexPattern=".*\/commonWorkItem\.?(jsf|xhtml)" rightRequired="">
+                            <Scripts> 
+                                 <String>ui/js/services/AccessRequestApprovalAddins.js</String>
+				 <String>ui/js/services/ADRequestProvFormAddins.js</String>
+				 <String>ui/js/main.js</String>
+                            </Scripts>
+                            <StyleSheets>
+                                <String>ui/css/AccessRequestApprovalAddins.css</String>
+                            </StyleSheets>
+                        </Snippet>
+			<Snippet regexPattern=".*\/identities\.?(jsf|xhtml)" rightRequired=""> 
+                            <Scripts> 
+				<String>ui/js/services/IdentityAccountsAddins.js</String>
+				<String>ui/js/services/ADAccountRequestPageAddins.js</String>
+				<String>ui/js/main.js</String>    
+                            </Scripts>
+                            <StyleSheets>
+                                <String>ui/css/AccessRequestApprovalAddins.css</String>
+                            </StyleSheets>
+                        </Snippet>
+			<Snippet regexPattern=".*\/accessRequest\.?(jsf|xhtml)" rightRequired=""> 
+                            <Scripts> 
+				<String>ui/js/services/ADAccessRequestPageAddins.js</String>
+                            </Scripts>
+                            <StyleSheets>
+                                <String>ui/css/AccessRequestApprovalAddins.css</String>
+                            </StyleSheets>
+                        </Snippet>    
+                    </List> 
+                </value>
+            </entry>
+		</Map>
+	</Attributes>
+</Plugin>  

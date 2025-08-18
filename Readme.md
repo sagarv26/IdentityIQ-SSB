@@ -3,6 +3,7 @@
 
 # Sailpoint IIQ Learnings
 - [Sailpoint IIQ Roadmap](https://youtu.be/WDFDZUh9gpY?si=gX80all768w_ukJD)
+- [Sailpoint IIQ Administrator Roadmap](https://youtu.be/HVfgqy-T3GY?si=NbdtOQcocUC0dUhw)
 - [Technologies and Concepts required](https://youtu.be/NazyQ36kGh8?si=62srIoykufWG2w9E)
 - [Basic PowerShell Commands](https://youtu.be/rygPWHhvgLs?si=RVZyfAkKfGUOb88L)
 - [Basic Unix Commands](https://youtu.be/IG2Bj7v1NVI?si=4X13aPmZRRGV3bu3)
@@ -17,6 +18,8 @@
 - [Eclipse Configuration](https://youtu.be/YIO0F-W2geI)
 
 ## Basics of IIQ
+- [How SailPoint Works?]()https://youtu.be/3hnOIsRWFxY
+- [UI walkthrough](https://youtu.be/eCZ_Q4Y-gkM)
 - [Data Collection](https://youtu.be/4lqTGPH96kI)
 - [Business Modeling](https://youtu.be/y4mHd12xRP4)
 - [Governance and Provisioning](https://youtu.be/ER2kgz5pTVM)

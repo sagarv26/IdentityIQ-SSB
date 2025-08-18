@@ -1,0 +1,303 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<Rule language="beanshell" name="SWE Certification Import File Decisions">
+<Description>
+      Rule to get certs data
+</Description>
+  <Signature>
+    <Inputs>
+      <Argument name="context">
+        <Description>
+            A sailpoint.api.SailPointContext object 
+          </Description>
+      </Argument>
+      <Argument name="log">
+        <Description>
+            The log object associated with the SailPointContext.
+          </Description>
+      </Argument>
+      <Argument name="result">
+        <Description>
+            result of task.
+          </Description>
+      </Argument>
+      <Argument name="config">
+        <Description>
+            Input config.
+          </Description>
+      </Argument>
+      <Argument name="ruleInputs">
+        <Description>
+            Input ruleInputs.
+          </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+    <Source>
+	   	import org.apache.commons.logging.Log;
+		import org.apache.commons.logging.LogFactory;
+		import java.util.ArrayList;
+		import java.util.Iterator;
+		import java.util.List;
+		import java.util.Arrays;
+
+		import sailpoint.api.SailPointContext; 
+		import sailpoint.object.Certification;
+		import sailpoint.object.Filter;
+		import sailpoint.object.QueryOptions;
+		import sailpoint.object.CertificationEntity;
+		import sailpoint.object.CertificationItem;
+		import sailpoint.object.Identity;
+		import sailpoint.object.EntitlementSnapshot;
+		import sailpoint.api.Certificationer;
+		import org.json.JSONArray;
+		import org.json.JSONException;
+		import org.json.JSONObject;
+		import sailpoint.object.AuditEvent;
+		import sailpoint.server.Auditor;
+		import sailpoint.object.Certification.CertificationStatistics;
+
+		Log log = LogFactory.getLog("com.SWE.certifications.SWECertificationRemoveItemsRule");
+	    Map resultMap=new HashMap();
+		
+	    log.debug("Enter SWE Custom Certs Get Data Rule" + ruleInputs);
+		int numberofitemsapproved=0;
+		int numberofitemsrevoked=0;
+		boolean certcompleted=false;
+		List successMessagesList = new ArrayList();
+		List errorsList = new ArrayList();
+		String certifier="";
+		String certid ="";
+		
+      if(null != ruleInputs)
+		{
+         log.info("Entering into postCertActions");
+         certid = (String) ruleInputs.get("certId");
+		 Certification certobj = context.getObjectById(sailpoint.object.Certification.class,certid);
+	     certifier = (String) ruleInputs.get("certifier");
+		 Identity certifierobj = context.getObjectByName(Identity.class, certifier);	
+		 Certificationer certificationer = new Certificationer(context);
+		 CertificationItem certitem=null;
+         log.debug("certid: " + certid);
+		 log.debug("certifier: " + certifier);
+	    if(null != certobj &amp;&amp; null != certifierobj &amp;&amp; null != ruleInputs.get("csvFileStr"))
+		{
+
+		
+		 JSONArray csvFilejsonArray = new JSONArray(ruleInputs.get("csvFileStr"));
+	    log.debug("csvFilejsonArray: " + csvFilejsonArray);
+		
+         for (int i=0; i&lt;csvFilejsonArray.length(); i++) 
+		{		 
+			JSONObject eachrowjson=csvFilejsonArray.getJSONObject(i);
+			log.debug("========Row Number: "+(i+1) + "====================");
+			log.debug("eachrowjson: " + eachrowjson);		 	
+			String itemid = eachrowjson.get("ItemId");		
+			String comments = eachrowjson.get("DecisionComments");		
+			String action = eachrowjson.get("Decision");		
+			log.debug("itemid: " + itemid);
+			log.debug("action: " + action);
+			log.debug("comments: " + comments);
+		 try
+			{
+			  				
+			  if(itemid!=null)
+			   {
+				certitem =context.getObjectById(CertificationItem.class, itemid);	
+				
+				if(null != certitem.getCertification() &amp;&amp; certitem.getCertification().getId().equalsIgnoreCase(certid))
+				{
+				
+				if(certitem.isDelegated())												
+				 certitem.revokeDelegation();
+		 
+			   if(action!=null &amp;&amp; (action.equalsIgnoreCase("approve") || action.equalsIgnoreCase("approved") || action.equalsIgnoreCase("certify") || action.equalsIgnoreCase("certified") || action.equalsIgnoreCase("reject") || action.equalsIgnoreCase("revoke") || action.equalsIgnoreCase("revoked") || action.equalsIgnoreCase("rejected")))
+				 {
+					String workItemId = null;
+					String RemediationAction=null;
+					String recipient=null;
+					
+					if(action.equalsIgnoreCase("approve") || action.equalsIgnoreCase("approved") || action.equalsIgnoreCase("certify") || action.equalsIgnoreCase("certified"))
+					{
+					  //if(null == comments || comments.isEmpty())
+					  comments=comments+" Note: Decisioned using File Upload Option";
+					  certitem.approve(context, certifierobj, workItemId, comments);
+					  numberofitemsapproved++;
+					}
+					else if(action.equalsIgnoreCase("reject") || action.equalsIgnoreCase("revoke") || action.equalsIgnoreCase("revoked") || action.equalsIgnoreCase("rejected"))
+					{
+					    //if(null == comments || comments.isEmpty())
+					    comments=comments+" Note: Decisioned using File Upload Option";
+						String certType=certitem.getType().toString();
+						if(null != certType &amp;&amp; certType.equalsIgnoreCase("Account"))
+						certitem.revokeAccount(context,certifierobj, workItemId, RemediationAction, recipient, "Item Revoked by Certifier using Decisions File Upload Option",comments);
+						else
+						certitem.remediate(context,certifierobj, workItemId, RemediationAction, recipient, "Item Revoked by Certifier using Decisions File Upload Option",comments,null, null);
+						numberofitemsrevoked++;
+                    }
+					// Save the item.
+					context.saveObject(certitem);
+					context.commitTransaction();
+
+					// Refresh the certification to get statistics, etc... updated.
+					certificationer = new Certificationer(context);
+					certificationer.refresh(certobj);
+					log.debug("Successfully Processed Item: " + itemid);
+				}//if approve or reject
+				
+				
+				successMessagesList.add("Successfully updated actions for itemId: "+ itemid);	
+				
+			 }
+			 else
+			 errorsList.add("itemId: "+itemid + " not in the Certification with certId: "+ certid);
+		   }
+		   else
+		   errorsList.add("itemId: "+itemid + " not found in the system");
+		}
+		catch (Exception e)
+							  {
+								  log.error("Error while Removing Item from Certification object: "+eachcertid + " Exception: " + e);		
+								  errorsList.add("Error while Removing Item from Certification object: "+eachcertid + " Exception: " + e);								  
+							  }	
+         
+
+       } 
+	   
+	      try
+			{
+	   
+	                 //signoff cert if its 100% completed
+	                  certificationer = new Certificationer(context);
+	                  certobj = context.getObjectById(sailpoint.object.Certification.class,certid);						  
+					  CertificationStatistics certstats=certobj.getStatistics();
+					  if(null != certstats)
+					   {
+						  resultMap.put("TotalItems",certstats.getTotalItems());
+						  resultMap.put("OpenItems",certstats.getOpenItems());
+						  resultMap.put("CompletedItems",certstats.getCompletedItems());
+					   }
+					  log.debug("certobj.getItemPercentComplete(): " + certobj.getItemPercentComplete());
+                      if(certobj.getItemPercentComplete()==100)
+                       {					  
+					      //certificationer.refresh(certobj);			 
+					      //certificationer.sign(certobj, certifierobj);
+						  successMessagesList.add("Successfully Completed Certification and Signed Off certId: " + certid);	
+						  certcompleted=true;						  
+					   }
+			 }
+	  catch (Exception e)
+							  {
+								  log.error("Exception while signing off the cert: "+eachcertid + " Exception: " + e);		
+								  								  
+							  }	
+				
+   }
+   else errorsList.add("Cert Object Not found or certifier object is null or file is empty: "+ certid);
+ }
+  else errorsList.add("rule input is null");
+  
+   log.debug("errorsList: " + errorsList);
+   
+  resultMap.put("numberofitemsapproved",numberofitemsapproved);
+  resultMap.put("numberofitemsrevoked",numberofitemsrevoked);
+  resultMap.put("isCertCompleted",certcompleted);
+  //resultMap.put("successMessagesList",successMessagesList);
+  //resultMap.put("errorsList",errorsList);		
+
+    try
+			{
+	
+	  AuditEvent event = new AuditEvent();
+	  event.setSource(certifier);
+	  event.setTarget(certid);
+	  event.setAction("Certification Decisions Import");  
+	  event.setString1("numberofitemsapproved: "+numberofitemsapproved + ", numberofitemsrevoked: "+numberofitemsrevoked);
+	  event.setString2("isCertCompleted: "+certcompleted);
+	  //event.setString3("successMessagesList: "+ successMessagesList.toString());	
+	  //event.setString4("errorsList: "+errorsList.toString());	
+	  context.saveObject(event);
+	  context.commitTransaction();
+	  Auditor.log(event);
+	  }
+	  catch (Exception e)
+							  {
+								  log.error("Error in SWE Custom Certs Get Data Rule while Auditing: "+eachcertid + " Exception: " + e);		
+								  								  
+							  }	
+	  
+	  log.debug("Exit SWE Custom Certs Get Data Rule resultMap: " + resultMap);
+   return resultMap;
+ 
+   </Source>
+</Rule>
+
+<Rule language="beanshell" name="SWE Certifications CBT Check Rule">
+<Description>
+      Rule to run cbt check
+</Description>
+ <ReferencedRules>
+    <!--Reference class="sailpoint.object.Rule"  name="SWE Approval Library"/>
+    <Reference class="sailpoint.object.Rule"  name="SWE Traxcess Lookahead Cache V2 Integration Rule Library"/>
+    <Reference class="sailpoint.object.Rule"  name="LCM Workflow Library"/>
+    <Reference class="sailpoint.object.Rule"  name="SWE Rule Library"/>
+    <Reference class="sailpoint.object.Rule"  name="SWE Temporary Access Provisioning Library"/>
+    <Reference class="sailpoint.object.Rule"  name="SWE Related Application Library"/>
+    <Reference class="sailpoint.object.Rule"  name="SWE Privileged AD Entitlement Rule Library"/>
+    <Reference class="sailpoint.object.Rule"  name="SWE Multiple Accounts - Single Entitlement SOD Validation Rule"/>
+    <Reference class="sailpoint.object.Rule"  name="SWE CyberArk Vault - Access Core Validation Rule"/-->	
+	<Reference class="sailpoint.object.Rule"  name="SWE User CBT Validation Rule"/>		
+  </ReferencedRules>
+  <Signature>
+    <Inputs>
+      <Argument name="context">
+        <Description>
+            A sailpoint.api.SailPointContext object 
+          </Description>
+      </Argument>
+      <Argument name="log">
+        <Description>
+            The log object associated with the SailPointContext.
+          </Description>
+      </Argument>
+      <Argument name="result">
+        <Description>
+            result of task.
+          </Description>
+      </Argument>
+      <Argument name="config">
+        <Description>
+            Input config.
+          </Description>
+      </Argument>
+	  <Argument name="identityName">
+        <Description>
+            identityName.
+          </Description>
+      </Argument>
+	   <Argument name="CertCBTString">
+        <Description>
+            CertCBTString.
+          </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+    <Source>
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+	import java.util.Map;
+	import java.util.HashMap;
+	
+	 log = LogFactory.getLog("com.SWE.SWEAccessTemplatesCBTCheckRule");
+     log.info("Entering into SWE Certifications CBT Check Rule");
+	 	
+	 Map creditMap = checkCBT(identityName, CertCBTString);
+	 boolean provideCredit = creditMap.get("provideCredit");
+	 log.info("creditMap: "+creditMap);
+
+    return provideCredit;
+ 
+   </Source>
+</Rule>
+</sailpoint>

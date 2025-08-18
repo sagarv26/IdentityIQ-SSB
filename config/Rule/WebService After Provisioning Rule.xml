@@ -1,0 +1,147 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="WebService After Provisioning Rule" type="AfterProvisioning">
+  <Description>An IdentityIQ server-side rule that is executed after the connector's provisioning method is called. This gives the customer the ability to customize or react to anything in the ProvisioningPlan AFTER it has been sent out to the specific applications. 
+
+    This rule will be called for any application found in a plan that also has a configured 'afterProvisioningRule' configured.</Description>
+  <Signature>
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="plan">
+        <Description>
+          The ProvisioningPlan object on its way to the Connector.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application object that references this before/after script.
+        </Description>
+      </Argument>
+      <Argument name="result">
+        <Description>
+          The ProvisioningResult object returned by the connectors provision method. This can be null and in many cases the connector will  not return a result and instead will annotate the plan's ProvisioningResult either at the plan or account level.        
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>
+ <![CDATA[ 
+	import org.apache.log4j.Logger;
+	import org.apache.log4j.Level;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+	import sailpoint.object.ProvisioningPlan;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	import sailpoint.object.Identity;
+	import sailpoint.connector.ConnectorException;
+	import sailpoint.tools.GeneralException;
+	import sailpoint.object.ResourceObject;
+	import sailpoint.object.TaskResult;
+	import sailpoint.api.Aggregator;
+	import sailpoint.api.SailPointContext;
+	import sailpoint.api.SailPointFactory;
+	import sailpoint.api.Aggregator;
+	import sailpoint.object.Link;
+	import sailpoint.object.Application;
+	import sailpoint.connector.Connector;
+	import sailpoint.connector.ConnectorException;
+	import sailpoint.object.Attributes;
+	import sailpoint.api.Aggregator;
+
+
+	Logger log = Logger.getLogger("webserviceWebServiceafterrule");
+	//log.setLevel((Level) Level.ERROR);
+	String appname = application.getName();
+
+	public static String identityAggregation(SailPointContext context,String applicationName,String distingushedName) throws ConnectorException, GeneralException{
+
+
+		String debugMessage = "";
+		String applicationName = applicationName;
+		String accountName = distingushedName;
+		log.debug("Doing after Single user Aggregation of WebService account: "+accountName);
+
+		Application appObject = context.getObjectByName(Application.class, applicationName);
+		String appConnName = appObject.getConnector();
+		log.debug("Application " + applicationName + " uses connector " + appConnName);
+		Connector appConnector = sailpoint.connector.ConnectorFactory.getConnector(appObject, null);
+
+		if (null == appConnector) {
+			debugMessage = "Failed to construct an instance of connector [" + appConnName + "]";
+			return debugMessage;
+		}
+
+		log.debug("Connector instantiated, calling getObject() to read account details...");
+		ResourceObject rObj = null;
+
+		try {
+			rObj = (ResourceObject) appConnector.getObject("account", accountName, null);
+		} catch (sailpoint.connector.ObjectNotFoundException onfe) {
+			debugMessage = "Connector could not find account: [" + accountName + "]";
+			debugMessage += " in application [" + applicationName + "]";
+			log.debug(debugMessage);
+			log.debug(onfe);
+			return debugMessage;
+		}
+		if (null == rObj) {
+			debugMessage = "debug: Could not get ResourceObject for account: " + accountName;
+			log.debug(debugMessage);
+			return debugMessage;
+		}
+
+		Attributes argMap = new Attributes();
+		argMap.put("promoteAttributes", "false");
+		argMap.put("correlateEntitlements", "false");
+		argMap.put("noOptimizeReaggregation", "true");
+		Aggregator agg = new Aggregator(context, argMap);
+
+		if (null == agg) {
+			debugMessage = "Null Aggregator returned from constructor. Unable to Aggregate!";
+			log.debug(debugMessage);
+			return debugMessage;
+		}
+
+		log.debug("Calling aggregate() method for WebService ");
+		TaskResult taskResult = agg.aggregate(appObject, rObj);
+		log.debug("aggregation complete.");
+
+		if (null == taskResult) {
+			debugMessage = "debug: Null taskResult returned from aggregate() call.";
+			log.debug(debugMessage);
+			return debugMessage;
+		}
+		return ("Success");
+
+	}
+
+	if(plan != null){
+		String identityName = plan.getNativeIdentity().toString();
+		Identity identity = context.getObjectByName(Identity.class, identityName);
+		List acctRequests = plan.getAccountRequests("WebService");
+		for(AccountRequest accountRequest:acctRequests ){
+			AccountRequest.Operation op = accountRequest.getOperation();
+			if(op == AccountRequest.Operation.Modify){
+				AttributeRequest group= accountRequest.getAttributeRequest("Group");      
+				if(group != null && group.getOperation() != null && group.getOperation().equals(ProvisioningPlan.Operation.Add))
+				{
+					log.debug("In modify Operation in after");
+					String auditid = accountRequest.getNativeIdentity();
+					if(auditid != null){
+						//DO AGGREGATION
+						identityAggregation(context,appname,auditid);}
+				}
+			}
+
+		}
+	}
+]]>  
+  </Source>
+</Rule>

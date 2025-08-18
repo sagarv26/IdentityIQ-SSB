@@ -1,0 +1,1815 @@
+
+
+.legend-header
+{
+	font-size: 14px;
+	font-weight: bold;
+}
+
+/* to hide the vertical scroll bar*/
+.data-table-full
+{
+	overflow-y: hidden;
+}
+
+.custcertslegend
+{
+	font-size: 12px;
+}
+#page-size-dropdown-toggle-menu-uiCertificationItemWorksheetColumns-DecisionsLeft
+{
+bottom: 50%;
+}
+.legend-Description
+{
+	display: inline-block;
+
+}
+.legend-access-priv
+{
+  background-color:#C0392B;
+  font-weight:bold;
+  color:white;
+   width: 190px;
+   height: 17px;
+   border-radius: 5px;
+    display: inline-block;
+  text-align: center;
+}
+.legend-access-cbt
+{
+  background-color:#1A5276;
+  font-weight:bold;
+  color:white;
+   width: 190px;
+   height: 17px;
+   border-radius: 5px;
+    display: inline-block;
+  text-align: center;
+}
+
+.legend-access-SharedMailBox
+{
+  background-color:#1A5276;
+  font-weight:bold;
+  color:white;
+   width: 190px;
+   height: 17px;
+   border-radius: 5px;
+    display: inline-block;
+  text-align: center;
+}
+.legend-customwarningicon
+{
+font-size: 20px;
+color: #f9c606;
+}
+.legend-stale-account
+{
+  background-color:#C0392B;
+  font-weight:bold;
+  color:white;
+   width: 190px;
+   height: 17px;
+   border-radius: 5px;
+    display: inline-block;
+  text-align: center;
+}
+.legend-less-stale-last-Used
+{
+	background-color:#F8CA51;
+	font-weight:bold;
+    color:black;
+   width: 190px;
+   height: 17px;
+   border-radius: 5px;
+    display: inline-block;
+  text-align: center;
+  border: 1px solid #E5E7E9;
+	
+}
+.legend-never-used
+{
+  background-color: white;
+  font-weight:bold;
+  color:black;
+   width: 190px;
+   height: 17px;
+   border-radius: 5px;
+    display: inline-block;
+  text-align: center;
+  border: 1px solid #E5E7E9;
+}
+.legend-plain-last-Used
+{
+  background-color: white;
+  font-weight:bold;
+  color:black;
+   width: 190px;
+   height: 17px;
+   border-radius: 5px;
+    display: inline-block;
+  text-align: center;
+  border: 1px solid #E5E7E9;
+}
+
+
+.legend-jobchange-violation
+{
+  background-color: #F8CA51;
+  font-weight:bold;
+  color:black;
+   width: 190px;
+   height: 17px;
+   border-radius: 5px;
+    display: inline-block;
+  text-align: center;
+}
+
+
+#lastcloneheadercolumn
+{
+	   vertical-align: middle !important;	 
+	   line-height: 40px;
+}
+#cloneheadercolumn
+{
+  vertical-align:middle	
+}
+#selectAllCheckbox
+{
+  vertical-align:middle	
+}
+#certstableheaderclone
+{
+  visibility: hidden;
+  position: fixed;
+  top: 0;
+  z-index: 2000 !important;
+  border-collapse: separate;
+}
+
+#certstableheaderclone thead
+{
+ visibility: visible;
+}
+
+/*  Approve Revoke button changes start */
+
+
+.btn.btn-white.btn-sm.icon-btn.m-r-xs.cert-action-Approved, .btn.btn-white.btn-sm.icon-btn.m-r-xs.customcert-action-Approved
+{
+  color: #145A32;
+  border: 1px solid #145A32;
+  border-radius: 3px;
+}
+
+
+ .btn.btn-white.btn-sm.icon-btn.m-r-xs.cert-action-Approved > i, .btn.btn-white.btn-sm.icon-btn.m-r-xs.customcert-action-Approved > i
+{
+  color: #145A32;
+}
+
+
+.btn.btn-white.btn-sm.icon-btn.m-r-xs.cert-action-Remediated, .btn.btn-white.btn-sm.icon-btn.m-r-xs.customcert-action-Remediated
+{
+  color: #C0392B;
+  border: 1px solid #C0392B;
+  border-radius: 3px;
+}
+
+.btn.btn-white.btn-sm.icon-btn.m-r-xs.cert-action-Remediated > i,.btn.btn-white.btn-sm.icon-btn.m-r-xs.customcert-action-Remediated > i
+{
+  color: #C0392B;
+}
+
+.btn.btn-white.btn-sm.icon-btn.m-r-xs.cert-action-RevokeAccount,.btn.btn-white.btn-sm.icon-btn.m-r-xs.customcert-action-RevokeAccount
+{
+  color: #C0392B;
+  border: 1px solid #C0392B;
+  border-radius: 3px;
+}
+
+.btn.btn-white.btn-sm.icon-btn.m-r-xs.cert-action-RevokeAccount > i,.btn.btn-white.btn-sm.icon-btn.m-r-xs.customcert-action-RevokeAccount > i
+{
+  color: #C0392B;
+}
+
+
+
+
+.normal-col.ng-scope.col-fixed-right.no-row-click .btn.btn-white.btn-sm.icon-btn.dropdown-toggle 
+{
+  border: 1px solid gray;
+  border-radius: 3px;
+  width: 62px;
+}
+
+/*
+.normal-col.ng-scope.col-fixed-right.no-row-click .btn.btn-white.btn-sm.icon-btn.dropdown-toggle  :after {
+  content: ' More';
+}
+*/
+.cert-action-column > .btn.btn-white.btn-sm.icon-btn.dropdown-toggle :after {
+	 content: ' More';
+}
+
+
+.cofcertapprovebutton
+{
+  border: 3px double green
+}
+
+
+
+/*  Approve Revoke button changes end */
+
+
+.feedbacklabel {
+  text-align: center;
+  color: #6E2C00;
+  font-weight: bold;
+  font-size: 15px;
+  margin-right:20px;
+  padding: 10px 0;
+}
+
+#cofcertsfeedbackdiv {
+  display: flex;
+  margin: 20px;
+  padding: 5px;
+  padding-bottom: 2px; 
+  padding-left: 18px;
+  margin: auto;
+  width: 600px;
+  height: 50px;
+  background-color: white;
+}
+
+.cofcertsfeedbackexcellentcls {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  margin-right:10px;
+
+}
+.cofcertsfeedbackaveragecls {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  margin-right:10px;
+
+}
+.cofcertsfeedbackbadcls {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+}
+.cofcertsfeedbackentercls {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  margin-right:15px;
+}
+
+.cofcertsfeedbackblurimg {
+  filter: grayscale(100%);
+}
+
+
+
+
+
+
+.cofcertsfeedbackexcellentdiv {
+  position: relative;
+  display: inline-block;
+  
+}
+
+/* Tooltip text */
+.cofcertsfeedbackexcellentdiv .excellenttool-tip  {
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.cofcertsfeedbackexcellentdiv .excellenttool-tip ::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.cofcertsfeedbackexcellentdiv:hover .excellenttool-tip  {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0.5s;
+}
+
+
+
+
+.cofcertsfeedbackaveragediv {
+  position: relative;
+  display: inline-block;
+  
+}
+
+/* Tooltip text */
+.cofcertsfeedbackaveragediv .averagetool-tip  {
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.cofcertsfeedbackaveragediv .averagetool-tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.cofcertsfeedbackaveragediv:hover .averagetool-tip  {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0.5s;
+}
+
+
+
+
+.cofcertsfeedbackbaddiv {
+  position: relative;
+  display: inline-block;
+  
+}
+
+/* Tooltip text */
+.cofcertsfeedbackbaddiv .badtool-tip  {
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.cofcertsfeedbackbaddiv .badtool-tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.cofcertsfeedbackbaddiv:hover .badtool-tip  {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0.5s;
+}
+
+
+
+
+.cofcertsfeedbackenterdiv {
+  position: relative;
+  display: inline-block;
+  
+}
+
+/* Tooltip text */
+.cofcertsfeedbackenterdiv .enterfeedbacktool-tip  {
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.cofcertsfeedbackenterdiv .enterfeedbacktool-tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.cofcertsfeedbackenterdiv:hover .enterfeedbacktool-tip  {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0.5s;
+}
+
+
+
+
+
+
+.clearfix:after {
+    content: "" !important;
+    display: table !important;
+    clear: both !important;
+}
+
+
+.cofcertsexpand-all, .cofcertscollapse-all {
+  background: #2874A6;
+  border-radius: 7px;
+  color: #fff;
+  font-size: 24px;
+  padding-left: 5px;
+  padding-right: 5px;
+  text-align: center;
+  cursor: pointer;
+  margin-right: 4px;
+}
+.cofexpcollsymbolsection
+{
+  background: #2874A6;
+  border-radius: 7px;
+  color: #fff;
+  font-size: 24px;
+  padding-left: 5px;
+  padding-right: 5px;
+  text-align: center;
+  cursor: pointer;
+  top: 5px;
+  margin-right: 4px;
+  margin-bottom: 6px;
+}
+.cofexpcollsymbol, .cofexpcollsymbol2 {
+
+}
+  
+	
+/*
+.cofexpcollsymbol:before, .cofexpcollsymbol2:before {
+  background: #2874A6;
+  border-radius: 7px;
+  color: #fff;
+  font-size: 25px;
+  margin: 0px 3px 0 0;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: center;
+  cursor: pointer;
+}
+
+
+.access-priv
+{
+  background-color:#C0392B;
+  font-weight:bold;
+  color:white;
+   width: 190px;
+   height: 22px;
+   margin: 0px 5px;
+   border-radius: 5px;
+    display: flex;
+  text-align: center;
+  margin-bottom: 5px;
+}
+*/
+
+
+/*
+.access-details  {
+  border-radius: 0 0 10px 10px;
+  background-color: #ddd;
+  padding: 2px 6px;
+  margin: 0;
+  box-shadow: 3px 3px 4px black;
+  text-align: left;
+}
+*/
+.access-details  {
+  border-radius: 0 0 10px 10px;
+  background-color: white;
+  padding: 2px 6px;
+  margin: 2px;
+  box-shadow: 3px 3px 4px white;
+  text-align: left;
+  border-top: 0px solid #ccc;
+  font-size: 13px;
+  color: #717171;
+}
+
+.access-details{
+  display: none;
+}
+.dummy-access-priv, .dummy-last-login, .dummy-lastlogin-info
+{
+  display: none;
+}
+	
+.expcol-accessdesccls {
+  background-color:none;
+  margin-right:10px;
+}
+
+
+
+.customwarningicon
+{
+font-size: 20px;
+color: #f9c606;
+margin-left:10px;
+}
+
+
+/*
+.access-jobchange-violation {
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-bottom: 30px solid #f9c606;
+  margin-left:10px;
+     border-radius: 5px;
+    display: flex;
+  text-align: center;
+}
+
+.access-jobchange-violation-text
+{
+  font-weight:bold;
+  color:white;
+      display: flex;
+  text-align: center;
+}
+*/
+
+.access-priv, .access-npi, .access-pci, .access-cbt, .access-SharedMailBox, .stale-account-nocolor, .stale-account,.less-stale-account, .plain-last-Used, .access-jobchange-violation
+{
+  font-weight:bold;
+   width: 190px;  
+   margin: 2px 5px;
+   border-radius: 5px;
+    display: flex;
+  text-align: center;
+}
+
+.access-priv, .access-npi, .access-pci
+{
+  background-color:#C0392B;
+  color:white;
+}
+
+.access-cbt
+{
+  background-color:#1A5276;
+}
+
+.access-SharedMailBox
+{
+  background-color:#F8CA51; 
+  color:black;
+}
+
+.stale-account
+{
+  background-color:#C0392B;
+  color:white;
+}
+.less-stale-account
+{
+  background-color:#F8CA51;
+  color:black;
+}
+
+.stale-account-nocolor
+{
+   background-color: white; 
+  color:black;
+}
+
+.plain-last-Used
+{
+   background-color: white;
+  color:black;
+}
+.access-jobchange-violation
+{
+  background-color: #F8CA51;
+  color:black;
+}
+
+.role-details-nocolor
+{
+	 margin: 0px 5px;
+	   position: relative;
+  display: inline-block;
+}
+
+.access-priv, .access-npi, .access-pci, .access-cbt, .stale-account, .access-jobchange-violation, .stale-account-nocolor, .plain-last-Used, .access-SharedMailBox, .less-stale-account, .cofexpcollsymbolsection {
+  position: relative;
+  display: inline-block;
+}
+
+.access-priv-helptip, .access-cbt-helptip, .stale-account-helptip, .stale-account-nocolor-helptip, .access-jobchange-helptip, .plain-last-Used-helptip, .access-SharedMailBox-helptip {
+  visibility: hidden;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  left: 0%;
+  margin-left: -50%;
+}
+
+.access-jobchange-helptip {
+  min-width: 350px;
+}
+
+.access-priv-helptip
+{
+	width: 250px;
+}
+.access-cbt-helptip, .access-SharedMailBox-helptip {
+  min-width: 300px;
+}
+
+.stale-account-helptip {
+  min-width: 300px;
+}
+
+.stale-account-nocolor-helptip, .plain-last-Used-helptip {
+  min-width: 300px;
+}
+
+.access-priv:hover .access-priv-helptip, .access-npi:hover .access-npi-helptip, .access-pci:hover .access-pci-helptip, .access-cbt:hover .access-cbt-helptip,  .stale-account:hover .stale-account-helptip, 
+.access-jobchange-violation:hover .access-jobchange-helptip, .stale-account-nocolor:hover .stale-account-nocolor-helptip , .plain-last-Used:hover .plain-last-Used-helptip, .access-SharedMailBox:hover .access-SharedMailBox-helptip, .less-stale-account:hover .stale-account-helptip {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0.5s;
+}
+
+
+
+.access-npi .access-npi-helptip, .access-pci .access-pci-helptip  {
+  visibility: hidden;
+  width: 200px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  left: 50%;
+  margin-left: -60px;
+}
+
+
+
+/*
+.cofcertactualdescwithoutflags:before
+{
+	content: '\A';
+    white-space: pre;
+}
+*/
+
+.cofroleval1:after, .cofroleval2:after, .cofroleval3:after, .cofroleval4:after, .cofroleval5:after, .cofroleval6:after, .cofroleval7:after, .cofroleval8:after, .eachRoleAccessDetails:after  {
+    content: '\A';
+    white-space: pre;
+}
+
+.cofentval1:after, .cofentval2:after, .cofentval3:after, .cofentval4:after, .cofentval5:after, .cofentval6:after, .cofentval7:after, .cofentval8:after, .cofentvalred3:after, .cofentvalorange3:after, .cofoweremailclickVal:after {
+    content: '\A';
+    white-space: pre;
+}
+.cofentvalred3
+{
+  
+}
+.cofentvalorange3
+{
+  color: #DC7633;	
+  font-weight: bold; 
+}
+
+.cofrolelbl1, .cofrolelbl2, .cofrolelbl3, .cofrolelbl4, .cofrolelbl5, .cofrolelbl6, .cofrolelbl7, .cofrolelbl8 {
+
+}
+
+.cofentlbl1, .cofentlbl2, .cofentlbl3, .cofentlbl4, .cofentlbl5, .cofentlbl6, .cofentlbl7, .cofentlbl8 {
+  
+}
+
+/* Offline Certs File upload CSS */
+		
+		
+		
+.modal-header	{
+   text-align: center;
+}
+
+.offliceCertsProgress
+{
+ padding-left: 10px;
+}		
+		
+.offliceCerts.panel.m-b.panel-default.ng-scope, .spContentTitle, .cofcertsfileuploadstats, .cofofflineCertsValidation
+{
+text-align: left;
+}
+
+.instrsApprove
+{
+  font-weight: bold;
+}
+.instrsRevoke
+{
+  font-weight: bold;
+}
+
+.cofcertlastcol
+{
+font-weight: bold;
+color: #037DA1;
+}
+.cofcertlastlastcol
+{
+font-weight: bold;
+color: #037DA1;
+}
+
+
+
+.Universalfeedbacklabel {
+  text-align: center;
+  color: #717171;
+  font-weight: bold;
+  font-size: 15px;
+  margin-right:5px;
+  margin-top:3px;
+}
+
+	
+.feedbackpanel
+{
+text-align: left;
+}
+
+.cofcertsfeedbackdivUniversal,  .cofcertsfeedbackdivAfterUniversal {
+  unicode-bidi: bidi-override;
+  direction: rtl;
+ 
+  display: flex;
+
+  width: 175px;
+  height: 20px;  
+  margin-bottom:15px;  
+}
+
+
+
+
+
+
+/* Stars css*/
+
+.cofcertsfeedbackdivUniversal > span:hover:before,
+.cofcertsfeedbackdivUniversal > span:hover ~ span:before
+ {
+	color: #10a2ce;
+}
+
+
+
+
+
+
+.form-control.feedbackfields  > input
+{
+	margin: 0 10px 0 10px;
+	text-align: right;
+	width: 15px;
+	height: 15px;
+}	
+
+.feedbackquestions
+{
+ font-size: 15px;
+}
+
+.flagaccessinfoicon
+{
+margin-right: 5px;
+}
+
+
+.accessinfoicon
+{
+ font-size: 16px;
+ text-align: left;
+    width: 20px;
+ margin-right: 2px;
+}
+.legendicon
+{
+ margin-right: 8px;
+}
+.emailclickaccessinfoicon
+{
+	margin-right: 8px;
+	margin-left: 40px;
+ font-size: 14px;
+	color: #255f82;
+}
+.popupemailclickicon
+{
+  margin-right: 3px;
+  font-size: 14px;
+  color: #255f82;
+}
+
+.accessicon, .accessinfoicon
+{
+
+}
+
+.roledetailstablediv, .accessDescFeedbackTabdiv
+{
+	max-width: 100%;
+    max-height: 460px;
+    overflow:scroll;
+    word-wrap: break-word;
+}
+
+
+
+.roleDetailsaccess-priv
+{
+  background-color:#C0392B;
+  font-weight:bold;
+  color:white;
+   width: 70px;
+   height: 16px;
+   margin-left:10px;
+   border-radius: 5px;
+    display: inline-block;
+   text-align: center;
+   
+}
+
+.roleDetailsaccess-npi, .roleDetailsaccess-pci
+{
+ background-color:#C0392B;
+  font-weight:bold;
+  color:white;
+   width: 30px;
+   height: 16px;
+   margin-left:10px;
+   border-radius: 5px;
+    display: inline-block;
+  text-align: center;
+
+}
+
+.roleDetailsaccess-cbt
+{
+  background-color:#1A5276;
+  font-weight:bold;
+  color:white;
+   width: 30px;
+   height: 16px;
+   margin-left:10px;
+   border-radius: 5px;
+    display: inline-block;
+  text-align: center;
+
+}
+
+.cert-action-column
+{
+	float: left;
+}
+
+
+
+.feedbackfields
+{
+	display: block;
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555555;
+    background-color: #ffffff;
+    background-image: none;
+    border: 1px solid #d8dde5;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+
+/* The feedbackEachRadiocontainer */
+.feedbackEachRadiocontainer {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  font-size: 14px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default radio button */
+.feedbackEachRadiocontainer input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Create a custom radio button */
+.feedbackEachRadiocheckmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+  border-radius: 50%;
+}
+
+/* On mouse-over, add a grey background color */
+.feedbackEachRadiocontainer:hover input ~ .feedbackEachRadiocheckmark {
+  background-color: #ccc;
+}
+
+/* When the radio button is checked, add a blue background */
+.feedbackEachRadiocontainer input:checked ~ .feedbackEachRadiocheckmark {
+  background-color: #2196F3;
+}
+
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.feedbackEachRadiocheckmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the indicator (dot/circle) when checked */
+.feedbackEachRadiocontainer input:checked ~ .feedbackEachRadiocheckmark:after {
+  display: block;
+}
+
+/* Style the indicator (dot/circle) */
+.feedbackEachRadiocontainer .feedbackEachRadiocheckmark:after {
+ 	top: 9px;
+	left: 9px;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: white;
+}
+
+.startRatingReset
+{
+	margin-left: 20px;
+	border-radius: 5px;
+	font-weight: bold;
+}
+.cofcertsfeedbacklayoversection
+{
+/* horizontal align center span of div */
+	margin: 0 auto;
+	display: flex;
+}
+
+.customsurveySection
+{
+	margin: 0 auto;
+}
+.feedbackfields
+{
+	text-align: left;
+}
+.customsurveySection
+{
+	margin-top: 30px;
+}
+/* Stars css*/
+
+.cofcertsfeedbackdivLayoverUniversal > .cofStarSize:hover:before,
+.cofcertsfeedbackdivLayoverUniversal > .cofStarSize:hover ~ .cofStarSize:before
+ {
+	color: #10a2ce;
+}
+
+.cofStarSize {
+  font-size: 25px;
+  position: relative;
+  top: 3px;
+  margin: 0 auto;
+}
+.cofStarSize:hover {
+  color: #10a2ce;
+}
+.cofStarSizeSelected {
+  font-size: 25px;
+  position: relative;
+  top: 3px;
+  margin: 0 auto;
+  color: #10a2ce;
+}
+
+.cofStarSizeNoHover:hover {
+  color: black;
+}
+.cofStarSizeNoHover {
+  font-size: 25px;
+  position: relative;
+  top: 3px;
+  margin: 0 auto;
+  color: black;
+}
+
+ .cofcertsfeedbackdivLayoverUniversal, .cofcertsfeedbackdivAfterLayoverUniversal {
+  unicode-bidi: bidi-override;
+  direction: rtl;
+ 
+  display: flex;
+
+  width: 175px;
+  height: 20px;  
+  margin-bottom:15px;  
+}
+
+
+.cofcertactualdescwithflags:before
+{
+	content:"\a";
+    white-space: pre;
+}
+
+
+.cofcertDownloadInprogress, .accessDescFeedbackDownloadInprogress, .accessDescFeedbackChartLoadInprogress
+{
+	 display: none;
+}
+.cofcertDownloadInprogress, .accessDescFeedbackDownloadInprogress, .accessDescFeedbackChartLoadInprogress
+{
+   padding: 4px 0px;
+}
+
+
+
+#cofimportfiledecisions
+{
+  margin-left: 5px;
+}
+.customCertSysIDRevokeHeader
+{
+	font-weight: 500;
+	font-size: 25px;
+	text-align: left;
+}
+#systemIdCertsModalFooter
+{
+	text-align: center;
+	
+}
+.systemIdCertsModalApproveIcon, .systemIdCertsModalRevokeIcon
+{
+	font-size: 16px;
+	margin-right: 5px;
+}
+.customCertApproveModalLbl, .customCertRevokeModalLbl, .systemIdCertsModalApproveHelpLbl, .systemIdCertsModalRevokeHelpLbl
+{
+	font-size: 16px;
+	font-weight: bold;
+}
+.systemIdCertsModalApproveHelpLbl, .systemIdCertsModalRevokeHelpLbl
+{
+	margin-right: 10px;
+}
+.systemIdCertsModalApproveSection
+{
+	/*float: left;*/
+	margin-left: 50px; 
+}
+
+.systemIdCertsModalRevokeSection
+{
+	/*float: right;*/
+	margin-right: 50px; 
+}
+.systemIdCertsModalApproveHelpLbl::after{
+    content: "\a";
+    white-space: pre;
+}
+.systemIdCertsModalRevokeHelpLbl::after{
+    content: "\a";
+    white-space: pre;
+}
+.customCertRevokeOptionIcon
+{
+	color: #F39C12;
+	font-size:30px;
+}
+.btn.btn-white.btn-sm.icon-btn.m-r-xs.customCertimnotSureBtn
+{
+  color: #F39C12;
+  border: 1px solid #F39C12;
+  border-radius: 3px;
+}
+
+.customCertimnotSureLbl
+{
+	color: #F39C12;
+}
+
+ .customCertimnotSureBtn > i
+{
+  color: #F39C12;
+  font-weight: 500;
+}
+
+.btn.btn-white.btn-sm.icon-btn.m-r-xs.customCertimnotSureBtn.customCertimnotSureBtnClicked
+{
+    border-radius: 3px;
+    color: #ffffff;
+    color: #ffffff !important;
+    background-color: #F39C12;
+    border-color: #F39C12;
+}
+
+.btn.btn-white.btn-sm.icon-btn.m-r-xs.customCertimnotSureBtn.customCertimnotSureBtnClicked > .customCertimnotSureLbl
+{
+    color: #ffffff;
+    color: #ffffff !important;
+}
+
+button.customcert-action-action-Approved:not(.returned-item) i.fa:before, button.customcert-action-Approved:not(.returned-item) i.fa:before {
+    content: "\f164";
+
+}
+button.customcert-action-action-Remediated:not(.returned-item) i.fa:before, button.customcert-action-Remediated:not(.returned-item) i.fa:before {
+    content: "\f165";
+}
+button.customcert-action-action-Approved.cert-action-current-decision, button.customcert-action-Approved.cert-action-current-decision {
+    color: #ffffff;
+    color: #ffffff !important;
+    background-color: #00842b;
+    border-color: #00842b;
+}
+
+button.customcert-action-action-Remediated.cert-action-current-decision, button.customcert-action-Remediated.cert-action-current-decision {
+    color: #ffffff;
+    color: #ffffff !important;
+    background-color: #d42511;
+    border-color: #d42511;
+}
+button.customcert-action-action-RevokeAccount.cert-action-current-decision, button.customcert-action-RevokeAccount.cert-action-current-decision {
+    color: #ffffff;
+    color: #ffffff !important;
+    background-color: #d42511;
+    border-color: #d42511;
+}
+
+.customcert-action-Approved
+{
+	margin-bottom: 5px;
+}
+
+.cofcustDescFeedbackYesNo
+{
+  display: inline-block;
+}
+.cofcustDescFeedbackNoHover, .cofcustDescFeedbackYesSelected, .cofcustDescFeedbackNoSelected, .cofcustDescFeedbackSelected,  .cofcustDescFeedbackYes, .cofcustDescFeedbackNo
+{
+	  margin-left: 5px;
+}
+/*
+.cofcustDescFeedbackNoHover:active ~ .cofdescfeedbackafterclearlink {
+  color: red;
+}
+*/
+#cofcustomCertsBanner
+{
+	font-size: 16px;
+    font-weight: bold;
+	text-align: center;
+    margin-bottom: 15px;
+	color: #1B4683;
+	display: table;
+	text-align: center;
+	width: 100%;
+}
+.cofcustomCertsBannerIcon
+{
+ padding-right:10px;
+ font-size: 25px;
+  display: table-cell;
+  vertical-align: middle;
+  transform: rotate(-15deg);
+}
+.customCertsBannerText
+{
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.customCertsBannerTextClickable
+{
+  display: table-cell;
+  vertical-align: middle;
+  color:#F0F3F6;
+}
+
+.customCertsBannerTextRedClickable
+{
+  display: table-cell;
+  vertical-align: middle;
+  color:#EB260F;
+}
+.cofcustDescFeedbackNoHover, .cofcustDescFeedbackYes, .cofcustDescFeedbackNo
+{
+    border: white solid 1px;
+    box-shadow: 0px 0px 0px 2px #fff inset;
+ 
+    background-color:#A4A5A5;
+	font-weight:bold;
+	color:white;
+	padding-left: 10px;
+	padding-right: 10px;
+	min-width: 40px;
+	border-radius: 7px;
+	display: inline-block;
+	text-align: center;
+	font-size: 10px;
+}
+.cofcustDescFeedbackYesSelected, .cofcustDescFeedbackNoSelected,.cofcustDescFeedbackSelected
+{
+
+  border: #2874A6 solid 1px;
+  box-shadow: 0px 0px 0px 2px #fff inset;
+ 
+    background-color:#2874A6;
+	font-weight:bold;
+	color:white;
+    padding-left: 10px;
+	padding-right: 10px;
+	min-width: 40px;
+	border-radius: 7px;
+	display: inline-block;
+	text-align: center;
+	font-size: 10px;
+  
+}
+
+.cofcustDescFeedbackYes:hover, .cofcustDescFeedbackNo:hover {
+   
+     border: #92B8D2 solid 1px;
+	  background-color:#2874A6;
+ 
+}
+
+.cofcustDescFeedbackYes, .cofcustDescFeedbackNo
+{
+	  cursor: pointer;
+}
+
+	
+.cofcustDescFeedbackLayover
+{
+  unicode-bidi: bidi-override;
+  direction: rtl;
+ 
+  display: inline-block;
+  margin-left: 10px;
+  /*letter-spacing: 5px;*/
+ 
+}
+.cofdescfeedbackbeforelbl, .cofdescfeedbackafterlbl
+{
+	color: #717171;
+}
+.cofcustDescFeedbackNomouseDown
+{
+	
+	border: #2874A6 solid 1px;
+    box-shadow: 0px 0px 0px 2px #A9CCE3 inset;
+    background-color: #A9CCE3;
+	font-weight:bold;
+	color:white;
+	padding-left: 2px;
+	padding-right: 2px;
+	display: inline-block;
+	text-align: center;
+	font-size: 10px;
+	margin-left: 5px;
+}
+.cofdescfeedbackafterclearlink, .cofdescfeedbackafterclearlinknot-active
+{
+	/*margin-left: 5px;	
+	font-weight:bold;
+	font-size: 10px;
+	font-weight:bold;
+	color:#2874A6;
+	border-radius: 5px;
+    padding-left: 2px;
+	padding-right: 2px;
+	display: inline-block;
+	text-align: center;
+	*/
+	margin-left: 5px;	
+	font-size: 10px;
+	color:#2874A6;
+	font-weight:bold;
+	padding-left: 2px;
+	padding-right: 2px;
+	display: inline-block;
+	text-align: center;
+}
+
+
+.cofdescfeedbackafterclearlink:hover {
+   text-decoration: underline;  
+}
+.cofdescfeedbackafterclearlinknot-active
+{
+   pointer-events: none;
+  cursor: default;
+  text-decoration: none;
+  color: white;
+  -webkit-user-select: none; /* Safari */        
+-moz-user-select: none; /* Firefox */
+-ms-user-select: none; /* IE10+/Edge */
+user-select: none; /* Standard */
+}
+.cofcustDescFeedbackLayover > .cofdescStarSize:hover:before,
+.cofcustDescFeedbackLayover > .cofdescStarSize:hover ~ .cofdescStarSize:before
+ {
+	color: #10a2ce;
+}
+
+.cofdescStarSize
+{
+  font-size: 15px;
+  position: relative;
+  margin: 0 auto;
+  color: grey;
+}
+
+.cofdescStarSizeNoHover:hover {
+  color: black;
+}
+.cofdescStarSizeNoHover {
+  font-size: 15px;
+  position: relative;
+  margin: 0 auto;
+}
+.cofdescStarSizeSelected {
+  font-size: 15px;
+  position: relative;
+  margin: 0 auto;
+  color: #10a2ce;
+}
+
+.cofcustDescFeedbackactionsmenu
+{
+  min-width: 300px !important;
+  right: 0;
+} 
+
+.cofcustDescFeedbackactionsmenu.dropdown-menu > li 
+{
+  color: #2874A6;
+} 
+/* The feedbackEachRadiocontainer */
+.cofcustDescFeedbackRadiocontainer {
+  display: block;
+  position: relative;
+  padding-left: 25px;
+  margin-top: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  margin-left:5px;
+}
+
+.cofcustDescFeedbackDropDownTitle 
+{
+	font-size: 15px;
+    font-weight: bold;
+    padding: 3px;
+    color: #717171;
+    margin: 10px 0 10px 0;
+}
+
+/* Hide the browser's default radio button */
+.cofcustDescFeedbackRadiocontainer input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Create a custom radio button */
+.cofcustDescFeedbackRadiocheckmark, .cofcustDescFeedbackRadiocheckmark-checked {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: #eee;
+  border-radius: 50%;
+}
+
+.cofcustDescFeedbackRadiocontainer ~ .cofcustDescFeedbackRadiocheckmark-checked:after {
+  display: block;
+}
+
+.cofcustDescFeedbackRadiocheckmark-checked {
+	background-color: #2196F3;
+}
+
+/* On mouse-over, add a grey background color */
+.cofcustDescFeedbackRadiocontainer:hover .cofcustDescFeedbackRadiocheckmark {
+  background-color: #ccc;
+}
+
+
+/* On mouse-over, add a grey background color */
+.cofcustDescFeedbackRadiocontainer:hover .cofcustDescFeedbackRadiocheckmark-checked {
+  background-color: #2196F3;
+}
+
+/* Style the indicator (dot/circle) */
+span.cofcustDescFeedbackRadiocheckmark-checked:before {
+    top: 6px;
+    left: 6px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+    content: "";
+    position: absolute;
+}
+
+/* On mouse-over, add a grey background color */
+.cofcustDescFeedbackRadiocontainer:hover input ~ .cofcustDescFeedbackRadiocheckmark {
+  background-color: #ccc;
+}
+
+/* When the radio button is checked, add a blue background */
+.cofcustDescFeedbackRadiocontainer input:checked ~ .cofcustDescFeedbackRadiocheckmark {
+  background-color: #2196F3;
+}
+
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.cofcustDescFeedbackRadiocheckmark:after, .cofcustDescFeedbackRadiocheckmark-checked:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the indicator (dot/circle) when checked */
+.cofcustDescFeedbackRadiocontainer input:checked ~ .cofcustDescFeedbackRadiocheckmark:after {
+  display: block;
+}
+
+/* Style the indicator (dot/circle) */
+.cofcustDescFeedbackRadiocontainer .cofcustDescFeedbackRadiocheckmark:after, .cofcustDescFeedbackRadiocontainer ~ .cofcustDescFeedbackRadiocheckmark-checked:after{
+ 	top: 6px;
+	left: 6px;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: white;
+}
+.cofoweremailclickVal > a, .eachRoleAccessDetails > a
+{
+	color: #2874A6 !important;
+}
+.cofoweremailclickVal:hover, .eachRoleAccessDetails:hover
+{
+	text-decoration: underline;
+}
+.cofcertactualdescwithoutflags {
+    position: relative;
+}
+/*
+
+.cofcustDescExistingstar_rating {
+  position: relative;
+  display: inline-block;
+  margin-left: 10px;
+  
+}
+  .cofcustDescExistingstar_rating:before {
+    display:block;
+    font-size:14px;
+    top:0;
+    left:0;
+    font-family: FontAwesome;
+    content: "\f005\f005\f005\f005\f005";
+    color: #818181;
+    text-shadow: 0 2px darken(#818181,20%);
+    padding-left:5px;
+  }
+  .cofcustDescExistingstar_rating > span {
+    position:absolute;
+    top:0;
+    left:0;
+    height:100%;
+    display:block;
+    overflow:hidden;
+  }
+    .cofcustDescExistingstar_rating > span:before{
+      font-size:14px;
+      font-family: FontAwesome;
+      color: #ffbb00;
+      position: absolute;
+      left: 0;
+      top:0;
+      content:"\f005\f005\f005\f005\f005";
+      text-shadow: 0 1px darken(#ffbb00, 20%);
+      display:block;
+      padding-left:5px;
+    }
+  }
+}
+*/
+
+
+
+.accessdescfeedHelpfulbox, .accessdescfeedTechbox, .accessdescfeedMissingbox, .accessdescfeedBothbox
+{
+	width:12px;
+    height:15px;
+	display: inline-block;
+}
+.accessdescfeedHelpfulbox
+{
+    background:#51BE30;
+}
+.accessdescfeedTechbox
+{
+	background:#EFCE3B;
+}
+.accessdescfeedMissingbox
+{
+	background:#E0A56A;
+}
+.accessdescfeedBothbox
+{
+	background:#C869E1;
+}
+.accessdescfeedTechbox, .accessdescfeedMissingbox,.accessdescfeedBothbox
+{
+	margin-left: 15px;
+}
+.accessdescfeedHelpfullbl, .accessdescfeedTechlbl,.accessdescfeedMissinglbl,.accessdescfeedBothlbl
+{
+	margin-left: 5px;
+    font-style: italic;
+	font-size: 12px;
+	font-weight: bold;
+}
+#accessDescFeedbackPagination,#revocationConfirmationModalPagination {
+    float: right;
+    margin-right: 20px;
+}
+#accessDescFeedbackDownloadLink{
+	margin-left: 20px;
+	margin-bottom: 10px;
+}
+.accessdescCertFeedbackMyAssetsLink, .accessDescFeedbackmyassetslink {
+   text-decoration: underline; 
+   cursor: pointer;   
+}
+.accessDescFeedbackTabSection,.revocationConfirmationTabSection
+{
+	max-height: 350px;
+	overflow-y: scroll;
+	min-height: 350px;
+}
+.customCertsBannerTextPositingClickable
+{
+ color: #2022E7;
+ font-weight: bold; 
+}
+
+
+
+/*
+@media only screen and (max-width: 600px) {
+  sp-column-data {
+    display: none;
+  }
+}
+*/
+
+
+button.close.customsystemIdCertDecisionOptionsModalCloseBtn {
+    color: black;
+    font-size: 40px;
+}
+
+#revocationConfirmationTable > caption + thead > tr:first-child > th, #revocationConfirmationTable > colgroup + thead > tr:first-child > th, #revocationConfirmationTable > thead:first-child > tr:first-child > th, #revocationConfirmationTable > caption + thead > tr:first-child > td, #revocationConfirmationTable > colgroup + thead > tr:first-child > td, #revocationConfirmationTable > thead:first-child > tr:first-child > td  {
+    border-top: 2px solid #ebeff6;
+}
+
+	
+#revocationConfirmationTable
+{
+	border-collapse: separate;
+}
+
+.role-sunset-expiring
+{
+	color: #C0392B;
+	 font-size: 15px;
+}
+.role-sunset-expiring-Info
+{
+	color: #C0392B;
+}
+
+.role-sunset-expiring:before
+{
+	content: '\A';
+    white-space: pre;
+}
+
+
+
+.customsystemIdCertCompleteButton.fa.fa-spinner {
+    animation: customsystemIdCertCompleteButtonSpin 2s infinite linear;
+    -webkit-animation: customsystemIdCertCompleteButtonSpin2 2s infinite linear;
+}
+
+@keyframes customsystemIdCertCompleteButtonSpin {
+    from { transform: scale(1) rotate(0deg);}
+    to { transform: scale(1) rotate(360deg);}
+}
+
+@-webkit-keyframes customsystemIdCertCompleteButtonSpin2 {
+    from { -webkit-transform: rotate(0deg);}
+    to { -webkit-transform: rotate(360deg);}
+}
+.customsystemIdCertCompleteButton {
+    margin-right: 5px;
+}
+
+
+.cert-action-column > div > div .btn.btn-white.btn-sm.icon-btn.dropdown-toggle :after {
+	 content: ' More';
+}
+div#feedbackModalDialog {
+    z-index: 1051;
+}
+div#systemIdCertDecisionOptionsModal {
+    z-index: 1051;
+}
+
+span.ng-binding.ng-scope.cofCustTextHide {
+    user-select: none; /* supported by Chrome and Opera */
+   -webkit-user-select: none; /* Safari */
+   -khtml-user-select: none; /* Konqueror HTML */
+   -moz-user-select: none; /* Firefox */
+   -ms-user-select: none; /* Internet Explorer/Edge */
+color:transparent;
+}
+
+
+/* self certify styles start */
+.entOwnerCertSelfReviewSection
+{
+	margin-right: 2px;
+}
+span.fa.fa-exclamation-circle.entOwnerCertSelfReviewItem {
+    font-size: 18px;
+    color: red;
+}
+.entOwnerCertSelfReviewSection
+{
+  position: relative;
+  display: inline-block;
+}
+.entOwnerCertSelfReviewItem-helptip {
+  visibility: hidden;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  left: 0%;
+  margin-left: -750%;
+}
+
+.entOwnerCertSelfReviewItem-helptip {
+    width: 300px;
+}
+
+ .entOwnerCertSelfReviewSection:hover .entOwnerCertSelfReviewItem-helptip {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0.5s;
+}
+/* self certify styles end */

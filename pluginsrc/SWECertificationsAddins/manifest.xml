@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Plugin PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Plugin certificationLevel="None" rightRequired="" displayName="SWE Certifications Addins" minSystemVersion="7.1" name="SWECertificationsAddins" version="2.2">
+  <Attributes>
+    <Map>
+      <entry key="minUpgradableVersion" value="1.0" />
+      <entry key="fullPage">
+        <value>
+          <FullPage title="SWE Certifications Addins" />
+        </value>
+      </entry>
+      <entry key="restResources">
+        <value>
+          <List>
+            <String>swe.plugin.rest.sweCustomCertificationsPluginAddins</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="serviceExecutors">
+        <value>
+          <List>
+          </List>
+        </value>
+      </entry>
+      <entry key="settings">
+        <value>
+          <List>
+    		<Setting dataType="string" helpText="The default name for this plugin" label="Default Name" name="defaultName" defaultValue="SWECertificationsAddins"/>
+
+          </List>
+        </value>
+      </entry>
+	  <entry key="snippets">  
+        <value>  
+          <List>  
+            <Snippet regexPattern=".*\/certification\.?(jsf|xhtml)" rightRequired="">  
+              <Scripts>  
+                <String>ui/js/swecertpages.js</String> 
+                <String>ui/js/googleapisangular.js</String>	
+				<String>ui/js/jquery.twbsPagination.min.js</String>
+                <String>ui/js/tableHeadFixer.js</String>							
+              </Scripts>  
+              <StyleSheets>  
+                <String>ui/css/swecertstyles.css</String> 				
+              </StyleSheets>  			  
+            </Snippet>  
+			<!--Snippet regexPattern=".*\/worksheet\.?(jsf|xhtml)" rightRequired="">  
+              <Scripts>  
+                <String>ui/js/test/othercerts.js</String>  
+              </Scripts>  
+              <StyleSheets>  
+                <String>ui/css/test.css</String>  
+              </StyleSheets>  
+            </Snippet-->  			
+          </List>  
+        </value>  
+      </entry>  
+    </Map>
+  </Attributes>
+</Plugin>
+

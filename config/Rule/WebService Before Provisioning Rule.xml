@@ -1,0 +1,163 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="WebService Before Provisioning Rule" type="BeforeProvisioning">
+  <Description>An IdentityIQ server-side rule that is executed before the connector's provisioning method is called. This gives the customer the ability to customize or react to anything in the ProvisioningPlan BEFORE it is sent to the underlying connectors used in provisioning. 
+
+This rule will be called for any application found in a plan that also has a configured 'beforeProvisioningRule' configured.  
+
+The plan can be updated directly in the rule by reference and does not need to return the plan.</Description>
+  <Signature>
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="plan">
+        <Description>
+          The ProvisioningPlan object on its way to the Connector.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application object that references this before/after script.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source>
+<![CDATA[  
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import sailpoint.object.ProvisioningPlan.AccountRequest;
+import sailpoint.object.ProvisioningPlan;
+import sailpoint.object.ProvisioningPlan.AttributeRequest;
+import sailpoint.object.Identity;
+import sailpoint.object.Application;
+import sailpoint.object.Link;
+import sailpoint.api.IdentityService;
+import sailpoint.object.Attributes;
+import sailpoint.tools.GeneralException;
+
+Log log = LogFactory.getLog("Rule.WebServiceBeforeProvisioningRule");
+
+String groupValueAudit = null;
+List groupValueList = new ArrayList();
+
+if(plan != null){
+    log.debug("plan before: " + plan);
+    log.debug("identityName" + plan.getNativeIdentity());
+
+    Identity identity = plan.getIdentity();
+    Link identityLink;
+	
+    String appName = application.getName();
+    log.debug("applicationName: " + appName);
+
+    List acctRequests = plan.getAccountRequests(appName);
+    log.debug("acctRequests: " + acctRequests);
+
+    for(AccountRequest accountRequest:acctRequests ){
+      AccountRequest.Operation op = accountRequest.getOperation();
+      log.debug("op: " + op);
+
+      try{
+        IdentityService is = new IdentityService(context);
+        if(identity!=null && appName != null) {
+          List idenLinks = is.getLinks(identity, application);
+          for (Link link : idenLinks) {
+            if (Util.nullSafeCaseInsensitiveEq(link.getNativeIdentity(), accountRequest.getNativeIdentity())) {
+              identityLink = link;
+            }
+          }
+        }
+      } catch (Exception e){
+        throw new GeneralException("WebService Before Provisioning Rule :: Error while getting link :: ",e);
+      }
+
+      AttributeRequest email = accountRequest.getAttributeRequest("emails.primary.value");
+      AttributeRequest givenName= accountRequest.getAttributeRequest("givenName");
+      AttributeRequest familyName= accountRequest.getAttributeRequest("familyName");
+      AttributeRequest group = accountRequest.getAttributeRequest("Group");
+
+      if(op == AccountRequest.Operation.Modify 
+         || op == AccountRequest.Operation.Disable 
+         || op == AccountRequest.Operation.Enable 
+         || op == AccountRequest.Operation.Delete){
+
+        log.debug("In Modify Operation***");
+        log.debug("email: " + email);
+        log.debug("givenName: " + givenName);
+        log.debug("familyName: " + familyName);
+        log.debug("group: " + group);
+      }
+
+      if(group != null && group.getOperation() != null && group.getOperation().equals(ProvisioningPlan.Operation.Remove))
+      {
+        accountRequest.setOperation(ProvisioningPlan.AccountRequest.Operation.Disable);
+      }
+
+      if(op == AccountRequest.Operation.Delete){
+        accountRequest.setOperation(ProvisioningPlan.AccountRequest.Operation.Disable);
+      }
+
+      if(op == AccountRequest.Operation.Enable){
+        if(group==null){
+          Attributes linkAttributes = identityLink.getAttributes();
+          groupValueList = linkAttributes.get("Group");
+          log.debug("groupValueList: " + groupValueList);
+          for (String grpEach : groupValueList){
+            if(grpEach != null) {
+              groupValueAudit = grpEach;
+              break;
+            }
+          }
+
+          AttributeRequest attrGrpRequest = new AttributeRequest("Group", ProvisioningPlan.Operation.Set, groupValueAudit);
+          accountRequest.add(attrGrpRequest);
+         }
+          else{
+          accountRequest.add(group);
+        }
+      }
+
+      log.debug("email: " + email);
+      log.debug("givenName:" + givenName);
+      log.debug("familyName: " + familyName);
+      log.debug("accountRequest: " + accountRequest);
+
+      AttributeRequest attreid = new AttributeRequest("username", ProvisioningPlan.Operation.Add, identity.getName());
+      accountRequest.add(attreid);
+
+      if(email == null)
+      {
+        log.debug("email is null***" + email);
+        AttributeRequest attremail = new AttributeRequest("emails.primary.value", ProvisioningPlan.Operation.Add, identity.getEmail());
+        accountRequest.add(attremail);
+      }
+
+      if(givenName== null)
+      {
+        log.debug("givenName***" + givenName);
+        AttributeRequest attrgivenName = new AttributeRequest("givenName", ProvisioningPlan.Operation.Add, identity.getLastname());
+        accountRequest.add(attrgivenName);
+      }
+
+      if(familyName== null)
+      {
+        log.debug("familyName***" + familyName);
+        AttributeRequest attrfamilyName = new AttributeRequest("familyName", ProvisioningPlan.Operation.Add, identity.getFirstname());
+        accountRequest.add(attrfamilyName );
+      }
+    }
+  }
+
+  log.debug("Plan modified: " + plan); 
+]]>
+</Source>
+</Rule>

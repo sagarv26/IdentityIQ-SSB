@@ -1,0 +1,248 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule name="WebService Field Value Rule" type="FieldValue">
+  <Description>This rule can be used to generate a field value (eg - an account name) using data from the given Identity. If this rule is run in the context of a workflow step then the arguments passed into the step will also be available. Also, any field values that have been processed so far from the policy related to the Application/Role will be available.</Description>
+  <Signature returnType="String">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity" type="Identity">
+        <Description>
+          The Identity object that represents the user needing the field value.
+        </Description>
+      </Argument>
+      <Argument name="link" type="Link">
+        <Description>
+          The sailpoint.object.Link that is being acted upon. If the link is not applicable,
+          this value will be null.
+        </Description>
+      </Argument>
+      <Argument name="group" type="ManagedAttribute">
+        <Description>
+          The sailpoint.object.ManagedAttribute that is being acted upon. If the managed attribute
+          is not applicable, the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="project" type="ProvisioningProject">
+        <Description>
+          The provisioning project being acted upon. If a provisioning project is not applicable,
+          the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="accountRequest" type="ProvisioningPlan.AccountRequest">
+        <Description>
+          The account request. If an account request is not applicable, the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="objectRequest" type="ProvisioningPlan.ObjectRequest">
+        <Description>
+          The object request. If an object request is not applicable, the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="role" type="Bundle">
+        <Description>
+          The role with the template we are compiling. If the role is
+          not applicable, the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="application" type="Application">
+        <Description>
+          The sailpont.object.Application with the template we are compiling. If the application
+          is not applicable, the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="template" type="Template">
+        <Description>
+          The Template that contains this field.
+        </Description>
+      </Argument>
+      <Argument name="field" type="Field">
+        <Description>
+          The current field being computed.
+        </Description>
+      </Argument>
+      <Argument name="current" type="Object">
+        <Description>
+          The current value corresponding to the identity or account attribute that the field represents.
+          If no current value is set, this value will be null.
+        </Description>
+      </Argument>
+      <Argument name="operation" type="ProvisioningPlan.Operation">
+        <Description>
+          The operation being performed.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="value">
+        <Description>
+          The string value created.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+<![CDATA[    
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import sailpoint.api.SailPointContext;
+import sailpoint.object.Application;
+import sailpoint.object.Custom;
+import sailpoint.object.Field;
+import sailpoint.object.Identity;
+import sailpoint.object.Form;
+import sailpoint.object.Link;
+import sailpoint.api.IdentityService;
+import sailpoint.object.ProvisioningProject;
+import sailpoint.object.ProvisioningPlan.AccountRequest;
+import sailpoint.object.ProvisioningPlan.AttributeRequest;
+import java.util.*;
+import sailpoint.tools.xml.XMLObjectFactory;
+
+Log log = LogFactory.getLog("com.FieldValueRule");
+log.debug("Enter rule Visa Online Field Value Rule");
+
+
+String FIELD_NAME_EMAIL="emails.primary.value";
+String FIELD_NAME_FNAME="givenName";
+String FIELD_NAME_LNAME="familyName";
+String FIELD_NAME_TITLE="title";
+String FIELD_NAME_DEPARTMENT="department";
+String FIELD_NAME_WORKADDRESS="location";
+
+
+String fieldName = field.getName();
+fieldName = fieldName.substring(fieldName.lastIndexOf(':') + 1);
+String returnString = "";
+
+boolean isSystemAccount = false;
+Identity managedByIdentity = null;
+//getting System Account
+String acctType = identity.getAttribute("AccountType");
+if ("System".equals(acctType)) {
+	isSystemAccount = true;
+	String eid=identity.getAttribute("ManagedBy");
+	managedByIdentity=context.getObjectByName(Identity.class,eid);
+
+} else {
+	isSystemAccount = false;
+}
+
+
+//EMAIL
+if (FIELD_NAME_EMAIL.equals(fieldName)) {
+	if(isSystemAccount){
+		if (managedByIdentity!=null && managedByIdentity.getEmail() != null) {
+			log.debug("Entering is System email"+managedByIdentity.getEmail());
+			returnString = managedByIdentity.getEmail();
+		}
+	}else{
+		if (identity.getEmail() != null) {
+			log.debug("Entering is email"+identity.getEmail());
+			returnString = identity.getEmail();
+
+		}
+	}
+
+}
+
+//First Name
+else if (FIELD_NAME_FNAME.equals(fieldName)) {
+	if(isSystemAccount){
+		if (managedByIdentity!=null && managedByIdentity.getFirstname() != null) {
+			log.debug("Entering is System First Name"+managedByIdentity.getFirstname());
+			returnString = managedByIdentity.getFirstname();
+		}
+	}else{
+		if (identity.getFirstname() != null) {
+			log.debug("Entering is Firstname"+identity.getFirstname());
+			returnString = identity.getFirstname();
+
+		}
+	}
+
+}
+
+//Last Name
+else if (FIELD_NAME_LNAME.equals(fieldName)) {
+	if(isSystemAccount){
+		if (managedByIdentity!=null && managedByIdentity.getLastname() != null) {
+			log.debug("Entering is System Lastname"+managedByIdentity.getLastname());
+			returnString = managedByIdentity.getLastname();
+		}
+	}else{
+		if (identity.getLastname() != null) {
+			log.debug("Entering is Lastname"+identity.getLastname());
+			returnString = identity.getLastname();
+
+		}
+	}
+
+}  
+
+//Department
+else if (FIELD_NAME_DEPARTMENT.equals(fieldName)) {
+	if(isSystemAccount){
+		if (managedByIdentity!=null && managedByIdentity.getAttribute("DeptIDDesc") != null) {
+			log.debug("Entering is System DeptIDDesc"+managedByIdentity.getAttribute("DeptIDDesc"));
+			returnString = managedByIdentity.getAttribute("DeptIDDesc");
+		}
+	}else{
+		if (identity.getAttribute("DeptIDDesc") != null) {
+			log.debug("Entering is DeptIDDesc"+identity.getAttribute("DeptIDDesc"));
+			returnString = identity.getAttribute("DeptIDDesc");
+
+		}
+	}
+
+}
+
+//Title
+else if (FIELD_NAME_TITLE.equals(fieldName)) {
+	if(isSystemAccount){
+		if (managedByIdentity!=null && managedByIdentity.getAttribute("Title") != null) {
+			log.debug("Entering is System Title"+managedByIdentity.getAttribute("Title"));
+			returnString = managedByIdentity.getAttribute("Title");
+		}
+	}else{
+		if (identity.getAttribute("Title") != null) {
+			log.debug("Entering is Title"+identity.getAttribute("Title"));
+			returnString = identity.getAttribute("Title");
+
+		}
+	}
+
+}
+
+
+//Workaddress
+else if (FIELD_NAME_WORKADDRESS.equals(fieldName)) {
+	if(isSystemAccount){
+		if (managedByIdentity!=null && managedByIdentity.getAttribute("SiteLocation") != null) {
+			log.debug("Entering is System SiteLocation"+managedByIdentity.getAttribute("SiteLocation"));
+			returnString = managedByIdentity.getAttribute("SiteLocation");
+		}
+	}else{
+		if (identity.getAttribute("SiteLocation") != null) {
+			log.debug("Entering is Lastname"+identity.getAttribute("SiteLocation"));
+			returnString = identity.getAttribute("SiteLocation");
+
+		}
+	}
+
+}
+
+
+
+return returnString;
+]]>
+  </Source>
+</Rule>

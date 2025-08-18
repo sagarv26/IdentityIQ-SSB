@@ -1,0 +1,71 @@
+ 
+ /* for workitem banner message */
+.workItemMessageBanner {
+  margin-top: 10px;
+  margin-bottom: 0px;
+  padding: 6px;
+  background-color: #eef2fa;
+  border: 1px solid #b8d2fa;
+  opacity: 0.83;
+  transition: opacity 0.6s;
+  color: #02628e;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: Optimist, Helvetica Neue, Helvetica, Arial, sans-serif;
+}
+
+
+/* for the AD provisioning form message banner */
+.provisioningFormMessageBanner {
+  margin-top: 0px;
+  margin-bottom: 4px;
+  padding: 6px;
+  background-color: #eef2fa;
+  border: 1px solid #b8d2fa;
+  /* opacity: 0.83; */
+  transition: opacity 0.6s;
+  color: #02628e;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: Optimist, Helvetica Neue, Helvetica, Arial, sans-serif;
+}
+
+.showADRequestProvFormAddin-HeaderLinkText{
+  text-decoration: underline;
+}
+
+
+/* for the manage accounts message banner */
+.identityAccountsMessageBanner{
+  margin-top: -10px;
+  margin-bottom: 4px;
+  padding: 6px;
+  background-color: #eef2fa;
+  border: 1px solid #b8d2fa;
+  /* opacity: 0.83; */
+  transition: opacity 0.6s;
+  color: #02628e;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: Optimist, Helvetica Neue, Helvetica, Arial, sans-serif;
+}
+
+
+/* for AD access request review page */
+.ADaccessRequestPageMessageBanner {
+  margin-top: 0px;
+  margin-bottom: 3px;
+  padding: 6px;
+  background-color: #fefeff; 
+  border: 1px solid #d7dce5; ;
+  /* opacity: 0.83; */
+  transition: opacity 0.6s;
+  color: #02628e;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: Optimist, Helvetica Neue, Helvetica, Arial, sans-serif;
+}

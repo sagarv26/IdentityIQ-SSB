@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<ImportAction name="merge">
+        <Configuration name="SystemConfiguration">
+            <Attributes>
+                <Map>
+                    <entry key='CertificationsPlugin'>
+                        <value>
+                            <Map>
+								 <entry key="Manager">
+									<value>
+									  <Map>
+									    <entry key="HidePreviousRevokesFlag" value ='true'/>
+										<entry key="ScrubTokens" value ='false'/>
+										<entry key="RemoveSelectEveryThingThreshold" value ='200'/>	
+										<entry key="ShowExpandCollapseAll" value ='true'/>	
+										<entry key="ShowFeedbackinSignoffPage" value ='true'/>		
+							            <entry key="ShowFixedHeader" value ='true'/>
+										<entry key="ShowFileDecisionsImport" value ='true'/>
+										<entry key="ShowCustomFileExport" value ='true'/>
+										<entry key="SystemIDCertDecisionOptions" value ='true'/>									
+										<entry key="fileDecisionsImportThreshold" value ='200'/>										
+										<entry key="Feedbackquestions">
+										 <value>
+										  <Map>
+											<entry key="question1">
+											  <value>
+												 <Map>
+												       <entry key="question" value ='Compared to the previous quarter, this quarters Certification was'/>
+													   <entry key="choice">
+														<value>
+														  <List>
+															<String>Easier to complete</String>
+															<String>More difficult to complete</String>
+															<String>Stayed the same</String>
+															<String>I didn't participate last quarter</String>
+														  </List>
+														</value>
+													  </entry>
+												 </Map>
+											  </value> 
+                                            </entry>											
+											<entry key="question2">
+											  <value>
+												 <Map>
+												       <entry key="question" value ='The Access descriptions are'/>
+													   <entry key="choice">
+														<value>
+														  <List>
+															<String>Getting better</String>
+															<String>Getting worse</String>
+															<String>Staying the same</String>
+														  </List>
+														</value>
+													  </entry>
+												 </Map>
+											  </value> 
+                                            </entry>	
+											<entry key="question3">
+											  <value>
+												 <Map>
+												       <entry key="question" value ='The time required to complete your certification was'/>
+													   <entry key="choice">
+														<value>
+														  <List>
+															<String>less than 5 minutes</String>
+															<String>5-30 minutes</String>
+															<String>30-60 minutes</String>
+															<String>More than 60 minutes</String>
+														  </List>
+														</value>
+													  </entry>
+												 </Map>
+											  </value> 
+                                            </entry>											
+										  </Map>
+										 </value>										
+										</entry>	
+                                        <entry key="ShowUncompletedCertCBTPopup" value ='false'/>
+										<entry key="CertCBTString" value ='ITM_B051995'/>	
+                                        <entry key="DescriptionsFeedback" value ='true'/>
+										<entry key="displayPrevalenceScores" value ='false'/>
+										<entry key="EntOwnerCertDecisionOptions" value ='false'/>											
+									  </Map>
+									</value>
+								  </entry>
+								   <entry key="DataOwner">
+									<value>
+									  <Map>
+										<!--entry key="RemoveSelectEveryThingOption" value ='2000'/>	
+										<entry key="ShowExpandAllButtonOption" value ='true'/-->					
+									  </Map>
+									</value>
+								  </entry>
+								   <entry key="Identity">
+									<value>
+									  <Map>
+									    <entry key="HidePreviousRevokesFlag" value ='true'/>
+										<entry key="ScrubTokens" value ='false'/>
+										<entry key="RemoveSelectEveryThingThreshold" value ='200'/>	
+										<entry key="ShowExpandCollapseAll" value ='true'/>	
+										<entry key="ShowFeedbackinSignoffPage" value ='true'/>		
+							            <entry key="ShowFixedHeader" value ='true'/>
+										<entry key="ShowFileDecisionsImport" value ='true'/>
+										<entry key="SystemIDCertDecisionOptions" value ='true'/>									
+										<entry key="fileDecisionsImportThreshold" value ='200'/>
+										<entry key="ShowCustomFileExport" value ='true'/>	
+										<entry key="Feedbackquestions">
+										 <value>
+										  <Map>
+											<entry key="question1">
+											  <value>
+												 <Map>
+												       <entry key="question" value ='Compared to the previous quarter, this quarters Certification was:'/>
+													   <entry key="choice">
+														<value>
+														  <List>
+															<String>Easier to complete</String>
+															<String>More difficult to complete</String>
+															<String>Stayed the same</String>
+															<String>I didn't participate last quarter</String>
+														  </List>
+														</value>
+													  </entry>
+												 </Map>
+											  </value> 
+                                            </entry>											
+											<entry key="question2">
+											  <value>
+												 <Map>
+												       <entry key="question" value ='The Access descriptions are:'/>
+													   <entry key="choice">
+														<value>
+														  <List>
+															<String>Getting better</String>
+															<String>Getting worse</String>
+															<String>Staying the same</String>
+														  </List>
+														</value>
+													  </entry>
+												 </Map>
+											  </value> 
+                                            </entry>	
+											<entry key="question3">
+											  <value>
+												 <Map>
+												       <entry key="question" value ='The time required to complete your certification was:'/>
+													   <entry key="choice">
+														<value>
+														  <List>
+															<String>Less than 5 minutes</String>
+															<String>5-30 minutes</String>
+															<String>30-60 minutes</String>
+															<String>More than 60 minutes</String>
+														  </List>
+														</value>
+													  </entry>
+												 </Map>
+											  </value> 
+                                            </entry>										
+										  </Map>
+										 </value>										
+										</entry>	
+                                        <entry key="ShowUncompletedCertCBTPopup" value ='false'/>
+										<entry key="CertCBTString" value ='ITM_B051995'/>
+										<entry key="DescriptionsFeedback" value ='true'/>
+										<entry key="displayPrevalenceScores" value ='false'/>
+										<entry key="EntOwnerCertDecisionOptions" value ='false'/>										
+									  </Map>
+									</value>
+								  </entry>	
+								  <entry key="DataOwner">
+									<value>
+									  <Map>
+									    <entry key="HidePreviousRevokesFlag" value ='true'/>
+										<entry key="ScrubTokens" value ='false'/>
+										<entry key="RemoveSelectEveryThingThreshold" value ='200'/>	
+										<entry key="ShowExpandCollapseAll" value ='true'/>	
+										<entry key="ShowFeedbackinSignoffPage" value ='true'/>		
+							            <entry key="ShowFixedHeader" value ='true'/>
+										<entry key="ShowFileDecisionsImport" value ='true'/>
+										<entry key="EntOwnerCertDecisionOptions" value ='true'/>
+										<entry key="RoleWizardRedirectOptions" value ='false'/>
+										<entry key="RolesTeamEmail" value ='rolesengineeringsupport@capitalone.com'/>										
+										<entry key="fileDecisionsImportThreshold" value ='200'/>
+										<entry key="ShowCustomFileExport" value ='false'/>
+										<entry key="Feedbackquestions">
+										 <value>
+										  <Map>
+											<entry key="question1">
+											  <value>
+												 <Map>
+												       <entry key="question" value ='Compared to the previous quarter, this quarters Certification was:'/>
+													   <entry key="choice">
+														<value>
+														  <List>
+															<String>Easier to complete</String>
+															<String>More difficult to complete</String>
+															<String>Stayed the same</String>
+															<String>I didn't participate last quarter</String>
+														  </List>
+														</value>
+													  </entry>
+												 </Map>
+											  </value> 
+                                            </entry>											
+											<entry key="question2">
+											  <value>
+												 <Map>
+												       <entry key="question" value ='The Access descriptions are:'/>
+													   <entry key="choice">
+														<value>
+														  <List>
+															<String>Getting better</String>
+															<String>Getting worse</String>
+															<String>Staying the same</String>
+														  </List>
+														</value>
+													  </entry>
+												 </Map>
+											  </value> 
+                                            </entry>	
+											<entry key="question3">
+											  <value>
+												 <Map>
+												       <entry key="question" value ='The time required to complete your certification was:'/>
+													   <entry key="choice">
+														<value>
+														  <List>
+															<String>Less than 5 minutes</String>
+															<String>5-30 minutes</String>
+															<String>30-60 minutes</String>
+															<String>More than 60 minutes</String>
+														  </List>
+														</value>
+													  </entry>
+												 </Map>
+											  </value> 
+                                            </entry>										
+										  </Map>
+										 </value>										
+										</entry>	
+                                        <entry key="ShowUncompletedCertCBTPopup" value ='false'/>
+										<entry key="CertCBTString" value ='ITM_B051995'/>
+										<entry key="DescriptionsFeedback" value ='true'/>	
+										<entry key="displayPrevalenceScores" value ='false'/>										
+									  </Map>
+									</value>
+								  </entry>
+			                </Map>
+                        </value>
+                    </entry>
+                </Map>
+            </Attributes>
+        </Configuration>
+    </ImportAction>  
+</sailpoint>	
+

@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="WebService BeforeOperation rule" type="WebServiceBeforeOperationRule">
+  <Description>This rule is used by the  Web Services connector before performing any operation like testconnection, aggregation etc .</Description>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="CyberArk PAM Server password retrieval rule"/>
+  </ReferencedRules>
+  <Signature returnType="EndPoint">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>The application whose data file is being processed.</Description>
+      </Argument>
+      <Argument name="requestEndPoint">
+        <Description>The current request information contain header, body, context url, method type, response attribute map, 
+                successful response code
+                </Description>
+      </Argument>
+      <Argument name="oldResponseMap">
+        <Description>earlier response object </Description>
+      </Argument>
+      <Argument name="restClient">
+        <Description>REST Client Object</Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="EndPoint">
+        <Description>Updated EndPoint Object</Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[ 
+    import org.apache.commons.logging.Log;
+    import org.apache.commons.logging.LogFactory;
+    import java.util.HashMap;
+    import java.util.Map;
+    Log log = LogFactory.getLog("BeforeRule");
+
+    String  currentbody = requestEndPoint.getBody().get("jsonBody");
+
+    if(null != currentbody && null != oldResponseMap){
+      String email = oldResponseMap.get("emails.primary.value").toString().replace("[","").replace("]","");
+      currentbody = currentbody.replace("plangiven", oldResponseMap.get("givenName"));
+      currentbody = currentbody.replace("planfamily", oldResponseMap.get("familyName"));
+      currentbody = currentbody.replace("planemail", email);
+
+      log.debug("currentbody after"+  currentbody);
+      Map newMap= new HashMap();
+
+      newMap.put("jsonBody", currentbody);
+      newMap.put("bodyFormat", "raw");
+
+      requestEndPoint.setBody(newMap);     
+    }
+
+    String appId = "allaccess";
+    String safeName = "_ALL_ACCESS_CONNECTORS";
+    String folder = "root";
+
+    String accountName = "bearer@AuditBoard";
+    String applicationName = "AuditBoard";
+
+    String auditBoardAuth = "Bearer " + getCyberarkPassword(appId, safeName, folder, accountName, applicationName);
+    Map auditBoardAuthMap = new HashMap();
+    auditBoardAuthMap.put("Authorization",auditBoardAuth);
+    auditBoardAuthMap.put("Accept","application/json;v=1");
+    auditBoardAuthMap.put("Content-Type","application/json");
+    requestEndPoint.setHeader(auditBoardAuthMap);
+
+    return requestEndPoint;
+    ]]></Source>
+</Rule>
