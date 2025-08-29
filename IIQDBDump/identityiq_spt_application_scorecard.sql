@@ -1,0 +1,68 @@
+-- MySQL dump 10.13  Distrib 8.0.17, for Win64 (x86_64)
+--
+-- Host: localhost    Database: identityiq
+-- ------------------------------------------------------
+-- Server version	5.7.22-log
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `spt_application_scorecard`
+--
+
+DROP TABLE IF EXISTS `spt_application_scorecard`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `spt_application_scorecard` (
+  `id` varchar(32) NOT NULL,
+  `created` bigint(20) DEFAULT NULL,
+  `modified` bigint(20) DEFAULT NULL,
+  `owner` varchar(32) DEFAULT NULL,
+  `assigned_scope` varchar(32) DEFAULT NULL,
+  `assigned_scope_path` varchar(450) DEFAULT NULL,
+  `incomplete` bit(1) DEFAULT NULL,
+  `composite_score` int(11) DEFAULT NULL,
+  `attributes` longtext,
+  `items` longtext,
+  `application_id` varchar(32) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `app_scorecard_cscore` (`composite_score`),
+  KEY `FK314187EB907AB97A` (`application_id`),
+  KEY `FK314187EB486634B7` (`assigned_scope`),
+  KEY `FK314187EBA5FB1B1` (`owner`),
+  KEY `SPT_IDXA367F317D4A97B02` (`assigned_scope_path`(255)),
+  CONSTRAINT `FK314187EB486634B7` FOREIGN KEY (`assigned_scope`) REFERENCES `spt_scope` (`id`),
+  CONSTRAINT `FK314187EB907AB97A` FOREIGN KEY (`application_id`) REFERENCES `spt_application` (`id`),
+  CONSTRAINT `FK314187EBA5FB1B1` FOREIGN KEY (`owner`) REFERENCES `spt_identity` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `spt_application_scorecard`
+--
+
+LOCK TABLES `spt_application_scorecard` WRITE;
+/*!40000 ALTER TABLE `spt_application_scorecard` DISABLE KEYS */;
+INSERT INTO `spt_application_scorecard` VALUES ('297e8b3d76432f3201764cc23575002c',1607605564789,1607605565195,NULL,NULL,NULL,_binary '\0',0,' ',' ','297e8b3d76432f3201764cc2356c002b'),('a9fe0bbd90c41bed8190d0a8f1af0476',1721487651247,1725429960713,NULL,NULL,NULL,_binary '\0',0,' ',' ','297e8b3d76432f3201764cc2356c002b'),('a9fe0bbd90c41bed8190d45e9a7705f0',1721549888119,1730181099861,NULL,NULL,NULL,_binary '\0',0,' ',' ','a9fe0bbd90c41bed8190d45e9a7705ef'),('a9fe0bbd90c41bed8190d46ece020649',1721550949890,1727934677019,NULL,NULL,NULL,_binary '\0',0,' ',' ','a9fe0bbd90c41bed8190d46ece020648'),('a9fe0bbd940617a1819406c057420084',1735280056130,1735281333162,NULL,NULL,NULL,_binary '\0',0,' ',' ','a9fe0bbd940617a1819406c057410083'),('a9fe0bbd940617a1819411d5df7801db',1735466016632,1735467944984,NULL,NULL,NULL,_binary '\0',0,' ',' ','a9fe0bbd940617a1819411d5df7801da'),('a9fe0bbd94fd12518194fdd334fc0002',1739425264892,NULL,NULL,NULL,NULL,_binary '\0',0,' ',' ','a9fe0bbd940617a1819406c057410083'),('a9fe0bbd94fd12518194fdd33e560005',1739425267286,NULL,NULL,NULL,NULL,_binary '\0',0,' ',' ','a9fe0bbd90c41bed8190d46ece020648'),('a9fe0bbd94fd12518194fdd340740007',1739425267829,NULL,NULL,NULL,NULL,_binary '\0',0,' ',' ','a9fe0bbd90c41bed8190d45e9a7705ef'),('a9fe0bbd94fd12518194fdd341f5000a',1739425268214,NULL,NULL,NULL,NULL,_binary '\0',0,' ',' ','297e8b3d76432f3201764cc2356c002b'),('a9fe0bbd957e1ec681957e8e9995006b',1741585029525,NULL,NULL,NULL,NULL,_binary '\0',0,' ',' ','297e8b3d76432f3201764cc2356c002b'),('a9fe0bbd957e1ec681957e8e9e41006f',1741585030722,NULL,NULL,NULL,NULL,_binary '\0',0,' ',' ','a9fe0bbd90c41bed8190d45e9a7705ef'),('a9fe0bbd957e1ec681957e8e9f2b0071',1741585030956,NULL,NULL,NULL,NULL,_binary '\0',0,' ',' ','a9fe0bbd90c41bed8190d46ece020648'),('a9fe0bbd957e1ec681957e8ea4610075',1741585032289,NULL,NULL,NULL,NULL,_binary '\0',0,' ',' ','a9fe0bbd940617a1819406c057410083'),('a9fe0bbd957e1ec681957e8ea7600078',1741585033056,1746517935497,NULL,NULL,NULL,_binary '\0',0,' ',' ','a9fe0bbd940617a1819411d5df7801da'),('a9fe0bbd957e1ec681957e8ea809007a',1741585033225,NULL,NULL,NULL,NULL,_binary '\0',0,' ',' ','a9fedb66922c14e481922d64ab4c00b9'),('a9fe0bbd957e1ec68195839d91250239',1741669896485,1741669896536,NULL,NULL,NULL,_binary '\0',0,' ',' ','a9fe0bbd957e1ec68195839d91180238'),('a9fe0bbd957e1ec6819583a6892e0264',1741670484270,1741670484324,NULL,NULL,NULL,_binary '\0',0,' ',' ','a9fe0bbd957e1ec6819583a6892e0263'),('a9fe0bbd965b1be58196b3a7b6c224ac',1746770835138,1747294701682,NULL,NULL,NULL,_binary '\0',0,' ',' ','a9fe0bbd965b1be58196b3a7b67a24ab'),('a9fedb66922c14e481922d64ab4c00ba',1727338425164,1728030519338,NULL,NULL,NULL,_binary '\0',0,' ',' ','a9fedb66922c14e481922d64ab4c00b9');
+/*!40000 ALTER TABLE `spt_application_scorecard` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-08-18 12:50:06
