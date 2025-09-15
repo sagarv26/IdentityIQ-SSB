@@ -1,7 +1,7 @@
-Create Database
+-- Create Database
 CREATE DATABASE sweDB;
 
-Create Admin User with Full Privileges
+-- Create Admin User with Full Privileges
 -- Create admin user with password
 CREATE USER 'adminUser'@'localhost' IDENTIFIED BY '@dminUser!123';
 
@@ -11,15 +11,15 @@ GRANT ALL PRIVILEGES ON sweDB.* TO 'adminUser'@'localhost';
 -- Apply changes
 FLUSH PRIVILEGES;
 
-Notes:
-Replace 'StrongPassword123!' with a secure password.
-If you want the admin to connect from anywhere, replace 'localhost' with '%'.
+-- Notes:
+-- Replace 'StrongPassword123!' with a secure password.
+-- If you want the admin to connect from anywhere, replace 'localhost' with '%'.
 
 
-Switch to the New Database
+-- Switch to the New Database
 USE sweDB;
 
-Create User Table
+-- Create User Table
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,  -- unique row identifier
     username VARCHAR(50) NOT NULL UNIQUE, -- login name
