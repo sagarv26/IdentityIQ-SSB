@@ -29,11 +29,11 @@ CREATE TABLE users (
     manager VARCHAR(50), -- could also be a foreign key to another user
     status VARCHAR(50) NOT NULL,
     usertype VARCHAR(50) NOT NULL,
-    useraccess VARCHAR(50) NOT NULL
+    access VARCHAR(50) NOT NULL
 );
 
-INSERT INTO `users` (`username`, `firstname`, `lastname`, `name`, `manager`, `employeenumber`, `status`, `usertype`, `useraccess`) VALUES
-('testUser10', 'Test', 'User10', 'Test User1', '20250001', '20250010', 'ACTIVE', 'User', 'Admin'),
-('testUser11', 'Test', 'User11', 'Test User2', '20250001', '20250011', 'ACTIVE', 'User', 'Admin');
+INSERT INTO `users` (`username`, `firstname`, `lastname`, `manager`, `employeenumber`, `status`, `usertype`, `useraccess`) VALUES
+('testUser10', 'Test', 'User10', '20250001', '20250010', 'ACTIVE', 'User', 'Admin'),
+('testUser11', 'Test', 'User11', '20250001', '20250011', 'ACTIVE', 'User', 'Admin');
 COMMIT;
 
