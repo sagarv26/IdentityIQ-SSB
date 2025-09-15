@@ -125,7 +125,7 @@ However, the ConnectorRegistry entry for the connectors does change with new rel
 - Group
 
 
-#### Concepts
+#### Other Concepts
 
 ##### FeatureString
 
