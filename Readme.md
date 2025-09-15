@@ -74,12 +74,163 @@
 - [Emailtemplate Example 2](https://youtu.be/2Ji5sI1v8IU)
 
 ## Application Onboarding
+There are several different types of connectors. Connectors are commonly grouped by the ways in which they can communicate. 
+There are: 
+- read-only connectors that can only communicate data from an external application (Governance)
+- read-write connectors that can read data from external applications and write data out to them (Gateway and Direct)  
+
+Connectors may be added, removed, or modified in any release, including patch releases. Existing defined applications will continue to use the connector specified during their initial creation, and changes to the connector will not affect existing applications unless those changes are manually applied to the application definition. 
+
+However, the ConnectorRegistry entry for the connectors does change with new releases. The list of available connectors, with their current set of available features, can be retrieved from the Connector Registry within the Debug Pages.
+
+#### YouTube
 - [Application Onboarding Process](https://youtu.be/IrVGL7rF3-U?si=_6f9KOH19EC2HIu7)
-- [AD](https://youtu.be/dEGRE8ODaCE?si=LaLbwkbz8AmqzSuf)
+
+#### Prerequisites
+- Host/URL
+- Connectivity
+- Service accounts and Permissions
+- Requirements
+
+#### Configuration
+- Connector
+- Authoritative/Native Change
+
+#### Correlation
+- Account
+- Manager
+
+#### Schema
+- Account
+- Group
+
+#### Provisioning Policy
+- Account
+- Create
+- Update
+- Delete
+
+#### Group
+- Create
+- Update
+
+#### Rules
+- Connector Rules
+- Aggregation Rules
+- Provisioning Rules
+- Connector Specific Rules
+
+#### Aggregation
+- Account
+- Group
+
+
+#### Concepts
+
+##### FeatureString
+
+The feature string determines which features of the application are enabled or disabled. For example if you remove "AUTHENTICATE" in the LDAP connector, you can no longer use it for pass-through authentication. If you remove PROVISION from the feature string of e.g. Active Directory, it will no longer provision accounts using the connector's features.
+If you do not define the feature string, or leave it empty, it could be an issue. Important features will not be available.
+The features that can be enabled or disabled depend on the connector.
+
+Typically you would not modify the feature string of an application definition.  When an application is created, the featureString is copied from the prototype application in the connector registry.  You might want to remove features from the string if you wish to limit the capabilities of the connector.  This might be useful if you want to disable provisioning to make sure that provisioning is fulfilled by another path such as IdentityIQ work items.
+
+The feature string in the connector registry should be the list of features that the connector can support, so you should never add to the list for an application instance.  Doing so will likely cause unexpected failures.
+
+FeatureString entirely depends on the type of application object. If you look for the Application.Feature enum within /doc/javadoc, you can see the available featureString.
+
+##### Attributes
+
+createAccountTimelag 
+Time in seconds to wait after creating an account and before calling get account. Default: 20 seconds,
+<entry key=”createAccountTimelag” value=”120”/>
+
+maxReadTimeout 
+Time in seconds to wait for getting response from the REST call, in the read operation, before the operation gets timed out. Default: 180 seconds. 
+```<entry key=”maxReadTimeout” value=”200”/>```
+
+maxRetryCount 
+Indicates the number of time read op
+```<entry key=”maxRetryCount” value=”5”/>```
+
+retryableErrors 
+The retryableErrors entry is a list of strings through which the connector searches when it receives a message from the managed application. If one of the strings in the entry exists in the error, the connector attempts to retry the connection.
+```
+<entry key=”retryableErrors”>
+    <value>
+        <List>
+            <String>Server is not operational</String>
+            <String>Object Not Found</String>
+        </List>
+     </value>
+</entry>
+```
+
+### Delimited File
+
+The SailPoint Delimited File Connector is a read only and rule driven connector. This connector has rules that can be customized to handle the complexity of the data that is being extracted.
+This connector can be configured to enable the automatic discovery of schema attributes.
+
+#### YouTube
 - [Delimited File](https://youtu.be/yizsQLpSkUo?si=GFpqab-cOOc0nhQb)
+
+#### JDBC
+
+The SailPoint JDBC Connector is used for Read/Write operations on the data of JDBC- enabled database engines.
+This connector supports flat table data. To handle complex, multi-table data, you need to define a rule and a more complex SQL statement.
+
+#### YouTube
 - [JDBC](https://youtu.be/HJtbTZnuTIY?si=wtPRUXca3969JKps)
+
+#### Create DB, User and Table
+```
+Create Database
+CREATE DATABASE sweDB;
+
+Create Admin User with Full Privileges
+-- Create admin user with password
+CREATE USER 'adminUser'@'localhost' IDENTIFIED BY '@dminUser!123';
+
+-- Grant read, write, delete (all privileges) on the new database
+GRANT ALL PRIVILEGES ON sweDB.* TO 'adminUser'@'localhost';
+
+-- Apply changes
+FLUSH PRIVILEGES;
+
+Notes:
+Replace 'StrongPassword123!' with a secure password.
+If you want the admin to connect from anywhere, replace 'localhost' with '%'.
+
+
+Switch to the New Database
+USE sweDB;
+
+Create User Table
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,  -- unique row identifier
+    username VARCHAR(50) NOT NULL UNIQUE, -- login name
+    firstname VARCHAR(50) NOT NULL,
+    lastname VARCHAR(50) NOT NULL,
+    employeenumber VARCHAR(20) UNIQUE NOT NULL,
+    manager VARCHAR(50), -- could also be a foreign key to another user
+    status ENUM('ACTIVE','INACTIVE') DEFAULT 'ACTIVE',
+    type ENUM('User','Service') DEFAULT 'EMPLOYEE',
+    group VARCHAR(50) NOT NULL,
+);
+
+```
+
+### LDAP
+The LDAP connector was developed using the LDAP RFC. The LDAP Connector must plug into almost any LDAP server with no customization. The LDAP Connector now supports provisioning of users and entitlements along with the retrieval of LDAP account and group object classes.
+
+#### YouTube
 - [LDAP](https://youtu.be/3f0KRO7WRhw?si=0ZWutEIEHKUgQRc2)
-- Webservice
+
+
+### Active Directory
+- [AD](https://youtu.be/dEGRE8ODaCE?si=LaLbwkbz8AmqzSuf)
+
+### Webservice
 	- [Webservice Basic](https://youtu.be/BItZdVNrXX0?si=REVBPjiLHHUbWy_9)
 	- [Webservice with Example](https://youtu.be/dgKG7xlmBlA?si=VUZuiL5wPAUhMmvm)
 
