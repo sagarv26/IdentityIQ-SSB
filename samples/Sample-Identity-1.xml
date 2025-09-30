@@ -1,0 +1,185 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Identity PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Identity correlated="true" created="1721551215914" id="a9fe0bbd90c41bed8190d472dd2a065c" lastRefresh="1743569750012" modified="1743569750018" name="2020009" password="1:ACP:vkcdG/dFwr/bA9O3psHlsMvjeoDQFuxQ3df8nCZ01uY=">
+  <Attributes>
+    <Map>
+      <entry key="displayName" value="Tina Connolly"/>
+      <entry key="email" value="tlconn001@sweinc.com"/>
+      <entry key="employeeType" value="Contractor"/>
+      <entry key="employeenumber" value="2020009"/>
+      <entry key="firstname" value="Tina"/>
+      <entry key="lastname" value="Connolly"/>
+      <entry key="status" value="Employee"/>
+      <entry key="title" value="Vendor Analyst"/>
+      <entry key="uid" value="aaa0011"/>
+    </Map>
+  </Attributes>
+  <AttributeMetaDatas>
+    <AttributeMetaData attribute="displayName" source="Contractor System Employee:name"/>
+    <AttributeMetaData attribute="email" source="HR System:mail"/>
+    <AttributeMetaData attribute="firstname" source="Contractor System Employee:givenName"/>
+    <AttributeMetaData attribute="lastname" source="Contractor System Employee:sn"/>
+    <AttributeMetaData attribute="title" source="Contractor System Employee:title"/>
+    <AttributeMetaData attribute="status" source="HR System:AppRule: Identity_Attribute_Employee HR System$Identity_Attribute_Employee"/>
+    <AttributeMetaData attribute="inactive" source="Contractor System Employee:inactive"/>
+    <AttributeMetaData attribute="uid" source="Contractor System Employee:EmployeeID"/>
+    <AttributeMetaData attribute="employeenumber" source="Contractor System Employee:employeenumber"/>
+    <AttributeMetaData attribute="manager" source="Contractor System Employee:manager"/>
+    <AttributeMetaData attribute="employeeType" source="Contractor System Employee:AppRule: Identity_Attribute_Contractor Contractor System Employee$Identity_Attribute_Contractor"/>
+  </AttributeMetaDatas>
+  <Capabilities>
+    <Reference class="sailpoint.object.Capability" id="297e8b3d78ab76ff0178ab7796200006" name="ViewAdminConsole"/>
+  </Capabilities>
+  <CertificationLinks>
+    <CertificationLink completed="1730275416595" id="a9fe0bbd92d11bbd8192dc7211340817" identitySnapshotId="a9fe0bbd92d11bbd8192d6a0c7fd0304" modified="1730275416602" type="Manager">
+      <Certifiers>
+        <String>2020007</String>
+      </Certifiers>
+    </CertificationLink>
+  </CertificationLinks>
+  <Exceptions>
+    <EntitlementGroup created="1741755931509" displayName="2020009" id="a9fe0bbd957e1ec6819588be5b7504aa" nativeIdentity="2020009">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" id="a9fe0bbd90c41bed8190d46ece020648" name="Contractor System Employee"/>
+      </ApplicationRef>
+      <Attributes>
+        <Map>
+          <entry key="Group">
+            <value>
+              <List>
+                <String>Admin</String>
+              </List>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </EntitlementGroup>
+    <EntitlementGroup created="1741755931510" displayName="aaa0011" id="a9fe0bbd957e1ec6819588be5b7604ab" nativeIdentity="aaa0011">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" id="a9fe0bbd90c41bed8190d45e9a7705ef" name="HR System"/>
+      </ApplicationRef>
+      <Attributes>
+        <Map>
+          <entry key="roles" value="Developer"/>
+        </Map>
+      </Attributes>
+    </EntitlementGroup>
+  </Exceptions>
+  <Manager>
+    <Reference class="sailpoint.object.Identity" id="a9fe0bbd90c41bed8190d472dc1d0658" name="2020007"/>
+  </Manager>
+  <Preferences>
+    <Map>
+      <entry key="attributeAssignments">
+        <value>
+          <List>
+            <AttributeAssignment applicationId="a9fe0bbd90c41bed8190d46ece020648" applicationName="Contractor System Employee" assigner="spadmin" assignmentId="b0e6308ed3f6487a92bf804f57ead538" name="Group" nativeIdentity="2020009" source="LCM" type="Entitlement" value="User"/>
+          </List>
+        </value>
+      </entry>
+    </Map>
+  </Preferences>
+  <Workgroups>
+    <Reference class="sailpoint.object.Identity" id="a9fedb6691bb1afa8191bbcfba9000cf" name="Developer"/>
+  </Workgroups>
+  <Links>
+    <Link created="1721551215915" displayName="2020009" entitlements="true" id="a9fe0bbd90c41bed8190d472dd2b065d" lastRefresh="1744089527778" modified="1730112674313" identity="2020009">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" id="a9fe0bbd90c41bed8190d46ece020648" name="Contractor System Employee"/>
+      </ApplicationRef>
+      <Attributes>
+        <Map>
+          <entry key="EmployeeID" value="aaa0011"/>
+          <entry key="Group">
+            <value>
+              <List>
+                <String>Admin</String>
+              </List>
+            </value>
+          </entry>
+          <entry key="IIQDisabled">
+            <value>
+              <Boolean></Boolean>
+            </value>
+          </entry>
+          <entry key="employeenumber" value="2020009"/>
+          <entry key="givenName" value="Tina"/>
+          <entry key="inactive">
+            <value>
+              <Boolean></Boolean>
+            </value>
+          </entry>
+          <entry key="manager" value="2020007"/>
+          <entry key="name" value="Tina Connolly"/>
+          <entry key="sn" value="Connolly"/>
+          <entry key="title" value="Vendor Analyst"/>
+        </Map>
+      </Attributes>
+    </Link>
+    <Link created="1721565903645" displayName="connolly,tina" id="a9fe0bbd90c41bed8190d552fb1d079b" lastRefresh="1726810272902" manuallyCorrelated="true" modified="1730112674314" identity="uid=aaa0011,ou=user,o=Company">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" id="297e8b3d76432f3201764cc2356c002b" name="LDAP"/>
+      </ApplicationRef>
+      <Attributes>
+        <Map>
+          <entry key="IIQDisabled">
+            <value>
+              <Boolean></Boolean>
+            </value>
+          </entry>
+          <entry key="cn" value="connolly,tina"/>
+          <entry key="description" value="Active"/>
+          <entry key="dn" value="uid=aaa0011,ou=user,o=Company"/>
+          <entry key="employeeNumber" value="2020009"/>
+          <entry key="employeeType" value="Contractor"/>
+          <entry key="givenName" value="Tina"/>
+          <entry key="mail" value="tlconn001@sweinc.com"/>
+          <entry key="objectClass">
+            <value>
+              <List>
+                <String>top</String>
+                <String>inetOrgPerson</String>
+                <String>person</String>
+                <String>organizationalPerson</String>
+              </List>
+            </value>
+          </entry>
+          <entry key="sn" value="Connolly"/>
+          <entry key="title" value="Vendor Analyst"/>
+          <entry key="uid" value="aaa0011"/>
+        </Map>
+      </Attributes>
+    </Link>
+    <Link created="1722147848190" displayName="aaa0011" entitlements="true" id="a9fe0bbd90c41bed8190f802bffd0d09" lastRefresh="1727934284506" modified="1741755931551" identity="aaa0011">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" id="a9fe0bbd90c41bed8190d45e9a7705ef" name="HR System"/>
+      </ApplicationRef>
+      <Attributes>
+        <Map>
+          <entry key="EmployeeID" value="aaa0011"/>
+          <entry key="IIQDisabled">
+            <value>
+              <Boolean></Boolean>
+            </value>
+          </entry>
+          <entry key="employeenumber" value="2020009"/>
+          <entry key="enabled" value="true"/>
+          <entry key="givenName" value="Tina"/>
+          <entry key="mail" value="tlconn001@sweinc.com"/>
+          <entry key="manager" value="aaa0010"/>
+          <entry key="name" value="Tina Connolly"/>
+          <entry key="roles" value="Developer"/>
+          <entry key="sn" value="Connolly"/>
+          <entry key="title" value="Vendor Analyst"/>
+        </Map>
+      </Attributes>
+    </Link>
+  </Links>
+  <Scorecard certificationScore="1000" compositeScore="250" created="1725432691423" entitlementScore="1" id="a9fedb6691bb1afa8191bbcd7adf00ce" modified="1730112674314" rawEntitlementScore="1">
+    <ScoreItem compositePercentage="100" displayName="score_def_certificationAge_name" score="1000" scorePercentage="100" type="score_def_certificationAge_shortname">
+      <TargetMessage>
+        <Message key="cert_scorer_target_id_not_certified" type="Info"/>
+      </TargetMessage>
+    </ScoreItem>
+  </Scorecard>
+</Identity>

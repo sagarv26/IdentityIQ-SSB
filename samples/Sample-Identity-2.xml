@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Identity PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Identity created="1746518100689" id="a9fe0bbd965b1be58196a4974ad0194e" lastRefresh="1747114760377" modified="1747114760382" name="2020024" needsRefresh="true">
+  <Attributes>
+    <Map>
+      <entry key="displayName" value="2020024"/>
+      <entry key="triggerSnapshots">
+        <value>
+          <Map>
+            <entry key="AttributeChange">
+              <value>
+                <Attributes>
+                  <Map>
+                    <entry key="displayName" value="2020024"/>
+                  </Map>
+                </Attributes>
+              </value>
+            </entry>
+            <entry key="Rule" value="a9fe0bbd965b1be58196b3af911c24d2"/>
+            <entry key="needsCreateProcessing">
+              <value>
+                <Boolean>true</Boolean>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Links>
+    <Link created="1746518100690" displayName="2020024" id="a9fe0bbd965b1be58196a4974ad2194f" lastRefresh="1746518100690" modified="1746518100691" identity="2020024">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" id="a9fe0bbd940617a1819411d5df7801da" name="Webservice App"/>
+      </ApplicationRef>
+      <Attributes>
+        <Map>
+          <entry key="IIQDisabled">
+            <value>
+              <Boolean></Boolean>
+            </value>
+          </entry>
+          <entry key="active" value="true"/>
+          <entry key="email" value="Rohit.Sharma@sweinc.com"/>
+          <entry key="employeenumber" value="2020024"/>
+          <entry key="familyName" value="Sharma"/>
+          <entry key="fullName" value="Rohit Sharma"/>
+          <entry key="givenName" value="Rohit"/>
+          <entry key="group" value="dev"/>
+          <entry key="id">
+            <value>
+              <Integer>5</Integer>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </Link>
+  </Links>
+</Identity>
