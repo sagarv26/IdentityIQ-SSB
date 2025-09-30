@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE CorrelationConfig PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<CorrelationConfig name="AD">
+  <AttributeAssignments>
+    <Filter operation="EQ" property="employeenumber" value="employeeNumber"/>
+    <Filter operation="EQ" property="uid" value="sAMAccountName"/>
+  </AttributeAssignments>
+</CorrelationConfig>
