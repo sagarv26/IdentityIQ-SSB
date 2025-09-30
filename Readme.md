@@ -278,9 +278,9 @@ Native Change Detection (NCD) is a mechanism in SailPoint IdentityIQ that detect
   - Triggers custom workflow (e.g., audit logging, send notification email to owner).
 
 ### Preliminaries
-**Decide scope & goals:** business owner, application owner, what access must be governed (users/accounts/roles/entitlements), compliance requirements (SOX, ISO, etc.).
-**Identify app type:** SaaS vs on-prem vs database vs directory vs custom (API/REST) — this determines connector choice.
-**Collect application details (minimum):** base URLs / endpoints, protocol (LDAP/AD/SCIM/SAML/REST/JDBC), admin/service account credentials (with required privileges), sample account(s), list of entitlements/roles, account/schema attributes. 
+**Decide scope & goals:** business owner, application owner, what access must be governed (users/accounts/roles/entitlements), compliance requirements (SOX, ISO, etc.).  
+**Identify app type:** SaaS vs on-prem vs database vs directory vs custom (API/REST) — this determines connector choice.  
+**Collect application details (minimum):** base URLs / endpoints, protocol (LDAP/AD/SCIM/SAML/REST/JDBC), admin/service account credentials (with required privileges), sample account(s), list of entitlements/roles, account/schema attributes.   
 
 ### Configuration
 ```
@@ -300,13 +300,14 @@ Attributes without the managed or entitlement mark are just (accounts) attribute
 **Managed:** adds to entitlement catalog where it can be assigned an owner, a display name, and a description, and where it can be marked as "requestable" for LCM and can be used in policy definitions
 
 ###  Provisioning Policy
-> Account - Create\Update\Delete
+> Account - Create\Update\Delete  
 > Group - Create\Update
 
 #### Why Provisioning Policy?
 When a user requests entitlement or group access, and no account exists on the target system, IdentityIQ creates a new account. During this process, IIQ fills in the required account attributes based on the provisioning policies defined for that application.
 ```
-User requests entitlement/group access → IIQ checks if account exists on target → If account does NOT exist
+User requests entitlement/group access → IIQ checks if account exists on target 
+→ If account does NOT exist
 → Create Account →  IIQ uses Provisioning Policy → Populate required account attributes
 → Submit account creation request to target
 ```
