@@ -1,0 +1,20 @@
+<!-- (c) Copyright 2010 SailPoint Technologies, Inc., All Rights Reserved. -->
+
+<!--
+Extended attribute mappings for Targets.
+See comments in IdentityExtended.hbm.xml for more on how to manage
+extended attribute mappings.
+ -->
+<property name="extended1" type="string" length="255"
+          index="spt_target_extended1_ci"/>
+<!--
+<property name="extended2" type="string" length="255"
+          index="spt_target_extended2_ci"/>
+<property name="extended3" type="string" length="255"
+          index="spt_target_extended3_ci"/>
+
+        <property name="extended4" type="string" length="255"
+                  index="spt_target_extended4_ci"/>
+        <property name="extended5" type="string" length="255"
+                  index="spt_target_extended5_ci"/>
+         -->

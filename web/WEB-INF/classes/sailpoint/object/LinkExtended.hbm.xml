@@ -1,0 +1,47 @@
+<!-- (c) Copyright 2008 SailPoint Technologies, Inc., All Rights Reserved. -->
+
+<!--
+Link correlation keys.
+There are a fixed number of these but you may need to adjust their
+sizes and indexes.
+The maximum size of an indexed string on SQL Server is 450.  
+If you are not using SQL Server you may raise this.
+-->
+
+    <property name="key1" type="string" length="450" index="spt_link_key1_ci"/>
+    <property name="key2" type="string" length="255"/>
+    <property name="key3" type="string" length="255"/>
+    <property name="key4" type="string" length="255"/>
+
+
+<!--
+Extended attribute mappings for Link.
+See comments in IdentityExtended.hbm.xml for more on how to manage
+extended attribute mappings.
+-->
+
+    <property name="extended1" type="string" length="450"
+              index="spt_link_extended1_ci"/>
+
+    <property name="extended2" type="string" length="450"/>
+    <property name="extended3" type="string" length="450"/>
+    <property name="extended4" type="string" length="450"/>
+    <property name="extended5" type="string" length="450"/>
+
+    <!--
+    <property name="extended6" type="string" length="450"/>
+    <property name="extended7" type="string" length="450"/>
+    <property name="extended8" type="string" length="450"/>
+    <property name="extended9" type="string" length="450"/>
+    <property name="extended10" type="string" length="450"/>
+    <property name="extended11" type="string" length="450"/>
+    <property name="extended12" type="string" length="450"/>
+    <property name="extended13" type="string" length="450"/>
+    <property name="extended14" type="string" length="450"/>
+    <property name="extended15" type="string" length="450"/>
+    <property name="extended16" type="string" length="450"/>
+    <property name="extended17" type="string" length="450"/>
+    <property name="extended18" type="string" length="450"/>
+    <property name="extended19" type="string" length="450"/>
+    <property name="extended20" type="string" length="450"/>
+    -->

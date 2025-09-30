@@ -1,0 +1,21 @@
+<!-- (c) Copyright 2010 SailPoint Technologies, Inc., All Rights Reserved. -->
+
+<!--
+Extended attribute mappings for ManagedAttributes.
+See comments in IdentityExtended.hbm.xml for more on how to manage
+extended attribute mappings.
+-->
+
+    <property name="extended1" type="string" length="450"
+              index="spt_managed_attr_extended1_ci"/>
+    <property name="extended2" type="string" length="450"
+              index="spt_managed_attr_extended2_ci"/>
+    <property name="extended3" type="string" length="450"
+              index="spt_managed_attr_extended3_ci"/>
+    <!--               
+    <property name="extended4" type="string" length="450"
+              index="spt_managed_attr_extended4_ci"/>
+    <property name="extended5" type="string" length="450"
+              index="spt_managed_attr_extended5_ci"/>
+     -->
+    

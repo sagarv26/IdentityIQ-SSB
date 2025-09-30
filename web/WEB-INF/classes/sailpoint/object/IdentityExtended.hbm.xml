@@ -1,0 +1,91 @@
+<!-- (c) Copyright 2008 SailPoint Technologies, Inc., All Rights Reserved. -->
+
+<!--
+Extended attribute mappings for Identity.
+
+By default we will map 10 extended attributes, but this may be raised to
+a maximum of 20.  Using ExtendedPropertyAccessor can add attributes beyond 
+the limit of 20 and have meaningful names.  Example of ExtendedPropertyAccessor 
+is shown below.
+
+Only the first five attributes are indexed, to provide
+an example of how to specify an index.  In a production deployment you
+will usually index most of the extended attributes since they are
+usually added for searching, but index maintenance slows down updates to
+the identity cube so add them only if necessary.
+
+All extended properties must be of type="string".
+
+We need the extended attributes to be large enough to hold arbitrary
+customer data but not so large that Hibernate turns them into a blob or
+other type which cannot be used in searches.
+
+The maximum size of a VARCHAR on various sysems is:
+
+    Oracle - 4000
+    SQLServer - 8000
+    MySQL 5 - 65K
+    DB2 8.1 - 32K
+
+With each dialect, Hibernate will use a non-indexable type for strings
+of a certain size length.  This size cliff is often less than the max size
+for varchar on that system, so be careful if extending the sizes of these
+fields beyond what is specified in this file.
+
+SQL Server will not index a value greater than 900 "bytes".
+Now that we're using NVARCHAR on SQL Server there are two bytes per
+characcter so the maximum size of an indexed string column is 450.
+If you know you are not running on SQL Server, or you know you will
+not need an index on the column,  you may raise the size safely.
+
+MySQL will only index 767 "bytes" by default for InnoDB tables.
+Using varchar with UTF-8, this equates to at most 255 characters.
+MySQL will allow indexing a subset of the column length,
+so generated ddl will have mysql indexes substringed to 255 by default.
+
+-->
+
+    <property name="extended1" type="string" length="450"
+              index="spt_identity_extended1_ci"/>
+    <property name="extended2" type="string" length="450"
+              index="spt_identity_extended2_ci"/>
+    <property name="extended3" type="string" length="450"
+              index="spt_identity_extended3_ci"/>
+    <property name="extended4" type="string" length="450"
+              index="spt_identity_extended4_ci"/>
+    <property name="extended5" type="string" length="450"
+              index="spt_identity_extended5_ci"/>
+
+    <property name="extended6" type="string" length="450"/>
+    <property name="extended7" type="string" length="450"/>
+    <property name="extended8" type="string" length="450"/>
+    <property name="extended9" type="string" length="450"/>
+    <property name="extended10" type="string" length="450"/>
+
+    <!-- An example of using ExtendedPropertyAccessor to add
+         attributes beyond the limit of 20 numbered 
+         SailPointObject properties and have meaningful names.
+
+    <property name="costCenter" type="string" length="450"
+              access="sailpoint.persistence.ExtendedPropertyAccessor"/>
+    -->
+
+    <!--
+    <property name="extended11" type="string" length="450"/>
+    <property name="extended12" type="string" length="450"/>
+    <property name="extended13" type="string" length="450"/>
+    <property name="extended14" type="string" length="450"/>
+    <property name="extended15" type="string" length="450"/>
+    <property name="extended16" type="string" length="450"/>
+    <property name="extended17" type="string" length="450"/>
+    <property name="extended18" type="string" length="450"/>
+    <property name="extended19" type="string" length="450"/>
+    <property name="extended20" type="string" length="450"/>
+    -->
+
+    <many-to-one embed-xml="false" name="extendedIdentity1" class="sailpoint.object.Identity"/>
+    <many-to-one embed-xml="false" name="extendedIdentity2" class="sailpoint.object.Identity"/>
+    <many-to-one embed-xml="false" name="extendedIdentity3" class="sailpoint.object.Identity"/>
+    <many-to-one embed-xml="false" name="extendedIdentity4" class="sailpoint.object.Identity"/>
+    <many-to-one embed-xml="false" name="extendedIdentity5" class="sailpoint.object.Identity"/>
+    
