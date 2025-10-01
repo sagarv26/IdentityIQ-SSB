@@ -521,13 +521,13 @@ Provisioning requests create a provisioning plan that the Provision Broker can a
 ## Roles
 A role is a collection of entitlement or other roles that enables an identity to access the resources and to perform certain operations within an organization.  
 
-**Type**
-Organizational Role
-Business Role
-IT Role
-Entitlement Role
+**Type**  
+- Organizational Role  
+- Business Role  
+- IT Role  
+- Entitlement Role  
 
-Custom Role can be created
+> Custom Role can be created
 
 **Organizational Role**
 Designed for organizing the role hierarchy in IIQ UI. Do not provide any function other than creating nesting structures in the role modeler.
@@ -606,46 +606,47 @@ Organization Role: Birthright Role
 
 # Essentials
 ## Task
-In IdentityIQ, a TaskDefinition represents a background job that runs operations such as importing data, recalculating identities, or executing rules.
+In IdentityIQ, a TaskDefinition represents a background job that runs operations such as importing data, recalculating identities, or executing rules.  
+
 Tasks can be:
-Scheduled (via Task Scheduler)
-Run on demand (via Tasks tab)
-Partitioned across servers for scalability
+- Scheduled (via Task Scheduler)
+- Run on demand (via Tasks tab)
+- Partitioned across servers for scalability
 
 ### Aggregation
 Pulls account/entitlement data from connected applications into IIQ.
 Updates the Identity Warehouse so IIQ knows what access each user has.
 
 **Attributes**
-Enable Delta Aggregation - Enable the connector to aggregate only those accounts that have changed since the last aggregation. This requires support by the connector. 
-Detect deleted accounts - Compare current aggregated accounts with the accounts previously aggregated and report any deleted accounts. Maximum deleted accounts: This is the maximum number of accounts that can be flagged for deletion after an account aggregation. If this number is passed, no accounts are deleted from the application.
-Promote managed attributes - When enabled, any values for entitlement or permissions encountered while running
-Enable Partitioning - Enable partitioning of this task across multiple hosts.
+**Enable Delta Aggregation** - Enable the connector to aggregate only those accounts that have changed since the last aggregation. This requires support by the connector.   
+**Detect deleted accounts** - Compare current aggregated accounts with the accounts previously aggregated and report any deleted accounts. Maximum deleted accounts: This is the maximum number of accounts that can be flagged for deletion after an account aggregation. If this number is passed, no accounts are deleted from the application.  
+**Promote managed attributes** - When enabled, any values for entitlement or permissions encountered while running  
+**Enable Partitioning** - Enable partitioning of this task across multiple hosts.  
 
 ### Refresh
 Recalculates identity attributes, entitlements, policies, and role assignments.
 Often needed after aggregations, role updates, or policy changes.
 
 **Attribute**
-Optional filter – Limit identities refreshed (e.g., name == "12345").
-Refresh identity attributes – Update Identity Cubes with attribute changes.
-Refresh entitlements – Refresh all entitlement values for all links (resource-intensive).
-Refresh manager status – Update Identity Cubes when manager status changes.
-Refresh roles & promote entitlements – Update changed role assignments and promote any new entitlements.
-Provision assignments – Provision newly assigned roles and entitlements.
-Synchronize attributes – Update identity mapping targets if values have changed.
-Maintain identity histories – Snapshot identities with changes since last refresh.
-Process events – Trigger lifecycle events.
+**Optional filter** – Limit identities refreshed (e.g., name == "12345").  
+**Refresh identity attributes** – Update Identity Cubes with attribute changes.  
+**Refresh entitlements** – Refresh all entitlement values for all links (resource-intensive).  
+**Refresh manager status** – Update Identity Cubes when manager status changes.  
+**Refresh roles & promote** entitlements – Update changed role assignments and promote any new entitlements.  
+**Provision assignments** – Provision newly assigned roles and entitlements.  
+**Synchronize attributes** – Update identity mapping targets if values have changed.  
+**Maintain identity histories** – Snapshot identities with changes since last refresh.  
+**Process events** – Trigger lifecycle events.
 
 ### Perform Maintenance
 Handles housekeeping operations to keep IIQ clean and performant. Examples include:
-Purging old task results
-Cleaning completed/expired work items
-Trimming logs and audit data
-Clearing temporary objects
+- Purging old task results
+- Cleaning completed/expired work items
+- Trimming logs and audit data
+- Clearing temporary objects
 
 ### Rule Execution
-Executes a specific SailPoint Rule as a background task.
+Executes a specific SailPoint Rule as a background task.  
 Useful for running custom logic (data fixes, bulk updates, reporting).
 
 ## Debug Page
@@ -671,10 +672,9 @@ About Page → Get application details.
 Reload Logger → Reload log files forcefully.
 
 
-⚠️ Notes
-The debug page is a powerful admin tool and should be restricted to trusted users.
-Changes made through debug may directly impact system behavior.
-Never ever delete objects through Debug page
+> [!NOTE]
+> The debug page is a powerful admin tool and should be restricted to trusted users. Changes made through debug may directly impact system behavior.
+> Never ever delete objects through Debug page
 
 ## Console
 The IIQ Console is a command-line interface (CLI) provided with SailPoint IdentityIQ that allows administrators to interact directly with the application. It’s mainly used for administration, troubleshooting, and executing tasks that are not always possible (or convenient) through the web UI.
@@ -720,34 +720,35 @@ Access Request is the process by which a user (or their manager, or an admin) re
 Here’s a breakdown of how Access Requests work in IIQ:
 
 Ways to Request Access
+```
 IdentityIQ Home Page → Request Access
 Users can request access for themselves or others (if they have the delegation/manager rights).
-
 
 Identity Search → Request Access
 Search for an identity and request access for that identity.
 
 Access Request Module (Shopping Cart Style)
 Add roles, or entitlements to a cart-like interface and submit the request.
-
+```
 Manage User Access can be restricted to allow only specific items to be requested(Add/Remove).
 
 Access Request Workflow
-User Submits Request
+
+**User Submits Request**
 Selects items (role/entitlement/application) → Adds justification → Submits.
 
-Policy & SOD (Separation of Duties) Check
+**Policy & SOD (Separation of Duties) Check**
 IIQ checks for policy violations (e.g., conflicts with existing access).
 If conflicts exist, the request may be blocked or routed for exception approval.
 
-Approval Workflow
+**Approval Workflow**
 Routed to managers, role/application owners, or custom-defined approvers.
 Multi-level approvals can be configured.
 
-Provisioning
+**Provisioning**
 If approved, IIQ sends provisioning instructions to target applications via connectors (direct or through an external ticketing system like ServiceNow).
 
-Completion & Notification
+**Completion & Notification**
 Users and approvers are notified when access is granted or denied.
 
 ## Workitem
@@ -761,13 +762,14 @@ After a workitem is finished (approved/rejected/closed), it is moved into the ar
 Users and auditors can review archived workitems for evidence of decision-making and compliance reporting.
 
 General Flow
-
+```
 Manage User Access (user submits Role/Entitlement request) → Access Request (IIQ creates AR) → Workitem (approval/review task generated) → Manage User Access (grants/revokes applied to identity) → Workitem Archive (completed record kept for audit)
+```
 
 ## Email Template
 The Email Template XML consists of an element with a set of attributes and nested elements that specify the basic components of an email message, such as sender, subject, message body, etc.
 
-**Apache Velocity**
+**Apache Velocity**  
 IdentityIQ email templates are processed through an open-source engine called Apache Velocity. Velocity is a Java-based template engine that allows web page designers to reference methods defined in Java code. IdentityIQ email templates make use of the Velocity Template Language to dynamically specify the email messages' contents and generate custom email messages specific to the recipient, work item, and action involved. 
 
 
@@ -776,55 +778,63 @@ A Policy Violation occurs in IIQ when a user’s access breaks a defined complia
 Policies in IIQ are created to enforce business rules, security standards, and regulatory requirements (e.g., SOX, GDPR).
 
 # Report
-Reports in IdentityIQ provide visibility into identities, accounts, entitlements, policy violations, certifications, and system activities. They are essential for audit, compliance, and operational monitoring.
-Customizable: Can be filtered by identity attributes, entitlements, or dates.
-Exportable: Results can be exported in formats like CSV, PDF, or Excel.
-Schedulable: Reports can run on-demand or be scheduled at regular intervals.
-Secure: Access to reports is controlled via Capabilities (only authorized users can run sensitive reports).
+Reports in IdentityIQ provide visibility into identities, accounts, entitlements, policy violations, certifications, and system activities.   
 
-Typical Use Cases
-Audit Evidence: Prove compliance with SOX, GDPR, HIPAA, etc.
-Access Monitoring: Track privileged accounts or orphan accounts.
-Policy Enforcement: Monitor violations and remediation progress.
-Operational Insights: Analyze system performance and provisioning outcomes.
+They are essential for audit, compliance, and operational monitoring.
+- Customizable: Can be filtered by identity attributes, entitlements, or dates.
+- Exportable: Results can be exported in formats like CSV, PDF, or Excel.
+- Schedulable: Reports can run on-demand or be scheduled at regular intervals.
+- Secure: Access to reports is controlled via Capabilities (only authorized users can run sensitive reports).
 
-TaskDefinition
-Attribute
-Live Report
-DataSource
-Filter
-QueryParameters
-Report Argument
-Default Value
-Hard-coded value
-Different Operations
-ValueScript/ValuerRule
-QueryScrip/QueryRule
-Join
-Query
-OptionsRule/OptionsScript
-Java
-Datasource
-objectType
-Type
-defaultSort
-HQL
-Columns
-Report Form
-Custom
-Standard Properties
-Report Layout
-ValidationScript/ValidationRule
-Report Summary
-DatasourceScript/DatasourceRule
-Chart
+Typical Use Cases  
+- Audit Evidence: Prove compliance with SOX, GDPR, HIPAA, etc.
+- Access Monitoring: Track privileged accounts or orphan accounts.
+- Policy Enforcement: Monitor violations and remediation progress.
+- Operationl Insights: Analyze system performance and provisioning outcomes.
+
+TaskDefinition  
+- Attribute
+	- Live Report
+		- DataSource
+			- Filter
+				- QueryParameters
+					- Report Argument
+					- Default Value
+					- Hard-coded value
+					- Different Operations
+					- ValueScript/ValuerRule
+					- QueryScrip/QueryRule
+				- Join
+				- Query
+				- OptionsRule/OptionsScript
+			- Java
+				- Datasource
+				- objectType
+				- Type
+				- defaultSort
+			- HQL
+		- Columns
+		- Report Form
+			- Custom
+			- Standard Properties
+			- Report Layout
+			- ValidationScript/ValidationRule
+		- Report Summary
+			- DatasourceScript/DatasourceRule
+		- Chart
 
 # Certification
 Certification in IdentityIQ is a governance process that ensures users have only the access they need. It provides a structured way to review and validate entitlements, roles, and account access for compliance and security.
 
 **Phase**
 ```
-Initiation (Generate Certification) → Staging (Optional, if selected administrator can examine certification before notification is triggered and activated) → Notify (Notify certifiers) → Active (certifiers need to take action) → Challenge (dispute the revocation) → Remediation (Revocation of items) → SignOff
+Initiation (Generate Certification) → 
+Staging (Optional, if selected administrator can examine certification before notification is triggered and activated) → 
+Notify (Notify certifiers) → 
+Active (certifiers need to take action) → 
+Challenge (dispute the revocation) → 
+Remediation (Revocation of items) → 
+SignOff
 ```
 
 # Quicklink
@@ -837,24 +847,24 @@ Allow one-click access to frequently used features.
 
 # Form
 A Form in IdentityIQ is a configurable user interface component that collects input from users during workflows, tasks, requests, or approvals.
-Forms make interactions in IIQ dynamic, user-friendly, and customizable.
+Forms make interactions in IIQ dynamic, user-friendly, and customizable.  
 
-**Purpose of Forms**
-Capture user input during Access Requests, Certifications, Approvals, or Workflows.
-Provide customized UI fields instead of hard-coded values.
-Ensure business processes collect the right data for provisioning or governance.
+**Purpose of Forms**  
+- Capture user input during Access Requests, Certifications, Approvals, or Workflows.
+- Provide customized UI fields instead of hard-coded values.
+- Ensure business processes collect the right data for provisioning or governance.
 
-**Where Forms Are Used**
-Access Requests → To request roles, entitlements, or applications.
-Approvals → Manager or application owner approvals with comments.
-Identity Management → Collect information during onboarding or updates.
-Custom Workflows → Gather parameters before task execution.
+**Where Forms Are Used**  
+- Access Requests → To request roles, entitlements, or applications.
+- Approvals → Manager or application owner approvals with comments.
+- Identity Management → Collect information during onboarding or updates.
+- Custom Workflows → Gather parameters before task execution.
 
-**Key Features**
-Types of Fields: Text boxes, dropdowns, checkboxes, date pickers, etc.
-Dynamic Behavior: Fields can be shown/hidden based on conditions.
-Validation: Input can be validated before submission.
-Reusability: Forms can be reused across workflows.
+**Key Features**  
+- Types of Fields: Text boxes, dropdowns, checkboxes, date pickers, etc.
+- Dynamic Behavior: Fields can be shown/hidden based on conditions.
+- Validation: Input can be validated before submission.
+- Reusability: Forms can be reused across workflows.
 
 ```
 Form
@@ -877,34 +887,34 @@ Form
 # Workflow
 In IIQ, a workflow (a “Business Process”) is the engine that orchestrates approvals, provisioning, notifications, branching logic, and custom scripts for things like access requests, joiner/mover/leaver events, identity updates, policy violations, etc. Every workflow has a type (e.g., LCM Provisioning, Identity Update, Identity Lifecycle, Role Modeler) which controls where and how it can be triggered in the product. Choosing the correct type is crucial because IIQ only offers workflows of the matching type in the configuration screens that wire them to system events. 
 
-Typical places you’ll see workflows fire:
-**Lifecycle Manager (LCM):** create/update, registration, manage passwords, provisioning. 
-**Lifecycle Events:** Joiner, Leaver, Manager Change, Reinstate. 
-Identity Update / Identity Refresh, Role actions, Policy violations, Scheduled role activation.
+Typical places you’ll see workflows fire:  
+**Lifecycle Manager (LCM):** create/update, registration, manage passwords, provisioning.   
+**Lifecycle Events:** Joiner, Leaver, Manager Change, Reinstate.  
+Identity Update / Identity Refresh, Role actions, Policy violations, Scheduled role activation. 
 
-**Ways to create (or modify) workflows**
-Business Process Editor (UI) – the built-in designer to create/edit workflows, define steps and transitions, design forms, and set inputs/variables. You’ll usually sketch the flow here, then fine-tune in XML for advanced logic. 
-Copy an existing/default workflow – clone an out-of-the-box workflow in the editor and tweak it (helpful for LCM or Lifecycle variants).
-Author/edit the XML directly – open a workflow in Debug pages to view/edit XML or export it to version control, then re-import. Forms can be embedded in a workflow or created as separate Form objects.
-Import via UI or IIQ Console – use Global Settings → Import from File or the iiq console import command to bring in workflow XML (also use console to validate/run tests).
+**Ways to create (or modify) workflows**  
+- Business Process Editor (UI) – the built-in designer to create/edit workflows, define steps and transitions, design forms, and set inputs/variables. You’ll usually sketch the flow here, then fine-tune in XML for advanced logic.  
+- Copy an existing/default workflow – clone an out-of-the-box workflow in the editor and tweak it (helpful for LCM or Lifecycle variants).  
+- Author/edit the XML directly – open a workflow in Debug pages to view/edit XML or export it to version control, then re-import. Forms can be embedded in a workflow or created as separate Form objects.    
+- Import via UI or IIQ Console – use Global Settings → Import from File or the iiq console import command to bring in workflow XML (also use console to validate/run tests).  
 
 **Important Workflow Objects**
 
-The IdentityIQ Object Model uses four key objects in workflows. To work with workflows, you need a basic understanding of these objects.
+The IdentityIQ Object Model uses four key objects in workflows. To work with workflows, you need a basic understanding of these objects.  
 **Workflow** - Defines the workflow structure and steps involved in the workflow processing  
 **WorkflowCase** - Represents a workflow in progress. Contains a workflow element in which the process is outlined and current state data is tracked. Contains identifying information about the workflow target object.  
 **WorkflowContext** - Tracks launchtime information the Workflower maintains as it advances through a workflow case. Passed into rules and scripts and to the registered WorkflowHandler. Contains all workflow variables, step arguments, current step or approval, workflow definition, libraries, and WorkflowCase.   
 **TaskResult** - Records the completion status of a task, or in this case, the workflow. Contained within the WorkflowCase. 
 
 **Key concepts you’ll use a lot**
-Workflow Type – determines where/how a workflow can be attached and what libraries/features it sees. Pick correctly or it won’t appear in config dropdowns. 
-Libraries – expose helper Java methods inside a workflow (e.g., Identity, LCM). If omitted, core libraries are available by default. 
-Steps – the nodes (Approval, Provisioning, Script/Action, Notification, Subprocess, Fork/Join, Loop…). Not all specialized options are available in the GUI; sometimes you must edit XML. 
-Transitions – edges with conditions (string expressions or rules). Handle success, reject, and exception paths. 
-Forms – UI screens embedded in the workflow XML or defined as independent Form objects for reuse. 
-Subprocesses – split large workflows into reusable sub-workflows (commonly marked type Subprocess). 
-Transient workflows – special mode (no DB persistence until there’s an approval or wait/background step), useful for quick, form-only flows (e.g., self-registration). 
-Testing & validation – validate, workflow, wftest in the IIQ Console. 
+- Workflow Type – determines where/how a workflow can be attached and what libraries/features it sees. Pick correctly or it won’t appear in config dropdowns. 
+- Libraries – expose helper Java methods inside a workflow (e.g., Identity, LCM). If omitted, core libraries are available by default. 
+- Steps – the nodes (Approval, Provisioning, Script/Action, Notification, Subprocess, Fork/Join, Loop…). Not all specialized options are available in the GUI; sometimes you must edit XML.  
+- Transitions – edges with conditions (string expressions or rules). Handle success, reject, and exception paths. 
+- Forms – UI screens embedded in the workflow XML or defined as independent Form objects for reuse.  
+- Subprocesses – split large workflows into reusable sub-workflows (commonly marked type Subprocess).  
+- Transient workflows – special mode (no DB persistence until there’s an approval or wait/background step), useful for quick, form-only flows (e.g., self-registration).  
+- Testing & validation – validate, workflow, wftest in the IIQ Console. 
 
 ## Workflow Variables
 Workflow variables control approvals, provisioning, notifications, and policy handling in request workflows.
