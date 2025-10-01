@@ -295,8 +295,8 @@ Configure correlation rules that determine how an application account/manager li
 ### Schema
 After configuring the connector, add the necessary **Account** and **Group** attributes. Most connectors provide a **Discover Schema** option  - ensure you select the correct attribute types.
 
-Attributes without the managed or entitlement mark are just (accounts) attributes. Actually, if you mark it as "Managed", even if you didn't mark it as "Entitlement", it will appear in the Entitlement Catalog.
-**Entitlement:** adds to identity cube as an entitlement that can be certified; also makes it available for use in role mining activities. Attributes marked as "Entitlement" can be certified in a certification. They could be used in IT roles, but not so easily.
+Attributes without the managed or entitlement mark are just (accounts) attributes. Actually, if you mark it as "Managed", even if you didn't mark it as "Entitlement", it will appear in the Entitlement Catalog.    
+**Entitlement:** adds to identity cube as an entitlement that can be certified; also makes it available for use in role mining activities. Attributes marked as "Entitlement" can be certified in a certification. They could be used in IT roles, but not so easily.  
 **Managed:** adds to entitlement catalog where it can be assigned an owner, a display name, and a description, and where it can be marked as "requestable" for LCM and can be used in policy definitions
 
 ###  Provisioning Policy
@@ -352,19 +352,19 @@ FeatureString entirely depends on the type of application object. If you look fo
 
 ##### Attributes
 
-createAccountTimelag 
+**createAccountTimelag**  
 Time in seconds to wait after creating an account and before calling get account. Default: 20 seconds,
 <entry key=”createAccountTimelag” value=”120”/>
 
-maxReadTimeout 
+**maxReadTimeout** 
 Time in seconds to wait for getting response from the REST call, in the read operation, before the operation gets timed out. Default: 180 seconds. 
 ```<entry key=”maxReadTimeout” value=”200”/>```
 
-maxRetryCount 
+**maxRetryCount** 
 Indicates the number of time read op
 ```<entry key=”maxRetryCount” value=”5”/>```
 
-retryableErrors 
+**retryableErrors** 
 The retryableErrors entry is a list of strings through which the connector searches when it receives a message from the managed application. If one of the strings in the entry exists in the error, the connector attempts to retry the connection.
 ```
 <entry key=”retryableErrors”>
@@ -487,19 +487,34 @@ Final provisioning execution
    - Assign entitlements
 ```
 
-**ProvisioningPlan**
+**ProvisioningPlan**  
 ProvisioningPlan is an object which represents the provisioning request. It contains a list of requested changes to an identity    
 ProvisioningPlan is one object which contains information about what to be provisioned on the target,on which application.    
 Plan contains for which identity and it can hold multiple Account requests. Each account request may contain multiple Attribute requests.  
 
 Basically this defines which Identity the request is created for .. what application account needs to be provisioned in and what all attributes needs to be provisioned.
 
-Recording Provisioning Requests You can create provisioning requests in IdentityIQ using any of the following actions or activities:
-Certifications
-Policy Violations
-Identity-Refresh-Driven Assignments
-Lifecycle Manager Requests
-Lifecycle Event-Driven Provisioning 
+```
+Identity identity = context.getObjectByName(Identity.class, identityName);
+
+ProvisioningPlan plan = new ProvisioningPlan();
+// Set identity to the plan
+plan.setIdentity(identity);
+
+AccountRequest acctReq = new AccountRequest();
+acctReq.setOperation(AccountRequest.Operation.Modify);
+acctReq.setNativeIdentity("nativeIdentity");
+acctReq.setApplication("Application");
+acctReq.add(new AttributeRequest("name", ProvisioningPlan.Operation.Set, "value"));
+plan.add(acctReq);
+```
+
+Recording Provisioning Requests You can create provisioning requests in IdentityIQ using any of the following actions or activities:  
+- Certifications  
+- Policy Violations  
+- Identity-Refresh-Driven Assignments    
+- Lifecycle Manager Requests
+- Lifecycle Event-Driven Provisioning 
 
 Provisioning requests create a provisioning plan that the Provision Broker can analyze and process. In all cases, except certification and policy violation-generated requests, provisioning requests create a Workflow case. The Workflow case manages the processing of the provisioning request based on a defined Workflow
 
