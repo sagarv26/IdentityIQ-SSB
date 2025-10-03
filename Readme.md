@@ -652,11 +652,11 @@ Useful for running custom logic (data fixes, bulk updates, reporting).
 ## Debug Page
 The Debug Page is an internal IdentityIQ tool used by administrators and developers to view, test, and troubleshoot configuration objects and system behavior.
 
-Purpose of the Debug Page
-Inspect and manage IdentityIQ objects (e.g., Identities, Roles, Tasks, Applications).
-Run and test rules, workflows, and forms.
-View log messages and troubleshoot provisioning or aggregation issues.
-Perform quick searches and queries against the IIQ database.
+Purpose of the Debug Page  
+- Inspect and manage IdentityIQ objects (e.g., Identities, Roles, Tasks, Applications).
+- Run and test rules, workflows, and forms.
+- View log messages and troubleshoot provisioning or aggregation issues.
+- Perform quick searches and queries against the IIQ database.
 
 Accessing the Debug Page
 Typically accessed via URL:
@@ -665,11 +665,11 @@ http://<IIQ-Server>/identityiq/debug/debug.jsp
 (Requires admin or sufficient capability permissions.)
 ```
 
-**Common Uses
-Search Objects **→ Quickly look up an identity, role, entitlement, or task.
-Run Rules → Test rule logic directly from the UI.
-About Page → Get application details.
-Reload Logger → Reload log files forcefully.
+**Common Uses**
+- Search Objects → Quickly look up an identity, role, entitlement, or task.
+- Run Rules → Test rule logic directly from the UI.
+- About Page → Get application details.
+- Reload Logger → Reload log files forcefully.
 
 
 > [!NOTE]
@@ -681,16 +681,20 @@ The IIQ Console is a command-line interface (CLI) provided with SailPoint Identi
 ```
 <Installation Path>\WEB-INF\bin > .\iiq console -j
 ```
-**Common Commands**  
-export - Export objects to a file
-rule - Run a rule
-notify - Send an email
-connectorDebug - Call one of the exposed connector methods using the specified application encrypt - Encrypt a string.
-source - runs commands from a script file.
-delete - Delete an object
+**Common Commands** 
+ 
+**export** - Export objects to a file  
+**rule** - Run a rule  
+**notify** - Send an email  
+**connectorDebug** - Call one of the exposed connector methods using the specified application 
+**encrypt** - Encrypt a string.  
+**source** - runs commands from a script file.  
+**delete** - Delete an object  
 
+```
 Redirecting
 get identity Rahul.Dravid > c:\output\rahulDravid.xml
+```
 
 ## Group
 Sets of identities created automatically based on the values of a single identity attribute
@@ -763,7 +767,11 @@ Users and auditors can review archived workitems for evidence of decision-making
 
 General Flow
 ```
-Manage User Access (user submits Role/Entitlement request) → Access Request (IIQ creates AR) → Workitem (approval/review task generated) → Manage User Access (grants/revokes applied to identity) → Workitem Archive (completed record kept for audit)
+Manage User Access (user submits Role/Entitlement request) →
+Access Request (IIQ creates AR) → 
+Workitem (approval/review task generated) → 
+Manage User Access (grants/revokes applied to identity) → 
+Workitem Archive (completed record kept for audit)
 ```
 
 ## Email Template
@@ -842,8 +850,8 @@ Quicklinks in IdentityIQ are shortcut links displayed on the IdentityIQ dashboar
 They provide easy access to common actions and requests, improving user experience.
 
 **Purpose of Quicklinks**
-Simplify navigation for end users.
-Allow one-click access to frequently used features.
+- Simplify navigation for end users.
+- Allow one-click access to frequently used features.
 
 # Form
 A Form in IdentityIQ is a configurable user interface component that collects input from users during workflows, tasks, requests, or approvals.
@@ -919,58 +927,58 @@ The IdentityIQ Object Model uses four key objects in workflows. To work with wor
 ## Workflow Variables
 Workflow variables control approvals, provisioning, notifications, and policy handling in request workflows.
 
-**Flow Control Variables**
-approvalSplitPoint → Splits approvals/provisioning so each entitlement is processed independently.
-optimisticProvisioning → Treats queued provisioning as successful (used in demos/ticket-based systems).
-foregroundProvisioning → Runs provisioning in foreground; used mainly for dev/test/demo.
-doRefresh → Forces identity refresh after request completion.
-identityName → Stores the target identity’s name for the request.
+**Flow Control Variables**  
+- approvalSplitPoint → Splits approvals/provisioning so each entitlement is processed independently.
+- optimisticProvisioning → Treats queued provisioning as successful (used in demos/ticket-based systems).
+- foregroundProvisioning → Runs provisioning in foreground; used mainly for dev/test/demo.
+- doRefresh → Forces identity refresh after request completion.
+- identityName → Stores the target identity’s name for the request.
 
 
-**Policy Checking Variables**
-policyScheme → Defines action if violations are found (none, continue, interactive, fail).
-allowRequestsWithViolations → Lets requesters proceed without fixing violations (only in interactive mode).
-violationReviewDecision → Captures requester’s decision (ignore, remediate, cancel).
-policyViolations → List of violations found, passed into workitems for visibility.
+**Policy Checking Variables**  
+- policyScheme → Defines action if violations are found (none, continue, interactive, fail).
+- allowRequestsWithViolations → Lets requesters proceed without fixing violations (only in interactive mode).
+- violationReviewDecision → Captures requester’s decision (ignore, remediate, cancel).
+- policyViolations → List of violations found, passed into workitems for visibility.
 
 **Approval Control Variables**
-approvalMode → Defines approval flow (serial, parallel, poll, any).
-approvalScheme → Defines who approves (manager, owner, security officer, identity, none).
-fallbackApprover → Backup approver if no valid approver is found.
-approvalSet → Groups approval items for processing.
+- approvalMode → Defines approval flow (serial, parallel, poll, any).
+- approvalScheme → Defines who approves (manager, owner, security officer, identity, none).
+- fallbackApprover → Backup approver if no valid approver is found.
+- approvalSet → Groups approval items for processing.
 
-**Provisioning Control Variables**
-Plan → Holds provisioning plan generated for the request.
-Flow → holds execution flow name.
+**Provisioning Control Variables**  
+- Plan → Holds provisioning plan generated for the request.
+- Flow → holds execution flow name.
 
-**Notification Variables**
-notificationScheme → Who gets notified after request completes (user, requester, manager, security officer, none).
+**Notification Variables**  
+- notificationScheme → Who gets notified after request completes (user, requester, manager, security officer, none).
 
-**Other Workflow Variables**
-Trace → Enables workflow trace logging (useful in debugging).
-Source → Identifies origin of request (UI, API, etc.).
-Project → Stores project metadata linked to the request.
-identityRequestId → Unique ID of the identity request object.
-EmailTemplates → Defines email templates used for notifications.
+**Other Workflow Variables**  
+- Trace → Enables workflow trace logging (useful in debugging).
+- Source → Identifies origin of request (UI, API, etc.).
+- Project → Stores project metadata linked to the request.
+- identityRequestId → Unique ID of the identity request object.
+- EmailTemplates → Defines email templates used for notifications.
 
 ## Lifecycle Event
 Lifecycle Events (LCEs) in IdentityIQ represent key identity-related activities that occur during an employee’s journey in an organization.
 They help automate provisioning, de-provisioning, and access adjustments based on employment changes.
 
-**Common Use Cases**
-**Joiner (New Hire)**
-Provision accounts and assign birthright access automatically.
-Trigger onboarding workflows (e.g., request manager approvals, send welcome notifications).
+**Common Use Cases**  
+**Joiner (New Hire)**  
+- Provision accounts and assign birthright access automatically.
+- Trigger onboarding workflows (e.g., request manager approvals, send welcome notifications).
 
-**Mover (Change in Role/Department/Manager)**
-Recalculate business roles and entitlements.
-Revoke access is no longer required in the new role.
-Grant new access based on updated department, title, or manager.
+**Mover (Change in Role/Department/Manager)**  
+- Recalculate business roles and entitlements.
+- Revoke access is no longer required in the new role.
+- Grant new access based on updated department, title, or manager.
 
-**Leaver (Termination/Exit)**
-Automatically disable or delete user accounts across systems.
-Revoke all entitlements and roles.
-Trigger offboarding workflows (e.g., notify HR, recover assets).
+**Leaver (Termination/Exit)**  
+- Automatically disable or delete user accounts across systems.
+- Revoke all entitlements and roles.
+- Trigger offboarding workflows (e.g., notify HR, recover assets).
 
 # Multithreading and Partitioning
 When IdentityIQ is installed, certain objects are defined that control how partitioned tasks are processed. These include:
