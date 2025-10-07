@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Policy PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Policy certificationActions="Remediated,Mitigated,Delegated" configPage="entitlementPolicy.xhtml" executor="sailpoint.policy.EntitlementSODPolicyExecutor" name="Entitlement SOD" state="Inactive" type="EntitlementSOD" typeKey="policy_type_entitlement_sod" violationOwnerType="Identity">
+  <PolicyAlert disabled="true" escalationStyle="none"/>
+  <Attributes>
+    <Map>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="taskResultId"/>
+    </Map>
+  </Attributes>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <ViolationOwner>
+    <Reference class="sailpoint.object.Identity" name="2020007"/>
+  </ViolationOwner>
+  <GenericConstraints>
+    <GenericConstraint disabled="true" name="new rule" violationOwnerType="None">
+      <Attributes>
+        <Map>
+          <entry key="taskResultId"/>
+        </Map>
+      </Attributes>
+      <IdentitySelector>
+        <MatchExpression>
+          <MatchTerm name="Group" type="Entitlement" value="Admin">
+            <ApplicationRef>
+              <Reference class="sailpoint.object.Application" name="Contractor System Employee"/>
+            </ApplicationRef>
+          </MatchTerm>
+        </MatchExpression>
+      </IdentitySelector>
+      <IdentitySelector>
+        <MatchExpression>
+          <MatchTerm name="Group" type="Entitlement" value="User">
+            <ApplicationRef>
+              <Reference class="sailpoint.object.Application" name="Contractor System Employee"/>
+            </ApplicationRef>
+          </MatchTerm>
+        </MatchExpression>
+      </IdentitySelector>
+    </GenericConstraint>
+    <GenericConstraint name="new rule" violationOwnerType="None">
+      <IdentitySelector>
+        <MatchExpression>
+          <MatchTerm name="Group" type="Entitlement" value="User">
+            <ApplicationRef>
+              <Reference class="sailpoint.object.Application" name="Contractor System Employee"/>
+            </ApplicationRef>
+          </MatchTerm>
+        </MatchExpression>
+      </IdentitySelector>
+      <IdentitySelector>
+        <MatchExpression>
+          <MatchTerm name="Group" type="Entitlement" value="Admin">
+            <ApplicationRef>
+              <Reference class="sailpoint.object.Application" name="Contractor System Employee"/>
+            </ApplicationRef>
+          </MatchTerm>
+        </MatchExpression>
+      </IdentitySelector>
+    </GenericConstraint>
+  </GenericConstraints>
+</Policy>

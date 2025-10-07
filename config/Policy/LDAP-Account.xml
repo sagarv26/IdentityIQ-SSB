@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Policy PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Policy certificationActions="Mitigated,Delegated" configPage="advancedPolicy.xhtml" executor="sailpoint.policy.GenericPolicyExecutor"name="LDAP Account" state="Active" type="Advanced" typeKey="policy_type_advanced" violationOwnerType="Manager">
+  <PolicyAlert disabled="true" escalationStyle="none"/>
+  <Attributes>
+    <Map>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <GenericConstraints>
+    <GenericConstraint name="Requires LDAP account - Please create LDAP Account before submitting request" violationOwnerType="None">
+      <CompensatingControl>Requires LDAP account</CompensatingControl>
+      <RemediationAdvice>Please create LDAP Account before submitting request</RemediationAdvice>
+      <IdentitySelector>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Require LDAP Account Policy Rule"/>
+        </RuleRef>
+      </IdentitySelector>
+    </GenericConstraint>
+  </GenericConstraints>
+</Policy>
