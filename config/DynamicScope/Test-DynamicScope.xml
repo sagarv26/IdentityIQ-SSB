@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE DynamicScope PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<DynamicScope name="Test DynamicScope">
+  <Description></Description>
+  <Exclusions>
+    <Reference class="sailpoint.object.Identity" name="2020005"/>
+  </Exclusions>
+  <Inclusions>
+    <Reference class="sailpoint.object.Identity" name="2020006"/>
+  </Inclusions>
+  <PopulationRequestAuthority>
+    <MatchConfig enableAttributeControl="true">
+      <IdentityAttributeFilterControl displayName="EmployeeType" name="employeeType"/>
+    </MatchConfig>
+  </PopulationRequestAuthority>
+  <Selector>
+    <IdentitySelector>
+      <MatchExpression>
+        <MatchTerm name="city" type="Entitlement" value="Bengaluru"/>
+      </MatchExpression>
+    </IdentitySelector>
+  </Selector>
+</DynamicScope>

@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule  name="Entitlement Request Selector Rule" type="RequestObjectSelector">
+<ReferencedRules>
+    <Reference class="sailpoint.object.Rule"  name="Rule Library"/>
+  </ReferencedRules>
+  <Description>Request Object Selector Rules are used by the Life Cycle Manager to determine the Objects that can be requested by a given user on a given population.  For bulk request this rule is run twice.  The first time the result determines which applications are shown to the requestor.  The second time the result determines whether or not the specified requestee has access to the object.  On the first execution the requestee is always null, so the rule needs to expect and handle that case in order to be usable for bulk requests.</Description>
+  <Signature returnType="sailpoint.object.QueryInfo">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="requestor" type="sailpoint.object.Identity">
+        <Description>
+          Identity that is making the Life Cycle Manager request.
+        </Description>
+      </Argument>
+      <Argument name="requestee" type="sailpoint.object.Identity">
+        <Description>
+          Identity on whose behalf the Life Cycle Manager request is being made.  In the case of bulk requests,
+          this argument will be set to null when determining the roles that are visible to the requestor.
+          It will be provided once a selection has been made in order to determine whether or not the given requestee
+          should have access to the selected role.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="filter">
+        <Description>
+          A Filter object that will be used to search for accessible request objects.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+  <![CDATA[
+  import java.util.List;
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+  import sailpoint.api.ScopeService;
+  import sailpoint.object.QueryInfo;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Filter;
+
+  Log log = LogFactory.getLog("com.swe.rap.sweEntitlementSelectorRule");
+  log.info("Enter swe Entitlement Request Selector Rule");
+  
+  List filterList = new ArrayList();
+  Filter customFilter ;
+
+  String customObjectName = "SWE Exclude Entitlements Custom Object";
+  String entryKeyValue = "excludeEntitlementsForSystemAccounts";
+  
+  //If the requestee is of sweAccountType "System", the entitlements values present in the "SWE Exclude Entitlements Custom Object" under  "excludeEntitlementsForSystemAccounts" should be made non-requestable.
+  
+  if( requestee != null  && "System".equals( requestee.getAttribute( "sweAccountType" ) ) ) {
+
+      Custom customObject = context.getObjectByName( Custom.class, customObjectName );
+
+      if( customObject != null ) {
+		  
+		  List entitlementList = (List) customObject.get( entryKeyValue );
+	 
+		  if( entitlementList != null && !entitlementList.isEmpty() ) {
+		 
+			for( String entitlementValue : entitlementList ) {      
+		
+				String[] arrayValue = entitlementValue.split("~");
+            
+				customFilter = Filter.and(Filter.eq("application.name",arrayValue[0]),Filter.eq("attribute",arrayValue[1]),Filter.eq("value",arrayValue[2]));
+
+				filterList.add( customFilter );
+			}	
+        
+		  customFilter = Filter.not( Filter.or(filterList) );
+		  log.info("Exit swe Entitlement Request Selector Rule");
+		  return customFilter;
+		  
+		  }
+	 }
+  }
+
+  log.info("Exit swe Entitlement Request Selector Rule");
+  return new QueryInfo(null, false);
+  ]]>
+
+  </Source>
+</Rule>

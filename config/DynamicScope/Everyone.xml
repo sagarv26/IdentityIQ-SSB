@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE DynamicScope PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<DynamicScope allowAll="true" name="Everyone">
+  <ManagedAttributeRequestControl>
+    <Reference class="sailpoint.object.Rule" name="Entitlement Request Selector Rule"/>
+  </ManagedAttributeRequestControl>
+  <PopulationRequestAuthority>
+    <MatchConfig customControl="!(inactive == true)" enableCustomControl="true"/>
+  </PopulationRequestAuthority>
+  <RoleRequestControl>
+    <Reference class="sailpoint.object.Rule" name="Role Request Authority Rule"/>
+  </RoleRequestControl>
+</DynamicScope>
