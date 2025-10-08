@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE ServiceDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<ServiceDefinition hosts="global" name="Request">
+	<Description>
+	Service definition for the Request processor service.
+    </Description>
+</ServiceDefinition>

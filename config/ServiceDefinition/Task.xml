@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE ServiceDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<ServiceDefinition hosts="global" name="Task">
+	<Description>
+	Service definition for the Task scheduler service.  
+    </Description>
+</ServiceDefinition>
