@@ -963,34 +963,13 @@ The Provisioning Engine sends multiple requests (T1, T2, …) over dedicated TCP
 Connector Gateway forwards requests sequentially to the Mainframe Connector, maintaining persistent socket channels secured via DES, 3DES, or TLS.
 Mainframe Connector executes requests (aggregation, provisioning, role/entitlement updates, password management) and sends responses back to update IdentityIQ/IdentityNow; intercept functionality is supported only in IdentityIQ.
 
+# Database
 
-## Business Processes (Workflows)
+# IdentityIQ REST API Integration
 
-## IIQ Console
+# Plugins
 
-## Database
+# Account Correlation
 
-## Groups
-
-## Roles
-
-## [Reports](https://youtu.be/CJQJPFwoRHU?si=MsCXfO_eqbeF9RFi)
-
-## Policy
-
-## [Workitem](https://youtu.be/q2U2b0o0b1E?si=NPX91elAzhBjJlWA)
-
-## [Certifications](https://youtu.be/WUZTVFwDA_k?si=I_2T9Oi2Xfqk5Uk2)
-
-## [QuickLink](https://youtu.be/98jTMXuHlu0?si=mufI3zmCauRq1e3U)
-
-## Services Standard Deployment
-
-## [IdentityIQ REST API Integration](https://youtu.be/aJwBlzkN-Sw?si=7Cg4XAQyhyMTtW5f)
-
-## Plugins
-
-## [Account Correlation](https://youtu.be/p4HzMUgPRcs?si=aIC-ax9q2XNRGZQk)
-
-## BeanShell
+# BeanShell
 
