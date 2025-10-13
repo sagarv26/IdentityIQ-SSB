@@ -177,22 +177,7 @@ Reference: https://community.sailpoint.com/t5/Deployment-Accelerator-Knowledge/I
 > [!NOTE]
 > All configuration will reflect in System Configuration File
 
-
-## Basics of IIQ
-
-## Identity Warehouse
-
-## Debug
-
-## Advance Analytics
-
-## Tasks
-
 ## Rules
-
-## Forms
-
-## Email Template
 
 ## Application Onboarding
 Application Onboarding
@@ -715,6 +700,9 @@ The Email Template XML consists of an element with a set of attributes and neste
 **Apache Velocity**  
 IdentityIQ email templates are processed through an open-source engine called Apache Velocity. Velocity is a Java-based template engine that allows web page designers to reference methods defined in Java code. IdentityIQ email templates make use of the Velocity Template Language to dynamically specify the email messages' contents and generate custom email messages specific to the recipient, work item, and action involved. 
 
+## Identity Warehouse
+
+## Advance Analytics
 
 # Policy
 A Policy Violation occurs in IIQ when a user’s access breaks a defined compliance or security rule.
