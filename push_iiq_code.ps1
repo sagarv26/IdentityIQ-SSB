@@ -35,12 +35,11 @@ git add .
 $status = git status --porcelain
 
 if (-not $status) {
-    Write-Host "No changes to commit." -ForegroundColor Yellow
-    exit
+    Write-Host "No new changes to commit. Attempting push..." -ForegroundColor Yellow
+} else {
+    git commit -m "$commitMessage"
 }
 
-# Commit
-git commit -m "$commitMessage"
 
 # Push (first push will create branch)
 git push -u origin main
