@@ -1,3 +1,4 @@
+# Powershell script to push changes to repo
 # Default repository link
 $repoLink = "https://github.com/sagarv26/IdentityIQ-SSB.git"
 
