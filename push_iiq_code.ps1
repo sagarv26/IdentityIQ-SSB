@@ -7,15 +7,18 @@ $commitMessage = Read-Host "Enter commit message"
 # Navigate to your project folder
 Set-Location "E:\IIQ-SSD\"
 
-# Ensure Git credential manager is enabled
+# Enable credential manager
 git config --global credential.helper manager
 
-# Initialize repo if not already initialized
+# Initialize repo if not exists
 if (!(Test-Path ".git")) {
     git init
 }
 
-# Check if remote exists
+# Ensure branch is main (safe for old Git too)
+git branch -M main
+
+# Set remote
 $remoteExists = git remote
 
 if ($remoteExists -notcontains "origin") {
@@ -27,7 +30,7 @@ if ($remoteExists -notcontains "origin") {
 # Add files
 git add .
 
-# Check if there are changes to commit
+# Check for changes
 $status = git status --porcelain
 
 if (-not $status) {
@@ -35,15 +38,8 @@ if (-not $status) {
     exit
 }
 
-# Commit changes
+# Commit
 git commit -m "$commitMessage"
 
-# Detect current branch
-$branch = git branch --show-current
-
-if (-not $branch) {
-    $branch = "main"
-}
-
-# Push to repo
-git push -u origin $branch
+# Push (first push will create branch)
+git push -u origin main
