@@ -372,6 +372,8 @@ The LDAP connector was developed using the LDAP RFC. The LDAP Connector must plu
 
 ### Webservice
 
+### LogiPlex
+
 # Provisioning
 The IdentityIQ provisioning capabilities help companies manage system access for their personnel. Provisioning requests can be created and processed in several ways in IdentityIQ, based on the needs and configuration of the installation. In many cases, modifications to access or entitlements you request in IdentityIQ can be automatically reflected in the associated native applications.  
 
@@ -969,7 +971,4 @@ Mainframe Connector executes requests (aggregation, provisioning, role/entitleme
 
 # Plugins
 
-# Account Correlation
-
-# BeanShell
 
