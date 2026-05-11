@@ -127,6 +127,39 @@
 		
 		return s.substring(s, length - 1) + ++c;
 	}
+	
+	
+	public static void createAccessDisablementWorkItem(Identity identity,String workitemOwner, String application) throws GeneralException {
+		WorkItem item = new WorkItem();  
+		item.setType(WorkItem.Type.ManualAction);  
+		item.setOwner(context.getObjectByName(Identity.class, workitemOwner));
+		item.setRequester(context.getObjectByName(Identity.class, "spadmin"));
+		Sequencer sequencer = new Sequencer();  
+		item.setName(sequencer.generateId(context, item));  
+		item.setRenderer("lcmManualActionsRenderer.xhtml");  
+		item.setLevel(WorkItem.Level.Normal);  
+		item.setTarget(identity);  
+		item.setTargetClass(Identity.class.getName());  
+		item.setDescription("Application Access Disablement for "+identity.getDisplayableName());  
+		String cid = identity.getAttribute("cnaid");
+		item.setHandler("sailpoint.api.Workflower");  
+		sailpoint.object.Attributes attributes = new sailpoint.object.Attributes();  
+		item.setAttributes(attributes);  
+		ApprovalSet approvalSet = new ApprovalSet();
+		ApprovalItem approvalItem = new ApprovalItem();  
+		approvalItem.setApplication(application);  
+		approvalItem.setNativeIdentity(cid);  
+		approvalItem.setOperation("Disable");  
+		approvalItem.setValue("Disable user "+ cid);  
+		approvalSet.add(approvalItem);
+
+		attributes.put("approvalSet", approvalSet);  
+		attributes.put("identityDisplayName", identity.getDisplayableName());  
+		attributes.put("identityName", identity.getName());  
+		context.startTransaction();  
+		context.saveObject(item);  
+		context.commitTransaction();
+	}
 
 	</Source>
 </Rule>
